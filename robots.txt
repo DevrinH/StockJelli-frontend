@@ -1,1 +1,3 @@
-Sitemap: https://stockjelli.com/sitemap.xml
+User-agent: *
+Allow: /
+https://stockjelli.com/sitemap.xml

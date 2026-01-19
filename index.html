@@ -37,48 +37,96 @@
 
       <!-- Hero -->
       <section class="hero">
-        <div class="container">
-          <h1>Clean momentum.<br>No noise.</h1>
-          <p>
-            A simple momentum stock screener. Free to use. Optional $5 a month alerts.
-          </p>
+        <div class="container hero-grid">
+          <div class="hero-left">
+            <h1>Clean momentum.<br>No noise.</h1>
+            <p>
+              A simple momentum stock screener. Free to use. Optional $5 a month alerts.
+            </p>
+      
+            <div class="hero-metrics">
+              <div class="metric">
+                <div class="metric-label">Scan</div>
+                <div class="metric-value">Top movers</div>
+              </div>
+              <div class="metric">
+                <div class="metric-label">Filter</div>
+                <div class="metric-value">No overload</div>
+              </div>
+              <div class="metric">
+                <div class="metric-label">Act</div>
+                <div class="metric-value">Alerts (optional)</div>
+              </div>
+            </div>
+          </div>
+      
+          <div class="hero-right">
+            <div class="chart-card" aria-label="Momentum chart preview">
+              <div class="chart-head">
+                <div class="chart-title">Momentum preview</div>
+                <div class="chart-pill">+12.4%</div>
+              </div>
+      
+              <!-- SVG line chart with gradient fill -->
+              <svg class="spark" viewBox="0 0 600 260" preserveAspectRatio="none" role="img" aria-label="Line chart">
+                <defs>
+                  <linearGradient id="fillGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="rgba(77,163,255,0.45)" />
+                    <stop offset="100%" stop-color="rgba(77,163,255,0.00)" />
+                  </linearGradient>
+      
+                  <linearGradient id="lineGrad" x1="0" y1="0" x2="1" y2="0">
+                    <stop offset="0%" stop-color="rgba(77,163,255,0.90)" />
+                    <stop offset="100%" stop-color="rgba(74,222,128,0.90)" />
+                  </linearGradient>
+                </defs>
+      
+                <!-- subtle grid -->
+                <g class="spark-grid">
+                  <line x1="0" y1="50" x2="600" y2="50" />
+                  <line x1="0" y1="110" x2="600" y2="110" />
+                  <line x1="0" y1="170" x2="600" y2="170" />
+                  <line x1="0" y1="230" x2="600" y2="230" />
+                </g>
+      
+                <!-- area fill -->
+                <path class="spark-fill"
+                  d="M0,210
+                     C60,200 90,185 120,190
+                     C170,198 195,140 240,150
+                     C290,160 310,120 350,110
+                     C390,100 430,130 470,95
+                     C510,70 540,90 600,50
+                     L600,260 L0,260 Z" />
+      
+                <!-- line -->
+                <path class="spark-line"
+                  d="M0,210
+                     C60,200 90,185 120,190
+                     C170,198 195,140 240,150
+                     C290,160 310,120 350,110
+                     C390,100 430,130 470,95
+                     C510,70 540,90 600,50" />
+      
+                <!-- last point glow -->
+                <circle class="spark-dot" cx="600" cy="50" r="6" />
+              </svg>
+      
+              <div class="chart-foot">
+                <div class="foot-item">
+                  <span class="muted">Trend</span>
+                  <span class="foot-strong">Up</span>
+                </div>
+                <div class="foot-item">
+                  <span class="muted">Signal</span>
+                  <span class="foot-strong">Volume + momentum</span>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
-
-      <!-- Screener -->
-      <section class="screener" id="screener">
-        <div class="container">
-          <div class="section-head">
-            <h2>Momentum Stocks (Preview)</h2>
-            <span class="badge">Updates every minute</span>
-          </div>
-
-          <div class="table-wrap">
-            <table>
-              <thead>
-                <tr>
-                  <th>Ticker</th>
-                  <th>Price</th>
-                  <th>% Change Today</th>
-                  <th>Volume</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td class="ticker">ASTS</td>
-                  <td>$18.42</td>
-                  <td class="up">+9.8%</td>
-                  <td>12.4M</td>
-                </tr>
-                <tr>
-                  <td class="ticker">AMD</td>
-                  <td>$142.10</td>
-                  <td class="up">+4.1%</td>
-                  <td>48.9M</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+      
 
           <!-- Filters (clean) -->
           <div class="filters" id="filters">

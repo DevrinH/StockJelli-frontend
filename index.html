@@ -87,75 +87,110 @@
                 <h3>Filters</h3>
                 <p class="muted">Reduce noise. Keep it fast.</p>
               </div>
-
+          
               <div class="filters-actions">
                 <button class="btn btn-primary" type="button">Apply</button>
                 <button class="btn btn-ghost" type="button">Reset</button>
               </div>
             </div>
-
-            <div class="filters-grid">
-              <!-- Market Cap -->
+          
+            <div class="filters-grid-2x2">
+              <!-- Row 1: Market Cap -->
               <div class="filter-card">
-                <div class="filter-top">
+                <div class="filter-title-row">
                   <label class="filter-title" for="mcapRange">Market Cap (Max)</label>
-                  <div class="pill">$<input class="num" type="number" value="50" min="1" max="5000" />B</div>
                 </div>
-                <input id="mcapRange" class="slider" type="range" min="1" max="5000" value="50" />
+          
+                <div class="filter-control-row">
+                  <input id="mcapRange" class="slider" type="range" min="1" max="5000" value="50" />
+                  <div class="pill">
+                    $<input class="num" type="number" value="50" min="1" max="5000" />B
+                  </div>
+                </div>
+          
                 <div class="filter-meta">
                   <span class="muted">Min</span><span class="muted">$0.3B</span>
                 </div>
               </div>
-
-              <!-- Price -->
+          
+              <!-- Row 1: Price Cap -->
               <div class="filter-card">
-                <div class="filter-top">
+                <div class="filter-title-row">
                   <label class="filter-title" for="priceRange">Price (Max)</label>
-                  <div class="pill">$<input class="num" type="number" value="300" min="1" max="5000" /></div>
                 </div>
-                <input id="priceRange" class="slider" type="range" min="1" max="5000" value="300" />
+          
+                <div class="filter-control-row">
+                  <input id="priceRange" class="slider" type="range" min="1" max="5000" value="300" />
+                  <div class="pill">
+                    $<input class="num" type="number" value="300" min="1" max="5000" />
+                  </div>
+                </div>
+          
                 <div class="filter-meta">
                   <span class="muted">Min</span><span class="muted">$2.50</span>
                 </div>
               </div>
-
-              <!-- Volume -->
+          
+              <!-- Row 2: Volume -->
               <div class="filter-card">
-                <div class="filter-top">
+                <div class="filter-title-row">
                   <label class="filter-title" for="volRange">Volume (Min)</label>
-                  <div class="pill"><input class="num" type="number" value="1000000" min="0" step="100000" />+</div>
                 </div>
-                <input id="volRange" class="slider" type="range" min="0" max="50000000" value="1000000" step="100000" />
+          
+                <div class="filter-control-row">
+                  <input id="volRange" class="slider" type="range" min="0" max="50000000" value="1000000" step="100000" />
+                  <div class="pill">
+                    <input class="num num-wide" type="number" value="1000000" min="0" step="100000" />+
+                  </div>
+                </div>
+          
                 <div class="filter-meta">
                   <span class="muted">0</span><span class="muted">50M</span>
                 </div>
               </div>
-
-              <!-- News toggle -->
+          
+              <!-- Row 2: Catalyst (checkboxes) -->
               <div class="filter-card">
-                <div class="filter-top">
+                <div class="filter-title-row">
                   <span class="filter-title">Catalyst</span>
-                  <span class="pill">Quality</span>
                 </div>
-
-                <label class="toggle">
-                  <input type="checkbox" checked />
-                  <span class="toggle-ui"></span>
-                  <span class="toggle-text">News required</span>
-                </label>
-
+          
+                <div class="checklist">
+                  <label class="check">
+                    <input type="checkbox" checked />
+                    <span class="check-ui"></span>
+                    <span class="check-text">News required</span>
+                  </label>
+          
+                  <label class="check">
+                    <input type="checkbox" />
+                    <span class="check-ui"></span>
+                    <span class="check-text">Unusual volume</span>
+                  </label>
+          
+                  <label class="check">
+                    <input type="checkbox" />
+                    <span class="check-ui"></span>
+                    <span class="check-text">High float rotation</span>
+                  </label>
+          
+                  <label class="check">
+                    <input type="checkbox" />
+                    <span class="check-ui"></span>
+                    <span class="check-text">Earnings / guidance</span>
+                  </label>
+                </div>
+          
                 <div class="divider"></div>
-
-                <div class="chips">
-                  <button class="chip chip-on" type="button">All</button>
-                  <button class="chip" type="button">Pre-market</button>
-                  <button class="chip" type="button">Market</button>
-                  <button class="chip" type="button">After</button>
+          
+                <div class="filter-meta">
+                  <span class="muted">Tip</span>
+                  <span class="muted">Use 1–2 checks max</span>
                 </div>
               </div>
             </div>
           </div>
-
+          
           <!-- Banner ad slot between filters and pricing -->
           <div class="ad-banner" aria-label="Advertisement">
             <div class="ad-box ad-box-banner">

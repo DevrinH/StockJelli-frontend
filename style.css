@@ -270,6 +270,38 @@
     margin-top: 8px;
     font-size: 0.78rem;
   }
+  /* 2x2 filters grid */
+.filters-grid-2x2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-top: 14px;
+  }
+  
+  @media (max-width: 900px) {
+    .filters-grid-2x2 {
+      grid-template-columns: 1fr;
+    }
+  }
+  
+  .filter-title-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+  
+  /* Slider left, number right */
+  .filter-control-row {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 12px;
+    align-items: center;
+  }
+  
+  .num-wide {
+    width: 120px;
+  }
   
   /* Toggle */
   .toggle {
@@ -457,5 +489,60 @@
     justify-content: space-between;
     gap: 14px;
     font-size: 0.85rem;
+  }
+  /* Checklist */
+.checklist {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  
+  @media (max-width: 520px) {
+    .checklist {
+      grid-template-columns: 1fr;
+    }
+  }
+  
+  .check {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    user-select: none;
+  }
+  
+  .check input {
+    display: none;
+  }
+  
+  .check-ui {
+    width: 18px;
+    height: 18px;
+    border-radius: 6px;
+    border: 1px solid #1c2330;
+    background: #121826;
+    position: relative;
+  }
+  
+  .check input:checked + .check-ui {
+    border-color: rgba(77, 163, 255, 0.55);
+    background: rgba(77, 163, 255, 0.18);
+  }
+  
+  .check input:checked + .check-ui::after {
+    content: "";
+    position: absolute;
+    left: 5px;
+    top: 2px;
+    width: 5px;
+    height: 9px;
+    border: solid #4da3ff;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+  }
+  
+  .check-text {
+    color: #cfd6e0;
+    font-size: 0.92rem;
   }
   

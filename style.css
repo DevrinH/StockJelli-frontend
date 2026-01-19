@@ -11,10 +11,11 @@
   
   /* Narrower content so there's room for side ads */
   .container {
-    width: 56%;
-    max-width: 980px;
+    width: 82%;
+    max-width: 1400px;
     margin: 0 auto;
   }
+  
   
   /* Responsive: collapse ad rails and widen content on smaller screens */
   @media (max-width: 1200px) {

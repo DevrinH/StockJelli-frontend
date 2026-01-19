@@ -9,62 +9,262 @@
     color: #e6e8eb;
   }
   
+  /* Content width */
+  .container {
+    width: 70%;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  
+  /* Make it usable on mobile */
+  @media (max-width: 900px) {
+    .container {
+      width: 92%;
+    }
+  }
+  
+  /* Header */
   .header {
-    padding: 20px 40px;
+    padding: 18px 0;
     border-bottom: 1px solid #1c2330;
+    background: rgba(11, 15, 20, 0.75);
+    backdrop-filter: blur(10px);
+  }
+  
+  .header-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
   }
   
   .logo {
-    font-size: 1.4rem;
-    font-weight: 700;
+    font-size: 1.25rem;
+    font-weight: 750;
+    letter-spacing: 0.2px;
   }
   
   .logo span {
     color: #4da3ff;
   }
   
+  .nav a {
+    color: #9aa4b2;
+    text-decoration: none;
+    margin-left: 18px;
+    font-size: 0.95rem;
+  }
+  
+  .nav a:hover {
+    color: #ffffff;
+  }
+  
+  /* Hero */
   .hero {
-    padding: 80px 40px;
-    max-width: 800px;
+    padding: 84px 0 48px;
   }
   
   .hero h1 {
     font-size: 3rem;
+    line-height: 1.05;
+    margin: 0 0 16px 0;
   }
   
   .hero p {
+    margin: 0;
+    font-size: 1.15rem;
     color: #b2bac5;
-    font-size: 1.2rem;
+    max-width: 720px;
   }
   
+  /* Sections */
   .screener {
-    padding: 40px;
+    padding: 34px 0 70px;
+  }
+  
+  .section-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+  
+  .section-head h2 {
+    margin: 0;
+    font-size: 1.35rem;
+  }
+  
+  .badge {
+    font-size: 0.8rem;
+    color: #a9b3c2;
+    border: 1px solid #1c2330;
+    padding: 6px 10px;
+    border-radius: 999px;
+    background: #0f1522;
+  }
+  
+  /* Table */
+  .table-wrap {
+    background: #121826;
+    border: 1px solid #1c2330;
+    border-radius: 14px;
+    overflow: hidden;
   }
   
   table {
     width: 100%;
     border-collapse: collapse;
-    background: #121826;
   }
   
   th, td {
-    padding: 12px;
+    padding: 14px 14px;
     border-bottom: 1px solid #1c2330;
+    text-align: left;
   }
   
   th {
     color: #8b95a5;
     font-size: 0.8rem;
+    font-weight: 650;
+  }
+  
+  tbody tr:hover {
+    background: rgba(255, 255, 255, 0.02);
+  }
+  
+  .ticker {
+    font-weight: 700;
+    letter-spacing: 0.2px;
   }
   
   .up {
     color: #4ade80;
+    font-weight: 700;
   }
   
-  footer {
-    padding: 20px 40px;
-    border-top: 1px solid #1c2330;
+  /* Filters */
+  .filters {
+    margin-top: 18px;
+    padding: 18px;
+    background: #0f1522;
+    border: 1px solid #1c2330;
+    border-radius: 14px;
+  }
+  
+  .filters-head h3 {
+    margin: 0 0 6px 0;
+    font-size: 1.05rem;
+  }
+  
+  .muted {
     color: #8b95a5;
+  }
+  
+  .filters-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-top: 14px;
+  }
+  
+  @media (max-width: 900px) {
+    .filters-grid {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+  
+  @media (max-width: 520px) {
+    .filters-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+  
+  .filter label {
+    display: block;
     font-size: 0.8rem;
+    color: #9aa4b2;
+    margin-bottom: 6px;
+  }
+  
+  select {
+    width: 100%;
+    padding: 10px 10px;
+    background: #121826;
+    color: #e6e8eb;
+    border: 1px solid #1c2330;
+    border-radius: 10px;
+    outline: none;
+  }
+  
+  select:focus {
+    border-color: #4da3ff;
+  }
+  
+  /* Buttons */
+  .filters-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 14px;
+  }
+  
+  .btn {
+    border: 1px solid #1c2330;
+    border-radius: 12px;
+    padding: 10px 14px;
+    font-size: 0.95rem;
+    cursor: pointer;
+  }
+  
+  .btn-primary {
+    background: #4da3ff;
+    color: #0b0f14;
+    border-color: transparent;
+    font-weight: 700;
+  }
+  
+  .btn-primary:hover {
+    opacity: 0.92;
+  }
+  
+  .btn-ghost {
+    background: transparent;
+    color: #d7dbe2;
+  }
+  
+  .btn-ghost:hover {
+    background: rgba(255,255,255,0.06);
+  }
+  
+  /* Pricing / CTA */
+  .pricing {
+    padding: 44px 0;
+    border-top: 1px solid #1c2330;
+    background: #0f1522;
+  }
+  
+  .pricing-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+  }
+  
+  .pricing h2 {
+    margin: 0 0 8px 0;
+    font-size: 1.35rem;
+  }
+  
+  /* Footer */
+  .footer {
+    padding: 18px 0;
+    border-top: 1px solid #1c2330;
+  }
+  
+  .footer-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    font-size: 0.85rem;
   }
   

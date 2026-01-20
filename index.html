@@ -11,29 +11,26 @@
 
   <!-- Header -->
   <header class="header">
-    <div class="container header-inner">
-      <div class="logo">
-        <img src="StockJelli (5).png" alt="StockJelli logo" class="logo-mark" />
-        
+    <div class="header-bar">
+      <!-- LEFT: logo -->
+      <a class="brand" href="/" aria-label="StockJelli home">
+        <img src="StockJelli.png" alt="StockJelli" class="brand-logo" />
+      </a>
+  
+      <!-- CENTER: market status -->
+      <div class="market-strip" aria-label="Market overview">
+        <span class="market up">NASDAQ <span class="market-val">+1.24%</span></span>
+        <span class="market-divider">|</span>
+        <span class="market down">S&amp;P 500 <span class="market-val">−0.31%</span></span>
       </div>
-      
-      <div class="market-status">
-        <span class="market-item up">
-          NASDAQ <strong>+1.24%</strong>
-        </span>
-        <span class="divider">|</span>
-        <span class="market-item down">
-          S&P 500 <strong>−0.31%</strong>
-        </span>
-      </div>
-      
-      <nav class="nav">
+  
+      <!-- RIGHT: nav -->
+      <nav class="header-nav">
         <a href="#screener">Screener</a>
-        <a href="#filters">Filters</a>
-        <a href="#pricing">Alerts</a>
       </nav>
     </div>
   </header>
+  
 
   <!-- Page layout with side ad rails -->
   <main class="page">

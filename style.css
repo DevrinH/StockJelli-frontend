@@ -26,20 +26,73 @@
   }
   
   /* Header */
-  .header {
+  .header{
     position: sticky;
     top: 0;
-    z-index: 1000;
+    z-index: 50;
+    background: linear-gradient(180deg, rgba(10,15,25,0.92), rgba(10,15,25,0.78));
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
   
-    padding: 14px 0; /* ← THIS is the key fix */
+  /* full width bar */
+  .header-bar{
+    height: 72px;                 /* padding back */
+    display: grid;
+    grid-template-columns: auto 1fr auto; /* left / center / right */
+    align-items: center;
+    padding: 0 28px;              /* edge padding */
+  }
   
-    background: linear-gradient(
-      180deg,
-      rgba(20, 28, 45, 0.98),
-      rgba(20, 28, 45, 0.90)
-    );
+  /* LEFT */
+  .brand{
+    display: inline-flex;
+    align-items: center;
+    justify-content: flex-start;
+    min-width: 0;
+  }
+  .brand-logo{
+    height: 34px;
+    width: auto;
+    display: block;
+  }
   
-    backdrop-filter: blur(10px);
+  /* CENTER: hard centered regardless of left/right widths */
+  .market-strip{
+    justify-self: center;
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    font-weight: 700;
+    letter-spacing: 0.2px;
+    font-size: 14px;
+    opacity: 0.95;
+  }
+  
+  .market{ display: inline-flex; gap: 6px; align-items: baseline; }
+  .market-val{ font-weight: 800; }
+  
+  .market-divider{
+    opacity: 0.35;
+  }
+  
+  /* up/down colors (match your theme) */
+  .market.up{ color: rgba(62,240,143,0.95); }
+  .market.down{ color: rgba(255,99,99,0.95); }
+  
+  /* RIGHT */
+  .header-nav{
+    justify-self: end;
+    display: flex;
+    gap: 18px;
+  }
+  .header-nav a{
+    color: rgba(255,255,255,0.70);
+    text-decoration: none;
+    font-weight: 600;
+  }
+  .header-nav a:hover{
+    color: rgba(255,255,255,0.92);
   }
   
   

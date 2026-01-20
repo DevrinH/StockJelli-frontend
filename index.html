@@ -212,7 +212,8 @@
               Alerts only fire when strict momentum criteria are met. No spam. No hype.
             </p>
           </div>
-          <button class="btn btn-primary">Enable Alerts</button>
+          <button class="btn btn-primary" id="enableAlertsBtn">Enable Alerts</button>
+
         </div>
       </section>
 
@@ -235,6 +236,142 @@
       </div>
     </aside>
   </main>
+
+  <!-- Alerts Modal -->
+<div class="modal-overlay" id="alertsModal" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <button class="modal-close" type="button" id="closeModalBtn" aria-label="Close">
+        ✕
+      </button>
+  
+      <div class="modal-header">
+        <div class="modal-kicker">StockJelli Alerts</div>
+        <h2 class="modal-title" id="modalTitle">Enable alerts in 60 seconds</h2>
+        <p class="modal-subtitle muted">
+          No spam. Strict criteria only. Email alerts in v1.
+        </p>
+      </div>
+  
+      <!-- Steps -->
+      <div class="steps">
+        <div class="step-dot step-active" data-step="1">1</div>
+        <div class="step-line"></div>
+        <div class="step-dot" data-step="2">2</div>
+        <div class="step-line"></div>
+        <div class="step-dot" data-step="3">3</div>
+      </div>
+  
+      <!-- Step 1 -->
+      <section class="modal-step" data-step="1">
+        <div class="card">
+          <h3 class="card-title">Sign in</h3>
+          <p class="muted card-sub">
+            Save your alert preferences and subscription status.
+          </p>
+  
+          <button class="btn btn-primary btn-wide" type="button" id="googleSignInBtn">
+            Continue with Google
+          </button>
+  
+          <p class="fineprint muted">
+            (Placeholder for now — we’ll wire Google OAuth on DigitalOcean later.)
+          </p>
+        </div>
+  
+        <div class="modal-actions">
+          <button class="btn btn-primary" type="button" id="toStep2Btn">Next</button>
+        </div>
+      </section>
+  
+      <!-- Step 2 -->
+      <section class="modal-step" data-step="2" hidden>
+        <div class="card">
+          <h3 class="card-title">Choose your alerts</h3>
+          <p class="muted card-sub">
+            Start simple. You can change this later.
+          </p>
+  
+          <div class="form-grid">
+            <div class="form-group">
+              <label class="form-label">Preset</label>
+              <div class="segmented" id="presetControl">
+                <button class="segmented-btn segmented-on" type="button" data-value="balanced">Balanced</button>
+                <button class="segmented-btn" type="button" data-value="conservative">Conservative</button>
+                <button class="segmented-btn" type="button" data-value="aggressive">Aggressive</button>
+              </div>
+              <p class="hint muted" id="presetHint">Default: best signal-to-noise.</p>
+            </div>
+  
+            <div class="form-group">
+              <label class="form-label">Session</label>
+              <div class="segmented" id="sessionControl">
+                <button class="segmented-btn segmented-on" type="button" data-value="market">Market</button>
+                <button class="segmented-btn" type="button" data-value="premarket">Pre-market</button>
+                <button class="segmented-btn" type="button" data-value="afterhours">After-hours</button>
+              </div>
+              <p class="hint muted">Market hours is usually enough for v1.</p>
+            </div>
+  
+            <div class="form-group">
+              <label class="form-label">Delivery</label>
+              <div class="pill pill-static">Email (v1)</div>
+              <p class="hint muted">Push + SMS later. Keep it clean.</p>
+            </div>
+          </div>
+        </div>
+  
+        <div class="modal-actions">
+          <button class="btn btn-ghost" type="button" id="backToStep1Btn">Back</button>
+          <button class="btn btn-primary" type="button" id="toStep3Btn">Continue</button>
+        </div>
+      </section>
+  
+      <!-- Step 3 -->
+      <section class="modal-step" data-step="3" hidden>
+        <div class="card">
+          <h3 class="card-title">Subscribe — $5/month</h3>
+          <p class="muted card-sub">
+            Cancel anytime. Subscription unlocks alerts + preference saving.
+          </p>
+  
+          <div class="checkout-box">
+            <div class="checkout-row">
+              <span class="muted">Plan</span>
+              <span class="strong">StockJelli Alerts</span>
+            </div>
+            <div class="checkout-row">
+              <span class="muted">Price</span>
+              <span class="strong">$5 / month</span>
+            </div>
+            <div class="checkout-row">
+              <span class="muted">Your preset</span>
+              <span class="strong" id="summaryPreset">Balanced</span>
+            </div>
+            <div class="checkout-row">
+              <span class="muted">Session</span>
+              <span class="strong" id="summarySession">Market</span>
+            </div>
+          </div>
+  
+          <button class="btn btn-primary btn-wide" type="button" id="stripeCheckoutBtn">
+            Subscribe with Stripe
+          </button>
+  
+          <p class="fineprint muted">
+            (Placeholder for now — next phase wires Stripe Checkout + webhook.)
+          </p>
+        </div>
+  
+        <div class="modal-actions">
+          <button class="btn btn-ghost" type="button" id="backToStep2Btn">Back</button>
+          <button class="btn btn-primary" type="button" id="finishBtn">Done</button>
+        </div>
+      </section>
+  
+    </div>
+  </div>
+  
+  <script src="app.js"></script>
 
 </body>
 </html>

@@ -1017,3 +1017,8 @@
     opacity: 0.9;
   }
 }
+@media (max-width: 768px) {
+  .market-indices strong {
+    font-weight: 600;
+  }
+}

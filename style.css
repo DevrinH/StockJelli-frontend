@@ -848,17 +848,7 @@
 }
 
 
-.hero-chart::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
 
-  background: linear-gradient(
-    90deg,
-    rgba(36,40,59,0.0) 60%,
-    rgba(36,40,59,0.85) 100%
-  );
 }
 
 

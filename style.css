@@ -1061,7 +1061,7 @@
 .header .logo,
 .header img.logo,
 .header .logo img {
-  height: 42px;        /* desktop size */
+  height: 28px;        /* desktop size */
   width: auto;
   flex: 0 0 auto;
   max-width: none;

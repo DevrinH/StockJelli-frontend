@@ -11,29 +11,24 @@
 
   <!-- Header -->
   <header class="header">
-    <div class="container header-inner">
-      <div class="logo">
-        <img src="StockJelli (5).png" alt="StockJelli logo" class="logo-mark" />
-        
+    <div class="header-inner">
+      <div class="logo-wrap">
+        <img src="StockJelli.png" alt="StockJelli logo" class="logo-icon" />
+        <span class="logo-text">StockJelli</span>
       </div>
-      
+  
       <div class="market-status">
-        <span class="market-item up">
-          NASDAQ <strong>+1.24%</strong>
-        </span>
+        <span class="up">NASDAQ +1.24%</span>
         <span class="divider">|</span>
-        <span class="market-item down">
-          S&P 500 <strong>−0.31%</strong>
-        </span>
+        <span class="down">S&P 500 −0.31%</span>
       </div>
-      
+  
       <nav class="nav">
         <a href="#screener">Screener</a>
-        <a href="#filters">Filters</a>
-        <a href="#pricing">Alerts</a>
       </nav>
     </div>
   </header>
+  
 
   <!-- Page layout with side ad rails -->
   <main class="page">
@@ -309,16 +304,17 @@
       <!-- Pricing / CTA -->
       <section class="pricing" id="pricing">
         <div class="container pricing-inner">
-          <div>
+          <div class="pricing-text">
             <h2>Optional Alerts — $5/month</h2>
             <p class="muted">
               Alerts only fire when strict momentum criteria are met. No spam. No hype.
             </p>
           </div>
-          <button class="btn btn-primary" id="enableAlertsBtn">Enable Alerts</button>
-
+      
+          <button class="btn btn-primary">Enable Alerts</button>
         </div>
       </section>
+      
 
       <!-- Footer -->
       <footer class="footer">

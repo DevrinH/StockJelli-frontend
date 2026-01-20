@@ -29,26 +29,39 @@
   .header {
     position: sticky;
     top: 0;
-    z-index: 1000;
-  
-    padding: 14px 0; /* ← THIS is the key fix */
-  
+    z-index: 50;
     background: linear-gradient(
       180deg,
-      rgba(20, 28, 45, 0.98),
-      rgba(20, 28, 45, 0.90)
+      rgba(10,15,25,0.95),
+      rgba(10,15,25,0.85)
     );
-  
-    backdrop-filter: blur(10px);
+    backdrop-filter: blur(12px);
   }
-  
-  
   
   .header-inner {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    height: 64px;
+    padding: 0 28px; /* this is the edge padding */
+  }
+  
+  .logo-wrap {
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    gap: 10px;
   }
+  
+  .logo-icon {
+    height: 28px;
+    width: auto;
+  }
+  
+  .logo-text {
+    font-size: 20px;
+    font-weight: 700;
+  }
+  
   
   .logo {
     display: flex;
@@ -67,11 +80,6 @@
   display: block;
 }
 
-/* Logo text */
-.logo-text {
-  font-weight: 700;
-  letter-spacing: 0.2px;
-}
   
 
   
@@ -487,17 +495,22 @@
   
   /* Pricing / CTA */
   .pricing {
-    padding: 44px 0;
-    border-top: 1px solid #1c2330;
-    background: #0f1522;
+    margin-top: 36px;
+    padding: 28px 0;
+    background: linear-gradient(
+      180deg,
+      rgba(10,15,25,0.85),
+      rgba(10,15,25,0.75)
+    );
   }
   
   .pricing-inner {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 18px;
+    gap: 24px;
   }
+  
   
   .pricing h2 {
     margin: 0 0 8px 0;

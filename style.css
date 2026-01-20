@@ -766,33 +766,28 @@
   .strong {
     font-weight: 750;
   }
-  .market-overview {
+  .market-status {
     display: flex;
-    gap: 14px;
-    margin: 28px 0 12px;
-  }
-  
-  .market-pill {
-    display: flex;
-    gap: 10px;
     align-items: center;
-    padding: 10px 14px;
-    border-radius: 999px;
-    font-size: 0.9rem;
-    background: rgba(255,255,255,0.04);
-    border: 1px solid rgba(255,255,255,0.06);
+    gap: 10px;
+    font-size: 0.8rem;
+    color: #9aa3b2;
   }
   
-  .market-name {
+  .market-item strong {
     font-weight: 600;
-    color: #cfd6e4;
   }
   
-  .market-pill.up .market-change {
+  .market-item.up strong {
     color: #3ef08f;
   }
   
-  .market-pill.down .market-change {
+  .market-item.down strong {
     color: #ff6b6b;
   }
+  
+  .market-status .divider {
+    opacity: 0.4;
+  }
+  
   

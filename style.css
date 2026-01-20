@@ -80,6 +80,11 @@
   display: block;
 }
 
+/* Logo text */
+.logo-text {
+  font-weight: 700;
+  letter-spacing: 0.2px;
+}
   
 
   
@@ -495,22 +500,17 @@
   
   /* Pricing / CTA */
   .pricing {
-    margin-top: 36px;
-    padding: 28px 0;
-    background: linear-gradient(
-      180deg,
-      rgba(10,15,25,0.85),
-      rgba(10,15,25,0.75)
-    );
+    padding: 44px 0;
+    border-top: 1px solid #1c2330;
+    background: #0f1522;
   }
   
   .pricing-inner {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 24px;
+    gap: 18px;
   }
-  
   
   .pricing h2 {
     margin: 0 0 8px 0;

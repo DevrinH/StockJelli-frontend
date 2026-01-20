@@ -11,24 +11,29 @@
 
   <!-- Header -->
   <header class="header">
-    <div class="header-inner">
-      <div class="logo-wrap">
-        <img src="StockJelli.png" alt="StockJelli logo" class="logo-icon" />
-        <span class="logo-text">StockJelli</span>
+    <div class="container header-inner">
+      <div class="logo">
+        <img src="StockJelli (5).png" alt="StockJelli logo" class="logo-mark" />
+        
       </div>
-  
+      
       <div class="market-status">
-        <span class="up">NASDAQ +1.24%</span>
+        <span class="market-item up">
+          NASDAQ <strong>+1.24%</strong>
+        </span>
         <span class="divider">|</span>
-        <span class="down">S&P 500 −0.31%</span>
+        <span class="market-item down">
+          S&P 500 <strong>−0.31%</strong>
+        </span>
       </div>
-  
+      
       <nav class="nav">
         <a href="#screener">Screener</a>
+        <a href="#filters">Filters</a>
+        <a href="#pricing">Alerts</a>
       </nav>
     </div>
   </header>
-  
 
   <!-- Page layout with side ad rails -->
   <main class="page">
@@ -57,43 +62,43 @@
           <div class="hero-right" aria-hidden="true">
             <div class="hero-chart">
               <svg viewBox="0 0 520 220" class="spark" role="img" aria-label="">
-                <defs>
-                  <!-- Line: subtle, uniform, no left/right emphasis -->
-                  <linearGradient id="lineGrad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stop-color="rgba(62,240,143,0.85)" />
-                    <stop offset="100%" stop-color="rgba(62,240,143,0.55)" />
-                  </linearGradient>
-                
-                  <!-- Area fill: strongest in middle, fades INTO page background -->
-                  <linearGradient id="fillGrad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stop-color="rgba(62,240,143,0.18)" />
-                    <stop offset="45%" stop-color="rgba(62,240,143,0.10)" />
-                    <stop offset="75%" stop-color="rgba(36,40,59,0.15)" />
-                    <stop offset="100%" stop-color="rgba(36,40,59,0.0)" />
-                  </linearGradient>
-                
-                  <!-- Soft glow, reduced so it doesn't scream -->
-                  <filter id="glow" x="-30%" y="-30%" width="160%" height="160%">
-                    <feGaussianBlur stdDeviation="2.5" result="blur"/>
-                    <feMerge>
-                      <feMergeNode in="blur"/>
-                      <feMergeNode in="SourceGraphic"/>
-                    </feMerge>
-                  </filter>
-                
-                  <!-- Reveal sweep stays, but slower + softer -->
-                  <mask id="revealMask">
-                    <rect
-                      class="reveal"
-                      x="-120"
-                      y="0"
-                      width="320"
-                      height="220"
-                      fill="white"
-                    />
-                  </mask>
-                </defs>
-                
+<defs>
+  <!-- Line: subtle, uniform, no left/right emphasis -->
+  <linearGradient id="lineGrad" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0%" stop-color="rgba(62,240,143,0.85)" />
+    <stop offset="100%" stop-color="rgba(62,240,143,0.55)" />
+  </linearGradient>
+
+  <!-- Area fill: strongest in middle, fades INTO page background -->
+  <linearGradient id="fillGrad" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0%" stop-color="rgba(62,240,143,0.18)" />
+    <stop offset="45%" stop-color="rgba(62,240,143,0.10)" />
+    <stop offset="75%" stop-color="rgba(36,40,59,0.15)" />
+    <stop offset="100%" stop-color="rgba(36,40,59,0.0)" />
+  </linearGradient>
+
+  <!-- Soft glow, reduced so it doesn't scream -->
+  <filter id="glow" x="-30%" y="-30%" width="160%" height="160%">
+    <feGaussianBlur stdDeviation="2.5" result="blur"/>
+    <feMerge>
+      <feMergeNode in="blur"/>
+      <feMergeNode in="SourceGraphic"/>
+    </feMerge>
+  </filter>
+
+  <!-- Reveal sweep stays, but slower + softer -->
+  <mask id="revealMask">
+    <rect
+      class="reveal"
+      x="-120"
+      y="0"
+      width="320"
+      height="220"
+      fill="white"
+    />
+  </mask>
+</defs>
+
       
                 <!-- subtle grid -->
                 <g class="grid">
@@ -304,17 +309,16 @@
       <!-- Pricing / CTA -->
       <section class="pricing" id="pricing">
         <div class="container pricing-inner">
-          <div class="pricing-text">
+          <div>
             <h2>Optional Alerts — $5/month</h2>
             <p class="muted">
               Alerts only fire when strict momentum criteria are met. No spam. No hype.
             </p>
           </div>
-      
-          <button class="btn btn-primary">Enable Alerts</button>
+          <button class="btn btn-primary" id="enableAlertsBtn">Enable Alerts</button>
+
         </div>
       </section>
-      
 
       <!-- Footer -->
       <footer class="footer">

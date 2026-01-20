@@ -26,12 +26,15 @@
   }
   
   /* Header */
-  .header {
-    padding: 18px 0;
-    border-bottom: 1px solid #1c2330;
-    background: rgba(21, 32, 44, 0.78);
+  .header{
+    position: sticky;
+    top: 0;
+    z-index: 100;
     backdrop-filter: blur(10px);
+    background: rgba(10, 14, 24, 0.55); /* adjust to match your theme */
+    border-bottom: 1px solid rgba(255,255,255,0.06);
   }
+  
   
   .header-inner {
     display: flex;

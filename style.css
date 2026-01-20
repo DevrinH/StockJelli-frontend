@@ -959,7 +959,7 @@
 
 /* Animated reveal sweep */
 .reveal{
-  animation: sweep 2.1s ease-in-out infinite; /* faster */
+  animation: sweep 3.1s ease-in-out infinite; /* faster */
   opacity: 0.9;
 }
 
@@ -990,5 +990,30 @@
 @media (max-width: 900px) {
   .ad-rail {
     display: none;
+  }
+}
+@media (max-width: 768px) {
+  .header-inner {
+    grid-template-columns: 1fr auto;
+    grid-template-rows: auto auto;
+    row-gap: 8px;
+  }
+
+  .header-left {
+    grid-column: 1 / 2;
+    grid-row: 1;
+  }
+
+  .header-right {
+    grid-column: 2 / 3;
+    grid-row: 1;
+  }
+
+  .header-center {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    justify-content: center;
+    font-size: 13px;
+    opacity: 0.9;
   }
 }

@@ -29,39 +29,26 @@
   .header {
     position: sticky;
     top: 0;
-    z-index: 50;
+    z-index: 1000;
+  
+    padding: 14px 0; /* ← THIS is the key fix */
+  
     background: linear-gradient(
       180deg,
-      rgba(10,15,25,0.95),
-      rgba(10,15,25,0.85)
+      rgba(20, 28, 45, 0.98),
+      rgba(20, 28, 45, 0.90)
     );
-    backdrop-filter: blur(12px);
+  
+    backdrop-filter: blur(10px);
   }
+  
+  
   
   .header-inner {
-    display: grid;
-    grid-template-columns: auto 1fr auto;
-    align-items: center;
-    height: 64px;
-    padding: 0 28px; /* this is the edge padding */
-  }
-  
-  .logo-wrap {
     display: flex;
     align-items: center;
-    gap: 10px;
+    justify-content: space-between;
   }
-  
-  .logo-icon {
-    height: 28px;
-    width: auto;
-  }
-  
-  .logo-text {
-    font-size: 20px;
-    font-weight: 700;
-  }
-  
   
   .logo {
     display: flex;

@@ -790,4 +790,89 @@
     opacity: 0.4;
   }
   
-  
+  /* Hero layout with right-side chart */
+.hero-grid {
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: 28px;
+  align-items: center;
+}
+
+.hero-left {
+  min-width: 0;
+}
+
+.hero-right {
+  display: flex;
+  justify-content: flex-end;
+  min-width: 0;
+}
+
+.hero-chart {
+  width: min(520px, 100%);
+  height: 220px;
+  border-radius: 18px;
+  border: 1px solid rgba(255,255,255,0.06);
+  background: radial-gradient(600px 240px at 20% 10%, rgba(77,163,255,0.10), rgba(0,0,0,0) 60%),
+              rgba(255,255,255,0.02);
+  overflow: hidden;
+  position: relative;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.25);
+}
+
+/* SVG */
+.spark {
+  width: 100%;
+  height: 100%;
+  display: block;
+  opacity: 0.9;
+}
+
+.grid line {
+  stroke: rgba(255,255,255,0.06);
+  stroke-width: 1;
+}
+
+.line {
+  opacity: 0.95;
+}
+
+.fill {
+  opacity: 1;
+}
+
+.dot {
+  fill: rgba(62,240,143,0.65);
+  filter: drop-shadow(0 0 8px rgba(62,240,143,0.35));
+  opacity: 0.65;
+}
+
+/* Animated reveal sweep */
+.reveal {
+  animation: sweep 3.8s ease-in-out infinite;
+  opacity: 0.85;
+}
+
+@keyframes sweep {
+  0%   { transform: translateX(-120px); }
+  45%  { transform: translateX(560px); }
+  100% { transform: translateX(560px); }
+}
+
+/* Reduce motion support */
+@media (prefers-reduced-motion: reduce) {
+  .reveal { animation: none; }
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .hero-grid {
+    grid-template-columns: 1fr;
+  }
+  .hero-right {
+    justify-content: flex-start;
+  }
+  .hero-chart {
+    height: 200px;
+  }
+}

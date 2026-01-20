@@ -539,23 +539,44 @@
   }
   
   /* Pricing / CTA */
-  .pricing {
-    padding: 44px 0;
-    border-top: 1px solid #1c2330;
-    background: #0f1522;
-  }
-  
-  .pricing-inner {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 18px;
-  }
+/* Alerts section should match other sections */
+.pricing {
+  padding: 22px 0 40px;
+}
+
+/* Make it look like the same container/card style */
+.pricing .pricing-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+
+  /* Match your other cards */
+  background: rgba(10, 14, 24, 0.55);
+  border-radius: 18px;
+  box-shadow:
+    inset 0 0 0 1px rgba(255,255,255,0.06),
+    0 18px 55px rgba(0,0,0,0.35);
+
+  padding: 22px 22px;
+}
   
   .pricing h2 {
     margin: 0 0 8px 0;
     font-size: 1.35rem;
   }
+
+  /* Stack nicely on mobile */
+@media (max-width: 900px) {
+  .pricing .pricing-inner {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .pricing .btn {
+    width: 100%;
+  }
+}
   
   /* Footer */
   .footer {

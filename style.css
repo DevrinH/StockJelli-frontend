@@ -965,3 +965,9 @@
     height: 200px;
   }
 }
+/* Hide side ad rails on mobile */
+@media (max-width: 900px) {
+  .ad-rail {
+    display: none;
+  }
+}

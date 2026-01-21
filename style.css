@@ -98,13 +98,11 @@
   
 
   .logo {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-weight: 700;
-    font-size: 1.25rem;
-    color: #fff;
-    white-space: nowrap;
+    height: 48px;            /* <-- your logo can be bigger safely */
+    width: auto;
+    max-width: 260px;
+    display: block;
+    object-fit: contain;
   }
 
   /* Logo image */
@@ -1228,11 +1226,11 @@
 }
 
 .header-inner {
+  min-height: 72px;        /* <-- gives breathing room */
+  padding: 10px 24px;      /* <-- adds vertical padding */
   display: grid;
   grid-template-columns: auto 1fr auto;
   align-items: center;
-  height: 64px;
-  padding: 0 24px;
 }
 
 /* Left */

@@ -951,7 +951,7 @@
 
 /* Animated reveal sweep */
 .reveal{
-  animation: sweep 3.1s ease-in-out infinite; /* faster */
+  animation: sweep 3.5s ease-in-out infinite; /* faster */
   opacity: 0.9;
 }
 

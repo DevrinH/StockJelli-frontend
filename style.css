@@ -1135,3 +1135,61 @@
     grid-row: 2 !important;
   }
 }
+
+/* Stocks table */
+.stocks-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.stocks-table th,
+.stocks-table td {
+  padding: 14px 16px;
+  text-align: left;
+  vertical-align: middle;
+  border-top: 1px solid rgba(255,255,255,0.06);
+}
+
+.stocks-table thead th {
+  border-top: none;
+  color: rgba(255,255,255,0.55);
+  font-weight: 600;
+  font-size: 0.92rem;
+}
+
+/* Make ticker + news feel “product-y” */
+.stocks-table td.ticker {
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+/* News column */
+.stocks-table td.news {
+  max-width: 420px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.news-link {
+  color: rgba(255,255,255,0.9);
+  text-decoration: none;
+}
+
+.news-link:hover {
+  text-decoration: underline;
+}
+
+.news-meta {
+  margin-left: 8px;
+  font-size: 0.85rem;
+  color: rgba(255,255,255,0.45);
+}
+
+/* Mobile: hide News column for space (optional but recommended) */
+@media (max-width: 640px) {
+  .stocks-table th:nth-child(5),
+  .stocks-table td:nth-child(5) {
+    display: none;
+  }
+}

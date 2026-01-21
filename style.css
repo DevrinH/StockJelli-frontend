@@ -1297,3 +1297,23 @@
     font-size: 0.9rem;
   }
 }
+.menu-btn {
+  display: none;
+  background: transparent;
+  border: 0;
+  color: rgba(255,255,255,0.9);
+  font-size: 22px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.header-nav a {
+  color: rgba(255,255,255,0.85);
+  text-decoration: none;
+}
+
+@media (max-width: 700px) {
+  .header-nav { display: none; }
+  .menu-btn { display: inline-flex; align-items: center; justify-content: center; }
+}

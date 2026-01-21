@@ -17,32 +17,50 @@
 
   <header class="header">
     <div class="header-inner">
+  
       <!-- LEFT -->
       <div class="header-left">
         <img class="logo" src="StockJelli (5).png" alt="StockJelli" />
       </div>
   
-      <!-- CENTER (INDICES) -->
+      <!-- CENTER -->
       <div class="header-center market-indices">
         <span class="nasdaq">NASDAQ <span class="up">+1.24%</span></span>
         <span class="divider">|</span>
         <span class="sp500">S&P 500 <span class="down">-0.31%</span></span>
       </div>
   
-      <!-- RIGHT -->
+      <!-- RIGHT (Hamburger only) -->
       <div class="header-right">
-        <button class="menu-btn" type="button" aria-label="Open menu" aria-expanded="false">
-          ☰
+        <button class="menu-btn" id="menuBtn" type="button" aria-label="Menu" aria-expanded="false">
+          <span></span>
+          <span></span>
         </button>
-      
-        <!-- Keep this for desktop for now -->
-        <nav class="header-nav">
-          <a href="#screener">Screener</a>
-        </nav>
       </div>
-      
+  
     </div>
   </header>
+  
+  <!-- Drawer -->
+  <div class="drawer-overlay" id="drawerOverlay" hidden></div>
+  
+  <aside class="drawer" id="drawer" aria-hidden="true">
+    <div class="drawer-top">
+      <div class="drawer-title">Menu</div>
+      <button class="drawer-close" id="drawerClose" type="button" aria-label="Close menu">✕</button>
+    </div>
+  
+    <nav class="drawer-nav">
+      <a href="#screener" class="drawer-link">Screener</a>
+      <a href="#filters" class="drawer-link">Filters</a>
+      <a href="#pricing" class="drawer-link">Alerts</a>
+    </nav>
+  
+    <div class="drawer-foot">
+      <div class="muted">Educational tool only.</div>
+    </div>
+  </aside>
+  
   
   
 

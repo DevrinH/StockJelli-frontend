@@ -1467,32 +1467,52 @@
   border-bottom: 1px solid rgba(255,255,255,0.06);
 }
 
-.header-inner{
-  display: grid;
-  grid-template-columns: 1fr auto 1fr; /* <-- makes the center truly centered */
+.header-inner {
+  position: relative;          /* key */
+  display: flex;
   align-items: center;
+  justify-content: space-between;
   padding: 14px 18px;
 }
 
-.header-left{
-  justify-self: start;
+/* Left */
+.header-left {
   display: flex;
   align-items: center;
   gap: 12px;
-  min-width: 0;
 }
 
-.header-center{
-  justify-self: center;
-  text-align: center;
-  white-space: nowrap;
+/* Logo (prevents weird shrinking) */
+.logo {
+  height: 34px;
+  width: auto;
+  display: block;
 }
 
-.header-right{
-  justify-self: end;
+/* Right */
+.header-right {
   display: flex;
   align-items: center;
 }
+
+/* ✅ TRUE CENTER */
+.header-center {
+  position: absolute;          /* key */
+  left: 50%;
+  transform: translateX(-50%);
+  display: inline-flex;
+  align-items: baseline;
+  gap: 14px;
+  white-space: nowrap;
+  pointer-events: none;        /* so clicks go to menu/logo */
+}
+
+.header-center .divider {
+  opacity: 0.35;
+  transform: translateY(-1px);
+  display: inline-block;
+}
+
 .market-indices{
   display: inline-flex;
   align-items: baseline;
@@ -1503,4 +1523,27 @@
 .market-indices .divider{
   opacity: 0.35;
   transform: translateY(-1px); /* tiny optical alignment */
+}
+@media (max-width: 640px) {
+  .header-inner {
+    display: grid;
+    grid-template-columns: 1fr auto;  /* left + right */
+    grid-template-rows: auto auto;    /* row1: logo/menu, row2: indices */
+    align-items: center;
+    gap: 6px 10px;
+  }
+
+  .header-left { grid-column: 1; grid-row: 1; }
+  .header-right { grid-column: 2; grid-row: 1; justify-self: end; }
+
+  .header-center {
+    position: static;                 /* stop absolute */
+    transform: none;
+    grid-column: 1 / -1;
+    grid-row: 2;
+    justify-content: center;
+    pointer-events: auto;
+    font-size: 14px;
+    opacity: 0.95;
+  }
 }

@@ -1193,3 +1193,20 @@
     display: none;
   }
 }
+/* Source column */
+.stocks-table td.news {
+  width: 140px;
+}
+
+.news-source {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: rgba(255,255,255,0.75);
+  text-decoration: none;
+  letter-spacing: 0.02em;
+}
+
+.news-source:hover {
+  color: rgba(255,255,255,0.95);
+  text-decoration: underline;
+}

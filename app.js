@@ -153,6 +153,8 @@
     setStep(1);
   })();
   
+  ////////
+
   const menuBtn = document.getElementById("menuBtn");
 const drawer = document.getElementById("drawer");
 const overlay = document.getElementById("drawerOverlay");
@@ -160,34 +162,23 @@ const closeBtn = document.getElementById("drawerClose");
 
 function openDrawer(){
   drawer.classList.add("is-open");
-  overlay.hidden = false;
-  drawer.setAttribute("aria-hidden", "false");
-  menuBtn.setAttribute("aria-expanded", "true");
+  overlay.classList.add("is-open");
   document.body.style.overflow = "hidden";
 }
 
 function closeDrawer(){
   drawer.classList.remove("is-open");
-  overlay.hidden = true;
-  drawer.setAttribute("aria-hidden", "true");
-  menuBtn.setAttribute("aria-expanded", "false");
+  overlay.classList.remove("is-open");
   document.body.style.overflow = "";
 }
 
-menuBtn?.addEventListener("click", () => {
-  if (drawer.classList.contains("is-open")) closeDrawer();
-  else openDrawer();
+menuBtn.addEventListener("click", () => {
+  drawer.classList.contains("is-open") ? closeDrawer() : openDrawer();
 });
 
-closeBtn?.addEventListener("click", closeDrawer);
-overlay?.addEventListener("click", closeDrawer);
+closeBtn.addEventListener("click", closeDrawer);
+overlay.addEventListener("click", closeDrawer);
 
 document.addEventListener("keydown", (e) => {
-  if (e.key === "Escape" && drawer.classList.contains("is-open")) closeDrawer();
-});
-
-// Close drawer when clicking a link
-drawer?.addEventListener("click", (e) => {
-  const link = e.target.closest("a");
-  if (link) closeDrawer();
+  if (e.key === "Escape") closeDrawer();
 });

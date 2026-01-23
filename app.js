@@ -182,3 +182,55 @@ overlay.addEventListener("click", closeDrawer);
 document.addEventListener("keydown", (e) => {
   if (e.key === "Escape") closeDrawer();
 });
+
+// ─────────────────────────────────────────────
+// Asset mode: Stocks vs Crypto (Screener toggle)
+// ─────────────────────────────────────────────
+(function () {
+  const assetControl = document.getElementById("assetControl");
+  const assetTitle = document.getElementById("assetTitle");
+  const newsRequiredChk = document.getElementById("newsRequiredChk");
+
+  if (!assetControl || !assetTitle || !newsRequiredChk) return;
+
+  const DEFAULTS = {
+    stocks: { newsRequired: true },
+    crypto: { newsRequired: false }
+  };
+
+  function setSegmented(controlEl, value) {
+    controlEl.querySelectorAll(".segmented-btn").forEach((btn) => {
+      btn.classList.toggle("segmented-on", btn.dataset.value === value);
+    });
+  }
+
+  function applyMode(mode) {
+    // Update UI
+    assetTitle.textContent = mode === "stocks" ? "Stocks" : "Crypto";
+    setSegmented(assetControl, mode);
+
+    // Default behavior you asked for:
+    // Stocks => news required ON
+    // Crypto => news required OFF
+    const defaults = DEFAULTS[mode];
+    newsRequiredChk.checked = !!defaults.newsRequired;
+
+    // Persist
+    localStorage.setItem("sj_asset_mode", mode);
+
+    // TODO: Later we’ll call refreshScreener(mode) here to hit the backend
+    // refreshScreener(mode);
+  }
+
+  // init
+  const saved = localStorage.getItem("sj_asset_mode");
+  const mode = saved === "crypto" ? "crypto" : "stocks";
+  applyMode(mode);
+
+  // handle clicks
+  assetControl.addEventListener("click", (e) => {
+    const btn = e.target.closest(".segmented-btn");
+    if (!btn) return;
+    applyMode(btn.dataset.value);
+  });
+})();

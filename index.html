@@ -172,9 +172,19 @@
       <section class="screener" id="screener">
         <div class="container">
           <div class="section-head">
-            <h2>Momentum Stocks</h2>
+            <div class="section-head-left">
+              <h2>Momentum <span id="assetTitle">Stocks</span></h2>
+          
+              <!-- Stocks / Crypto toggle -->
+              <div class="segmented segmented-small" id="assetControl" aria-label="Asset type">
+                <button class="segmented-btn segmented-on" type="button" data-value="stocks">Stocks</button>
+                <button class="segmented-btn" type="button" data-value="crypto">Crypto</button>
+              </div>
+            </div>
+          
             <span class="badge">Updates every minute</span>
           </div>
+          
 
           <div class="table-wrap">
             <table class="stocks-table">
@@ -296,11 +306,11 @@
           
                 <div class="checklist">
                   <label class="check">
-                    <input type="checkbox" checked />
+                    <input id="newsRequiredChk" type="checkbox" checked />
                     <span class="check-ui"></span>
                     <span class="check-text">News required</span>
                   </label>
-          
+                  
 
       
                   <label class="check">

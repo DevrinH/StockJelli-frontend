@@ -1616,3 +1616,25 @@
 @media (max-width: 640px){
   header.header .header-inner{ display:grid !important; }
 }
+
+.section-head-left{
+  display:flex;
+  align-items:center;
+  gap:14px;
+}
+
+.segmented-small{
+  transform: scale(0.92);
+  transform-origin: left center;
+}
+
+@media (max-width: 520px){
+  .section-head-left{
+    flex-direction: column;
+    align-items: flex-start;
+    gap:10px;
+  }
+  .segmented-small{
+    transform:none;
+  }
+}

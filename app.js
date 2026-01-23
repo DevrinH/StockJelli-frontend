@@ -43,23 +43,52 @@
     const idxRightLabel = document.getElementById("idxRightLabel");
     const idxRightValue = document.getElementById("idxRightValue");
   
+    // labels
     if (idxLeftLabel && header.left?.label) idxLeftLabel.textContent = header.left.label;
     if (idxRightLabel && header.right?.label) idxRightLabel.textContent = header.right.label;
   
+    // values + up/down color
     if (idxLeftValue) {
       idxLeftValue.textContent = fmtPct(header.left?.pct);
       idxLeftValue.classList.remove("up", "down");
-      idxLeftValue.classList.add(classUpDown(header.left?.pct));
+      const c = classUpDown(header.left?.pct);
+      if (c) idxLeftValue.classList.add(c);
     }
   
     if (idxRightValue) {
       idxRightValue.textContent = fmtPct(header.right?.pct);
       idxRightValue.classList.remove("up", "down");
-      idxRightValue.classList.add(classUpDown(header.right?.pct));
+      const c = classUpDown(header.right?.pct);
+      if (c) idxRightValue.classList.add(c);
+    }
+  
+    // OPTIONAL: make crypto labels green (letters) regardless
+    // (You asked: "crypto indice letters should be green")
+    // This assumes you toggle idxWrap.classList.add("crypto") in applyMode for crypto.
+    const idxWrap = document.querySelector(".market-indices");
+    const isCrypto = idxWrap?.classList.contains("crypto");
+  
+    if (idxLeftLabel) {
+      idxLeftLabel.classList.toggle("crypto-label", !!isCrypto);
+    }
+    if (idxRightLabel) {
+      idxRightLabel.classList.toggle("crypto-label", !!isCrypto);
     }
   }
   
-
+  
+  function fmtCompactUsd(n, decimals = 1) {
+    if (n === null || n === undefined || Number.isNaN(Number(n))) return "$—";
+    const v = Number(n);
+    const abs = Math.abs(v);
+  
+    if (abs >= 1e12) return `$${(v / 1e12).toFixed(decimals)}T`;
+    if (abs >= 1e9)  return `$${(v / 1e9).toFixed(decimals)}B`;
+    if (abs >= 1e6)  return `$${(v / 1e6).toFixed(decimals)}M`;
+    if (abs >= 1e3)  return `$${(v / 1e3).toFixed(decimals)}K`;
+    return `$${v.toFixed(0)}`;
+  }
+  
   function classUpDown(n) {
     const v = Number(n);
     if (Number.isNaN(v)) return "";
@@ -315,7 +344,8 @@
             <td>${fmtUsd(x.price)}</td>
             <td class="${changeClass}">${fmtPct(x.pct_change_24h)}</td>
             <td>${fmtNum(x.volume_24h)}</td>
-            <td>${fmtUsd(x.market_cap, 0)}</td>
+            <td>${fmtCompactUsd(x.market_cap, 1)}</td>
+
           </tr>
         `;
       })

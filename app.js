@@ -400,17 +400,17 @@
   let pollTimer = null;
 
   async function loadStocksOnce() {
-    const data = await apiGet("/api/v1/stocks/momentum" + buildQueryForStocks());
+    const data = await apiGet(buildStocksPath());   // <-- uses your existing function
     setHeaderFromApi(data.header);
-    renderStocks(data.rows || data);
+    renderStocks(data.rows);                        // <-- always rows array
   }
   
-
   async function loadCryptoOnce() {
-    const data = await apiGet("/api/v1/crypto/momentum" + buildQueryForCrypto());
+    const data = await apiGet(buildCryptoPath());   // <-- uses your existing function
     setHeaderFromApi(data.header);
-    renderCrypto(data.rows || data);
+    renderCrypto(data.rows);                        // <-- always rows array
   }
+  
   
 
   async function refreshOnce() {

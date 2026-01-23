@@ -1638,15 +1638,14 @@
     transform:none;
   }
 }
+
 .idx { display:inline-flex; gap:8px; align-items:baseline; }
 .idx-value { font-weight: 600; }
 
-.market-indices.crypto .idx-value{
-  color: rgba(62,240,143,0.95) !important;
-}
-.market-indices.crypto .idx-value {
-  color: rgba(62,240,143,0.95);
-}
-.crypto-label {
-  color: #2ee59d; /* or whatever green you use */
-}
+/* up/down colors for indices (stocks + crypto) */
+.idx-value.up { color: rgba(62,240,143,0.95); }
+.idx-value.down { color: rgba(255,90,90,0.95); }
+
+/* crypto label text (BTC / Total Crypto Market) green */
+.market-indices.crypto .idx-label,
+.market-indices.crypto-label { color: rgba(2, 168, 77, 0.95); }

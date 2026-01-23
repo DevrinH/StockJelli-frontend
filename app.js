@@ -35,6 +35,31 @@
     return `${sign}${v.toFixed(decimals)}%`;
   }
 
+  function setHeaderFromApi(header) {
+    if (!header) return;
+  
+    const idxLeftLabel = document.getElementById("idxLeftLabel");
+    const idxLeftValue = document.getElementById("idxLeftValue");
+    const idxRightLabel = document.getElementById("idxRightLabel");
+    const idxRightValue = document.getElementById("idxRightValue");
+  
+    if (idxLeftLabel && header.left?.label) idxLeftLabel.textContent = header.left.label;
+    if (idxRightLabel && header.right?.label) idxRightLabel.textContent = header.right.label;
+  
+    if (idxLeftValue) {
+      idxLeftValue.textContent = fmtPct(header.left?.pct);
+      idxLeftValue.classList.remove("up", "down");
+      idxLeftValue.classList.add(classUpDown(header.left?.pct));
+    }
+  
+    if (idxRightValue) {
+      idxRightValue.textContent = fmtPct(header.right?.pct);
+      idxRightValue.classList.remove("up", "down");
+      idxRightValue.classList.add(classUpDown(header.right?.pct));
+    }
+  }
+  
+
   function classUpDown(n) {
     const v = Number(n);
     if (Number.isNaN(v)) return "";
@@ -375,14 +400,18 @@
   let pollTimer = null;
 
   async function loadStocksOnce() {
-    const data = await apiGet(buildStocksPath());
+    const data = await apiGet("/api/v1/stocks/momentum" + buildQueryForStocks());
+    setHeaderFromApi(data.header);
     renderStocks(data.rows || data);
   }
+  
 
   async function loadCryptoOnce() {
-    const data = await apiGet(buildCryptoPath());
+    const data = await apiGet("/api/v1/crypto/momentum" + buildQueryForCrypto());
+    setHeaderFromApi(data.header);
     renderCrypto(data.rows || data);
   }
+  
 
   async function refreshOnce() {
     try {

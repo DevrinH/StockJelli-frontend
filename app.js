@@ -299,7 +299,12 @@
     const tbody = document.getElementById("cryptoTbody");
     if (!tbody) return;
 
-    if (!rows || rows.length === 0) return; // keep placeholders
+    if (!rows || rows.length === 0) {
+      tbody.innerHTML = `
+        <tr><td class="ticker">—</td><td>$—</td><td>—</td><td>—</td><td>—</td></tr>
+      `;
+      return;
+    }
 
     tbody.innerHTML = rows
       .map((x) => {
@@ -450,16 +455,17 @@
       if (mode === "stocks") {
         idxLeftLabel.textContent = "NASDAQ";
         idxRightLabel.textContent = "S&P 500";
-        if (idxLeftValue) idxLeftValue.textContent = "+1.24%";
-        if (idxRightValue) idxRightValue.textContent = "-0.31%";
+        if (idxLeftValue) idxLeftValue.textContent = "—";
+        if (idxRightValue) idxRightValue.textContent = "—";
         idxWrap?.classList.remove("crypto");
       } else {
         idxLeftLabel.textContent = "BTC";
         idxRightLabel.textContent = "Total Crypto Market";
-        if (idxLeftValue) idxLeftValue.textContent = "+—%";
-        if (idxRightValue) idxRightValue.textContent = "+—%";
-        idxWrap?.classList.add("crypto"); // your CSS makes them green
+        if (idxLeftValue) idxLeftValue.textContent = "—";
+        if (idxRightValue) idxRightValue.textContent = "—";
+        idxWrap?.classList.add("crypto");
       }
+      
     }
 
     localStorage.setItem("sj_asset_mode", mode);

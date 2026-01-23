@@ -305,6 +305,9 @@ function startPolling(loadFn, ms = 60_000) {
   const assetControl = document.getElementById("assetControl");
   const newsRequiredChk = document.getElementById("newsRequiredChk");
 
+  const stocksTable = document.getElementById("stocksTable");
+  const cryptoTable = document.getElementById("cryptoTable");
+
   const idxWrap = document.querySelector(".market-indices");
   const idxLeftLabel = document.getElementById("idxLeftLabel");
   const idxRightLabel = document.getElementById("idxRightLabel");
@@ -314,12 +317,16 @@ function startPolling(loadFn, ms = 60_000) {
   const heroChartStocks = document.getElementById("heroChartStocks");
   const heroChartCrypto = document.getElementById("heroChartCrypto");
 
-  if (!assetControl || !newsRequiredChk) return;
+  if (!assetControl) return; // toggle UI missing
 
+  // Defaults: stocks = news required ON, crypto = OFF
   const DEFAULTS = {
     stocks: { newsRequired: true },
-    crypto: { newsRequired: false }
+    crypto: { newsRequired: false },
   };
+
+  let pollTimer = null;
+  let currentMode = "stocks";
 
   function setSegmented(controlEl, value) {
     controlEl.querySelectorAll(".segmented-btn").forEach((btn) => {
@@ -327,57 +334,67 @@ function startPolling(loadFn, ms = 60_000) {
     });
   }
 
+  async function refreshOnce() {
+    try {
+      if (currentMode === "stocks") {
+        await loadStocksOnce();
+      } else {
+        await loadCryptoOnce();
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  function startPollingForMode() {
+    if (pollTimer) clearInterval(pollTimer);
+    refreshOnce(); // immediate
+    pollTimer = setInterval(refreshOnce, 60_000);
+  }
+
   function applyMode(mode) {
+    currentMode = mode;
     setSegmented(assetControl, mode);
 
-    // Catalyst default behavior
-    newsRequiredChk.checked = !!DEFAULTS[mode].newsRequired;
+    // checkbox default behavior (only if it exists)
+    if (newsRequiredChk) {
+      newsRequiredChk.checked = !!DEFAULTS[mode].newsRequired;
+    }
 
-    if (stocksTable && cryptoTable) {
-      stocksTable.style.display = mode === "stocks" ? "" : "none";
-      cryptoTable.style.display = mode === "crypto" ? "" : "none";
-    }    
+    // tables
+    if (stocksTable) stocksTable.style.display = mode === "stocks" ? "" : "none";
+    if (cryptoTable) cryptoTable.style.display = mode === "crypto" ? "" : "none";
 
-    // Header indices swap
+    // hero charts
+    if (heroChartStocks) heroChartStocks.style.display = mode === "stocks" ? "" : "none";
+    if (heroChartCrypto) heroChartCrypto.style.display = mode === "crypto" ? "" : "none";
+
+    // header indices labels + placeholder values
     if (idxLeftLabel && idxRightLabel) {
       if (mode === "stocks") {
         idxLeftLabel.textContent = "NASDAQ";
         idxRightLabel.textContent = "S&P 500";
-
-        // Keep whatever demo values you want
-        // (Later we’ll update these from backend)
-        idxLeftValue && (idxLeftValue.textContent = "+1.24%");
-        idxRightValue && (idxRightValue.textContent = "-0.31%");
-
+        if (idxLeftValue) idxLeftValue.textContent = "+1.24%";
+        if (idxRightValue) idxRightValue.textContent = "-0.31%";
         idxWrap?.classList.remove("crypto");
       } else {
         idxLeftLabel.textContent = "BTC";
         idxRightLabel.textContent = "Total Crypto Market";
-
-        // Demo values (swap later to real)
-        idxLeftValue && (idxLeftValue.textContent = "+2.41%");
-        idxRightValue && (idxRightValue.textContent = "+0.88%");
-
-        // Make both green
-        idxWrap?.classList.add("crypto");
+        if (idxLeftValue) idxLeftValue.textContent = "+—%";
+        if (idxRightValue) idxRightValue.textContent = "+—%";
+        idxWrap?.classList.add("crypto"); // make green via CSS
       }
-    }
-
-    // Hero chart swap
-    if (heroChartStocks && heroChartCrypto) {
-      heroChartStocks.style.display = mode === "stocks" ? "" : "none";
-      heroChartCrypto.style.display = mode === "crypto" ? "" : "none";
     }
 
     localStorage.setItem("sj_asset_mode", mode);
 
-    // Later: refreshScreener(mode);
+    // start polling correct endpoint for this mode
+    startPollingForMode();
   }
 
-  // init
+  // init mode
   const saved = localStorage.getItem("sj_asset_mode");
-  const mode = saved === "crypto" ? "crypto" : "stocks";
-  applyMode(mode);
+  applyMode(saved === "crypto" ? "crypto" : "stocks");
 
   // clicks
   assetControl.addEventListener("click", (e) => {
@@ -387,119 +404,4 @@ function startPolling(loadFn, ms = 60_000) {
   });
 })();
 
-let stocksTimer = null;
-let cryptoTimer = null;
 
-function showStocksMode() {
-  document.getElementById("stocksTable")?.style && (document.getElementById("stocksTable").style.display = "");
-  document.getElementById("cryptoTable")?.style && (document.getElementById("cryptoTable").style.display = "none");
-
-  // stop crypto polling
-  if (cryptoTimer) clearInterval(cryptoTimer);
-
-  // start stocks polling
-  stocksTimer = startPolling(loadStocksOnce, 60_000);
-}
-
-function showCryptoMode() {
-  document.getElementById("stocksTable")?.style && (document.getElementById("stocksTable").style.display = "none");
-  document.getElementById("cryptoTable")?.style && (document.getElementById("cryptoTable").style.display = "");
-
-  // stop stocks polling
-  if (stocksTimer) clearInterval(stocksTimer);
-
-  // start crypto polling
-  cryptoTimer = startPolling(loadCryptoOnce, 60_000);
-}
-
-// TODO: wire these to your actual toggle buttons/segmented control.
-// For now, default to Stocks.
-showStocksMode();
-
-// ------------------------------
-// Phase A: Toggle (Stocks / Crypto)
-// ------------------------------
-const assetControl = document.getElementById("assetControl");
-
-const stocksTable = document.getElementById("stocksTable");
-const cryptoTable = document.getElementById("cryptoTable");
-
-const heroStocks = document.getElementById("heroChartStocks");
-const heroCrypto = document.getElementById("heroChartCrypto");
-
-// Header indices
-const idxLeftLabel = document.getElementById("idxLeftLabel");
-const idxLeftValue = document.getElementById("idxLeftValue");
-const idxRightLabel = document.getElementById("idxRightLabel");
-const idxRightValue = document.getElementById("idxRightValue");
-
-function setSegmented(controlEl, value) {
-  if (!controlEl) return;
-  controlEl.querySelectorAll(".segmented-btn").forEach((btn) => {
-    btn.classList.toggle("segmented-on", btn.dataset.value === value);
-  });
-}
-
-// Optional: persist choice
-function getSavedAsset() {
-  return localStorage.getItem("sj_asset") || "stocks";
-}
-function saveAsset(v) {
-  localStorage.setItem("sj_asset", v);
-}
-
-// CSS helper: make crypto values green
-function setCryptoIndexStyle(isCrypto) {
-  // For crypto: both values green
-  if (isCrypto) {
-    idxLeftValue?.classList.remove("down");
-    idxRightValue?.classList.remove("down");
-    idxLeftValue?.classList.add("up");
-    idxRightValue?.classList.add("up");
-  }
-  // For stocks: leave as-is (you can later wire real values)
-}
-
-function applyAssetMode(mode) {
-  currentMode = mode; // uses your Phase A variable
-
-  const isCrypto = mode === "crypto";
-
-  // Tables
-  if (stocksTable) stocksTable.style.display = isCrypto ? "none" : "";
-  if (cryptoTable) cryptoTable.style.display = isCrypto ? "" : "none";
-
-  // Hero charts
-  if (heroStocks) heroStocks.style.display = isCrypto ? "none" : "";
-  if (heroCrypto) heroCrypto.style.display = isCrypto ? "" : "none";
-
-  // Header indices labels
-  if (idxLeftLabel) idxLeftLabel.textContent = isCrypto ? "BTC" : "NASDAQ";
-  if (idxRightLabel) idxRightLabel.textContent = isCrypto ? "Total Crypto Market" : "S&P 500";
-
-  // Header indices values (placeholder values for now)
-  // Later Phase B: you’ll fetch actual BTC change / total mkt change
-  if (idxLeftValue) idxLeftValue.textContent = isCrypto ? "+—%" : "+1.24%";
-  if (idxRightValue) idxRightValue.textContent = isCrypto ? "+—%" : "-0.31%";
-
-  setCryptoIndexStyle(isCrypto);
-
-  // Kick an immediate refresh for the newly selected mode
-  refreshActive();
-}
-
-if (assetControl) {
-  assetControl.addEventListener("click", (e) => {
-    const btn = e.target.closest(".segmented-btn");
-    if (!btn) return;
-    const v = btn.dataset.value; // "stocks" or "crypto"
-    setSegmented(assetControl, v);
-    saveAsset(v);
-    applyAssetMode(v);
-  });
-
-  // Init from saved
-  const initial = getSavedAsset();
-  setSegmented(assetControl, initial);
-  applyAssetMode(initial);
-}

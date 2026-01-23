@@ -1638,3 +1638,9 @@
     transform:none;
   }
 }
+.idx { display:inline-flex; gap:8px; align-items:baseline; }
+.idx-value { font-weight: 600; }
+
+.market-indices.crypto .idx-value{
+  color: rgba(62,240,143,0.95) !important;
+}

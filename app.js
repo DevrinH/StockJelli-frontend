@@ -188,10 +188,18 @@ document.addEventListener("keydown", (e) => {
 // ─────────────────────────────────────────────
 (function () {
   const assetControl = document.getElementById("assetControl");
-  const assetTitle = document.getElementById("assetTitle");
   const newsRequiredChk = document.getElementById("newsRequiredChk");
 
-  if (!assetControl || !assetTitle || !newsRequiredChk) return;
+  const idxWrap = document.querySelector(".market-indices");
+  const idxLeftLabel = document.getElementById("idxLeftLabel");
+  const idxRightLabel = document.getElementById("idxRightLabel");
+  const idxLeftValue = document.getElementById("idxLeftValue");
+  const idxRightValue = document.getElementById("idxRightValue");
+
+  const heroChartStocks = document.getElementById("heroChartStocks");
+  const heroChartCrypto = document.getElementById("heroChartCrypto");
+
+  if (!assetControl || !newsRequiredChk) return;
 
   const DEFAULTS = {
     stocks: { newsRequired: true },
@@ -205,21 +213,45 @@ document.addEventListener("keydown", (e) => {
   }
 
   function applyMode(mode) {
-    // Update UI
-    assetTitle.textContent = mode === "stocks" ? "Stocks" : "Crypto";
     setSegmented(assetControl, mode);
 
-    // Default behavior you asked for:
-    // Stocks => news required ON
-    // Crypto => news required OFF
-    const defaults = DEFAULTS[mode];
-    newsRequiredChk.checked = !!defaults.newsRequired;
+    // Catalyst default behavior
+    newsRequiredChk.checked = !!DEFAULTS[mode].newsRequired;
 
-    // Persist
+    // Header indices swap
+    if (idxLeftLabel && idxRightLabel) {
+      if (mode === "stocks") {
+        idxLeftLabel.textContent = "NASDAQ";
+        idxRightLabel.textContent = "S&P 500";
+
+        // Keep whatever demo values you want
+        // (Later we’ll update these from backend)
+        idxLeftValue && (idxLeftValue.textContent = "+1.24%");
+        idxRightValue && (idxRightValue.textContent = "-0.31%");
+
+        idxWrap?.classList.remove("crypto");
+      } else {
+        idxLeftLabel.textContent = "BTC";
+        idxRightLabel.textContent = "Total Crypto Market";
+
+        // Demo values (swap later to real)
+        idxLeftValue && (idxLeftValue.textContent = "+2.41%");
+        idxRightValue && (idxRightValue.textContent = "+0.88%");
+
+        // Make both green
+        idxWrap?.classList.add("crypto");
+      }
+    }
+
+    // Hero chart swap
+    if (heroChartStocks && heroChartCrypto) {
+      heroChartStocks.style.display = mode === "stocks" ? "" : "none";
+      heroChartCrypto.style.display = mode === "crypto" ? "" : "none";
+    }
+
     localStorage.setItem("sj_asset_mode", mode);
 
-    // TODO: Later we’ll call refreshScreener(mode) here to hit the backend
-    // refreshScreener(mode);
+    // Later: refreshScreener(mode);
   }
 
   // init
@@ -227,10 +259,11 @@ document.addEventListener("keydown", (e) => {
   const mode = saved === "crypto" ? "crypto" : "stocks";
   applyMode(mode);
 
-  // handle clicks
+  // clicks
   assetControl.addEventListener("click", (e) => {
     const btn = e.target.closest(".segmented-btn");
     if (!btn) return;
     applyMode(btn.dataset.value);
   });
 })();
+

@@ -1644,3 +1644,6 @@
 .market-indices.crypto .idx-value{
   color: rgba(62,240,143,0.95) !important;
 }
+.market-indices.crypto .idx-value {
+  color: rgba(62,240,143,0.95);
+}

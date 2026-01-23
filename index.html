@@ -88,79 +88,164 @@
     <!-- Main content -->
     <div class="content">
 
-      <!-- Hero -->
-      <section class="hero">
-        <div class="container hero-grid">
-          <div class="hero-left">
-            <h1>Clean momentum.<br>No noise.</h1>
-            <p>
-              A simple momentum stock and crypto screener. Free to use. Optional $5 a month alerts.
-            </p>
-          </div>
-      
-          <div class="hero-right" aria-hidden="true">
-            <div class="hero-chart">
-              <!-- STOCKS CHART -->
-              <svg id="heroChartStocks" viewBox="0 0 520 220" class="spark" role="img" aria-label="">
-                <!-- (KEEP YOUR EXISTING SVG CONTENT EXACTLY AS-IS) -->
-              </svg>
-            
-              <!-- CRYPTO CHART (simple variant; you can style/shape later) -->
-              <svg id="heroChartCrypto" viewBox="0 0 520 220" class="spark" role="img" aria-label="" style="display:none;">
-                <defs>
-                  <linearGradient id="lineGradCrypto" x1="0" y1="0" x2="1" y2="0">
-                    <stop offset="0%" stop-color="rgba(62,240,143,0.0)"/>
-                    <stop offset="40%" stop-color="rgba(62,240,143,0.55)"/>
-                    <stop offset="100%" stop-color="rgba(62,240,143,0.0)"/>
-                  </linearGradient>
-                  <linearGradient id="fillGradCrypto" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stop-color="rgba(62,240,143,0.16)"/>
-                    <stop offset="70%" stop-color="rgba(62,240,143,0.03)"/>
-                    <stop offset="100%" stop-color="rgba(62,240,143,0.0)"/>
-                  </linearGradient>
-                  <filter id="glowCrypto" x="-20%" y="-20%" width="140%" height="140%">
-                    <feGaussianBlur stdDeviation="3" result="blur"/>
-                    <feMerge>
-                      <feMergeNode in="blur"/>
-                      <feMergeNode in="SourceGraphic"/>
-                    </feMerge>
-                  </filter>
-                </defs>
-            
-                <g class="grid">
-                  <line x1="0" y1="40" x2="520" y2="40"></line>
-                  <line x1="0" y1="90" x2="520" y2="90"></line>
-                  <line x1="0" y1="140" x2="520" y2="140"></line>
-                  <line x1="0" y1="190" x2="520" y2="190"></line>
-                </g>
-            
-                <path
-                  d="M0 170
-                     C 80 120, 140 190, 210 130
-                     C 280 75, 340 155, 410 95
-                     C 455 60, 480 110, 520 70
-                     L 520 220 L 0 220 Z"
-                  fill="url(#fillGradCrypto)"
-                />
-            
-                <path
-                  d="M0 170
-                     C 80 120, 140 190, 210 130
-                     C 280 75, 340 155, 410 95
-                     C 455 60, 480 110, 520 70"
-                  stroke="url(#lineGradCrypto)"
-                  stroke-width="3"
-                  fill="none"
-                  filter="url(#glowCrypto)"
-                />
-            
-                <circle cx="410" cy="95" r="4" fill="rgba(62,240,143,0.95)" />
-              </svg>
-            </div>
-            
-          </div>
-        </div>
-      </section>
+     <!-- Hero -->
+<section class="hero">
+  <div class="container hero-grid">
+    <div class="hero-left">
+      <h1>Clean momentum.<br>No noise.</h1>
+      <p>
+        A simple momentum stock and crypto screener. Free to use. Optional $5 a month alerts.
+      </p>
+    </div>
+
+    <div class="hero-right" aria-hidden="true">
+      <div class="hero-chart">
+
+        <!-- STOCKS CHART (unchanged from your original working one) -->
+        <svg id="heroChartStocks" viewBox="0 0 520 220" class="spark" role="img" aria-label="">
+          <defs>
+            <linearGradient id="lineGradStocks" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0%" stop-color="rgba(77,163,255,0.0)" />
+              <stop offset="35%" stop-color="rgba(77,163,255,0.55)" />
+              <stop offset="70%" stop-color="rgba(62,240,143,0.55)" />
+              <stop offset="100%" stop-color="rgba(62,240,143,0.0)" />
+            </linearGradient>
+
+            <linearGradient id="fillGradStocks" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="rgba(62,240,143,0.16)" />
+              <stop offset="70%" stop-color="rgba(62,240,143,0.03)" />
+              <stop offset="100%" stop-color="rgba(62,240,143,0.0)" />
+            </linearGradient>
+
+            <filter id="glowStocks" x="-20%" y="-20%" width="140%" height="140%">
+              <feGaussianBlur stdDeviation="3" result="blur" />
+              <feMerge>
+                <feMergeNode in="blur" />
+                <feMergeNode in="SourceGraphic" />
+              </feMerge>
+            </filter>
+
+            <!-- Mask used to animate a soft reveal sweep -->
+            <mask id="revealMaskStocks">
+              <rect class="reveal" x="-40" y="0" width="240" height="220" fill="white" />
+            </mask>
+          </defs>
+
+          <!-- subtle grid -->
+          <g class="grid">
+            <line x1="0" y1="40" x2="520" y2="40"></line>
+            <line x1="0" y1="90" x2="520" y2="90"></line>
+            <line x1="0" y1="140" x2="520" y2="140"></line>
+            <line x1="0" y1="190" x2="520" y2="190"></line>
+          </g>
+
+          <!-- shadow fill -->
+          <path
+            class="fill"
+            d="M0 190
+               C 60 160, 90 170, 130 145
+               C 175 118, 205 135, 250 105
+               C 290 78, 330 95, 370 72
+               C 412 50, 450 75, 520 55
+               L 520 220 L 0 220 Z"
+            fill="url(#fillGradStocks)"
+            mask="url(#revealMaskStocks)"
+          />
+
+          <!-- main line -->
+          <path
+            class="line"
+            d="M0 190
+               C 60 160, 90 170, 130 145
+               C 175 118, 205 135, 250 105
+               C 290 78, 330 95, 370 72
+               C 412 50, 450 75, 520 55"
+            stroke="url(#lineGradStocks)"
+            stroke-width="3"
+            fill="none"
+            filter="url(#glowStocks)"
+            mask="url(#revealMaskStocks)"
+          />
+
+          <!-- tiny highlight dot -->
+          <circle class="dot" cx="370" cy="72" r="4" />
+        </svg>
+
+        <!-- CRYPTO CHART (same reveal animation via mask + same .reveal CSS) -->
+        <svg
+          id="heroChartCrypto"
+          viewBox="0 0 520 220"
+          class="spark"
+          role="img"
+          aria-label=""
+          style="display:none;"
+        >
+          <defs>
+            <linearGradient id="lineGradCrypto" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0%" stop-color="rgba(62,240,143,0.0)" />
+              <stop offset="40%" stop-color="rgba(62,240,143,0.6)" />
+              <stop offset="100%" stop-color="rgba(62,240,143,0.0)" />
+            </linearGradient>
+
+            <linearGradient id="fillGradCrypto" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="rgba(62,240,143,0.16)" />
+              <stop offset="70%" stop-color="rgba(62,240,143,0.03)" />
+              <stop offset="100%" stop-color="rgba(62,240,143,0.0)" />
+            </linearGradient>
+
+            <filter id="glowCrypto" x="-20%" y="-20%" width="140%" height="140%">
+              <feGaussianBlur stdDeviation="3" result="blur" />
+              <feMerge>
+                <feMergeNode in="blur" />
+                <feMergeNode in="SourceGraphic" />
+              </feMerge>
+            </filter>
+
+            <!-- IMPORTANT: crypto also uses the reveal sweep -->
+            <mask id="revealMaskCrypto">
+              <rect class="reveal" x="-40" y="0" width="240" height="220" fill="white" />
+            </mask>
+          </defs>
+
+          <g class="grid">
+            <line x1="0" y1="40" x2="520" y2="40"></line>
+            <line x1="0" y1="90" x2="520" y2="90"></line>
+            <line x1="0" y1="140" x2="520" y2="140"></line>
+            <line x1="0" y1="190" x2="520" y2="190"></line>
+          </g>
+
+          <path
+            class="fill"
+            d="M0 170
+               C 80 120, 140 190, 210 130
+               C 280 75, 340 155, 410 95
+               C 455 60, 480 110, 520 70
+               L 520 220 L 0 220 Z"
+            fill="url(#fillGradCrypto)"
+            mask="url(#revealMaskCrypto)"
+          />
+
+          <path
+            class="line"
+            d="M0 170
+               C 80 120, 140 190, 210 130
+               C 280 75, 340 155, 410 95
+               C 455 60, 480 110, 520 70"
+            stroke="url(#lineGradCrypto)"
+            stroke-width="3"
+            fill="none"
+            filter="url(#glowCrypto)"
+            mask="url(#revealMaskCrypto)"
+          />
+
+          <circle class="dot" cx="410" cy="95" r="4" fill="rgba(62,240,143,0.95)" />
+        </svg>
+
+      </div>
+    </div>
+  </div>
+</section>
+
       
 
 
@@ -186,7 +271,9 @@
           
 
           <div class="table-wrap">
-            <table class="stocks-table">
+
+            <!-- STOCKS TABLE -->
+            <table class="stocks-table" id="stocksTable">
               <thead>
                 <tr>
                   <th>Ticker</th>
@@ -196,36 +283,36 @@
                   <th>News</th>
                 </tr>
               </thead>
+              <tbody id="stocksTbody">
+                <!-- (your stock rows) -->
+              </tbody>
+            </table>
           
-              <tbody>
+            <!-- CRYPTO TABLE -->
+            <table class="stocks-table" id="cryptoTable" style="display:none;">
+              <thead>
                 <tr>
-                  <td class="ticker">ASTS</td>
-                  <td>$18.42</td>
-                  <td class="up">+9.8%</td>
-                  <td>12.4M</td>
-                  <td class="news">
-                    <a class="news-source" href="#" target="_blank" rel="noopener">
-                      Reuters
-                    </a>
-                  </td>
-                  
+                  <th>Coin</th>
+                  <th>Price</th>
+                  <th>% Change 24h</th>
+                  <th>Volume 24h</th>
+                  <th>Market Cap</th>
                 </tr>
-          
+              </thead>
+              <tbody id="cryptoTbody">
+                <!-- placeholder rows -->
                 <tr>
-                  <td class="ticker">AMD</td>
-                  <td>$142.10</td>
-                  <td class="up">+4.1%</td>
-                  <td>48.9M</td>
-                  <td class="news">
-                    <a class="news-source" href="#" target="_blank" rel="noopener">
-                      PR Newswire
-                    </a>
-                  </td>
-                  
+                  <td class="ticker">BTC</td>
+                  <td>$—</td>
+                  <td class="up">—</td>
+                  <td>—</td>
+                  <td>—</td>
                 </tr>
               </tbody>
             </table>
+          
           </div>
+          
           
 
           <!-- Filters (clean) -->

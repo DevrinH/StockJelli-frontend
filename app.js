@@ -18,6 +18,10 @@
   
     const stripeCheckoutBtn = document.getElementById("stripeCheckoutBtn");
     const googleSignInBtn = document.getElementById("googleSignInBtn");
+
+    const stocksTable = document.getElementById("stocksTable");
+    const cryptoTable = document.getElementById("cryptoTable");
+
   
     if (!modal || !openBtn) return;
   
@@ -217,6 +221,11 @@ document.addEventListener("keydown", (e) => {
 
     // Catalyst default behavior
     newsRequiredChk.checked = !!DEFAULTS[mode].newsRequired;
+
+    if (stocksTable && cryptoTable) {
+      stocksTable.style.display = mode === "stocks" ? "" : "none";
+      cryptoTable.style.display = mode === "crypto" ? "" : "none";
+    }    
 
     // Header indices swap
     if (idxLeftLabel && idxRightLabel) {

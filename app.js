@@ -1,202 +1,212 @@
+// ============================================================
+// StockJelli Frontend (app.js) — CLEAN SINGLE VERSION
+// ============================================================
+
+// ------------------------------------------------------------
+// Alerts Modal (3-step)
+// ------------------------------------------------------------
 (function () {
-    const modal = document.getElementById("alertsModal");
-    const openBtn = document.getElementById("enableAlertsBtn");
-    const closeBtn = document.getElementById("closeModalBtn");
-  
-    const toStep2Btn = document.getElementById("toStep2Btn");
-    const backToStep1Btn = document.getElementById("backToStep1Btn");
-    const toStep3Btn = document.getElementById("toStep3Btn");
-    const backToStep2Btn = document.getElementById("backToStep2Btn");
-    const finishBtn = document.getElementById("finishBtn");
-  
-    const presetControl = document.getElementById("presetControl");
-    const sessionControl = document.getElementById("sessionControl");
-    const presetHint = document.getElementById("presetHint");
-  
-    const summaryPreset = document.getElementById("summaryPreset");
-    const summarySession = document.getElementById("summarySession");
-  
-    const stripeCheckoutBtn = document.getElementById("stripeCheckoutBtn");
-    const googleSignInBtn = document.getElementById("googleSignInBtn");
+  const modal = document.getElementById("alertsModal");
+  const openBtn = document.getElementById("enableAlertsBtn");
+  const closeBtn = document.getElementById("closeModalBtn");
 
-    const stocksTable = document.getElementById("stocksTable");
-    const cryptoTable = document.getElementById("cryptoTable");
+  const toStep2Btn = document.getElementById("toStep2Btn");
+  const backToStep1Btn = document.getElementById("backToStep1Btn");
+  const toStep3Btn = document.getElementById("toStep3Btn");
+  const backToStep2Btn = document.getElementById("backToStep2Btn");
+  const finishBtn = document.getElementById("finishBtn");
 
-  
-    if (!modal || !openBtn) return;
-  
-    const state = {
-      step: 1,
-      preset: "balanced",
-      session: "market",
-    };
-  
-    const presetHints = {
-      balanced: "Default: best signal-to-noise.",
-      conservative: "Fewer alerts. Higher confidence setups.",
-      aggressive: "More alerts. Lower threshold. More noise.",
-    };
-  
-    const labelPreset = {
-      balanced: "Balanced",
-      conservative: "Conservative",
-      aggressive: "Aggressive",
-    };
-  
-    const labelSession = {
-      market: "Market",
-      premarket: "Pre-market",
-      afterhours: "After-hours",
-    };
-  
-    function openModal() {
-      modal.classList.add("is-open");
-      modal.setAttribute("aria-hidden", "false");
-      document.body.style.overflow = "hidden";
-      setStep(1);
-    }
-  
-    function closeModal() {
-      modal.classList.remove("is-open");
-      modal.setAttribute("aria-hidden", "true");
-      document.body.style.overflow = "";
-    }
-  
-    function setStep(step) {
-      state.step = step;
-  
-      // toggle sections
-      document.querySelectorAll(".modal-step").forEach((el) => {
-        const s = Number(el.getAttribute("data-step"));
-        el.hidden = s !== step;
-      });
-  
-      // step dots
-      document.querySelectorAll(".step-dot").forEach((dot) => {
-        const s = Number(dot.getAttribute("data-step"));
-        dot.classList.toggle("step-active", s === step);
-      });
-  
-      // summaries
-      summaryPreset.textContent = labelPreset[state.preset];
-      summarySession.textContent = labelSession[state.session];
-      presetHint.textContent = presetHints[state.preset];
-    }
-  
-    function setSegmented(controlEl, value) {
-      controlEl.querySelectorAll(".segmented-btn").forEach((btn) => {
-        btn.classList.toggle("segmented-on", btn.dataset.value === value);
-      });
-    }
-  
-    // Open/close handlers
-    openBtn.addEventListener("click", openModal);
-    closeBtn.addEventListener("click", closeModal);
-  
-    // Close when clicking outside modal
-    modal.addEventListener("click", (e) => {
-      if (e.target === modal) closeModal();
-    });
-  
-    // ESC to close
-    document.addEventListener("keydown", (e) => {
-      if (e.key === "Escape" && modal.classList.contains("is-open")) closeModal();
-    });
-  
-    // Step nav
-    toStep2Btn?.addEventListener("click", () => setStep(2));
-    backToStep1Btn?.addEventListener("click", () => setStep(1));
-    toStep3Btn?.addEventListener("click", () => setStep(3));
-    backToStep2Btn?.addEventListener("click", () => setStep(2));
-    finishBtn?.addEventListener("click", closeModal);
-  
-    // Preset selection
-    presetControl?.addEventListener("click", (e) => {
-      const btn = e.target.closest(".segmented-btn");
-      if (!btn) return;
-      state.preset = btn.dataset.value;
-      setSegmented(presetControl, state.preset);
-      presetHint.textContent = presetHints[state.preset];
-      summaryPreset.textContent = labelPreset[state.preset];
-      // persist light prefs (placeholder)
-      localStorage.setItem("sj_preset", state.preset);
-    });
-  
-    // Session selection
-    sessionControl?.addEventListener("click", (e) => {
-      const btn = e.target.closest(".segmented-btn");
-      if (!btn) return;
-      state.session = btn.dataset.value;
-      setSegmented(sessionControl, state.session);
-      summarySession.textContent = labelSession[state.session];
-      localStorage.setItem("sj_session", state.session);
-    });
-  
-    // Load persisted prefs (placeholder)
-    const savedPreset = localStorage.getItem("sj_preset");
-    const savedSession = localStorage.getItem("sj_session");
-    if (savedPreset && labelPreset[savedPreset]) {
-      state.preset = savedPreset;
-      setSegmented(presetControl, state.preset);
-    }
-    if (savedSession && labelSession[savedSession]) {
-      state.session = savedSession;
-      setSegmented(sessionControl, state.session);
-    }
-  
-    // Placeholder buttons
-    googleSignInBtn?.addEventListener("click", () => {
-      alert("Google Sign-In will be wired on the DigitalOcean backend (OAuth).");
-    });
-  
-    stripeCheckoutBtn?.addEventListener("click", () => {
-      alert("Stripe Checkout will be wired next (create session + webhook).");
-    });
-  
-    // initial sync
+  const presetControl = document.getElementById("presetControl");
+  const sessionControl = document.getElementById("sessionControl");
+  const presetHint = document.getElementById("presetHint");
+
+  const summaryPreset = document.getElementById("summaryPreset");
+  const summarySession = document.getElementById("summarySession");
+
+  const stripeCheckoutBtn = document.getElementById("stripeCheckoutBtn");
+  const googleSignInBtn = document.getElementById("googleSignInBtn");
+
+  if (!modal || !openBtn) return;
+
+  const state = {
+    step: 1,
+    preset: "balanced",
+    session: "market",
+  };
+
+  const presetHints = {
+    balanced: "Default: best signal-to-noise.",
+    conservative: "Fewer alerts. Higher confidence setups.",
+    aggressive: "More alerts. Lower threshold. More noise.",
+  };
+
+  const labelPreset = {
+    balanced: "Balanced",
+    conservative: "Conservative",
+    aggressive: "Aggressive",
+  };
+
+  const labelSession = {
+    market: "Market",
+    premarket: "Pre-market",
+    afterhours: "After-hours",
+  };
+
+  function openModal() {
+    modal.classList.add("is-open");
+    modal.setAttribute("aria-hidden", "false");
+    document.body.style.overflow = "hidden";
     setStep(1);
-  })();
-  
-  ////////
+  }
 
+  function closeModal() {
+    modal.classList.remove("is-open");
+    modal.setAttribute("aria-hidden", "true");
+    document.body.style.overflow = "";
+  }
+
+  function setStep(step) {
+    state.step = step;
+
+    // toggle sections
+    document.querySelectorAll(".modal-step").forEach((el) => {
+      const s = Number(el.getAttribute("data-step"));
+      el.hidden = s !== step;
+    });
+
+    // step dots
+    document.querySelectorAll(".step-dot").forEach((dot) => {
+      const s = Number(dot.getAttribute("data-step"));
+      dot.classList.toggle("step-active", s === step);
+    });
+
+    // summaries
+    if (summaryPreset) summaryPreset.textContent = labelPreset[state.preset];
+    if (summarySession) summarySession.textContent = labelSession[state.session];
+    if (presetHint) presetHint.textContent = presetHints[state.preset];
+  }
+
+  function setSegmented(controlEl, value) {
+    if (!controlEl) return;
+    controlEl.querySelectorAll(".segmented-btn").forEach((btn) => {
+      btn.classList.toggle("segmented-on", btn.dataset.value === value);
+    });
+  }
+
+  // Open/close handlers
+  openBtn.addEventListener("click", openModal);
+  closeBtn?.addEventListener("click", closeModal);
+
+  // Close when clicking outside modal
+  modal.addEventListener("click", (e) => {
+    if (e.target === modal) closeModal();
+  });
+
+  // ESC to close
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && modal.classList.contains("is-open")) closeModal();
+  });
+
+  // Step nav
+  toStep2Btn?.addEventListener("click", () => setStep(2));
+  backToStep1Btn?.addEventListener("click", () => setStep(1));
+  toStep3Btn?.addEventListener("click", () => setStep(3));
+  backToStep2Btn?.addEventListener("click", () => setStep(2));
+  finishBtn?.addEventListener("click", closeModal);
+
+  // Preset selection
+  presetControl?.addEventListener("click", (e) => {
+    const btn = e.target.closest(".segmented-btn");
+    if (!btn) return;
+    state.preset = btn.dataset.value;
+    setSegmented(presetControl, state.preset);
+    if (presetHint) presetHint.textContent = presetHints[state.preset];
+    if (summaryPreset) summaryPreset.textContent = labelPreset[state.preset];
+    localStorage.setItem("sj_preset", state.preset);
+  });
+
+  // Session selection
+  sessionControl?.addEventListener("click", (e) => {
+    const btn = e.target.closest(".segmented-btn");
+    if (!btn) return;
+    state.session = btn.dataset.value;
+    setSegmented(sessionControl, state.session);
+    if (summarySession) summarySession.textContent = labelSession[state.session];
+    localStorage.setItem("sj_session", state.session);
+  });
+
+  // Load persisted prefs
+  const savedPreset = localStorage.getItem("sj_preset");
+  const savedSession = localStorage.getItem("sj_session");
+  if (savedPreset && labelPreset[savedPreset]) {
+    state.preset = savedPreset;
+    setSegmented(presetControl, state.preset);
+  }
+  if (savedSession && labelSession[savedSession]) {
+    state.session = savedSession;
+    setSegmented(sessionControl, state.session);
+  }
+
+  // Placeholder buttons
+  googleSignInBtn?.addEventListener("click", () => {
+    alert("Google Sign-In will be wired on the DigitalOcean backend (OAuth).");
+  });
+
+  stripeCheckoutBtn?.addEventListener("click", () => {
+    alert("Stripe Checkout will be wired next (create session + webhook).");
+  });
+
+  // initial sync
+  setStep(1);
+})();
+
+
+// ------------------------------------------------------------
+// Drawer menu
+// ------------------------------------------------------------
+(function () {
   const menuBtn = document.getElementById("menuBtn");
-const drawer = document.getElementById("drawer");
-const overlay = document.getElementById("drawerOverlay");
-const closeBtn = document.getElementById("drawerClose");
+  const drawer = document.getElementById("drawer");
+  const overlay = document.getElementById("drawerOverlay");
+  const drawerCloseBtn = document.getElementById("drawerClose");
 
-function openDrawer(){
-  drawer.classList.add("is-open");
-  overlay.classList.add("is-open");
-  document.body.style.overflow = "hidden";
-}
+  if (!menuBtn || !drawer || !overlay) return;
 
-function closeDrawer(){
-  drawer.classList.remove("is-open");
-  overlay.classList.remove("is-open");
-  document.body.style.overflow = "";
-}
+  function openDrawer() {
+    drawer.classList.add("is-open");
+    overlay.classList.add("is-open");
+    document.body.style.overflow = "hidden";
+  }
 
-menuBtn.addEventListener("click", () => {
-  drawer.classList.contains("is-open") ? closeDrawer() : openDrawer();
-});
+  function closeDrawer() {
+    drawer.classList.remove("is-open");
+    overlay.classList.remove("is-open");
+    document.body.style.overflow = "";
+  }
 
-closeBtn.addEventListener("click", closeDrawer);
-overlay.addEventListener("click", closeDrawer);
+  menuBtn.addEventListener("click", () => {
+    drawer.classList.contains("is-open") ? closeDrawer() : openDrawer();
+  });
 
-document.addEventListener("keydown", (e) => {
-  if (e.key === "Escape") closeDrawer();
-});
+  drawerCloseBtn?.addEventListener("click", closeDrawer);
+  overlay.addEventListener("click", closeDrawer);
+
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") closeDrawer();
+  });
+})();
 
 
-// === StockJelli API ===
-const API_BASE = "https://api.stockjelli.com"; // backend lives here now
+// ------------------------------------------------------------
+// API helpers
+// ------------------------------------------------------------
+const API_BASE = "https://api.stockjelli.com";
 
 async function apiGet(path) {
   const r = await fetch(`${API_BASE}${path}`, { cache: "no-store" });
   if (!r.ok) throw new Error(`API ${path} -> ${r.status}`);
   return r.json();
 }
-
 
 function fmtNum(n) {
   if (n === null || n === undefined || Number.isNaN(Number(n))) return "—";
@@ -221,6 +231,10 @@ function classUpDown(n) {
   return v >= 0 ? "up" : "down";
 }
 
+
+// ------------------------------------------------------------
+// Renderers
+// ------------------------------------------------------------
 function renderStocks(rows) {
   const tbody = document.getElementById("stocksTbody");
   if (!tbody) return;
@@ -279,129 +293,130 @@ function renderCrypto(rows) {
 }
 
 
+// ------------------------------------------------------------
+// Loaders
+// ------------------------------------------------------------
 async function loadStocksOnce() {
-  // TEMP: We will create this endpoint in the backend in Phase A-Backend step
   const data = await apiGet("/api/v1/stocks/momentum");
   renderStocks(data.rows || data);
 }
 
 async function loadCryptoOnce() {
-  // TEMP: We will create this endpoint in the backend in Phase A-Backend step
   const data = await apiGet("/api/v1/crypto/momentum");
   renderCrypto(data.rows || data);
 }
 
-function startPolling(loadFn, ms = 60_000) {
-  loadFn().catch(console.error);
-  return setInterval(() => loadFn().catch(console.error), ms);
-}
 
-
-
-// ─────────────────────────────────────────────
-// Asset mode: Stocks vs Crypto (Screener toggle)
-// ─────────────────────────────────────────────
+// ------------------------------------------------------------
+// Phase A: ONE Toggle + ONE Polling loop
+// ------------------------------------------------------------
 (function () {
   const assetControl = document.getElementById("assetControl");
-  const newsRequiredChk = document.getElementById("newsRequiredChk");
 
-  const stocksTable = document.getElementById("stocksTable");
-  const cryptoTable = document.getElementById("cryptoTable");
+  const stocksTableEl = document.getElementById("stocksTable");
+  const cryptoTableEl = document.getElementById("cryptoTable");
 
-  const idxWrap = document.querySelector(".market-indices");
-  const idxLeftLabel = document.getElementById("idxLeftLabel");
-  const idxRightLabel = document.getElementById("idxRightLabel");
-  const idxLeftValue = document.getElementById("idxLeftValue");
-  const idxRightValue = document.getElementById("idxRightValue");
+  const heroStocksEl = document.getElementById("heroChartStocks");
+  const heroCryptoEl = document.getElementById("heroChartCrypto");
 
-  const heroChartStocks = document.getElementById("heroChartStocks");
-  const heroChartCrypto = document.getElementById("heroChartCrypto");
+  const idxWrapEl = document.querySelector(".market-indices");
+  const idxLeftLabelEl = document.getElementById("idxLeftLabel");
+  const idxLeftValueEl = document.getElementById("idxLeftValue");
+  const idxRightLabelEl = document.getElementById("idxRightLabel");
+  const idxRightValueEl = document.getElementById("idxRightValue");
 
-  if (!assetControl) return; // toggle UI missing
-
-  // Defaults: stocks = news required ON, crypto = OFF
-  const DEFAULTS = {
-    stocks: { newsRequired: true },
-    crypto: { newsRequired: false },
-  };
+  if (!assetControl) {
+    // still load stocks once so page isn't blank
+    loadStocksOnce().catch(console.error);
+    return;
+  }
 
   let pollTimer = null;
-  let currentMode = "stocks";
+  let mode = "stocks"; // "stocks" | "crypto"
 
-  function setSegmented(controlEl, value) {
-    controlEl.querySelectorAll(".segmented-btn").forEach((btn) => {
+  function setSegmentedUI(value) {
+    assetControl.querySelectorAll(".segmented-btn").forEach((btn) => {
       btn.classList.toggle("segmented-on", btn.dataset.value === value);
     });
   }
 
+  function setCryptoHeaderStyle(isCrypto) {
+    // Add class on wrapper; CSS can color it green
+    idxWrapEl?.classList.toggle("crypto", isCrypto);
+
+    // Also make both values "up" class so they appear green even without wrapper CSS
+    if (isCrypto) {
+      idxLeftValueEl?.classList.remove("down");
+      idxRightValueEl?.classList.remove("down");
+      idxLeftValueEl?.classList.add("up");
+      idxRightValueEl?.classList.add("up");
+    }
+  }
+
+  function stopPolling() {
+    if (pollTimer) clearInterval(pollTimer);
+    pollTimer = null;
+  }
+
   async function refreshOnce() {
     try {
-      if (currentMode === "stocks") {
-        await loadStocksOnce();
-      } else {
-        await loadCryptoOnce();
-      }
+      if (mode === "crypto") await loadCryptoOnce();
+      else await loadStocksOnce();
     } catch (e) {
       console.error(e);
     }
   }
 
-  function startPollingForMode() {
-    if (pollTimer) clearInterval(pollTimer);
-    refreshOnce(); // immediate
+  function startPolling() {
+    stopPolling();
+    refreshOnce();
     pollTimer = setInterval(refreshOnce, 60_000);
   }
 
-  function applyMode(mode) {
-    currentMode = mode;
-    setSegmented(assetControl, mode);
-
-    // checkbox default behavior (only if it exists)
-    if (newsRequiredChk) {
-      newsRequiredChk.checked = !!DEFAULTS[mode].newsRequired;
-    }
+  function applyMode(nextMode) {
+    mode = nextMode;
 
     // tables
-    if (stocksTable) stocksTable.style.display = mode === "stocks" ? "" : "none";
-    if (cryptoTable) cryptoTable.style.display = mode === "crypto" ? "" : "none";
+    if (stocksTableEl) stocksTableEl.style.display = mode === "stocks" ? "" : "none";
+    if (cryptoTableEl) cryptoTableEl.style.display = mode === "crypto" ? "" : "none";
 
     // hero charts
-    if (heroChartStocks) heroChartStocks.style.display = mode === "stocks" ? "" : "none";
-    if (heroChartCrypto) heroChartCrypto.style.display = mode === "crypto" ? "" : "none";
+    if (heroStocksEl) heroStocksEl.style.display = mode === "stocks" ? "" : "none";
+    if (heroCryptoEl) heroCryptoEl.style.display = mode === "crypto" ? "" : "none";
 
-    // header indices labels + placeholder values
-    if (idxLeftLabel && idxRightLabel) {
-      if (mode === "stocks") {
-        idxLeftLabel.textContent = "NASDAQ";
-        idxRightLabel.textContent = "S&P 500";
-        if (idxLeftValue) idxLeftValue.textContent = "+1.24%";
-        if (idxRightValue) idxRightValue.textContent = "-0.31%";
-        idxWrap?.classList.remove("crypto");
-      } else {
-        idxLeftLabel.textContent = "BTC";
-        idxRightLabel.textContent = "Total Crypto Market";
-        if (idxLeftValue) idxLeftValue.textContent = "+—%";
-        if (idxRightValue) idxRightValue.textContent = "+—%";
-        idxWrap?.classList.add("crypto"); // make green via CSS
-      }
+    // indices labels + placeholder values (Phase B later: real values)
+    if (mode === "stocks") {
+      if (idxLeftLabelEl) idxLeftLabelEl.textContent = "NASDAQ";
+      if (idxRightLabelEl) idxRightLabelEl.textContent = "S&P 500";
+      if (idxLeftValueEl) idxLeftValueEl.textContent = "+1.24%";
+      if (idxRightValueEl) idxRightValueEl.textContent = "-0.31%";
+      idxWrapEl?.classList.remove("crypto");
+    } else {
+      if (idxLeftLabelEl) idxLeftLabelEl.textContent = "BTC";
+      if (idxRightLabelEl) idxRightLabelEl.textContent = "Total Crypto Market";
+      if (idxLeftValueEl) idxLeftValueEl.textContent = "+—%";
+      if (idxRightValueEl) idxRightValueEl.textContent = "+—%";
+      idxWrapEl?.classList.add("crypto");
     }
 
+    setCryptoHeaderStyle(mode === "crypto");
+
+    // segmented UI + persistence
+    setSegmentedUI(mode);
     localStorage.setItem("sj_asset_mode", mode);
 
-    // start polling correct endpoint for this mode
-    startPollingForMode();
+    // polling
+    startPolling();
   }
 
-  // init mode
+  // init
   const saved = localStorage.getItem("sj_asset_mode");
   applyMode(saved === "crypto" ? "crypto" : "stocks");
 
-  // clicks
+  // click handler
   assetControl.addEventListener("click", (e) => {
     const btn = e.target.closest(".segmented-btn");
     if (!btn) return;
     applyMode(btn.dataset.value);
   });
 })();
-
-

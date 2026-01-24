@@ -1,0 +1,2 @@
+# ads.txt placeholder for Ezoic
+# Will be populated once Ezoic completes domain activation

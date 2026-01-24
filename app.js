@@ -149,10 +149,22 @@
   // Price pill input (no id in HTML) - grab it by location
   const priceCard = filterEls.priceRange?.closest(".filter-card");
   const priceNum = priceCard?.querySelector(".pill .num") || null;
+  const priceMetaLeft = priceCard?.querySelector(".filter-meta .muted:first-child") || null;
+  const priceMetaRight = priceCard?.querySelector(".filter-meta .muted:last-child") || null;
 
   // Volume pill input (no id in HTML)
   const volCard = filterEls.volRange?.closest(".filter-card");
   const volNum = volCard?.querySelector(".pill .num") || null;
+  const volMetaLeft = volCard?.querySelector(".filter-meta .muted:first-child") || null;
+  const volMetaRight = volCard?.querySelector(".filter-meta .muted:last-child") || null;
+
+  // Helper to format volume for display
+  function fmtVolume(n) {
+    if (!Number.isFinite(n)) return "0";
+    if (n >= 1e6) return `${(n / 1e6).toFixed(n % 1e6 === 0 ? 0 : 1)}M`;
+    if (n >= 1e3) return `${(n / 1e3).toFixed(0)}K`;
+    return String(n);
+  }
 
   // ----------------------------
   // Renderers
@@ -329,41 +341,66 @@
     }
   }
 
+  function setPriceUiForMode(mode) {
+    if (!filterEls.priceRange) return;
+
+    const state = filterState[mode];
+    const d = MODE_DEFAULTS[mode];
+
+    // Price filter config (same for both modes currently, but can diverge)
+    const priceMin = 1;
+    const priceMax = 5000;
+
+    filterEls.priceRange.min = String(priceMin);
+    filterEls.priceRange.max = String(priceMax);
+    filterEls.priceRange.step = "1";
+
+    // Update meta labels
+    if (priceMetaLeft) priceMetaLeft.textContent = `$${priceMin}`;
+    if (priceMetaRight) priceMetaRight.textContent = `$${priceMax.toLocaleString()}`;
+
+    // Set current value
+    const price = state.priceTouched ? state.priceValue : d.priceMax;
+    filterEls.priceRange.value = String(price);
+    if (priceNum) priceNum.value = String(price);
+  }
+
+  function setVolumeUiForMode(mode) {
+    if (!filterEls.volRange) return;
+
+    const state = filterState[mode];
+    const d = MODE_DEFAULTS[mode];
+
+    // Volume filter config (same for both modes currently)
+    const volMin = 0;
+    const volMax = 50_000_000;
+
+    filterEls.volRange.min = String(volMin);
+    filterEls.volRange.max = String(volMax);
+    filterEls.volRange.step = "100000";
+
+    // Update meta labels
+    if (volMetaLeft) volMetaLeft.textContent = "0";
+    if (volMetaRight) volMetaRight.textContent = "50M";
+
+    // Set current value
+    const vol = state.volTouched ? state.volValue : d.volMin;
+    filterEls.volRange.value = String(vol);
+    if (volNum) volNum.value = String(vol);
+  }
+
   function setUiDefaultsForMode(mode) {
     const d = MODE_DEFAULTS[mode];
-    const state = filterState[mode];
-
-    // Market cap - use state value if touched, otherwise default
-    if (filterEls.mcapRange) {
-      if (mode === "crypto") {
-        const dial = state.mcapTouched ? state.mcapValue : d.mcapDial;
-        filterEls.mcapRange.value = String(dial);
-      } else {
-        const mcapB = state.mcapTouched ? state.mcapValue : d.mcapMaxB;
-        filterEls.mcapRange.value = String(mcapB);
-      }
-    }
-
-    // Price - use state value if touched, otherwise default
-    if (filterEls.priceRange) {
-      const price = state.priceTouched ? state.priceValue : d.priceMax;
-      filterEls.priceRange.value = String(price);
-      if (priceNum) priceNum.value = String(price);
-    }
-
-    // Volume - use state value if touched, otherwise default
-    if (filterEls.volRange) {
-      const vol = state.volTouched ? state.volValue : d.volMin;
-      filterEls.volRange.value = String(vol);
-      if (volNum) volNum.value = String(vol);
-    }
 
     // News required checkbox
     if (filterEls.newsRequiredChk) {
       filterEls.newsRequiredChk.checked = !!d.newsRequired;
     }
 
+    // Update all filter UIs for the current mode
     setMcapUiForMode(mode);
+    setPriceUiForMode(mode);
+    setVolumeUiForMode(mode);
   }
 
   function readFiltersForMode(mode) {

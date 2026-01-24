@@ -450,12 +450,23 @@
 
   async function refreshOnce() {
     try {
-      if (currentMode === "stocks") await loadStocksOnce();
-      else await loadCryptoOnce();
+      const url =
+        currentMode === "crypto"
+          ? "https://api.stockjelli.com/api/crypto?limit=15&pctMin=3&volMin=100000000"
+          : "https://api.stockjelli.com/api/stocks?limit=15&pctMin=4&volMin=10000000&mcapMin=1000000000&newsRequired=false";
+  
+      const res = await fetch(url, { cache: "no-store" });
+      const data = await res.json();
+  
+      // ✅ THIS is what updates BTC / Total Crypto Market %
+      updateHeaderIndicesFromApi(data);
+  
+      // ...then your existing table render logic...
     } catch (e) {
-      console.error(e);
+      console.error("refreshOnce failed", e);
     }
   }
+  
 
   function startPollingForMode() {
     if (pollTimer) clearInterval(pollTimer);
@@ -538,3 +549,44 @@
   });
 
 })();
+function formatPct(pct) {
+  if (pct === null || pct === undefined || Number.isNaN(Number(pct))) return "—";
+  const n = Number(pct);
+  const sign = n > 0 ? "+" : "";
+  return `${sign}${n.toFixed(2)}%`;
+}
+
+function setIdxValue(el, pct) {
+  if (!el) return;
+  el.textContent = formatPct(pct);
+
+  // reset classes
+  el.classList.remove("up", "down", "flat");
+
+  const n = Number(pct);
+  if (!Number.isFinite(n)) return;
+
+  if (n > 0) el.classList.add("up");
+  else if (n < 0) el.classList.add("down");
+  else el.classList.add("flat");
+}
+
+function updateHeaderIndicesFromApi(data) {
+  // supports BOTH shapes:
+  // - data.header.left.pct / data.header.right.pct
+  // - compat aliases (btcPct / totalMarketPct), if present
+  const leftPct =
+    data?.header?.left?.pct ??
+    data?.header?.btcPct ??
+    data?.header?.leftPct ??
+    null;
+
+  const rightPct =
+    data?.header?.right?.pct ??
+    data?.header?.totalMarketPct ??
+    data?.header?.rightPct ??
+    null;
+
+  setIdxValue(document.getElementById("idxLeftValue"), leftPct);
+  setIdxValue(document.getElementById("idxRightValue"), rightPct);
+}

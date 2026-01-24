@@ -296,26 +296,35 @@
   function renderStocks(rows) {
     const tbody = document.getElementById("stocksTbody");
     if (!tbody) return;
-
+  
     if (!rows || rows.length === 0) {
       tbody.innerHTML = `
         <tr><td class="ticker">—</td><td>$—</td><td>—</td><td>—</td><td class="news">—</td></tr>
       `;
       return;
     }
-
+  
     tbody.innerHTML = rows
       .map((x) => {
-        const changeClass = classUpDown(x.pct_change);
-        const newsHtml = x.news_source_url
-          ? `<a class="news-source" href="${x.news_source_url}" target="_blank" rel="noopener">${x.news_source || "Source"}</a>`
-          : x.news_source || "—";
-
+        const pct = x.pctChange;
+        const changeClass = classUpDown(pct);
+  
+        // news: backend returns news: [{title,source,url,publishedAt}]
+        let newsHtml = "—";
+        if (Array.isArray(x.news) && x.news.length) {
+          const item = x.news[0];
+          if (item?.url) {
+            newsHtml = `<a class="news-source" href="${item.url}" target="_blank" rel="noopener">${item.source || "News"}</a>`;
+          } else {
+            newsHtml = item?.source || "News";
+          }
+        }
+  
         return `
           <tr>
-            <td class="ticker">${x.ticker || "—"}</td>
+            <td class="ticker">${x.symbol || "—"}</td>
             <td>${fmtUsd(x.price)}</td>
-            <td class="${changeClass}">${fmtPct(x.pct_change)}</td>
+            <td class="${changeClass}">${fmtPct(pct)}</td>
             <td>${fmtNum(x.volume)}</td>
             <td class="news">${newsHtml}</td>
           </tr>
@@ -323,34 +332,43 @@
       })
       .join("");
   }
+  
 
   function renderCrypto(rows) {
     const tbody = document.getElementById("cryptoTbody");
     if (!tbody) return;
-
+  
     if (!rows || rows.length === 0) {
       tbody.innerHTML = `
         <tr><td class="ticker">—</td><td>$—</td><td>—</td><td>—</td><td>—</td></tr>
       `;
       return;
     }
-
+  
     tbody.innerHTML = rows
       .map((x) => {
-        const changeClass = classUpDown(x.pct_change_24h);
+        const pct = x.pctChange;        // ✅ new field
+        const vol = x.volume;           // ✅ new field
+        const mcap = x.marketCap;       // ✅ new field
+  
+        // use dynamic decimals for sub-$1 coins
+        const priceDecimals = x.price !== null && x.price !== undefined && Number(x.price) < 1 ? 6 : 2;
+  
+        const changeClass = classUpDown(pct);
+  
         return `
           <tr>
-            <td class="ticker">${x.symbol || x.coin || "—"}</td>
-            <td>${fmtUsd(x.price)}</td>
-            <td class="${changeClass}">${fmtPct(x.pct_change_24h)}</td>
-            <td>${fmtNum(x.volume_24h)}</td>
-            <td>${fmtCompactUsd(x.market_cap, 1)}</td>
-
+            <td class="ticker">${x.coinSymbol || "—"}</td>
+            <td>${fmtUsd(x.price, priceDecimals)}</td>
+            <td class="${changeClass}">${fmtPct(pct)}</td>
+            <td>${fmtNum(vol)}</td>
+            <td>${fmtCompactUsd(mcap, 1)}</td>
           </tr>
         `;
       })
       .join("");
   }
+  
 
   // ----------------------------
   // Filters -> query params (Phase A plumbing)
@@ -456,16 +474,24 @@
           : "https://api.stockjelli.com/api/stocks?limit=15&pctMin=4&volMin=10000000&mcapMin=1000000000&newsRequired=false";
   
       const res = await fetch(url, { cache: "no-store" });
+      if (!res.ok) throw new Error(`Fetch failed ${res.status} for ${url}`);
+  
       const data = await res.json();
   
-      // ✅ THIS is what updates BTC / Total Crypto Market %
+      // header
       updateHeaderIndicesFromApi(data);
   
-      // ...then your existing table render logic...
+      // ✅ render table
+      if (currentMode === "crypto") {
+        renderCrypto(data.rows);
+      } else {
+        renderStocks(data.rows);
+      }
     } catch (e) {
       console.error("refreshOnce failed", e);
     }
   }
+  
   
 
   function startPollingForMode() {

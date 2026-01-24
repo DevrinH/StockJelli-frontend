@@ -373,43 +373,115 @@
   // ----------------------------
   // Filters -> query params (Phase A plumbing)
   // ----------------------------
-  const filterEls = {
-    mcapRange: document.getElementById("mcapRange"),
-    mcapNum: document.getElementById("mcapNum"), // optional, if you add it
-    priceRange: document.getElementById("priceRange"),
-    volRange: document.getElementById("volRange"),
-    newsRequiredChk: document.getElementById("newsRequiredChk"),
+// ----------------------------
+// Filters -> query params (D-1 real wiring)
+// ----------------------------
+const filterEls = {
+  // NOTE: re-interpret mcapRange as "min" in billions
+  mcapMinRange: document.getElementById("mcapRange"),
+  mcapMinNum: document.getElementById("mcapNum"), // optional
 
-    applyBtn: document.getElementById("filtersApplyBtn"),
-    resetBtn: document.getElementById("filtersResetBtn"),
+  priceMaxRange: document.getElementById("priceRange"),
+  volMinRange: document.getElementById("volRange"),
+
+  newsRequiredChk: document.getElementById("newsRequiredChk"),
+
+  applyBtn: document.getElementById("filtersApplyBtn"),
+  resetBtn: document.getElementById("filtersResetBtn"),
+};
+
+const MODE_DEFAULTS = {
+  stocks: {
+    limit: 15,
+    pctMin: 4,
+    volMin: 10_000_000,
+    mcapMin: 1_000_000_000,
+    mcapMax: 500_000_000_000,
+    priceMin: 2,
+    priceMax: null,
+    newsRequired: true,
+  },
+  crypto: {
+    limit: 15,
+    pctMin: 3,
+    volMin: 100_000_000,
+    mcapMin: 1_000_000_000,
+    mcapMax: null,
+    priceMin: null,
+    priceMax: null,
+    newsRequired: false,
+  },
+};
+
+function readFiltersForMode(mode) {
+  const d = MODE_DEFAULTS[mode];
+
+  // mcapMin slider is in BILLIONS in the UI (e.g. 6 => 6B)
+  const mcapMinB = filterEls.mcapMinRange ? Number(filterEls.mcapMinRange.value) : 1;
+  const mcapMin = Number.isFinite(mcapMinB) ? Math.round(mcapMinB * 1e9) : d.mcapMin;
+
+  // price max slider in dollars
+  const priceMax = filterEls.priceMaxRange ? Number(filterEls.priceMaxRange.value) : (d.priceMax ?? 300);
+  const priceMaxFinal = Number.isFinite(priceMax) ? priceMax : d.priceMax;
+
+  // vol min slider in raw dollars (your UI currently goes 0..50M; crypto default is 100M)
+  const volMinUi = filterEls.volMinRange ? Number(filterEls.volMinRange.value) : d.volMin;
+  const volMin = Number.isFinite(volMinUi) ? Math.round(volMinUi) : d.volMin;
+
+  // checkbox
+  const newsRequired =
+    filterEls.newsRequiredChk ? !!filterEls.newsRequiredChk.checked : d.newsRequired;
+
+  return {
+    limit: d.limit,
+    pctMin: d.pctMin,
+    volMin,
+    mcapMin,
+    mcapMax: d.mcapMax,
+    priceMin: d.priceMin,
+    priceMax: priceMaxFinal,
+    newsRequired,
   };
+}
 
-  function readFilters() {
-    const mcapMaxB = filterEls.mcapRange ? clamp(filterEls.mcapRange.value, 1, 500) : 50;
-    const priceMax = filterEls.priceRange ? clamp(filterEls.priceRange.value, 1, 5000) : 300;
-    const volMin = filterEls.volRange ? clamp(filterEls.volRange.value, 0, 50_000_000) : 1_000_000;
-    const newsRequired = filterEls.newsRequiredChk ? !!filterEls.newsRequiredChk.checked : true;
+function buildApiPath(mode) {
+  const f = readFiltersForMode(mode);
+  const p = new URLSearchParams();
 
-    return { mcapMaxB, priceMax, volMin, newsRequired };
-  }
+  p.set("limit", String(Math.min(15, f.limit || 15)));
+  p.set("pctMin", String(f.pctMin));
+  p.set("volMin", String(f.volMin));
+  p.set("mcapMin", String(f.mcapMin));
 
-  function buildStocksPath() {
-    const f = readFilters();
-    const params = new URLSearchParams();
-    params.set("mcap_max_b", String(f.mcapMaxB));
-    params.set("price_max", String(f.priceMax));
-    params.set("vol_min", String(f.volMin));
-    params.set("news_required", f.newsRequired ? "1" : "0");
-    return `/api/v1/stocks/momentum?${params.toString()}`;
-  }
+  if (f.mcapMax !== null && f.mcapMax !== undefined) p.set("mcapMax", String(f.mcapMax));
+  if (f.priceMin !== null && f.priceMin !== undefined) p.set("priceMin", String(f.priceMin));
+  if (f.priceMax !== null && f.priceMax !== undefined) p.set("priceMax", String(f.priceMax));
 
-  function buildCryptoPath() {
-    const f = readFilters();
-    const params = new URLSearchParams();
-    params.set("price_max", String(f.priceMax));
-    params.set("vol_min", String(f.volMin));
-    return `/api/v1/crypto/momentum?${params.toString()}`;
-  }
+  // Only meaningful for stocks right now, but safe to send always
+  p.set("newsRequired", f.newsRequired ? "true" : "false");
+
+  return mode === "crypto"
+    ? `/api/crypto?${p.toString()}`
+    : `/api/stocks?${p.toString()}`;
+}
+
+// Optional sync for market cap number input
+function syncMcapNumberFromRange() {
+  if (!filterEls.mcapMinRange || !filterEls.mcapMinNum) return;
+  filterEls.mcapMinNum.value = filterEls.mcapMinRange.value;
+}
+
+if (filterEls.mcapMinRange && filterEls.mcapMinNum) {
+  filterEls.mcapMinRange.addEventListener("input", syncMcapNumberFromRange);
+  filterEls.mcapMinNum.addEventListener("input", () => {
+    const v = clamp(filterEls.mcapMinNum.value, 0, 500);
+    filterEls.mcapMinNum.value = v;
+    filterEls.mcapMinRange.value = v;
+  });
+  syncMcapNumberFromRange();
+}
+
+
 
   // Optional sync for market cap number input
   function syncMcapNumberFromRange() {
@@ -468,25 +540,14 @@
 
   async function refreshOnce() {
     try {
-      const url =
-        currentMode === "crypto"
-          ? "https://api.stockjelli.com/api/crypto?limit=15&pctMin=3&volMin=100000000"
-          : "https://api.stockjelli.com/api/stocks?limit=15&pctMin=4&volMin=10000000&mcapMin=1000000000&newsRequired=false";
+      const path = buildApiPath(currentMode);
+      const data = await apiGet(path);
   
-      const res = await fetch(url, { cache: "no-store" });
-      if (!res.ok) throw new Error(`Fetch failed ${res.status} for ${url}`);
-  
-      const data = await res.json();
-  
-      // header
+      // header should always reflect the current mode’s endpoint
       updateHeaderIndicesFromApi(data);
   
-      // ✅ render table
-      if (currentMode === "crypto") {
-        renderCrypto(data.rows);
-      } else {
-        renderStocks(data.rows);
-      }
+      if (currentMode === "crypto") renderCrypto(data.rows);
+      else renderStocks(data.rows);
     } catch (e) {
       console.error("refreshOnce failed", e);
     }
@@ -503,6 +564,9 @@
   function applyMode(mode) {
     currentMode = mode;
     setSegmented(assetControl, mode);
+    setUiDefaultsForMode(mode);
+    startPollingForMode();
+
 
     // default checkbox behavior
     if (filterEls.newsRequiredChk) {
@@ -540,6 +604,33 @@
     // poll correct endpoint
     startPollingForMode();
   }
+
+  function setUiDefaultsForMode(mode) {
+    const d = MODE_DEFAULTS[mode];
+  
+    // If you want hard switch every time, remove the "if (!...dataset.touched)" checks.
+    if (filterEls.mcapMinRange && !filterEls.mcapMinRange.dataset.touched) {
+      filterEls.mcapMinRange.value = Math.round(d.mcapMin / 1e9);
+    }
+    if (filterEls.priceMaxRange && !filterEls.priceMaxRange.dataset.touched) {
+      filterEls.priceMaxRange.value = d.priceMax ?? 300;
+    }
+    if (filterEls.volMinRange && !filterEls.volMinRange.dataset.touched) {
+      filterEls.volMinRange.value = d.volMin;
+    }
+    if (filterEls.newsRequiredChk) {
+      filterEls.newsRequiredChk.checked = !!d.newsRequired;
+    }
+  
+    // keep optional number input synced
+    syncMcapNumberFromRange();
+  }
+  
+  // mark touched if user changes sliders
+  [filterEls.mcapMinRange, filterEls.priceMaxRange, filterEls.volMinRange].forEach((el) => {
+    el?.addEventListener("input", () => (el.dataset.touched = "1"));
+  });
+  
 
   // toggle click
   assetControl?.addEventListener("click", (e) => {

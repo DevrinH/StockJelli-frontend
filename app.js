@@ -117,6 +117,17 @@
     return `$${Math.round(n).toLocaleString()}`;
   }
   
+  // dial: 0..1000 => 200M .. 100B
+  function cryptoMcapFromDial(dial) {
+    const t = clamp(dial, 0, 1000) / 1000;   // 0..1
+    const min = 2e8;                         // 200M
+    const max = 1e11;                        // 100B
+    const logMin = Math.log10(min);
+    const logMax = Math.log10(max);
+    const logVal = logMin + (logMax - logMin) * t;
+    return Math.round(Math.pow(10, logVal));
+  }
+  
   // sliderValue: 0..1000  ->  mcapMin: 2e8 .. 1e11
   function cryptoMcapFromSlider(sliderValue) {
     const t = clamp(sliderValue, 0, 1000) / 1000;      // 0..1
@@ -398,18 +409,22 @@
 // Filters -> query params (D-1 real wiring)
 // ----------------------------
 const filterEls = {
-  // NOTE: re-interpret mcapRange as "min" in billions
-  mcapMinRange: document.getElementById("mcapRange"),
-  mcapMinNum: document.getElementById("mcapNum"), // optional
+  mcapRange: document.getElementById("mcapRange"),
+  mcapNumStocks: document.getElementById("mcapNumStocks"),
+  mcapTextCrypto: document.getElementById("mcapTextCrypto"),
+  mcapPillStocks: document.getElementById("mcapPillStocks"),
+  mcapPillCrypto: document.getElementById("mcapPillCrypto"),
+  mcapLabel: document.getElementById("mcapLabel"),
+  mcapMetaRight: document.getElementById("mcapMetaRight"),
 
-  priceMaxRange: document.getElementById("priceRange"),
-  volMinRange: document.getElementById("volRange"),
-
+  priceRange: document.getElementById("priceRange"),
+  volRange: document.getElementById("volRange"),
   newsRequiredChk: document.getElementById("newsRequiredChk"),
 
   applyBtn: document.getElementById("filtersApplyBtn"),
   resetBtn: document.getElementById("filtersResetBtn"),
 };
+
 
 const MODE_DEFAULTS = {
   stocks: {
@@ -505,7 +520,59 @@ if (filterEls.mcapMinRange && filterEls.mcapMinNum) {
   syncMcapNumberFromRange();
 }
 
+function setMcapUiForMode(mode) {
+  if (!filterEls.mcapRange) return;
 
+  if (mode === "crypto") {
+    // switch slider to dial mode
+    filterEls.mcapLabel.textContent = "Market Cap (Min)";
+    filterEls.mcapRange.min = "0";
+    filterEls.mcapRange.max = "1000";
+
+    // sensible default dial (ex: ~1B-2B-ish)
+    if (!filterEls.mcapRange.dataset.touched) filterEls.mcapRange.value = "400";
+
+    filterEls.mcapPillStocks.style.display = "none";
+    filterEls.mcapPillCrypto.style.display = "";
+
+    const dollars = cryptoMcapFromDial(Number(filterEls.mcapRange.value));
+    filterEls.mcapTextCrypto.textContent = `${fmtMoneyShort(dollars)}+`;
+    filterEls.mcapMetaRight.textContent = "$100B+";
+  } else {
+    // stocks mode: billions (max or min depending on your backend)
+    filterEls.mcapLabel.textContent = "Market Cap (Max)";
+    filterEls.mcapRange.min = "1";
+    filterEls.mcapRange.max = "500";
+
+    if (!filterEls.mcapRange.dataset.touched) filterEls.mcapRange.value = "50";
+
+    filterEls.mcapPillStocks.style.display = "";
+    filterEls.mcapPillCrypto.style.display = "none";
+
+    filterEls.mcapNumStocks.value = filterEls.mcapRange.value;
+    filterEls.mcapMetaRight.textContent = "$0.3B";
+  }
+}
+
+filterEls.mcapRange?.addEventListener("input", () => {
+  filterEls.mcapRange.dataset.touched = "1";
+
+  if (currentMode === "crypto") {
+    const dollars = cryptoMcapFromDial(Number(filterEls.mcapRange.value));
+    filterEls.mcapTextCrypto.textContent = `${fmtMoneyShort(dollars)}+`;
+  } else {
+    filterEls.mcapNumStocks.value = filterEls.mcapRange.value;
+  }
+});
+
+filterEls.mcapNumStocks?.addEventListener("input", () => {
+  // only relevant in stocks mode
+  if (currentMode !== "stocks") return;
+  const v = clamp(filterEls.mcapNumStocks.value, 1, 500);
+  filterEls.mcapNumStocks.value = v;
+  filterEls.mcapRange.value = v;
+  filterEls.mcapRange.dataset.touched = "1";
+});
 
   // Optional sync for market cap number input
   function syncMcapNumberFromRange() {
@@ -567,7 +634,6 @@ if (filterEls.mcapMinRange && filterEls.mcapMinNum) {
       const path = buildApiPath(currentMode);
       const data = await apiGet(path);
   
-      // header should always reflect the current mode’s endpoint
       updateHeaderIndicesFromApi(data);
   
       if (currentMode === "crypto") renderCrypto(data.rows);
@@ -576,6 +642,7 @@ if (filterEls.mcapMinRange && filterEls.mcapMinNum) {
       console.error("refreshOnce failed", e);
     }
   }
+  
   
   
 

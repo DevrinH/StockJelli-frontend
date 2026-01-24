@@ -16,6 +16,7 @@
     <!-- Ezoic Privacy Scripts (must load first) -->
     <script data-cfasync="false" src="https://cmp.gatekeeperconsent.com/min.js"></script>
     <script data-cfasync="false" src="https://the.gatekeeperconsent.com/cmp.min.js"></script>
+    <script src="alerts-frontend.js" defer></script>
   
     <!-- Ezoic Header Script -->
     <script async src="https://www.ezojs.com/ezoic/sa.min.js"></script>
@@ -574,138 +575,142 @@
   </main>
 
   <!-- Alerts Modal -->
+<!-- 
+  UPDATED Alerts Modal - Replace the existing modal in index.html
+  Stripe-only flow (no Google OAuth)
+-->
+
+<!-- Alerts Modal -->
 <div class="modal-overlay" id="alertsModal" aria-hidden="true">
-    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
-      <button class="modal-close" type="button" id="closeModalBtn" aria-label="Close">
-        ✕
-      </button>
-  
-      <div class="modal-header">
-        <div class="modal-kicker">StockJelli Alerts</div>
-        <h2 class="modal-title" id="modalTitle">Enable alerts in 60 seconds</h2>
-        <p class="modal-subtitle muted">
-          No spam. Strict criteria only. Email alerts in v1.
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <button class="modal-close" type="button" id="closeModalBtn" aria-label="Close">
+      ✕
+    </button>
+
+    <div class="modal-header">
+      <div class="modal-kicker">StockJelli Alerts</div>
+      <h2 class="modal-title" id="modalTitle">Get morning alerts for $5/month</h2>
+      <p class="modal-subtitle muted">
+        No spam. Strict momentum criteria only. Cancel anytime.
+      </p>
+    </div>
+
+    <!-- Steps -->
+    <div class="steps">
+      <div class="step-dot step-active" data-step="1">1</div>
+      <div class="step-line"></div>
+      <div class="step-dot" data-step="2">2</div>
+    </div>
+
+    <!-- Step 1: Email + Preferences -->
+    <section class="modal-step" data-step="1">
+      <div class="card">
+        <h3 class="card-title">Enter your email</h3>
+        <p class="muted card-sub">
+          We'll send your morning momentum alerts here.
+        </p>
+
+        <div class="form-group" style="margin-bottom: 24px;">
+          <label class="form-label" for="alertEmail">Email address</label>
+          <input 
+            type="email" 
+            id="alertEmail" 
+            class="form-input" 
+            placeholder="you@example.com"
+            required
+          />
+          <p class="hint muted" id="emailError" style="color: #ef4444; display: none;">
+            Please enter a valid email address
+          </p>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Alert frequency</label>
+          <div class="segmented" id="frequencyControl">
+            <button class="segmented-btn segmented-on" type="button" data-value="1">1/day</button>
+            <button class="segmented-btn" type="button" data-value="2">2/day</button>
+            <button class="segmented-btn" type="button" data-value="3">3/day</button>
+            <button class="segmented-btn" type="button" data-value="4">4/day</button>
+          </div>
+          <p class="hint muted">More alerts = more opportunities, but also more noise.</p>
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn btn-primary" type="button" id="toStep2Btn">Continue</button>
+      </div>
+    </section>
+
+    <!-- Step 2: Checkout Summary -->
+    <section class="modal-step" data-step="2" hidden>
+      <div class="card">
+        <h3 class="card-title">Confirm subscription</h3>
+        <p class="muted card-sub">
+          Review your settings before checkout.
+        </p>
+
+        <div class="checkout-box">
+          <div class="checkout-row">
+            <span class="muted">Plan</span>
+            <span class="strong">StockJelli Alerts</span>
+          </div>
+          <div class="checkout-row">
+            <span class="muted">Price</span>
+            <span class="strong">$5 / month</span>
+          </div>
+          <div class="checkout-row">
+            <span class="muted">Email</span>
+            <span class="strong" id="summaryEmail">—</span>
+          </div>
+          <div class="checkout-row">
+            <span class="muted">Frequency</span>
+            <span class="strong" id="summaryFrequency">1 alert/day</span>
+          </div>
+        </div>
+
+        <div class="alert-features" style="margin-top: 20px;">
+          <h4 style="color: var(--text-primary); font-size: 14px; margin-bottom: 12px;">What you'll get:</h4>
+          <ul style="color: var(--text-muted); font-size: 13px; padding-left: 20px; margin: 0; line-height: 1.8;">
+            <li><strong>Morning alerts</strong> — Before market open (8:30 AM ET)</li>
+            <li><strong>Stocks + Crypto</strong> — On trading days</li>
+            <li><strong>Crypto only</strong> — On weekends & holidays</li>
+            <li><strong>TradingView links</strong> — One click to charts</li>
+            <li><strong>Tiered news sources</strong> — Quality catalysts highlighted</li>
+          </ul>
+        </div>
+
+        <button class="btn btn-primary btn-wide" type="button" id="stripeCheckoutBtn" style="margin-top: 24px;">
+          Subscribe with Stripe →
+        </button>
+
+        <p class="fineprint muted" style="margin-top: 12px; text-align: center;">
+          🔒 Secure checkout powered by Stripe. Cancel anytime.
         </p>
       </div>
-  
-      <!-- Steps -->
-      <div class="steps">
-        <div class="step-dot step-active" data-step="1">1</div>
-        <div class="step-line"></div>
-        <div class="step-dot" data-step="2">2</div>
-        <div class="step-line"></div>
-        <div class="step-dot" data-step="3">3</div>
+
+      <div class="modal-actions">
+        <button class="btn btn-ghost" type="button" id="backToStep1Btn">Back</button>
       </div>
-  
-      <!-- Step 1 -->
-      <section class="modal-step" data-step="1">
-        <div class="card">
-          <h3 class="card-title">Sign in</h3>
-          <p class="muted card-sub">
-            Save your alert preferences and subscription status.
-          </p>
-  
-          <button class="btn btn-primary btn-wide" type="button" id="googleSignInBtn">
-            Continue with Google
-          </button>
-  
-          <p class="fineprint muted">
-            (Placeholder for now — we’ll wire Google OAuth on DigitalOcean later.)
-          </p>
-        </div>
-  
-        <div class="modal-actions">
-          <button class="btn btn-primary" type="button" id="toStep2Btn">Next</button>
-        </div>
-      </section>
-  
-      <!-- Step 2 -->
-      <section class="modal-step" data-step="2" hidden>
-        <div class="card">
-          <h3 class="card-title">Choose your alerts</h3>
-          <p class="muted card-sub">
-            Start simple. You can change this later.
-          </p>
-  
-          <div class="form-grid">
-            <div class="form-group">
-              <label class="form-label">Preset</label>
-              <div class="segmented" id="presetControl">
-                <button class="segmented-btn segmented-on" type="button" data-value="balanced">Balanced</button>
-                <button class="segmented-btn" type="button" data-value="conservative">Conservative</button>
-                <button class="segmented-btn" type="button" data-value="aggressive">Aggressive</button>
-              </div>
-              <p class="hint muted" id="presetHint">Default: best signal-to-noise.</p>
-            </div>
-  
-            <div class="form-group">
-              <label class="form-label">Session</label>
-              <div class="segmented" id="sessionControl">
-                <button class="segmented-btn segmented-on" type="button" data-value="market">Market</button>
-                <button class="segmented-btn" type="button" data-value="premarket">Pre-market</button>
-                <button class="segmented-btn" type="button" data-value="afterhours">After-hours</button>
-              </div>
-              <p class="hint muted">Market hours is usually enough for v1.</p>
-            </div>
-  
-            <div class="form-group">
-              <label class="form-label">Delivery</label>
-              <div class="pill pill-static">Email (v1)</div>
-              <p class="hint muted">Push + SMS later. Keep it clean.</p>
-            </div>
-          </div>
-        </div>
-  
-        <div class="modal-actions">
-          <button class="btn btn-ghost" type="button" id="backToStep1Btn">Back</button>
-          <button class="btn btn-primary" type="button" id="toStep3Btn">Continue</button>
-        </div>
-      </section>
-  
-      <!-- Step 3 -->
-      <section class="modal-step" data-step="3" hidden>
-        <div class="card">
-          <h3 class="card-title">Subscribe — $5/month</h3>
-          <p class="muted card-sub">
-            Cancel anytime. Subscription unlocks alerts + preference saving.
-          </p>
-  
-          <div class="checkout-box">
-            <div class="checkout-row">
-              <span class="muted">Plan</span>
-              <span class="strong">StockJelli Alerts</span>
-            </div>
-            <div class="checkout-row">
-              <span class="muted">Price</span>
-              <span class="strong">$5 / month</span>
-            </div>
-            <div class="checkout-row">
-              <span class="muted">Your preset</span>
-              <span class="strong" id="summaryPreset">Balanced</span>
-            </div>
-            <div class="checkout-row">
-              <span class="muted">Session</span>
-              <span class="strong" id="summarySession">Market</span>
-            </div>
-          </div>
-  
-          <button class="btn btn-primary btn-wide" type="button" id="stripeCheckoutBtn">
-            Subscribe with Stripe
-          </button>
-  
-          <p class="fineprint muted">
-            (Placeholder for now — next phase wires Stripe Checkout + webhook.)
-          </p>
-        </div>
-  
-        <div class="modal-actions">
-          <button class="btn btn-ghost" type="button" id="backToStep2Btn">Back</button>
-          <button class="btn btn-primary" type="button" id="finishBtn">Done</button>
-        </div>
-      </section>
-  
-    </div>
+    </section>
+
+    <!-- Success State (shown after successful checkout) -->
+    <section class="modal-step" data-step="success" hidden>
+      <div class="card" style="text-align: center;">
+        <div style="font-size: 48px; margin-bottom: 16px;">🎉</div>
+        <h3 class="card-title">You're subscribed!</h3>
+        <p class="muted card-sub">
+          Check your email for a welcome message.<br>
+          Your first alert arrives tomorrow morning.
+        </p>
+
+        <button class="btn btn-primary btn-wide" type="button" id="closeSuccessBtn" style="margin-top: 24px;">
+          Done
+        </button>
+      </div>
+    </section>
+
   </div>
+</div>
   
 <!-- Privacy Policy Modal -->
 <div class="modal-overlay" id="privacyModal" aria-hidden="true">

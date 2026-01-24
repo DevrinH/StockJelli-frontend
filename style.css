@@ -2330,3 +2330,107 @@
 .legal-email {
   opacity: 0.95;
 }
+/* ===========================================
+   Alerts Modal Styles
+   Add to your style.css
+   =========================================== */
+
+/* Modal Open State */
+.modal-overlay.modal-open {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Form Input */
+.form-input {
+  width: 100%;
+  padding: 12px 16px;
+  background: var(--bg-primary, #0f172a);
+  border: 1px solid var(--border, #334155);
+  border-radius: 8px;
+  color: var(--text-primary, #f1f5f9);
+  font-size: 16px;
+  transition: border-color 0.2s ease;
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: var(--accent, #3ef08f);
+}
+
+.form-input::placeholder {
+  color: var(--text-muted, #64748b);
+}
+
+/* Alert Features List */
+.alert-features ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.alert-features li {
+  position: relative;
+  padding-left: 24px;
+  margin-bottom: 8px;
+}
+
+.alert-features li::before {
+  content: '✓';
+  position: absolute;
+  left: 0;
+  color: var(--accent, #3ef08f);
+  font-weight: bold;
+}
+
+/* Step Dots - Complete State */
+.step-dot.step-complete {
+  background: var(--accent, #3ef08f);
+  color: var(--bg-primary, #0f172a);
+}
+
+.step-dot.step-complete::after {
+  content: '✓';
+  font-size: 10px;
+}
+
+/* Hidden utility */
+.hidden {
+  display: none !important;
+}
+
+/* Button Loading State */
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Checkout Box Enhancement */
+.checkout-box {
+  background: var(--bg-primary, #0f172a);
+  border-radius: 8px;
+  padding: 16px;
+  border: 1px solid var(--border, #334155);
+}
+
+.checkout-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border, #334155);
+}
+
+.checkout-row:last-child {
+  border-bottom: none;
+}
+
+/* Success Animation */
+@keyframes successPop {
+  0% { transform: scale(0.8); opacity: 0; }
+  50% { transform: scale(1.1); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.modal-step[data-step="success"] .card {
+  animation: successPop 0.4s ease-out;
+}

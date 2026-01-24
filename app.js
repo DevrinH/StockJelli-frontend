@@ -120,6 +120,8 @@
   const idxRightLabel = document.getElementById("idxRightLabel");
   const idxRightValue = document.getElementById("idxRightValue");
 
+  let lastCryptoMcapMin = null;
+
   // Filter UI pieces you actually have
   const filterEls = {
     mcapLabel: document.getElementById("mcapLabel"),
@@ -264,8 +266,11 @@
       if (filterEls.mcapMetaRight) filterEls.mcapMetaRight.textContent = "$100B+";
 
       const dial = Number(filterEls.mcapRange.value || 0);
-      const dollars = cryptoMcapFromDial(dial);
-      if (filterEls.mcapTextCrypto) filterEls.mcapTextCrypto.textContent = `${fmtMoneyShort(dollars)}+`;
+      lastCryptoMcapMin = cryptoMcapFromDial(dial); // <-- IMPORTANT: keep cache synced
+      if (filterEls.mcapTextCrypto) {
+        filterEls.mcapTextCrypto.textContent = `${fmtMoneyShort(lastCryptoMcapMin)}+`;
+      }
+      
     } else {
       // stocks: billions max
       if (filterEls.mcapLabel) filterEls.mcapLabel.textContent = "Market Cap (Max)";
@@ -305,50 +310,81 @@
 
   function readFiltersForMode(mode) {
     const d = MODE_DEFAULTS[mode];
-
+  
     const limit = d.limit;
     const pctMin = d.pctMin;
-
+  
     const volMin = filterEls.volRange ? Number(filterEls.volRange.value) : d.volMin;
     const priceMax = filterEls.priceRange ? Number(filterEls.priceRange.value) : d.priceMax;
-
-    const newsRequired = filterEls.newsRequiredChk ? !!filterEls.newsRequiredChk.checked : d.newsRequired;
-
+  
+    const newsRequired = filterEls.newsRequiredChk
+      ? !!filterEls.newsRequiredChk.checked
+      : d.newsRequired;
+  
     if (mode === "crypto") {
       const dial = filterEls.mcapRange ? Number(filterEls.mcapRange.value) : d.mcapDial;
-      const mcapMin = cryptoMcapFromDial(dial);
-      return { limit, pctMin, volMin, priceMax, mcapMin, newsRequired, dial };
-    } else {
-      const mcapMaxB = filterEls.mcapRange ? Number(filterEls.mcapRange.value) : d.mcapMaxB;
-      const mcapMax = Math.round(mcapMaxB * 1e9);
-      return { limit, pctMin, volMin, priceMax, mcapMax, newsRequired, mcapMaxB };
+  
+      // Always recompute if null, otherwise reuse cached (for perfect UI/request consistency)
+      if (!Number.isFinite(lastCryptoMcapMin)) {
+        lastCryptoMcapMin = cryptoMcapFromDial(dial);
+      }
+  
+      return { limit, pctMin, volMin, priceMax, mcapMin: lastCryptoMcapMin, newsRequired, dial };
     }
+  
+    // stocks
+    const mcapMaxB = filterEls.mcapRange ? Number(filterEls.mcapRange.value) : d.mcapMaxB;
+    const mcapMax = Math.round(clamp(mcapMaxB, 1, 500) * 1e9); // dollars
+  
+    return { limit, pctMin, volMin, priceMax, mcapMax, newsRequired, mcapMaxB };
   }
+  
 
   function buildApiPath(mode) {
     const f = readFiltersForMode(mode);
+    if (!f) throw new Error("readFiltersForMode returned nothing");
+  
     const p = new URLSearchParams();
-
     p.set("limit", String(f.limit));
     p.set("pctMin", String(f.pctMin));
     p.set("volMin", String(f.volMin));
     p.set("priceMax", String(f.priceMax));
     p.set("newsRequired", f.newsRequired ? "true" : "false");
-
-    if (mode === "crypto") p.set("mcapMin", String(f.mcapMin));
-    else p.set("mcapMax", String(f.mcapMax));
-
-    const path = mode === "crypto" ? `/api/crypto?${p.toString()}` : `/api/stocks?${p.toString()}`;
-
-    console.debug("[StockJelli] mode:", mode, "filters:", f, "path:", path);
+  
+    if (mode === "crypto") {
+      p.set("mcapMin", String(f.mcapMin));
+    } else {
+      p.set("mcapMax", String(f.mcapMax));
+    }
+  
+    const path = mode === "crypto"
+      ? `/api/crypto?${p.toString()}`
+      : `/api/stocks?${p.toString()}`;
+  
+    console.log("[StockJelli] mode:", mode, "filters:", f, "path:", path);
     return path;
   }
+  
 
   // ---- wire inputs / touch markers ----
   filterEls.mcapRange?.addEventListener("input", () => {
     filterEls.mcapRange.dataset.touched = "1";
-    setMcapUiForMode(currentMode);
+  
+    if (currentMode === "crypto") {
+      const dial = Number(filterEls.mcapRange.value || 0);
+      lastCryptoMcapMin = cryptoMcapFromDial(dial);
+  
+      if (filterEls.mcapTextCrypto) {
+        filterEls.mcapTextCrypto.textContent = `${fmtMoneyShort(lastCryptoMcapMin)}+`;
+      }
+  
+      console.log("[MCAP] dial=", dial, "mcapMin=", lastCryptoMcapMin);
+    } else {
+      // stocks: sync pill
+      if (filterEls.mcapNumStocks) filterEls.mcapNumStocks.value = String(filterEls.mcapRange.value);
+    }
   });
+  
 
   // stocks-only: mcapNumStocks editable
   filterEls.mcapNumStocks?.addEventListener("input", () => {

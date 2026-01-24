@@ -1,14 +1,4 @@
-/* StockJelli app.js (clean rebuild)
-   - Drawer menu
-   - Alerts modal (3-step)
-   - Stocks/Crypto toggle (tables + hero chart + header indices)
-   - Polling + backend fetch
-   - Mode-aware filters (stocks vs crypto)
-   - Apply/Reset that actually affects the API call
-*/
-
 (() => {
-  // ---- prevent double-init if app.js is included twice ----
   if (window.__STOCKJELLI_APP_INIT__) return;
   window.__STOCKJELLI_APP_INIT__ = true;
 
@@ -18,14 +8,13 @@
   const API_BASE = "https://api.stockjelli.com";
   const POLL_MS = 60_000;
 
-  // You can tune these anytime
   const MODE_DEFAULTS = {
     stocks: {
       limit: 15,
       pctMin: 4,
-      volMin: 1_000_000,         // UI slider is 0..50M, so keep it realistic here
-      priceMax: 300,             // UI slider
-      mcapMaxB: 50,              // UI in billions
+      volMin: 1_000_000,
+      priceMax: 300,
+      mcapMaxB: 50,     // billions
       newsRequired: true,
     },
     crypto: {
@@ -33,12 +22,11 @@
       pctMin: 3,
       volMin: 1_000_000,
       priceMax: 300,
-      mcapDial: 0,               // 0 => 200M, 1000 => 100B
+      mcapDial: 0,      // 0..1000 (log dial)
       newsRequired: false,
     },
   };
 
-  // crypto dial mapping: 0..1000 => 200M..100B (log)
   const CRYPTO_MCAP_MIN = 2e8;   // 200M
   const CRYPTO_MCAP_MAX = 1e11;  // 100B
 
@@ -84,7 +72,6 @@
     if (n === null || n === undefined || Number.isNaN(Number(n))) return "$—";
     const v = Number(n);
     const abs = Math.abs(v);
-
     if (abs >= 1e12) return `$${(v / 1e12).toFixed(decimals)}T`;
     if (abs >= 1e9)  return `$${(v / 1e9).toFixed(decimals)}B`;
     if (abs >= 1e6)  return `$${(v / 1e6).toFixed(decimals)}M`;
@@ -109,7 +96,7 @@
   }
 
   function cryptoMcapFromDial(dial0to1000) {
-    const t = clamp(dial0to1000, 0, 1000) / 1000; // 0..1
+    const t = clamp(dial0to1000, 0, 1000) / 1000;
     const logMin = Math.log10(CRYPTO_MCAP_MIN);
     const logMax = Math.log10(CRYPTO_MCAP_MAX);
     const logVal = logMin + (logMax - logMin) * t;
@@ -117,7 +104,7 @@
   }
 
   // ----------------------------
-  // DOM refs
+  // DOM refs (match your HTML)
   // ----------------------------
   const assetControl = document.getElementById("assetControl");
 
@@ -133,10 +120,17 @@
   const idxRightLabel = document.getElementById("idxRightLabel");
   const idxRightValue = document.getElementById("idxRightValue");
 
+  // Filter UI pieces you actually have
   const filterEls = {
     mcapLabel: document.getElementById("mcapLabel"),
     mcapRange: document.getElementById("mcapRange"),
-    mcapNum: document.getElementById("mcapNum"),
+
+    mcapPillStocks: document.getElementById("mcapPillStocks"),
+    mcapNumStocks: document.getElementById("mcapNumStocks"),
+
+    mcapPillCrypto: document.getElementById("mcapPillCrypto"),
+    mcapTextCrypto: document.getElementById("mcapTextCrypto"),
+
     mcapMetaRight: document.getElementById("mcapMetaRight"),
 
     priceRange: document.getElementById("priceRange"),
@@ -147,175 +141,13 @@
     resetBtn: document.getElementById("filtersResetBtn"),
   };
 
-  // ----------------------------
-  // Drawer Menu
-  // ----------------------------
-  const menuBtn = document.getElementById("menuBtn");
-  const drawer = document.getElementById("drawer");
-  const overlay = document.getElementById("drawerOverlay");
-  const drawerClose = document.getElementById("drawerClose");
+  // Price pill input (no id in HTML) - grab it by location
+  const priceCard = filterEls.priceRange?.closest(".filter-card");
+  const priceNum = priceCard?.querySelector(".pill .num") || null;
 
-  function openDrawer() {
-    drawer?.classList.add("is-open");
-    overlay?.classList.add("is-open");
-    document.body.style.overflow = "hidden";
-  }
-  function closeDrawer() {
-    drawer?.classList.remove("is-open");
-    overlay?.classList.remove("is-open");
-    document.body.style.overflow = "";
-  }
-
-  menuBtn?.addEventListener("click", () => {
-    if (!drawer) return;
-    drawer.classList.contains("is-open") ? closeDrawer() : openDrawer();
-  });
-  drawerClose?.addEventListener("click", closeDrawer);
-  overlay?.addEventListener("click", closeDrawer);
-  document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape") closeDrawer();
-  });
-
-  // ----------------------------
-  // Alerts Modal (3-step) (unchanged logic, safe no-op if missing)
-  // ----------------------------
-  (function initModal() {
-    const modal = document.getElementById("alertsModal");
-    const openBtn = document.getElementById("enableAlertsBtn");
-    const closeBtn = document.getElementById("closeModalBtn");
-
-    const toStep2Btn = document.getElementById("toStep2Btn");
-    const backToStep1Btn = document.getElementById("backToStep1Btn");
-    const toStep3Btn = document.getElementById("toStep3Btn");
-    const backToStep2Btn = document.getElementById("backToStep2Btn");
-    const finishBtn = document.getElementById("finishBtn");
-
-    const presetControl = document.getElementById("presetControl");
-    const sessionControl = document.getElementById("sessionControl");
-    const presetHint = document.getElementById("presetHint");
-
-    const summaryPreset = document.getElementById("summaryPreset");
-    const summarySession = document.getElementById("summarySession");
-
-    const stripeCheckoutBtn = document.getElementById("stripeCheckoutBtn");
-    const googleSignInBtn = document.getElementById("googleSignInBtn");
-
-    if (!modal || !openBtn) return;
-
-    const state = { step: 1, preset: "balanced", session: "market" };
-
-    const presetHints = {
-      balanced: "Default: best signal-to-noise.",
-      conservative: "Fewer alerts. Higher confidence setups.",
-      aggressive: "More alerts. Lower threshold. More noise.",
-    };
-
-    const labelPreset = {
-      balanced: "Balanced",
-      conservative: "Conservative",
-      aggressive: "Aggressive",
-    };
-
-    const labelSession = {
-      market: "Market",
-      premarket: "Pre-market",
-      afterhours: "After-hours",
-    };
-
-    function openModal() {
-      modal.classList.add("is-open");
-      modal.setAttribute("aria-hidden", "false");
-      document.body.style.overflow = "hidden";
-      setStep(1);
-    }
-
-    function closeModal() {
-      modal.classList.remove("is-open");
-      modal.setAttribute("aria-hidden", "true");
-      document.body.style.overflow = "";
-    }
-
-    function setStep(step) {
-      state.step = step;
-
-      document.querySelectorAll(".modal-step").forEach((el) => {
-        const s = Number(el.getAttribute("data-step"));
-        el.hidden = s !== step;
-      });
-
-      document.querySelectorAll(".step-dot").forEach((dot) => {
-        const s = Number(dot.getAttribute("data-step"));
-        dot.classList.toggle("step-active", s === step);
-      });
-
-      if (summaryPreset) summaryPreset.textContent = labelPreset[state.preset];
-      if (summarySession) summarySession.textContent = labelSession[state.session];
-      if (presetHint) presetHint.textContent = presetHints[state.preset];
-    }
-
-    function setSegmentedLocal(controlEl, value) {
-      controlEl?.querySelectorAll(".segmented-btn").forEach((btn) => {
-        btn.classList.toggle("segmented-on", btn.dataset.value === value);
-      });
-    }
-
-    openBtn.addEventListener("click", openModal);
-    closeBtn?.addEventListener("click", closeModal);
-
-    modal.addEventListener("click", (e) => {
-      if (e.target === modal) closeModal();
-    });
-
-    document.addEventListener("keydown", (e) => {
-      if (e.key === "Escape" && modal.classList.contains("is-open")) closeModal();
-    });
-
-    toStep2Btn?.addEventListener("click", () => setStep(2));
-    backToStep1Btn?.addEventListener("click", () => setStep(1));
-    toStep3Btn?.addEventListener("click", () => setStep(3));
-    backToStep2Btn?.addEventListener("click", () => setStep(2));
-    finishBtn?.addEventListener("click", closeModal);
-
-    presetControl?.addEventListener("click", (e) => {
-      const btn = e.target.closest(".segmented-btn");
-      if (!btn) return;
-      state.preset = btn.dataset.value;
-      setSegmentedLocal(presetControl, state.preset);
-      if (presetHint) presetHint.textContent = presetHints[state.preset];
-      if (summaryPreset) summaryPreset.textContent = labelPreset[state.preset];
-      localStorage.setItem("sj_preset", state.preset);
-    });
-
-    sessionControl?.addEventListener("click", (e) => {
-      const btn = e.target.closest(".segmented-btn");
-      if (!btn) return;
-      state.session = btn.dataset.value;
-      setSegmentedLocal(sessionControl, state.session);
-      if (summarySession) summarySession.textContent = labelSession[state.session];
-      localStorage.setItem("sj_session", state.session);
-    });
-
-    const savedPreset = localStorage.getItem("sj_preset");
-    const savedSession = localStorage.getItem("sj_session");
-    if (savedPreset && labelPreset[savedPreset]) {
-      state.preset = savedPreset;
-      setSegmentedLocal(presetControl, state.preset);
-    }
-    if (savedSession && labelSession[savedSession]) {
-      state.session = savedSession;
-      setSegmentedLocal(sessionControl, state.session);
-    }
-
-    googleSignInBtn?.addEventListener("click", () => {
-      alert("Google Sign-In will be wired on the backend (OAuth).");
-    });
-
-    stripeCheckoutBtn?.addEventListener("click", () => {
-      alert("Stripe Checkout will be wired next (create session + webhook).");
-    });
-
-    setStep(1);
-  })();
+  // Volume pill input (no id in HTML)
+  const volCard = filterEls.volRange?.closest(".filter-card");
+  const volNum = volCard?.querySelector(".pill .num") || null;
 
   // ----------------------------
   // Renderers
@@ -329,32 +161,30 @@
       return;
     }
 
-    tbody.innerHTML = rows
-      .map((x) => {
-        const pct = x.pctChange;
-        const changeClass = classUpDown(pct);
+    tbody.innerHTML = rows.map((x) => {
+      const pct = x.pctChange;
+      const changeClass = classUpDown(pct);
 
-        let newsHtml = "—";
-        if (Array.isArray(x.news) && x.news.length) {
-          const item = x.news[0];
-          if (item?.url) {
-            newsHtml = `<a class="news-source" href="${item.url}" target="_blank" rel="noopener">${item.source || "News"}</a>`;
-          } else {
-            newsHtml = item?.source || "News";
-          }
+      let newsHtml = "—";
+      if (Array.isArray(x.news) && x.news.length) {
+        const item = x.news[0];
+        if (item?.url) {
+          newsHtml = `<a class="news-source" href="${item.url}" target="_blank" rel="noopener">${item.source || "News"}</a>`;
+        } else {
+          newsHtml = item?.source || "News";
         }
+      }
 
-        return `
-          <tr>
-            <td class="ticker">${x.symbol || "—"}</td>
-            <td>${fmtUsd(x.price)}</td>
-            <td class="${changeClass}">${fmtPct(pct)}</td>
-            <td>${fmtNum(x.volume)}</td>
-            <td class="news">${newsHtml}</td>
-          </tr>
-        `;
-      })
-      .join("");
+      return `
+        <tr>
+          <td class="ticker">${x.symbol || "—"}</td>
+          <td>${fmtUsd(x.price)}</td>
+          <td class="${changeClass}">${fmtPct(pct)}</td>
+          <td>${fmtNum(x.volume)}</td>
+          <td class="news">${newsHtml}</td>
+        </tr>
+      `;
+    }).join("");
   }
 
   function renderCrypto(rows) {
@@ -366,43 +196,31 @@
       return;
     }
 
-    tbody.innerHTML = rows
-      .map((x) => {
-        const pct = x.pctChange;
-        const vol = x.volume;
-        const mcap = x.marketCap;
+    tbody.innerHTML = rows.map((x) => {
+      const pct = x.pctChange;
+      const changeClass = classUpDown(pct);
 
-        const priceDecimals =
-          x.price !== null && x.price !== undefined && Number(x.price) < 1 ? 6 : 2;
+      const priceDecimals =
+        x.price !== null && x.price !== undefined && Number(x.price) < 1 ? 6 : 2;
 
-        const changeClass = classUpDown(pct);
-
-        return `
-          <tr>
-            <td class="ticker">${x.coinSymbol || "—"}</td>
-            <td>${fmtUsd(x.price, priceDecimals)}</td>
-            <td class="${changeClass}">${fmtPct(pct)}</td>
-            <td>${fmtNum(vol)}</td>
-            <td>${fmtCompactUsd(mcap, 1)}</td>
-          </tr>
-        `;
-      })
-      .join("");
+      return `
+        <tr>
+          <td class="ticker">${x.coinSymbol || "—"}</td>
+          <td>${fmtUsd(x.price, priceDecimals)}</td>
+          <td class="${changeClass}">${fmtPct(pct)}</td>
+          <td>${fmtNum(x.volume)}</td>
+          <td>${fmtCompactUsd(x.marketCap, 1)}</td>
+        </tr>
+      `;
+    }).join("");
   }
 
   // ----------------------------
-  // Header indices updater (supports multiple shapes)
+  // Header indices
   // ----------------------------
-  function formatPct(pct) {
-    if (pct === null || pct === undefined || Number.isNaN(Number(pct))) return "—";
-    const n = Number(pct);
-    const sign = n > 0 ? "+" : "";
-    return `${sign}${n.toFixed(2)}%`;
-  }
-
   function setIdxValue(el, pct) {
     if (!el) return;
-    el.textContent = formatPct(pct);
+    el.textContent = (pct === null || pct === undefined) ? "—" : fmtPct(pct);
     el.classList.remove("up", "down", "flat");
     const n = Number(pct);
     if (!Number.isFinite(n)) return;
@@ -412,99 +230,75 @@
   }
 
   function applyHeaderFromApi(data) {
-    // If backend provides labels, use them. Otherwise keep your placeholders.
     const leftLabel = data?.header?.left?.label;
     const rightLabel = data?.header?.right?.label;
+
     if (idxLeftLabel && leftLabel) idxLeftLabel.textContent = leftLabel;
     if (idxRightLabel && rightLabel) idxRightLabel.textContent = rightLabel;
 
-    const leftPct =
-      data?.header?.left?.pct ??
-      data?.header?.btcPct ??
-      data?.header?.leftPct ??
-      null;
-
-    const rightPct =
-      data?.header?.right?.pct ??
-      data?.header?.totalMarketPct ??
-      data?.header?.rightPct ??
-      null;
+    const leftPct = data?.header?.left?.pct ?? data?.header?.btcPct ?? null;
+    const rightPct = data?.header?.right?.pct ?? data?.header?.totalMarketPct ?? null;
 
     setIdxValue(idxLeftValue, leftPct);
     setIdxValue(idxRightValue, rightPct);
 
-    // optional: green labels for crypto mode via CSS class
-    const isCrypto = currentMode === "crypto";
-    idxWrap?.classList.toggle("crypto", isCrypto);
+    idxWrap?.classList.toggle("crypto", currentMode === "crypto");
   }
 
   // ----------------------------
-  // Filters (mode-aware)
+  // Filters (mode-aware, matches HTML)
   // ----------------------------
   function setMcapUiForMode(mode) {
     if (!filterEls.mcapRange) return;
 
     if (mode === "crypto") {
-      // Market Cap (Min) log dial
+      // dial: 0..1000
       if (filterEls.mcapLabel) filterEls.mcapLabel.textContent = "Market Cap (Min)";
       filterEls.mcapRange.min = "0";
       filterEls.mcapRange.max = "1000";
       filterEls.mcapRange.step = "1";
 
-      // switch mcapNum to text display (because crypto is not linear)
-      if (filterEls.mcapNum) {
-        filterEls.mcapNum.type = "text";
-        filterEls.mcapNum.readOnly = true;
-        filterEls.mcapNum.inputMode = "none";
-      }
+      filterEls.mcapPillStocks && (filterEls.mcapPillStocks.style.display = "none");
+      filterEls.mcapPillCrypto && (filterEls.mcapPillCrypto.style.display = "");
 
       if (filterEls.mcapMetaRight) filterEls.mcapMetaRight.textContent = "$100B+";
 
-      // set display immediately
-      const dollars = cryptoMcapFromDial(Number(filterEls.mcapRange.value || 0));
-      if (filterEls.mcapNum) filterEls.mcapNum.value = `${fmtMoneyShort(dollars)}+`;
-
+      const dial = Number(filterEls.mcapRange.value || 0);
+      const dollars = cryptoMcapFromDial(dial);
+      if (filterEls.mcapTextCrypto) filterEls.mcapTextCrypto.textContent = `${fmtMoneyShort(dollars)}+`;
     } else {
-      // Stocks: Market Cap (Max) in billions (linear)
+      // stocks: billions max
       if (filterEls.mcapLabel) filterEls.mcapLabel.textContent = "Market Cap (Max)";
       filterEls.mcapRange.min = "1";
       filterEls.mcapRange.max = "500";
       filterEls.mcapRange.step = "1";
 
-      if (filterEls.mcapNum) {
-        filterEls.mcapNum.type = "number";
-        filterEls.mcapNum.readOnly = false;
-        filterEls.mcapNum.inputMode = "decimal";
-        filterEls.mcapNum.min = "1";
-        filterEls.mcapNum.max = "500";
-      }
+      filterEls.mcapPillStocks && (filterEls.mcapPillStocks.style.display = "");
+      filterEls.mcapPillCrypto && (filterEls.mcapPillCrypto.style.display = "none");
 
       if (filterEls.mcapMetaRight) filterEls.mcapMetaRight.textContent = "$0.3B";
 
-      // sync number UI
-      if (filterEls.mcapNum) filterEls.mcapNum.value = String(filterEls.mcapRange.value);
+      // sync to stocks pill
+      if (filterEls.mcapNumStocks) filterEls.mcapNumStocks.value = String(filterEls.mcapRange.value);
     }
   }
 
   function setUiDefaultsForMode(mode) {
     const d = MODE_DEFAULTS[mode];
 
-    // clear "touched" if you want defaults on mode switch:
-    // (we keep touched behavior so user doesn't lose a custom slider unless they press Reset)
-    // If you want HARD switch, delete the "if (!dataset.touched)" checks.
-
     if (filterEls.mcapRange && !filterEls.mcapRange.dataset.touched) {
       filterEls.mcapRange.value = mode === "crypto" ? String(d.mcapDial) : String(d.mcapMaxB);
     }
     if (filterEls.priceRange && !filterEls.priceRange.dataset.touched) {
       filterEls.priceRange.value = String(d.priceMax);
+      if (priceNum) priceNum.value = String(d.priceMax);
     }
     if (filterEls.volRange && !filterEls.volRange.dataset.touched) {
       filterEls.volRange.value = String(d.volMin);
+      if (volNum) volNum.value = String(d.volMin);
     }
-    if (filterEls.newsRequiredChk) {
-      filterEls.newsRequiredChk.checked = !!d.newsRequired;
-    }
+
+    if (filterEls.newsRequiredChk) filterEls.newsRequiredChk.checked = !!d.newsRequired;
 
     setMcapUiForMode(mode);
   }
@@ -513,27 +307,22 @@
     const d = MODE_DEFAULTS[mode];
 
     const limit = d.limit;
-
-    const pctMin = d.pctMin; // you can make this a UI control later
+    const pctMin = d.pctMin;
 
     const volMin = filterEls.volRange ? Number(filterEls.volRange.value) : d.volMin;
     const priceMax = filterEls.priceRange ? Number(filterEls.priceRange.value) : d.priceMax;
 
-    const newsRequired =
-      filterEls.newsRequiredChk ? !!filterEls.newsRequiredChk.checked : d.newsRequired;
+    const newsRequired = filterEls.newsRequiredChk ? !!filterEls.newsRequiredChk.checked : d.newsRequired;
 
     if (mode === "crypto") {
       const dial = filterEls.mcapRange ? Number(filterEls.mcapRange.value) : d.mcapDial;
       const mcapMin = cryptoMcapFromDial(dial);
-
-      return { limit, pctMin, volMin, priceMax, mcapMin, newsRequired };
+      return { limit, pctMin, volMin, priceMax, mcapMin, newsRequired, dial };
+    } else {
+      const mcapMaxB = filterEls.mcapRange ? Number(filterEls.mcapRange.value) : d.mcapMaxB;
+      const mcapMax = Math.round(mcapMaxB * 1e9);
+      return { limit, pctMin, volMin, priceMax, mcapMax, newsRequired, mcapMaxB };
     }
-
-    // stocks mode
-    const mcapMaxB = filterEls.mcapRange ? Number(filterEls.mcapRange.value) : d.mcapMaxB;
-    const mcapMax = Math.round(mcapMaxB * 1e9);
-
-    return { limit, pctMin, volMin, priceMax, mcapMax, newsRequired };
   }
 
   function buildApiPath(mode) {
@@ -544,51 +333,61 @@
     p.set("pctMin", String(f.pctMin));
     p.set("volMin", String(f.volMin));
     p.set("priceMax", String(f.priceMax));
+    p.set("newsRequired", f.newsRequired ? "true" : "false");
 
-    // mode-specific mcap
     if (mode === "crypto") p.set("mcapMin", String(f.mcapMin));
     else p.set("mcapMax", String(f.mcapMax));
 
-    // safe to always send
-    p.set("newsRequired", f.newsRequired ? "true" : "false");
-
     const path = mode === "crypto" ? `/api/crypto?${p.toString()}` : `/api/stocks?${p.toString()}`;
 
-    // debugging (helps you verify backend is receiving what you think)
-    console.debug("[StockJelli] API path:", path);
-
+    console.debug("[StockJelli] mode:", mode, "filters:", f, "path:", path);
     return path;
   }
 
-  // wire slider UI updates
+  // ---- wire inputs / touch markers ----
   filterEls.mcapRange?.addEventListener("input", () => {
     filterEls.mcapRange.dataset.touched = "1";
-
-    if (currentMode === "crypto") {
-      const dollars = cryptoMcapFromDial(Number(filterEls.mcapRange.value));
-      if (filterEls.mcapNum) filterEls.mcapNum.value = `${fmtMoneyShort(dollars)}+`;
-    } else {
-      if (filterEls.mcapNum) filterEls.mcapNum.value = String(filterEls.mcapRange.value);
-    }
+    setMcapUiForMode(currentMode);
   });
 
-  // stocks-only: allow typing billions
-  filterEls.mcapNum?.addEventListener("input", () => {
+  // stocks-only: mcapNumStocks editable
+  filterEls.mcapNumStocks?.addEventListener("input", () => {
     if (currentMode !== "stocks") return;
     if (!filterEls.mcapRange) return;
-
-    const v = clamp(filterEls.mcapNum.value, 1, 500);
-    filterEls.mcapNum.value = String(v);
+    const v = clamp(filterEls.mcapNumStocks.value, 1, 500);
+    filterEls.mcapNumStocks.value = String(v);
     filterEls.mcapRange.value = String(v);
     filterEls.mcapRange.dataset.touched = "1";
   });
 
-  [filterEls.priceRange, filterEls.volRange].forEach((el) => {
-    el?.addEventListener("input", () => (el.dataset.touched = "1"));
+  // price sync (range <-> pill input)
+  filterEls.priceRange?.addEventListener("input", () => {
+    filterEls.priceRange.dataset.touched = "1";
+    if (priceNum) priceNum.value = filterEls.priceRange.value;
+  });
+  priceNum?.addEventListener("input", () => {
+    if (!filterEls.priceRange) return;
+    const v = clamp(priceNum.value, Number(filterEls.priceRange.min || 1), Number(filterEls.priceRange.max || 5000));
+    priceNum.value = String(v);
+    filterEls.priceRange.value = String(v);
+    filterEls.priceRange.dataset.touched = "1";
+  });
+
+  // volume sync
+  filterEls.volRange?.addEventListener("input", () => {
+    filterEls.volRange.dataset.touched = "1";
+    if (volNum) volNum.value = filterEls.volRange.value;
+  });
+  volNum?.addEventListener("input", () => {
+    if (!filterEls.volRange) return;
+    const v = clamp(volNum.value, Number(filterEls.volRange.min || 0), Number(filterEls.volRange.max || 50_000_000));
+    volNum.value = String(v);
+    filterEls.volRange.value = String(v);
+    filterEls.volRange.dataset.touched = "1";
   });
 
   // ----------------------------
-  // Mode switching + Polling
+  // Polling + Mode switching
   // ----------------------------
   let currentMode = "stocks";
   let pollTimer = null;
@@ -615,18 +414,15 @@
 
   function applyMode(mode) {
     currentMode = mode;
-
     setSegmented(assetControl, mode);
 
-    // tables
     if (stocksTable) stocksTable.style.display = mode === "stocks" ? "" : "none";
     if (cryptoTable) cryptoTable.style.display = mode === "crypto" ? "" : "none";
 
-    // hero charts
     if (heroChartStocks) heroChartStocks.style.display = mode === "stocks" ? "" : "none";
     if (heroChartCrypto) heroChartCrypto.style.display = mode === "crypto" ? "" : "none";
 
-    // placeholder header labels (backend can overwrite via applyHeaderFromApi)
+    // baseline labels (backend will overwrite on refresh)
     if (mode === "stocks") {
       if (idxLeftLabel) idxLeftLabel.textContent = "NASDAQ";
       if (idxRightLabel) idxRightLabel.textContent = "S&P 500";
@@ -637,40 +433,28 @@
     if (idxLeftValue) idxLeftValue.textContent = "—";
     if (idxRightValue) idxRightValue.textContent = "—";
 
-    // filter defaults + UI
     setUiDefaultsForMode(mode);
-
-    // persist + poll
     localStorage.setItem("sj_asset_mode", mode);
     startPolling();
   }
 
-  // toggle click
   assetControl?.addEventListener("click", (e) => {
     const btn = e.target.closest(".segmented-btn");
     if (!btn) return;
-    const mode = btn.dataset.value === "crypto" ? "crypto" : "stocks";
-    applyMode(mode);
+    applyMode(btn.dataset.value === "crypto" ? "crypto" : "stocks");
   });
 
-  // init mode
+  // init
   const savedMode = localStorage.getItem("sj_asset_mode");
   applyMode(savedMode === "crypto" ? "crypto" : "stocks");
 
-  // ----------------------------
-  // Apply / Reset buttons
-  // ----------------------------
-  filterEls.applyBtn?.addEventListener("click", () => {
-    refreshOnce();
-  });
+  // apply/reset
+  filterEls.applyBtn?.addEventListener("click", () => refreshOnce());
 
   filterEls.resetBtn?.addEventListener("click", () => {
-    // clear touched so defaults apply cleanly
     [filterEls.mcapRange, filterEls.priceRange, filterEls.volRange].forEach((el) => {
       if (el) delete el.dataset.touched;
     });
-
-    // reset to mode defaults
     setUiDefaultsForMode(currentMode);
     refreshOnce();
   });

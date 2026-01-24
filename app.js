@@ -317,8 +317,19 @@
       const pct = x.pctChange;
       const changeClass = classUpDown(pct);
 
-      const priceDecimals =
-        x.price !== null && x.price !== undefined && Number(x.price) < 1 ? 6 : 2;
+      // Price formatting for crypto:
+      // Default: 2 decimal places ($0.08, $25.50)
+      // Only show more decimals for very tiny prices (< $0.01)
+      let priceDecimals = 2;
+      if (x.price !== null && x.price !== undefined) {
+        const p = Number(x.price);
+        if (p > 0 && p < 0.01) {
+          // For very small prices like $0.00045, find enough precision
+          // to show at least 2 significant digits
+          priceDecimals = Math.max(2, Math.ceil(-Math.log10(p)) + 1);
+          priceDecimals = Math.min(priceDecimals, 6); // cap at 6
+        }
+      }
       
       // Range indicator using 24h low/high
       const rangeHtml = renderRangeIndicator(x.low24h ?? x.rangeLow, x.high24h ?? x.rangeHigh, x.price);
@@ -750,7 +761,7 @@
   });
 
   // ----------------------------
-  // Legal modals (Privacy / Terms) - ADDED ONLY
+  // Legal modals (Privacy / Terms)
   // ----------------------------
   (function initLegalModals() {
     const privacyModal = document.getElementById("privacyModal");
@@ -797,9 +808,11 @@
       if (termsModal.classList.contains("is-open")) closeModal(termsModal);
     });
   })();
-})();
 
-    // About / Contact
+  // ----------------------------
+  // About / Contact modals
+  // ----------------------------
+  (function initAboutContactModals() {
     const aboutModal = document.getElementById("aboutModal");
     const contactModal = document.getElementById("contactModal");
 
@@ -847,3 +860,5 @@
       closeModalSafe(contactModal);
       contactForm.reset();
     });
+  })();
+})();

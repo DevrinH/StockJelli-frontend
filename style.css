@@ -2015,3 +2015,275 @@
     border-bottom-color: #1e293b;
   }
 }
+
+/* ===========================================
+   Range Indicator ("Sideways Candle") Styles
+   Add this to your style.css
+   =========================================== */
+
+/* Wrapper for % change + range indicator */
+.change-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.change-pct {
+  /* Inherit color from parent .up/.down classes */
+  white-space: nowrap;
+}
+
+/* The range indicator container */
+.range-indicator {
+  display: inline-flex;
+  align-items: center;
+  min-width: 50px;
+  height: 16px;
+}
+
+.range-indicator.range-na {
+  color: var(--muted, #666);
+  font-size: 0.85em;
+}
+
+/* The track (the line from L to H) */
+.range-track {
+  position: relative;
+  width: 100%;
+  height: 3px;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 2px;
+}
+
+/* The dot (current price position) */
+.range-dot {
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: currentColor;
+  box-shadow: 0 0 4px currentColor;
+  transition: left 0.3s ease;
+}
+
+/* Color variations based on position */
+.range-high .range-track {
+  background: linear-gradient(90deg, rgba(255,255,255,0.1) 0%, rgba(62, 240, 143, 0.3) 100%);
+}
+.range-high .range-dot {
+  color: #3ef08f; /* Green - near the high */
+}
+
+.range-mid .range-track {
+  background: rgba(255, 255, 255, 0.15);
+}
+.range-mid .range-dot {
+  color: #a0aec0; /* Neutral gray */
+}
+
+.range-low .range-track {
+  background: linear-gradient(90deg, rgba(239, 68, 68, 0.3) 0%, rgba(255,255,255,0.1) 100%);
+}
+.range-low .range-dot {
+  color: #ef4444; /* Red - near the low */
+}
+
+/* Responsive: make range indicator smaller on mobile */
+@media (max-width: 768px) {
+  .range-indicator {
+    min-width: 40px;
+  }
+  
+  .range-dot {
+    width: 6px;
+    height: 6px;
+  }
+  
+  .change-wrap {
+    gap: 6px;
+  }
+}
+
+
+/* ===========================================
+   News Source Tiers
+   =========================================== */
+
+.news-source {
+  text-decoration: none;
+  font-size: 0.9em;
+  padding: 2px 8px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.news-source:hover {
+  text-decoration: underline;
+}
+
+/* Tier 1 - Premium sources (WSJ, Bloomberg, Reuters, etc.) */
+.news-tier1 {
+  color: #fbbf24; /* Gold/amber */
+  background: rgba(251, 191, 36, 0.15);
+  border: 1px solid rgba(251, 191, 36, 0.3);
+}
+
+.news-tier1:hover {
+  background: rgba(251, 191, 36, 0.25);
+  color: #fcd34d;
+}
+
+/* Tier 2 - Quality sources (MarketWatch, Seeking Alpha, etc.) */
+.news-tier2 {
+  color: #60a5fa; /* Blue */
+  background: rgba(96, 165, 250, 0.1);
+  border: 1px solid rgba(96, 165, 250, 0.2);
+}
+
+.news-tier2:hover {
+  background: rgba(96, 165, 250, 0.2);
+  color: #93c5fd;
+}
+
+/* Tier 3 - Other sources */
+.news-tier3 {
+  color: #9ca3af; /* Gray */
+  background: rgba(156, 163, 175, 0.1);
+  border: 1px solid rgba(156, 163, 175, 0.15);
+}
+
+.news-tier3:hover {
+  background: rgba(156, 163, 175, 0.2);
+  color: #d1d5db;
+}
+
+.news-none {
+  color: var(--muted, #666);
+}
+
+
+/* ===========================================
+   TradingView Ticker Hover Tooltip
+   =========================================== */
+
+.ticker-wrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.ticker-symbol {
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.ticker-tv-link {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  z-index: 1;
+}
+
+.ticker-tv-tooltip {
+  position: absolute;
+  left: 100%;
+  top: 50%;
+  transform: translateY(-50%);
+  margin-left: 8px;
+  padding: 6px 10px;
+  background: #1e293b;
+  color: #f1f5f9;
+  font-size: 0.75em;
+  font-weight: 500;
+  white-space: nowrap;
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.2s ease;
+  pointer-events: none;
+  
+  /* Arrow pointing left */
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.ticker-tv-tooltip::before {
+  content: '';
+  position: absolute;
+  right: 100%;
+  top: 50%;
+  transform: translateY(-50%);
+  border: 6px solid transparent;
+  border-right-color: #1e293b;
+}
+
+/* Show tooltip on hover */
+.ticker-wrap:hover .ticker-tv-tooltip {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Highlight ticker on hover */
+.ticker-wrap:hover .ticker-symbol {
+  color: #60a5fa;
+}
+
+/* Make the whole cell clickable feel */
+.ticker-wrap:hover {
+  cursor: pointer;
+}
+
+/* Mobile: show tooltip below instead of to the right */
+@media (max-width: 768px) {
+  .ticker-tv-tooltip {
+    left: 50%;
+    top: 100%;
+    transform: translateX(-50%);
+    margin-left: 0;
+    margin-top: 8px;
+  }
+  
+  .ticker-tv-tooltip::before {
+    right: auto;
+    left: 50%;
+    top: -12px;
+    transform: translateX(-50%);
+    border: 6px solid transparent;
+    border-bottom-color: #1e293b;
+  }
+}
+
+
+/* ===========================================
+   Disabled Filter Card (e.g., Catalyst for Crypto)
+   =========================================== */
+
+.filter-card-disabled {
+  opacity: 0.4;
+  pointer-events: none;
+  position: relative;
+}
+
+.filter-card-disabled::after {
+  content: 'Stocks only';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(0, 0, 0, 0.7);
+  color: #9ca3af;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 0.8em;
+  font-weight: 500;
+  white-space: nowrap;
+}

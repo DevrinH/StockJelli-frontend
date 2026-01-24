@@ -512,6 +512,29 @@
     setMcapUiForMode(mode);
     setPriceUiForMode(mode);
     setVolumeUiForMode(mode);
+    
+    // Disable/enable catalyst filter card for crypto mode
+    setCatalystUiForMode(mode);
+  }
+  
+  function setCatalystUiForMode(mode) {
+    // Find the catalyst filter card (it's the one with the checklist)
+    const catalystCard = document.querySelector(".filter-card .checklist")?.closest(".filter-card");
+    if (!catalystCard) return;
+    
+    if (mode === "crypto") {
+      // Disable the catalyst card for crypto
+      catalystCard.classList.add("filter-card-disabled");
+      catalystCard.querySelectorAll("input").forEach(input => {
+        input.disabled = true;
+      });
+    } else {
+      // Enable the catalyst card for stocks
+      catalystCard.classList.remove("filter-card-disabled");
+      catalystCard.querySelectorAll("input").forEach(input => {
+        input.disabled = false;
+      });
+    }
   }
 
   function readFiltersForMode(mode) {

@@ -861,4 +861,70 @@
       contactForm.reset();
     });
   })();
+
+  // ----------------------------
+  // Drawer (burger menu)
+  // ----------------------------
+  (function initDrawer() {
+    const menuBtn = document.getElementById("menuBtn");
+    const drawer = document.getElementById("drawer");
+    const drawerOverlay = document.getElementById("drawerOverlay");
+    const drawerClose = document.getElementById("drawerClose");
+    const drawerAboutBtn = document.getElementById("drawerAboutBtn");
+    const drawerContactBtn = document.getElementById("drawerContactBtn");
+
+    if (!drawer || !menuBtn) return;
+
+    function openDrawer() {
+      drawer.classList.add("is-open");
+      drawer.setAttribute("aria-hidden", "false");
+      drawerOverlay?.classList.add("is-open");
+      document.body.style.overflow = "hidden";
+    }
+
+    function closeDrawer() {
+      drawer.classList.remove("is-open");
+      drawer.setAttribute("aria-hidden", "true");
+      drawerOverlay?.classList.remove("is-open");
+      document.body.style.overflow = "";
+    }
+
+    menuBtn.addEventListener("click", openDrawer);
+    drawerClose?.addEventListener("click", closeDrawer);
+    drawerOverlay?.addEventListener("click", closeDrawer);
+
+    // Close drawer when clicking a link
+    drawer.querySelectorAll("a.drawer-link").forEach(link => {
+      link.addEventListener("click", closeDrawer);
+    });
+
+    // About button in drawer
+    drawerAboutBtn?.addEventListener("click", () => {
+      closeDrawer();
+      const aboutModal = document.getElementById("aboutModal");
+      if (aboutModal) {
+        aboutModal.classList.add("is-open");
+        aboutModal.setAttribute("aria-hidden", "false");
+        document.body.style.overflow = "hidden";
+      }
+    });
+
+    // Contact button in drawer
+    drawerContactBtn?.addEventListener("click", () => {
+      closeDrawer();
+      const contactModal = document.getElementById("contactModal");
+      if (contactModal) {
+        contactModal.classList.add("is-open");
+        contactModal.setAttribute("aria-hidden", "false");
+        document.body.style.overflow = "hidden";
+      }
+    });
+
+    // ESC to close drawer
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && drawer.classList.contains("is-open")) {
+        closeDrawer();
+      }
+    });
+  })();
 })();

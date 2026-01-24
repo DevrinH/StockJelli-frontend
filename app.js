@@ -1,3 +1,5 @@
+///app.st frontend
+
 (() => {
   if (window.__STOCKJELLI_APP_INIT__) return;
   window.__STOCKJELLI_APP_INIT__ = true;
@@ -133,6 +135,7 @@
     mcapPillCrypto: document.getElementById("mcapPillCrypto"),
     mcapTextCrypto: document.getElementById("mcapTextCrypto"),
 
+    mcapMetaLeft: document.getElementById("mcapMetaLeft"),
     mcapMetaRight: document.getElementById("mcapMetaRight"),
 
     priceRange: document.getElementById("priceRange"),
@@ -250,60 +253,115 @@
   // ----------------------------
   // Filters (mode-aware, matches HTML)
   // ----------------------------
+  
+  // Track separate touched states and values for each mode
+  const filterState = {
+    stocks: {
+      mcapTouched: false,
+      mcapValue: MODE_DEFAULTS.stocks.mcapMaxB,
+      priceTouched: false,
+      priceValue: MODE_DEFAULTS.stocks.priceMax,
+      volTouched: false,
+      volValue: MODE_DEFAULTS.stocks.volMin,
+    },
+    crypto: {
+      mcapTouched: false,
+      mcapValue: MODE_DEFAULTS.crypto.mcapDial,
+      priceTouched: false,
+      priceValue: MODE_DEFAULTS.crypto.priceMax,
+      volTouched: false,
+      volValue: MODE_DEFAULTS.crypto.volMin,
+    },
+  };
+
   function setMcapUiForMode(mode) {
     if (!filterEls.mcapRange) return;
 
     if (mode === "crypto") {
-      // dial: 0..1000
+      // dial: 0..1000 (logarithmic scale from $200M to $100B)
       if (filterEls.mcapLabel) filterEls.mcapLabel.textContent = "Market Cap (Min)";
       filterEls.mcapRange.min = "0";
       filterEls.mcapRange.max = "1000";
       filterEls.mcapRange.step = "1";
 
-      filterEls.mcapPillStocks && (filterEls.mcapPillStocks.style.display = "none");
-      filterEls.mcapPillCrypto && (filterEls.mcapPillCrypto.style.display = "");
+      // Show crypto pill, hide stocks pill
+      if (filterEls.mcapPillStocks) filterEls.mcapPillStocks.style.display = "none";
+      if (filterEls.mcapPillCrypto) filterEls.mcapPillCrypto.style.display = "";
 
+      // Update meta labels for crypto
+      if (filterEls.mcapMetaLeft) filterEls.mcapMetaLeft.textContent = "$200M";
       if (filterEls.mcapMetaRight) filterEls.mcapMetaRight.textContent = "$100B+";
 
-      const dial = Number(filterEls.mcapRange.value || 0);
-      lastCryptoMcapMin = cryptoMcapFromDial(dial); // <-- IMPORTANT: keep cache synced
+      // Get the current dial value (either from state or slider)
+      const dial = filterState.crypto.mcapTouched 
+        ? filterState.crypto.mcapValue 
+        : MODE_DEFAULTS.crypto.mcapDial;
+      
+      filterEls.mcapRange.value = String(dial);
+      lastCryptoMcapMin = cryptoMcapFromDial(dial);
+      
       if (filterEls.mcapTextCrypto) {
         filterEls.mcapTextCrypto.textContent = `${fmtMoneyShort(lastCryptoMcapMin)}+`;
       }
       
     } else {
-      // stocks: billions max
+      // stocks: 1-500 = billions max
       if (filterEls.mcapLabel) filterEls.mcapLabel.textContent = "Market Cap (Max)";
       filterEls.mcapRange.min = "1";
       filterEls.mcapRange.max = "500";
       filterEls.mcapRange.step = "1";
 
-      filterEls.mcapPillStocks && (filterEls.mcapPillStocks.style.display = "");
-      filterEls.mcapPillCrypto && (filterEls.mcapPillCrypto.style.display = "none");
+      // Show stocks pill, hide crypto pill
+      if (filterEls.mcapPillStocks) filterEls.mcapPillStocks.style.display = "";
+      if (filterEls.mcapPillCrypto) filterEls.mcapPillCrypto.style.display = "none";
 
-      if (filterEls.mcapMetaRight) filterEls.mcapMetaRight.textContent = "$0.3B";
+      // Update meta labels for stocks (showing the range endpoints: 1B to 500B)
+      if (filterEls.mcapMetaLeft) filterEls.mcapMetaLeft.textContent = "$1B";
+      if (filterEls.mcapMetaRight) filterEls.mcapMetaRight.textContent = "$500B";
 
-      // sync to stocks pill
-      if (filterEls.mcapNumStocks) filterEls.mcapNumStocks.value = String(filterEls.mcapRange.value);
+      // Get the current value (either from state or default)
+      const mcapB = filterState.stocks.mcapTouched 
+        ? filterState.stocks.mcapValue 
+        : MODE_DEFAULTS.stocks.mcapMaxB;
+      
+      filterEls.mcapRange.value = String(mcapB);
+      if (filterEls.mcapNumStocks) filterEls.mcapNumStocks.value = String(mcapB);
     }
   }
 
   function setUiDefaultsForMode(mode) {
     const d = MODE_DEFAULTS[mode];
+    const state = filterState[mode];
 
-    if (filterEls.mcapRange && !filterEls.mcapRange.dataset.touched) {
-      filterEls.mcapRange.value = mode === "crypto" ? String(d.mcapDial) : String(d.mcapMaxB);
-    }
-    if (filterEls.priceRange && !filterEls.priceRange.dataset.touched) {
-      filterEls.priceRange.value = String(d.priceMax);
-      if (priceNum) priceNum.value = String(d.priceMax);
-    }
-    if (filterEls.volRange && !filterEls.volRange.dataset.touched) {
-      filterEls.volRange.value = String(d.volMin);
-      if (volNum) volNum.value = String(d.volMin);
+    // Market cap - use state value if touched, otherwise default
+    if (filterEls.mcapRange) {
+      if (mode === "crypto") {
+        const dial = state.mcapTouched ? state.mcapValue : d.mcapDial;
+        filterEls.mcapRange.value = String(dial);
+      } else {
+        const mcapB = state.mcapTouched ? state.mcapValue : d.mcapMaxB;
+        filterEls.mcapRange.value = String(mcapB);
+      }
     }
 
-    if (filterEls.newsRequiredChk) filterEls.newsRequiredChk.checked = !!d.newsRequired;
+    // Price - use state value if touched, otherwise default
+    if (filterEls.priceRange) {
+      const price = state.priceTouched ? state.priceValue : d.priceMax;
+      filterEls.priceRange.value = String(price);
+      if (priceNum) priceNum.value = String(price);
+    }
+
+    // Volume - use state value if touched, otherwise default
+    if (filterEls.volRange) {
+      const vol = state.volTouched ? state.volValue : d.volMin;
+      filterEls.volRange.value = String(vol);
+      if (volNum) volNum.value = String(vol);
+    }
+
+    // News required checkbox
+    if (filterEls.newsRequiredChk) {
+      filterEls.newsRequiredChk.checked = !!d.newsRequired;
+    }
 
     setMcapUiForMode(mode);
   }
@@ -324,17 +382,16 @@
     if (mode === "crypto") {
       const dial = filterEls.mcapRange ? Number(filterEls.mcapRange.value) : d.mcapDial;
   
-      // Always recompute if null, otherwise reuse cached (for perfect UI/request consistency)
-      if (!Number.isFinite(lastCryptoMcapMin)) {
-        lastCryptoMcapMin = cryptoMcapFromDial(dial);
-      }
+      // Always recompute from current dial value for consistency
+      const mcapMin = cryptoMcapFromDial(dial);
+      lastCryptoMcapMin = mcapMin;
   
-      return { limit, pctMin, volMin, priceMax, mcapMin: lastCryptoMcapMin, newsRequired, dial };
+      return { limit, pctMin, volMin, priceMax, mcapMin, newsRequired, dial };
     }
   
     // stocks
     const mcapMaxB = filterEls.mcapRange ? Number(filterEls.mcapRange.value) : d.mcapMaxB;
-    const mcapMax = Math.round(clamp(mcapMaxB, 1, 500) * 1e9); // dollars
+    const mcapMax = Math.round(clamp(mcapMaxB, 1, 500) * 1e9); // convert to dollars
   
     return { limit, pctMin, volMin, priceMax, mcapMax, newsRequired, mcapMaxB };
   }
@@ -368,20 +425,27 @@
 
   // ---- wire inputs / touch markers ----
   filterEls.mcapRange?.addEventListener("input", () => {
-    filterEls.mcapRange.dataset.touched = "1";
-  
+    const state = filterState[currentMode];
+    
     if (currentMode === "crypto") {
       const dial = Number(filterEls.mcapRange.value || 0);
+      state.mcapTouched = true;
+      state.mcapValue = dial;
       lastCryptoMcapMin = cryptoMcapFromDial(dial);
   
       if (filterEls.mcapTextCrypto) {
         filterEls.mcapTextCrypto.textContent = `${fmtMoneyShort(lastCryptoMcapMin)}+`;
       }
   
-      console.log("[MCAP] dial=", dial, "mcapMin=", lastCryptoMcapMin);
+      console.log("[MCAP] crypto dial=", dial, "mcapMin=", lastCryptoMcapMin);
     } else {
       // stocks: sync pill
-      if (filterEls.mcapNumStocks) filterEls.mcapNumStocks.value = String(filterEls.mcapRange.value);
+      const mcapB = Number(filterEls.mcapRange.value || 50);
+      state.mcapTouched = true;
+      state.mcapValue = mcapB;
+      if (filterEls.mcapNumStocks) filterEls.mcapNumStocks.value = String(mcapB);
+      
+      console.log("[MCAP] stocks mcapMaxB=", mcapB);
     }
   });
   
@@ -393,33 +457,44 @@
     const v = clamp(filterEls.mcapNumStocks.value, 1, 500);
     filterEls.mcapNumStocks.value = String(v);
     filterEls.mcapRange.value = String(v);
-    filterEls.mcapRange.dataset.touched = "1";
+    filterState.stocks.mcapTouched = true;
+    filterState.stocks.mcapValue = v;
   });
 
   // price sync (range <-> pill input)
   filterEls.priceRange?.addEventListener("input", () => {
-    filterEls.priceRange.dataset.touched = "1";
+    const state = filterState[currentMode];
+    state.priceTouched = true;
+    state.priceValue = Number(filterEls.priceRange.value);
     if (priceNum) priceNum.value = filterEls.priceRange.value;
   });
+  
   priceNum?.addEventListener("input", () => {
     if (!filterEls.priceRange) return;
     const v = clamp(priceNum.value, Number(filterEls.priceRange.min || 1), Number(filterEls.priceRange.max || 5000));
     priceNum.value = String(v);
     filterEls.priceRange.value = String(v);
-    filterEls.priceRange.dataset.touched = "1";
+    const state = filterState[currentMode];
+    state.priceTouched = true;
+    state.priceValue = v;
   });
 
   // volume sync
   filterEls.volRange?.addEventListener("input", () => {
-    filterEls.volRange.dataset.touched = "1";
+    const state = filterState[currentMode];
+    state.volTouched = true;
+    state.volValue = Number(filterEls.volRange.value);
     if (volNum) volNum.value = filterEls.volRange.value;
   });
+  
   volNum?.addEventListener("input", () => {
     if (!filterEls.volRange) return;
     const v = clamp(volNum.value, Number(filterEls.volRange.min || 0), Number(filterEls.volRange.max || 50_000_000));
     volNum.value = String(v);
     filterEls.volRange.value = String(v);
-    filterEls.volRange.dataset.touched = "1";
+    const state = filterState[currentMode];
+    state.volTouched = true;
+    state.volValue = v;
   });
 
   // ----------------------------
@@ -488,9 +563,17 @@
   filterEls.applyBtn?.addEventListener("click", () => refreshOnce());
 
   filterEls.resetBtn?.addEventListener("click", () => {
-    [filterEls.mcapRange, filterEls.priceRange, filterEls.volRange].forEach((el) => {
-      if (el) delete el.dataset.touched;
-    });
+    // Reset state for current mode
+    const state = filterState[currentMode];
+    const d = MODE_DEFAULTS[currentMode];
+    
+    state.mcapTouched = false;
+    state.mcapValue = currentMode === "crypto" ? d.mcapDial : d.mcapMaxB;
+    state.priceTouched = false;
+    state.priceValue = d.priceMax;
+    state.volTouched = false;
+    state.volValue = d.volMin;
+    
     setUiDefaultsForMode(currentMode);
     refreshOnce();
   });

@@ -384,25 +384,31 @@
               <!-- Row 1: Market Cap -->
               <div class="filter-card">
                 <div class="filter-title-row">
-                  <label id="mcapLabel" class="filter-title" for="mcapRange">
-                    Market Cap (Max)
-                  </label>
-                  
+                  <label id="mcapLabel" class="filter-title" for="mcapRange">Market Cap (Max)</label>
                 </div>
-          
+              
                 <div class="filter-control-row">
+                  <!-- stocks: 1..500 = billions
+                       crypto: 0..1000 = log dial -->
                   <input id="mcapRange" class="slider" type="range" min="1" max="500" value="50" />
-                  <div class="pill" id="mcapPill">
-                    <span id="mcapPillPrefix">$</span>
-                    <input id="mcapNum" class="num" type="number" value="50" min="1" max="500" />
-                    <span id="mcapPillSuffix">B</span>
+              
+                  <!-- STOCKS pill (editable) -->
+                  <div class="pill" id="mcapPillStocks">
+                    $<input id="mcapNumStocks" class="num" type="number" value="50" min="1" max="500" />B
+                  </div>
+              
+                  <!-- CRYPTO pill (read-only) -->
+                  <div class="pill" id="mcapPillCrypto" style="display:none;">
+                    <span id="mcapTextCrypto">$200M+</span>
                   </div>
                 </div>
-          
+              
                 <div class="filter-meta">
                   <span id="mcapMetaLeft" class="muted">Min</span>
                   <span id="mcapMetaRight" class="muted">$0.3B</span>
                 </div>
+              </div>
+              
                 
           
               <!-- Row 1: Price Cap -->

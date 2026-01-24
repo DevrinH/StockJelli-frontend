@@ -522,12 +522,20 @@
       </section>
       
       <!-- Footer -->
-      <footer class="footer">
-        <div class="container footer-inner">
-          <p>Educational tool only. Not financial advice.</p>
-          <p class="muted">© StockJelli</p>
-        </div>
-      </footer>
+<!-- Footer -->
+<footer class="footer">
+  <div class="container footer-inner">
+    <p>Educational tool only. Not financial advice.</p>
+
+    <p class="muted">
+      © StockJelli ·
+      <button class="footer-link" id="openPrivacyBtn" type="button">Privacy Policy</button>
+      ·
+      <button class="footer-link" id="openTermsBtn" type="button">Terms of Service</button>
+    </p>
+  </div>
+</footer>
+
 
     </div>
 
@@ -675,6 +683,121 @@
     </div>
   </div>
   
+<!-- Privacy Policy Modal -->
+<div class="modal-overlay" id="privacyModal" aria-hidden="true">
+  <div class="modal modal-legal" role="dialog" aria-modal="true" aria-labelledby="privacyTitle">
+    <button class="modal-close" type="button" id="closePrivacyBtn" aria-label="Close">✕</button>
+
+    <div class="modal-header">
+      <div class="modal-kicker">Legal</div>
+      <h2 class="modal-title" id="privacyTitle">Privacy Policy</h2>
+      <p class="modal-subtitle muted">Last updated: <span id="privacyUpdated">2026-01-23</span></p>
+    </div>
+
+    <div class="legal-body">
+      <h3>Summary</h3>
+      <p>
+        StockJelli is an educational tool. We collect minimal data needed to operate the site and improve performance.
+        We do not sell your personal information.
+      </p>
+
+      <h3>Information we collect</h3>
+      <ul>
+        <li><strong>Analytics:</strong> We use Google Analytics to understand site usage (e.g., pages visited, approximate location, device type).</li>
+        <li><strong>Log data:</strong> Our servers may log request metadata (IP address, user agent, timestamps) for security and reliability.</li>
+        <li><strong>Account & payments (future):</strong> If you subscribe to alerts later, we may collect email/account identifiers and payment status via our providers.</li>
+      </ul>
+
+      <h3>How we use information</h3>
+      <ul>
+        <li>Operate and maintain the service.</li>
+        <li>Monitor performance, prevent abuse, and debug issues.</li>
+        <li>Improve features and user experience.</li>
+      </ul>
+
+      <h3>Cookies</h3>
+      <p>
+        We and our analytics providers may use cookies or similar technologies. You can control cookies through your browser settings.
+      </p>
+
+      <h3>Third-party services</h3>
+      <p>
+        We may use third-party services such as Google Analytics. Their handling of data is governed by their own policies.
+      </p>
+
+      <h3>Data retention</h3>
+      <p>
+        We retain data only as long as reasonably necessary for the purposes described above, unless a longer period is required by law.
+      </p>
+
+      <h3>Your choices</h3>
+      <ul>
+        <li>You may block cookies in your browser.</li>
+        <li>You may use privacy tools (e.g., tracker blocking extensions).</li>
+      </ul>
+
+      <h3>Contact</h3>
+      <p>
+        Questions? Email: <span class="legal-email">support@stockjelli.com</span>
+      </p>
+    </div>
+  </div>
+</div>
+
+<!-- Terms of Service Modal -->
+<div class="modal-overlay" id="termsModal" aria-hidden="true">
+  <div class="modal modal-legal" role="dialog" aria-modal="true" aria-labelledby="termsTitle">
+    <button class="modal-close" type="button" id="closeTermsBtn" aria-label="Close">✕</button>
+
+    <div class="modal-header">
+      <div class="modal-kicker">Legal</div>
+      <h2 class="modal-title" id="termsTitle">Terms of Service</h2>
+      <p class="modal-subtitle muted">Last updated: <span id="termsUpdated">2026-01-23</span></p>
+    </div>
+
+    <div class="legal-body">
+      <h3>1) Educational use only — not financial advice</h3>
+      <p>
+        StockJelli provides general market information for educational purposes only. Nothing on this site constitutes
+        investment, legal, tax, or financial advice. You are solely responsible for your decisions and outcomes.
+      </p>
+
+      <h3>2) No warranties</h3>
+      <p>
+        The service is provided “as is” and “as available.” We do not guarantee accuracy, completeness, timeliness, or
+        uninterrupted operation. Market data may be delayed or incorrect.
+      </p>
+
+      <h3>3) Limitation of liability</h3>
+      <p>
+        To the maximum extent permitted by law, StockJelli and its operators are not liable for any losses, damages,
+        or claims arising from your use of the service, including trading losses or missed opportunities.
+      </p>
+
+      <h3>4) Acceptable use</h3>
+      <ul>
+        <li>Do not abuse or attempt to disrupt the service (e.g., scraping at unreasonable rates, attacks).</li>
+        <li>Do not reverse engineer or misuse the site in a way that harms others.</li>
+      </ul>
+
+      <h3>5) Alerts subscription (future)</h3>
+      <p>
+        If we offer paid alerts, subscription terms, billing, refunds, and cancellation details will be presented at checkout.
+        Subscription features may change over time.
+      </p>
+
+      <h3>6) Changes</h3>
+      <p>
+        We may update these terms from time to time. Continued use after changes means you accept the updated terms.
+      </p>
+
+      <h3>7) Contact</h3>
+      <p>
+        Questions? Email: <span class="legal-email">support@stockjelli.com</span>
+      </p>
+    </div>
+  </div>
+</div>
 
 
 </body>

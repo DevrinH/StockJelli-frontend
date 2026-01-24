@@ -748,4 +748,53 @@
     setUiDefaultsForMode(currentMode);
     refreshOnce();
   });
+
+  // ----------------------------
+  // Legal modals (Privacy / Terms) - ADDED ONLY
+  // ----------------------------
+  (function initLegalModals() {
+    const privacyModal = document.getElementById("privacyModal");
+    const termsModal = document.getElementById("termsModal");
+
+    const openPrivacyBtn = document.getElementById("openPrivacyBtn");
+    const openTermsBtn = document.getElementById("openTermsBtn");
+
+    const closePrivacyBtn = document.getElementById("closePrivacyBtn");
+    const closeTermsBtn = document.getElementById("closeTermsBtn");
+
+    if (!privacyModal || !termsModal) return;
+
+    function openModal(modalEl) {
+      modalEl.classList.add("is-open");
+      modalEl.setAttribute("aria-hidden", "false");
+      document.body.style.overflow = "hidden";
+    }
+
+    function closeModal(modalEl) {
+      modalEl.classList.remove("is-open");
+      modalEl.setAttribute("aria-hidden", "true");
+      document.body.style.overflow = "";
+    }
+
+    openPrivacyBtn?.addEventListener("click", () => openModal(privacyModal));
+    openTermsBtn?.addEventListener("click", () => openModal(termsModal));
+
+    closePrivacyBtn?.addEventListener("click", () => closeModal(privacyModal));
+    closeTermsBtn?.addEventListener("click", () => closeModal(termsModal));
+
+    // Click outside closes
+    privacyModal.addEventListener("click", (e) => {
+      if (e.target === privacyModal) closeModal(privacyModal);
+    });
+    termsModal.addEventListener("click", (e) => {
+      if (e.target === termsModal) closeModal(termsModal);
+    });
+
+    // ESC closes whichever is open
+    document.addEventListener("keydown", (e) => {
+      if (e.key !== "Escape") return;
+      if (privacyModal.classList.contains("is-open")) closeModal(privacyModal);
+      if (termsModal.classList.contains("is-open")) closeModal(termsModal);
+    });
+  })();
 })();

@@ -2287,3 +2287,46 @@
   font-weight: 500;
   white-space: nowrap;
 }
+
+/* Footer links look like inline links but are buttons */
+.footer-link {
+  background: transparent;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  color: inherit;
+  font: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+  opacity: 0.9;
+}
+
+.footer-link:hover {
+  opacity: 1;
+}
+
+/* Legal modal: taller + scrollable body */
+.modal-legal {
+  max-width: 860px;
+}
+
+.legal-body {
+  margin-top: 12px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(255,255,255,0.08);
+  max-height: 60vh;
+  overflow: auto;
+  padding-right: 8px;
+}
+
+.legal-body h3 {
+  margin: 14px 0 8px;
+}
+
+.legal-body ul {
+  margin: 8px 0 12px 18px;
+}
+
+.legal-email {
+  opacity: 0.95;
+}

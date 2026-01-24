@@ -169,6 +169,58 @@
   // ----------------------------
   // Renderers
   // ----------------------------
+  
+  // Format volume as compact (248,448,229 → 248M)
+  function fmtVolumeCompact(n) {
+    if (n === null || n === undefined || Number.isNaN(Number(n))) return "—";
+    const v = Number(n);
+    if (v >= 1e9) return `${(v / 1e9).toFixed(1)}B`;
+    if (v >= 1e6) return `${(v / 1e6).toFixed(0)}M`;
+    if (v >= 1e3) return `${(v / 1e3).toFixed(0)}K`;
+    return String(Math.round(v));
+  }
+
+  // Generate the "sideways candle" range indicator HTML
+  // Shows: L ──────●──────── H with dot position based on current price
+  function renderRangeIndicator(low, high, current) {
+    // If we don't have valid data, return empty
+    if (low === null || high === null || current === null) {
+      return '<span class="range-indicator range-na">—</span>';
+    }
+    
+    const lo = Number(low);
+    const hi = Number(high);
+    const cur = Number(current);
+    
+    if (!Number.isFinite(lo) || !Number.isFinite(hi) || !Number.isFinite(cur)) {
+      return '<span class="range-indicator range-na">—</span>';
+    }
+    
+    // Calculate position (0 = at low, 1 = at high)
+    let position = 0.5;
+    if (hi !== lo) {
+      position = (cur - lo) / (hi - lo);
+      position = Math.max(0, Math.min(1, position)); // clamp 0-1
+    }
+    
+    // Convert to percentage for CSS
+    const pct = Math.round(position * 100);
+    
+    // Determine color class based on position
+    // Near high (>70%) = bullish/green, near low (<30%) = bearish/red, middle = neutral
+    let posClass = "range-mid";
+    if (pct >= 70) posClass = "range-high";
+    else if (pct <= 30) posClass = "range-low";
+    
+    return `
+      <span class="range-indicator ${posClass}" title="L: ${fmtUsd(lo, 2)} | H: ${fmtUsd(hi, 2)} | Now: ${fmtUsd(cur, 2)}">
+        <span class="range-track">
+          <span class="range-dot" style="left: ${pct}%"></span>
+        </span>
+      </span>
+    `;
+  }
+
   function renderStocks(rows) {
     const tbody = document.getElementById("stocksTbody");
     if (!tbody) return;
@@ -181,6 +233,9 @@
     tbody.innerHTML = rows.map((x) => {
       const pct = x.pctChange;
       const changeClass = classUpDown(pct);
+      
+      // Range indicator using day low/high
+      const rangeHtml = renderRangeIndicator(x.dayLow ?? x.rangeLow, x.dayHigh ?? x.rangeHigh, x.price);
 
       let newsHtml = "—";
       if (Array.isArray(x.news) && x.news.length) {
@@ -196,8 +251,13 @@
         <tr>
           <td class="ticker">${x.symbol || "—"}</td>
           <td>${fmtUsd(x.price)}</td>
-          <td class="${changeClass}">${fmtPct(pct)}</td>
-          <td>${fmtNum(x.volume)}</td>
+          <td class="${changeClass}">
+            <span class="change-wrap">
+              <span class="change-pct">${fmtPct(pct)}</span>
+              ${rangeHtml}
+            </span>
+          </td>
+          <td>${fmtVolumeCompact(x.volume)}</td>
           <td class="news">${newsHtml}</td>
         </tr>
       `;
@@ -219,13 +279,21 @@
 
       const priceDecimals =
         x.price !== null && x.price !== undefined && Number(x.price) < 1 ? 6 : 2;
+      
+      // Range indicator using 24h low/high
+      const rangeHtml = renderRangeIndicator(x.low24h ?? x.rangeLow, x.high24h ?? x.rangeHigh, x.price);
 
       return `
         <tr>
           <td class="ticker">${x.coinSymbol || "—"}</td>
           <td>${fmtUsd(x.price, priceDecimals)}</td>
-          <td class="${changeClass}">${fmtPct(pct)}</td>
-          <td>${fmtNum(x.volume)}</td>
+          <td class="${changeClass}">
+            <span class="change-wrap">
+              <span class="change-pct">${fmtPct(pct)}</span>
+              ${rangeHtml}
+            </span>
+          </td>
+          <td>${fmtVolumeCompact(x.volume)}</td>
           <td>${fmtCompactUsd(x.marketCap, 1)}</td>
         </tr>
       `;

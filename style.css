@@ -1649,3 +1649,123 @@
 /* crypto label text (BTC / Total Crypto Market) green */
 .market-indices.crypto .idx-label,
 .market-indices.crypto-label { color: rgba(2, 168, 77, 0.95); }
+/* ===========================================
+   Range Indicator ("Sideways Candle") Styles
+   Add this to your style.css
+   =========================================== */
+
+/* Wrapper for % change + range indicator */
+.change-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.change-pct {
+  /* Inherit color from parent .up/.down classes */
+  white-space: nowrap;
+}
+
+/* The range indicator container */
+.range-indicator {
+  display: inline-flex;
+  align-items: center;
+  min-width: 50px;
+  height: 16px;
+}
+
+.range-indicator.range-na {
+  color: var(--muted, #666);
+  font-size: 0.85em;
+}
+
+/* The track (the line from L to H) */
+.range-track {
+  position: relative;
+  width: 100%;
+  height: 3px;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 2px;
+}
+
+/* The dot (current price position) */
+.range-dot {
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: currentColor;
+  box-shadow: 0 0 4px currentColor;
+  transition: left 0.3s ease;
+}
+
+/* Color variations based on position */
+.range-high .range-track {
+  background: linear-gradient(90deg, rgba(255,255,255,0.1) 0%, rgba(62, 240, 143, 0.3) 100%);
+}
+.range-high .range-dot {
+  color: #3ef08f; /* Green - near the high */
+}
+
+.range-mid .range-track {
+  background: rgba(255, 255, 255, 0.15);
+}
+.range-mid .range-dot {
+  color: #a0aec0; /* Neutral gray */
+}
+
+.range-low .range-track {
+  background: linear-gradient(90deg, rgba(239, 68, 68, 0.3) 0%, rgba(255,255,255,0.1) 100%);
+}
+.range-low .range-dot {
+  color: #ef4444; /* Red - near the low */
+}
+
+/* Optional: Add L/H labels on hover or always visible */
+/* Uncomment if you want visible L/H labels */
+/*
+.range-indicator::before {
+  content: 'L';
+  font-size: 0.6em;
+  color: var(--muted, #666);
+  margin-right: 4px;
+}
+.range-indicator::after {
+  content: 'H';
+  font-size: 0.6em;
+  color: var(--muted, #666);
+  margin-left: 4px;
+}
+*/
+
+/* Responsive: make range indicator smaller on mobile */
+@media (max-width: 768px) {
+  .range-indicator {
+    min-width: 40px;
+  }
+  
+  .range-dot {
+    width: 6px;
+    height: 6px;
+  }
+  
+  .change-wrap {
+    gap: 6px;
+  }
+}
+
+/* Alternative: If you want the range on a new line under the % */
+/*
+.change-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+}
+
+.range-indicator {
+  width: 60px;
+}
+*/

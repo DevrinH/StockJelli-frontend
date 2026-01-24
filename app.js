@@ -3,19 +3,35 @@
    - Alerts modal (3-step)
    - Stocks/Crypto toggle (tables + hero chart + header indices)
    - Polling + backend fetch
-   - Filters Apply/Reset plumbing
+   - Filters Apply/Reset wiring (mode-aware)
 */
 
 (() => {
   // ----------------------------
-  // Helpers
+  // Config
   // ----------------------------
   const API_BASE = "https://api.stockjelli.com";
+  const POLL_MS = 60_000;
 
+  // ----------------------------
+  // Helpers
+  // ----------------------------
   async function apiGet(path) {
     const r = await fetch(`${API_BASE}${path}`, { cache: "no-store" });
     if (!r.ok) throw new Error(`API ${path} -> ${r.status}`);
     return r.json();
+  }
+
+  function clamp(n, min, max) {
+    const v = Number(n);
+    if (!Number.isFinite(v)) return min;
+    return Math.min(max, Math.max(min, v));
+  }
+
+  function classUpDown(n) {
+    const v = Number(n);
+    if (!Number.isFinite(v)) return "";
+    return v >= 0 ? "up" : "down";
   }
 
   function fmtNum(n) {
@@ -35,77 +51,15 @@
     return `${sign}${v.toFixed(decimals)}%`;
   }
 
-  function setHeaderFromApi(header) {
-    if (!header) return;
-  
-    const idxLeftLabel = document.getElementById("idxLeftLabel");
-    const idxLeftValue = document.getElementById("idxLeftValue");
-    const idxRightLabel = document.getElementById("idxRightLabel");
-    const idxRightValue = document.getElementById("idxRightValue");
-  
-    // labels
-    if (idxLeftLabel && header.left?.label) idxLeftLabel.textContent = header.left.label;
-    if (idxRightLabel && header.right?.label) idxRightLabel.textContent = header.right.label;
-  
-    // values + up/down color
-    if (idxLeftValue) {
-      idxLeftValue.textContent = fmtPct(header.left?.pct);
-      idxLeftValue.classList.remove("up", "down");
-      const c = classUpDown(header.left?.pct);
-      if (c) idxLeftValue.classList.add(c);
-    }
-  
-    if (idxRightValue) {
-      idxRightValue.textContent = fmtPct(header.right?.pct);
-      idxRightValue.classList.remove("up", "down");
-      const c = classUpDown(header.right?.pct);
-      if (c) idxRightValue.classList.add(c);
-    }
-  
-    // OPTIONAL: make crypto labels green (letters) regardless
-    // (You asked: "crypto indice letters should be green")
-    // This assumes you toggle idxWrap.classList.add("crypto") in applyMode for crypto.
-    const idxWrap = document.querySelector(".market-indices");
-    const isCrypto = idxWrap?.classList.contains("crypto");
-  
-    if (idxLeftLabel) {
-      idxLeftLabel.classList.toggle("crypto-label", !!isCrypto);
-    }
-    if (idxRightLabel) {
-      idxRightLabel.classList.toggle("crypto-label", !!isCrypto);
-    }
-  }
-  
-  
   function fmtCompactUsd(n, decimals = 1) {
     if (n === null || n === undefined || Number.isNaN(Number(n))) return "$—";
     const v = Number(n);
     const abs = Math.abs(v);
-  
     if (abs >= 1e12) return `$${(v / 1e12).toFixed(decimals)}T`;
     if (abs >= 1e9)  return `$${(v / 1e9).toFixed(decimals)}B`;
     if (abs >= 1e6)  return `$${(v / 1e6).toFixed(decimals)}M`;
     if (abs >= 1e3)  return `$${(v / 1e3).toFixed(decimals)}K`;
     return `$${v.toFixed(0)}`;
-  }
-  
-  function classUpDown(n) {
-    const v = Number(n);
-    if (Number.isNaN(v)) return "";
-    return v >= 0 ? "up" : "down";
-  }
-
-  function clamp(n, min, max) {
-    const v = Number(n);
-    if (Number.isNaN(v)) return min;
-    return Math.min(max, Math.max(min, v));
-  }
-
-  function setSegmented(controlEl, value) {
-    if (!controlEl) return;
-    controlEl.querySelectorAll(".segmented-btn").forEach((btn) => {
-      btn.classList.toggle("segmented-on", btn.dataset.value === value);
-    });
   }
 
   function fmtMoneyShort(n) {
@@ -116,29 +70,24 @@
     if (abs >= 1e6)  return `$${(n / 1e6).toFixed(0)}M`;
     return `$${Math.round(n).toLocaleString()}`;
   }
-  
-  // dial: 0..1000 => 200M .. 100B
+
+  // Crypto Market Cap dial: 0..1000 => 200M .. 100B
   function cryptoMcapFromDial(dial) {
-    const t = clamp(dial, 0, 1000) / 1000;   // 0..1
-    const min = 2e8;                         // 200M
-    const max = 1e11;                        // 100B
+    const t = clamp(dial, 0, 1000) / 1000; // 0..1
+    const min = 2e8;  // 200M
+    const max = 1e11; // 100B
     const logMin = Math.log10(min);
     const logMax = Math.log10(max);
     const logVal = logMin + (logMax - logMin) * t;
     return Math.round(Math.pow(10, logVal));
   }
-  
-  // sliderValue: 0..1000  ->  mcapMin: 2e8 .. 1e11
-  function cryptoMcapFromSlider(sliderValue) {
-    const t = clamp(sliderValue, 0, 1000) / 1000;      // 0..1
-    const min = 2e8;                                    // 200M
-    const max = 1e11;                                   // 100B
-    const logMin = Math.log10(min);
-    const logMax = Math.log10(max);
-    const logVal = logMin + (logMax - logMin) * t;
-    return Math.round(Math.pow(10, logVal));
+
+  function setSegmented(controlEl, value) {
+    if (!controlEl) return;
+    controlEl.querySelectorAll(".segmented-btn").forEach((btn) => {
+      btn.classList.toggle("segmented-on", btn.dataset.value === value);
+    });
   }
-  
 
   // ----------------------------
   // Drawer Menu
@@ -167,7 +116,6 @@
 
   drawerClose?.addEventListener("click", closeDrawer);
   overlay?.addEventListener("click", closeDrawer);
-
   document.addEventListener("keydown", (e) => {
     if (e.key === "Escape") closeDrawer();
   });
@@ -198,11 +146,7 @@
 
     if (!modal || !openBtn) return;
 
-    const state = {
-      step: 1,
-      preset: "balanced",
-      session: "market",
-    };
+    const state = { step: 1, preset: "balanced", session: "market" };
 
     const presetHints = {
       balanced: "Default: best signal-to-noise.",
@@ -222,17 +166,10 @@
       afterhours: "After-hours",
     };
 
-    function openModal() {
-      modal.classList.add("is-open");
-      modal.setAttribute("aria-hidden", "false");
-      document.body.style.overflow = "hidden";
-      setStep(1);
-    }
-
-    function closeModal() {
-      modal.classList.remove("is-open");
-      modal.setAttribute("aria-hidden", "true");
-      document.body.style.overflow = "";
+    function setSegmentedLocal(controlEl, value) {
+      controlEl?.querySelectorAll(".segmented-btn").forEach((btn) => {
+        btn.classList.toggle("segmented-on", btn.dataset.value === value);
+      });
     }
 
     function setStep(step) {
@@ -253,13 +190,19 @@
       if (presetHint) presetHint.textContent = presetHints[state.preset];
     }
 
-    function setSegmentedLocal(controlEl, value) {
-      controlEl?.querySelectorAll(".segmented-btn").forEach((btn) => {
-        btn.classList.toggle("segmented-on", btn.dataset.value === value);
-      });
+    function openModal() {
+      modal.classList.add("is-open");
+      modal.setAttribute("aria-hidden", "false");
+      document.body.style.overflow = "hidden";
+      setStep(1);
     }
 
-    // open/close
+    function closeModal() {
+      modal.classList.remove("is-open");
+      modal.setAttribute("aria-hidden", "true");
+      document.body.style.overflow = "";
+    }
+
     openBtn.addEventListener("click", openModal);
     closeBtn?.addEventListener("click", closeModal);
 
@@ -271,14 +214,12 @@
       if (e.key === "Escape" && modal.classList.contains("is-open")) closeModal();
     });
 
-    // steps
     toStep2Btn?.addEventListener("click", () => setStep(2));
     backToStep1Btn?.addEventListener("click", () => setStep(1));
     toStep3Btn?.addEventListener("click", () => setStep(3));
     backToStep2Btn?.addEventListener("click", () => setStep(2));
     finishBtn?.addEventListener("click", closeModal);
 
-    // preset selection
     presetControl?.addEventListener("click", (e) => {
       const btn = e.target.closest(".segmented-btn");
       if (!btn) return;
@@ -289,7 +230,6 @@
       localStorage.setItem("sj_preset", state.preset);
     });
 
-    // session selection
     sessionControl?.addEventListener("click", (e) => {
       const btn = e.target.closest(".segmented-btn");
       if (!btn) return;
@@ -299,7 +239,6 @@
       localStorage.setItem("sj_session", state.session);
     });
 
-    // load saved
     const savedPreset = localStorage.getItem("sj_preset");
     const savedSession = localStorage.getItem("sj_session");
     if (savedPreset && labelPreset[savedPreset]) {
@@ -323,275 +262,7 @@
   })();
 
   // ----------------------------
-  // Renderers
-  // ----------------------------
-  function renderStocks(rows) {
-    const tbody = document.getElementById("stocksTbody");
-    if (!tbody) return;
-  
-    if (!rows || rows.length === 0) {
-      tbody.innerHTML = `
-        <tr><td class="ticker">—</td><td>$—</td><td>—</td><td>—</td><td class="news">—</td></tr>
-      `;
-      return;
-    }
-  
-    tbody.innerHTML = rows
-      .map((x) => {
-        const pct = x.pctChange;
-        const changeClass = classUpDown(pct);
-  
-        // news: backend returns news: [{title,source,url,publishedAt}]
-        let newsHtml = "—";
-        if (Array.isArray(x.news) && x.news.length) {
-          const item = x.news[0];
-          if (item?.url) {
-            newsHtml = `<a class="news-source" href="${item.url}" target="_blank" rel="noopener">${item.source || "News"}</a>`;
-          } else {
-            newsHtml = item?.source || "News";
-          }
-        }
-  
-        return `
-          <tr>
-            <td class="ticker">${x.symbol || "—"}</td>
-            <td>${fmtUsd(x.price)}</td>
-            <td class="${changeClass}">${fmtPct(pct)}</td>
-            <td>${fmtNum(x.volume)}</td>
-            <td class="news">${newsHtml}</td>
-          </tr>
-        `;
-      })
-      .join("");
-  }
-  
-
-  function renderCrypto(rows) {
-    const tbody = document.getElementById("cryptoTbody");
-    if (!tbody) return;
-  
-    if (!rows || rows.length === 0) {
-      tbody.innerHTML = `
-        <tr><td class="ticker">—</td><td>$—</td><td>—</td><td>—</td><td>—</td></tr>
-      `;
-      return;
-    }
-  
-    tbody.innerHTML = rows
-      .map((x) => {
-        const pct = x.pctChange;        // ✅ new field
-        const vol = x.volume;           // ✅ new field
-        const mcap = x.marketCap;       // ✅ new field
-  
-        // use dynamic decimals for sub-$1 coins
-        const priceDecimals = x.price !== null && x.price !== undefined && Number(x.price) < 1 ? 6 : 2;
-  
-        const changeClass = classUpDown(pct);
-  
-        return `
-          <tr>
-            <td class="ticker">${x.coinSymbol || "—"}</td>
-            <td>${fmtUsd(x.price, priceDecimals)}</td>
-            <td class="${changeClass}">${fmtPct(pct)}</td>
-            <td>${fmtNum(vol)}</td>
-            <td>${fmtCompactUsd(mcap, 1)}</td>
-          </tr>
-        `;
-      })
-      .join("");
-  }
-  
-
-  // ----------------------------
-  // Filters -> query params (Phase A plumbing)
-  // ----------------------------
-// ----------------------------
-// Filters -> query params (D-1 real wiring)
-// ----------------------------
-const filterEls = {
-  mcapRange: document.getElementById("mcapRange"),
-  mcapNumStocks: document.getElementById("mcapNumStocks"),
-  mcapTextCrypto: document.getElementById("mcapTextCrypto"),
-  mcapPillStocks: document.getElementById("mcapPillStocks"),
-  mcapPillCrypto: document.getElementById("mcapPillCrypto"),
-  mcapLabel: document.getElementById("mcapLabel"),
-  mcapMetaRight: document.getElementById("mcapMetaRight"),
-
-  priceRange: document.getElementById("priceRange"),
-  volRange: document.getElementById("volRange"),
-  newsRequiredChk: document.getElementById("newsRequiredChk"),
-
-  applyBtn: document.getElementById("filtersApplyBtn"),
-  resetBtn: document.getElementById("filtersResetBtn"),
-};
-
-
-const MODE_DEFAULTS = {
-  stocks: {
-    limit: 15,
-    pctMin: 4,
-    volMin: 10_000_000,
-    mcapMin: 1_000_000_000,
-    mcapMax: 500_000_000_000,
-    priceMin: 2,
-    priceMax: null,
-    newsRequired: true,
-  },
-  crypto: {
-    limit: 15,
-    pctMin: 3,
-    volMin: 100_000_000,
-    mcapMin: 1_000_000_000,
-    mcapMax: null,
-    priceMin: null,
-    priceMax: null,
-    newsRequired: false,
-  },
-};
-
-// --- Market cap min ---
-let mcapMin = d.mcapMin;
-
-if (mode === "crypto") {
-  // mcapRange is a 0..1000 log dial
-  const dial = filterEls.mcapMinRange ? Number(filterEls.mcapMinRange.value) : 0;
-  mcapMin = cryptoMcapFromSlider(dial);
-} else {
-  // stocks: keep your existing behavior (billions slider -> dollars)
-  const mcapMinB = filterEls.mcapMinRange ? Number(filterEls.mcapMinRange.value) : 1;
-  mcapMin = Number.isFinite(mcapMinB) ? Math.round(mcapMinB * 1e9) : d.mcapMin;
-}
-
-function updateMcapDisplayForMode(mode) {
-  if (!filterEls.mcapMinRange) return;
-
-  if (mode === "crypto") {
-    const dial = Number(filterEls.mcapMinRange.value);
-    const dollars = cryptoMcapFromSlider(dial);
-
-    // Show as "$200M+" style
-    if (filterEls.mcapMinNum) filterEls.mcapMinNum.value = `${fmtMoneyShort(dollars)}+`;
-    else {
-      // if you don’t have mcapNum, you can update a label span instead
-    }
-  } else {
-    // stocks: slider is billions
-    const b = Number(filterEls.mcapMinRange.value);
-    if (filterEls.mcapMinNum) filterEls.mcapMinNum.value = `$ ${b}B`;
-  }
-}
-filterEls.mcapMinRange?.addEventListener("input", () => updateMcapDisplayForMode(currentMode));
-
-
-function buildApiPath(mode) {
-  const f = readFiltersForMode(mode);
-  const p = new URLSearchParams();
-
-  p.set("limit", String(Math.min(15, f.limit || 15)));
-  p.set("pctMin", String(f.pctMin));
-  p.set("volMin", String(f.volMin));
-  p.set("mcapMin", String(f.mcapMin));
-
-  if (f.mcapMax !== null && f.mcapMax !== undefined) p.set("mcapMax", String(f.mcapMax));
-  if (f.priceMin !== null && f.priceMin !== undefined) p.set("priceMin", String(f.priceMin));
-  if (f.priceMax !== null && f.priceMax !== undefined) p.set("priceMax", String(f.priceMax));
-
-  // Only meaningful for stocks right now, but safe to send always
-  p.set("newsRequired", f.newsRequired ? "true" : "false");
-
-  return mode === "crypto"
-    ? `/api/crypto?${p.toString()}`
-    : `/api/stocks?${p.toString()}`;
-}
-
-// Optional sync for market cap number input
-function syncMcapNumberFromRange() {
-  if (!filterEls.mcapMinRange || !filterEls.mcapMinNum) return;
-  filterEls.mcapMinNum.value = filterEls.mcapMinRange.value;
-}
-
-if (filterEls.mcapMinRange && filterEls.mcapMinNum) {
-  filterEls.mcapMinRange.addEventListener("input", syncMcapNumberFromRange);
-  filterEls.mcapMinNum.addEventListener("input", () => {
-    const v = clamp(filterEls.mcapMinNum.value, 0, 500);
-    filterEls.mcapMinNum.value = v;
-    filterEls.mcapMinRange.value = v;
-  });
-  syncMcapNumberFromRange();
-}
-
-function setMcapUiForMode(mode) {
-  if (!filterEls.mcapRange) return;
-
-  if (mode === "crypto") {
-    // switch slider to dial mode
-    filterEls.mcapLabel.textContent = "Market Cap (Min)";
-    filterEls.mcapRange.min = "0";
-    filterEls.mcapRange.max = "1000";
-
-    // sensible default dial (ex: ~1B-2B-ish)
-    if (!filterEls.mcapRange.dataset.touched) filterEls.mcapRange.value = "400";
-
-    filterEls.mcapPillStocks.style.display = "none";
-    filterEls.mcapPillCrypto.style.display = "";
-
-    const dollars = cryptoMcapFromDial(Number(filterEls.mcapRange.value));
-    filterEls.mcapTextCrypto.textContent = `${fmtMoneyShort(dollars)}+`;
-    filterEls.mcapMetaRight.textContent = "$100B+";
-  } else {
-    // stocks mode: billions (max or min depending on your backend)
-    filterEls.mcapLabel.textContent = "Market Cap (Max)";
-    filterEls.mcapRange.min = "1";
-    filterEls.mcapRange.max = "500";
-
-    if (!filterEls.mcapRange.dataset.touched) filterEls.mcapRange.value = "50";
-
-    filterEls.mcapPillStocks.style.display = "";
-    filterEls.mcapPillCrypto.style.display = "none";
-
-    filterEls.mcapNumStocks.value = filterEls.mcapRange.value;
-    filterEls.mcapMetaRight.textContent = "$0.3B";
-  }
-}
-
-filterEls.mcapRange?.addEventListener("input", () => {
-  filterEls.mcapRange.dataset.touched = "1";
-
-  if (currentMode === "crypto") {
-    const dollars = cryptoMcapFromDial(Number(filterEls.mcapRange.value));
-    filterEls.mcapTextCrypto.textContent = `${fmtMoneyShort(dollars)}+`;
-  } else {
-    filterEls.mcapNumStocks.value = filterEls.mcapRange.value;
-  }
-});
-
-filterEls.mcapNumStocks?.addEventListener("input", () => {
-  // only relevant in stocks mode
-  if (currentMode !== "stocks") return;
-  const v = clamp(filterEls.mcapNumStocks.value, 1, 500);
-  filterEls.mcapNumStocks.value = v;
-  filterEls.mcapRange.value = v;
-  filterEls.mcapRange.dataset.touched = "1";
-});
-
-  // Optional sync for market cap number input
-  function syncMcapNumberFromRange() {
-    if (!filterEls.mcapRange || !filterEls.mcapNum) return;
-    filterEls.mcapNum.value = filterEls.mcapRange.value;
-  }
-
-  if (filterEls.mcapRange && filterEls.mcapNum) {
-    filterEls.mcapRange.addEventListener("input", syncMcapNumberFromRange);
-    filterEls.mcapNum.addEventListener("input", () => {
-      const v = clamp(filterEls.mcapNum.value, 1, 500);
-      filterEls.mcapNum.value = v;
-      filterEls.mcapRange.value = v;
-    });
-    syncMcapNumberFromRange();
-  }
-
-  // ----------------------------
-  // Polling + mode switching
+  // DOM refs
   // ----------------------------
   const assetControl = document.getElementById("assetControl");
 
@@ -607,62 +278,272 @@ filterEls.mcapNumStocks?.addEventListener("input", () => {
   const idxLeftValue = document.getElementById("idxLeftValue");
   const idxRightValue = document.getElementById("idxRightValue");
 
-  const DEFAULTS = {
-    stocks: { newsRequired: true },
-    crypto: { newsRequired: false },
+  // Filters
+  const filterEls = {
+    mcapRange: document.getElementById("mcapRange"),
+    mcapNumStocks: document.getElementById("mcapNumStocks"),
+    mcapTextCrypto: document.getElementById("mcapTextCrypto"),
+    mcapPillStocks: document.getElementById("mcapPillStocks"),
+    mcapPillCrypto: document.getElementById("mcapPillCrypto"),
+    mcapLabel: document.getElementById("mcapLabel"),
+    mcapMetaRight: document.getElementById("mcapMetaRight"),
+
+    priceRange: document.getElementById("priceRange"),
+    volRange: document.getElementById("volRange"),
+    newsRequiredChk: document.getElementById("newsRequiredChk"),
+
+    applyBtn: document.getElementById("filtersApplyBtn"),
+    resetBtn: document.getElementById("filtersResetBtn"),
+  };
+
+  // ----------------------------
+  // Renderers
+  // ----------------------------
+  function renderStocks(rows) {
+    const tbody = document.getElementById("stocksTbody");
+    if (!tbody) return;
+
+    if (!rows || rows.length === 0) {
+      tbody.innerHTML = `<tr><td class="ticker">—</td><td>$—</td><td>—</td><td>—</td><td class="news">—</td></tr>`;
+      return;
+    }
+
+    tbody.innerHTML = rows
+      .map((x) => {
+        const pct = x.pctChange;
+        const changeClass = classUpDown(pct);
+
+        let newsHtml = "—";
+        if (Array.isArray(x.news) && x.news.length) {
+          const item = x.news[0];
+          if (item?.url) {
+            newsHtml = `<a class="news-source" href="${item.url}" target="_blank" rel="noopener">${item.source || "News"}</a>`;
+          } else {
+            newsHtml = item?.source || "News";
+          }
+        }
+
+        return `
+          <tr>
+            <td class="ticker">${x.symbol || "—"}</td>
+            <td>${fmtUsd(x.price)}</td>
+            <td class="${changeClass}">${fmtPct(pct)}</td>
+            <td>${fmtNum(x.volume)}</td>
+            <td class="news">${newsHtml}</td>
+          </tr>
+        `;
+      })
+      .join("");
+  }
+
+  function renderCrypto(rows) {
+    const tbody = document.getElementById("cryptoTbody");
+    if (!tbody) return;
+
+    if (!rows || rows.length === 0) {
+      tbody.innerHTML = `<tr><td class="ticker">—</td><td>$—</td><td>—</td><td>—</td><td>—</td></tr>`;
+      return;
+    }
+
+    tbody.innerHTML = rows
+      .map((x) => {
+        const pct = x.pctChange;
+        const vol = x.volume;
+        const mcap = x.marketCap;
+
+        const priceDecimals =
+          x.price !== null && x.price !== undefined && Number(x.price) < 1 ? 6 : 2;
+
+        const changeClass = classUpDown(pct);
+
+        return `
+          <tr>
+            <td class="ticker">${x.coinSymbol || "—"}</td>
+            <td>${fmtUsd(x.price, priceDecimals)}</td>
+            <td class="${changeClass}">${fmtPct(pct)}</td>
+            <td>${fmtNum(vol)}</td>
+            <td>${fmtCompactUsd(mcap, 1)}</td>
+          </tr>
+        `;
+      })
+      .join("");
+  }
+
+  // ----------------------------
+  // Header indices from API
+  // ----------------------------
+  function setIdxValue(el, pct) {
+    if (!el) return;
+    el.textContent = fmtPct(pct);
+    el.classList.remove("up", "down");
+    const c = classUpDown(pct);
+    if (c) el.classList.add(c);
+  }
+
+  function updateHeaderIndicesFromApi(data) {
+    const leftPct =
+      data?.header?.left?.pct ??
+      data?.header?.btcPct ??
+      data?.header?.leftPct ??
+      null;
+
+    const rightPct =
+      data?.header?.right?.pct ??
+      data?.header?.totalMarketPct ??
+      data?.header?.rightPct ??
+      null;
+
+    setIdxValue(idxLeftValue, leftPct);
+    setIdxValue(idxRightValue, rightPct);
+  }
+
+  // ----------------------------
+  // Mode defaults
+  // ----------------------------
+  const MODE_DEFAULTS = {
+    stocks: {
+      // UI defaults (feel free to tune)
+      mcapMaxB: 50,         // billions
+      priceMax: 300,
+      volMin: 1_000_000,    // slider is generic, backend will interpret
+      newsRequired: true,
+    },
+    crypto: {
+      mcapDial: 400,        // 0..1000
+      priceMax: 300,        // still shown; you can ignore server-side
+      volMin: 1_000_000,
+      newsRequired: false,
+    },
   };
 
   let currentMode = "stocks";
   let pollTimer = null;
 
-  async function loadStocksOnce() {
-    const data = await apiGet(buildStocksPath());   // <-- uses your existing function
-    setHeaderFromApi(data.header);
-    renderStocks(data.rows);                        // <-- always rows array
-  }
-  
-  async function loadCryptoOnce() {
-    const data = await apiGet(buildCryptoPath());   // <-- uses your existing function
-    setHeaderFromApi(data.header);
-    renderCrypto(data.rows);                        // <-- always rows array
-  }
-  
-  
+  // ----------------------------
+  // Market cap UI (mode-aware)
+  // ----------------------------
+  function setMcapUiForMode(mode) {
+    if (!filterEls.mcapRange) return;
 
+    if (mode === "crypto") {
+      filterEls.mcapLabel && (filterEls.mcapLabel.textContent = "Market Cap (Min)");
+      filterEls.mcapRange.min = "0";
+      filterEls.mcapRange.max = "1000";
+
+      if (!filterEls.mcapRange.dataset.touched) {
+        filterEls.mcapRange.value = String(MODE_DEFAULTS.crypto.mcapDial);
+      }
+
+      filterEls.mcapPillStocks && (filterEls.mcapPillStocks.style.display = "none");
+      filterEls.mcapPillCrypto && (filterEls.mcapPillCrypto.style.display = "");
+
+      const dollars = cryptoMcapFromDial(Number(filterEls.mcapRange.value));
+      filterEls.mcapTextCrypto && (filterEls.mcapTextCrypto.textContent = `${fmtMoneyShort(dollars)}+`);
+      filterEls.mcapMetaRight && (filterEls.mcapMetaRight.textContent = "$100B+");
+    } else {
+      filterEls.mcapLabel && (filterEls.mcapLabel.textContent = "Market Cap (Max)");
+      filterEls.mcapRange.min = "1";
+      filterEls.mcapRange.max = "500";
+
+      if (!filterEls.mcapRange.dataset.touched) {
+        filterEls.mcapRange.value = String(MODE_DEFAULTS.stocks.mcapMaxB);
+      }
+
+      filterEls.mcapPillStocks && (filterEls.mcapPillStocks.style.display = "");
+      filterEls.mcapPillCrypto && (filterEls.mcapPillCrypto.style.display = "none");
+
+      filterEls.mcapNumStocks && (filterEls.mcapNumStocks.value = filterEls.mcapRange.value);
+      filterEls.mcapMetaRight && (filterEls.mcapMetaRight.textContent = "$0.3B");
+    }
+  }
+
+  filterEls.mcapRange?.addEventListener("input", () => {
+    filterEls.mcapRange.dataset.touched = "1";
+    if (currentMode === "crypto") {
+      const dollars = cryptoMcapFromDial(Number(filterEls.mcapRange.value));
+      if (filterEls.mcapTextCrypto) filterEls.mcapTextCrypto.textContent = `${fmtMoneyShort(dollars)}+`;
+    } else {
+      if (filterEls.mcapNumStocks) filterEls.mcapNumStocks.value = filterEls.mcapRange.value;
+    }
+  });
+
+  filterEls.mcapNumStocks?.addEventListener("input", () => {
+    if (currentMode !== "stocks") return;
+    const v = clamp(filterEls.mcapNumStocks.value, 1, 500);
+    filterEls.mcapNumStocks.value = v;
+    if (filterEls.mcapRange) filterEls.mcapRange.value = String(v);
+    filterEls.mcapRange.dataset.touched = "1";
+  });
+
+  // ----------------------------
+  // Build API path from filters
+  // ----------------------------
+  function buildApiPath(mode) {
+    const p = new URLSearchParams();
+    p.set("limit", "15");
+
+    const volMin = Number(filterEls.volRange?.value ?? 0);
+    const priceMax = Number(filterEls.priceRange?.value ?? 0);
+
+    if (mode === "crypto") {
+      // crypto: mcapMin from log dial
+      const dial = Number(filterEls.mcapRange?.value ?? 0);
+      const mcapMin = cryptoMcapFromDial(dial);
+
+      p.set("mcapMin", String(mcapMin));
+      if (Number.isFinite(volMin) && volMin > 0) p.set("volMin", String(volMin));
+      if (Number.isFinite(priceMax) && priceMax > 0) p.set("priceMax", String(priceMax));
+
+      // intentionally false by default for crypto
+      p.set("newsRequired", filterEls.newsRequiredChk?.checked ? "true" : "false");
+
+      return `/api/crypto?${p.toString()}`;
+    }
+
+    // stocks: mcapMax in billions -> dollars
+    const mcapMaxB = Number(filterEls.mcapRange?.value ?? 50);
+    const mcapMax = Math.round(mcapMaxB * 1e9);
+
+    p.set("mcapMax", String(mcapMax));
+    if (Number.isFinite(volMin) && volMin > 0) p.set("volMin", String(volMin));
+    if (Number.isFinite(priceMax) && priceMax > 0) p.set("priceMax", String(priceMax));
+
+    p.set("newsRequired", filterEls.newsRequiredChk?.checked ? "true" : "false");
+
+    return `/api/stocks?${p.toString()}`;
+  }
+
+  // ----------------------------
+  // Polling + refresh
+  // ----------------------------
   async function refreshOnce() {
     try {
       const path = buildApiPath(currentMode);
       const data = await apiGet(path);
-  
+
       updateHeaderIndicesFromApi(data);
-  
+
       if (currentMode === "crypto") renderCrypto(data.rows);
       else renderStocks(data.rows);
     } catch (e) {
       console.error("refreshOnce failed", e);
     }
   }
-  
-  
-  
 
-  function startPollingForMode() {
+  function startPolling() {
     if (pollTimer) clearInterval(pollTimer);
     refreshOnce(); // immediate
-    pollTimer = setInterval(refreshOnce, 60_000);
+    pollTimer = setInterval(refreshOnce, POLL_MS);
   }
 
+  // ----------------------------
+  // Apply mode (toggle)
+  // ----------------------------
   function applyMode(mode) {
     currentMode = mode;
+
+    // segmented UI
     setSegmented(assetControl, mode);
-    setUiDefaultsForMode(mode);
-    startPollingForMode();
-
-
-    // default checkbox behavior
-    if (filterEls.newsRequiredChk) {
-      filterEls.newsRequiredChk.checked = !!DEFAULTS[mode].newsRequired;
-    }
 
     // tables
     if (stocksTable) stocksTable.style.display = mode === "stocks" ? "" : "none";
@@ -672,129 +553,96 @@ filterEls.mcapNumStocks?.addEventListener("input", () => {
     if (heroChartStocks) heroChartStocks.style.display = mode === "stocks" ? "" : "none";
     if (heroChartCrypto) heroChartCrypto.style.display = mode === "crypto" ? "" : "none";
 
-    // header indices swap
+    // header labels
     if (idxLeftLabel && idxRightLabel) {
       if (mode === "stocks") {
         idxLeftLabel.textContent = "NASDAQ";
         idxRightLabel.textContent = "S&P 500";
-        if (idxLeftValue) idxLeftValue.textContent = "—";
-        if (idxRightValue) idxRightValue.textContent = "—";
         idxWrap?.classList.remove("crypto");
       } else {
         idxLeftLabel.textContent = "BTC";
         idxRightLabel.textContent = "Total Crypto Market";
-        if (idxLeftValue) idxLeftValue.textContent = "—";
-        if (idxRightValue) idxRightValue.textContent = "—";
         idxWrap?.classList.add("crypto");
       }
-      
+      // clear values until API returns
+      if (idxLeftValue) idxLeftValue.textContent = "—";
+      if (idxRightValue) idxRightValue.textContent = "—";
+      idxLeftValue?.classList.remove("up", "down");
+      idxRightValue?.classList.remove("up", "down");
     }
 
-    localStorage.setItem("sj_asset_mode", mode);
-
-    // poll correct endpoint
-    startPollingForMode();
-  }
-
-  function setUiDefaultsForMode(mode) {
+    // filter defaults per mode (only if not touched)
     const d = MODE_DEFAULTS[mode];
-  
-    // If you want hard switch every time, remove the "if (!...dataset.touched)" checks.
-    if (filterEls.mcapMinRange && !filterEls.mcapMinRange.dataset.touched) {
-      filterEls.mcapMinRange.value = Math.round(d.mcapMin / 1e9);
+
+    if (filterEls.volRange && !filterEls.volRange.dataset.touched) {
+      filterEls.volRange.value = String(d.volMin);
     }
-    if (filterEls.priceMaxRange && !filterEls.priceMaxRange.dataset.touched) {
-      filterEls.priceMaxRange.value = d.priceMax ?? 300;
+    if (filterEls.priceRange && !filterEls.priceRange.dataset.touched) {
+      filterEls.priceRange.value = String(d.priceMax);
     }
-    if (filterEls.volMinRange && !filterEls.volMinRange.dataset.touched) {
-      filterEls.volMinRange.value = d.volMin;
-    }
+
+    // News required default differs by mode (always set)
     if (filterEls.newsRequiredChk) {
       filterEls.newsRequiredChk.checked = !!d.newsRequired;
     }
-  
-    // keep optional number input synced
-    syncMcapNumberFromRange();
+
+    // Market cap UI swap
+    setMcapUiForMode(mode);
+
+    // persist + poll
+    localStorage.setItem("sj_asset_mode", mode);
+    startPolling();
   }
-  
-  // mark touched if user changes sliders
-  [filterEls.mcapMinRange, filterEls.priceMaxRange, filterEls.volMinRange].forEach((el) => {
-    el?.addEventListener("input", () => (el.dataset.touched = "1"));
-  });
-  
 
   // toggle click
   assetControl?.addEventListener("click", (e) => {
     const btn = e.target.closest(".segmented-btn");
     if (!btn) return;
-    applyMode(btn.dataset.value);
+    applyMode(btn.dataset.value === "crypto" ? "crypto" : "stocks");
   });
 
-  // init mode
-  const savedMode = localStorage.getItem("sj_asset_mode");
-  applyMode(savedMode === "crypto" ? "crypto" : "stocks");
+  // mark touched for sliders so mode switch doesn’t overwrite user input
+  [filterEls.mcapRange, filterEls.priceRange, filterEls.volRange].forEach((el) => {
+    el?.addEventListener("input", () => (el.dataset.touched = "1"));
+  });
 
   // ----------------------------
-  // Apply / Reset buttons
+  // Apply / Reset
   // ----------------------------
   filterEls.applyBtn?.addEventListener("click", () => {
     refreshOnce();
   });
 
   filterEls.resetBtn?.addEventListener("click", () => {
-    // reset ranges (tune these however you want)
-    if (filterEls.mcapRange) filterEls.mcapRange.value = 50;
-    if (filterEls.mcapNum) filterEls.mcapNum.value = 50;
-    if (filterEls.priceRange) filterEls.priceRange.value = 300;
-    if (filterEls.volRange) filterEls.volRange.value = 1_000_000;
+    // clear touched so defaults apply again
+    [filterEls.mcapRange, filterEls.priceRange, filterEls.volRange].forEach((el) => {
+      if (el) delete el.dataset.touched;
+    });
 
-    // defaults depend on mode
+    // reset mode-specific defaults
+    if (filterEls.priceRange) filterEls.priceRange.value = String(MODE_DEFAULTS[currentMode].priceMax);
+    if (filterEls.volRange) filterEls.volRange.value = String(MODE_DEFAULTS[currentMode].volMin);
+
+    // reset news default per mode
     if (filterEls.newsRequiredChk) {
-      filterEls.newsRequiredChk.checked = (currentMode === "stocks");
+      filterEls.newsRequiredChk.checked = !!MODE_DEFAULTS[currentMode].newsRequired;
     }
 
+    // reset market cap per mode
+    if (currentMode === "crypto") {
+      if (filterEls.mcapRange) filterEls.mcapRange.value = String(MODE_DEFAULTS.crypto.mcapDial);
+    } else {
+      if (filterEls.mcapRange) filterEls.mcapRange.value = String(MODE_DEFAULTS.stocks.mcapMaxB);
+      if (filterEls.mcapNumStocks) filterEls.mcapNumStocks.value = String(MODE_DEFAULTS.stocks.mcapMaxB);
+    }
+
+    setMcapUiForMode(currentMode);
     refreshOnce();
   });
 
+  // ----------------------------
+  // Init
+  // ----------------------------
+  const savedMode = localStorage.getItem("sj_asset_mode");
+  applyMode(savedMode === "crypto" ? "crypto" : "stocks");
 })();
-function formatPct(pct) {
-  if (pct === null || pct === undefined || Number.isNaN(Number(pct))) return "—";
-  const n = Number(pct);
-  const sign = n > 0 ? "+" : "";
-  return `${sign}${n.toFixed(2)}%`;
-}
-
-function setIdxValue(el, pct) {
-  if (!el) return;
-  el.textContent = formatPct(pct);
-
-  // reset classes
-  el.classList.remove("up", "down", "flat");
-
-  const n = Number(pct);
-  if (!Number.isFinite(n)) return;
-
-  if (n > 0) el.classList.add("up");
-  else if (n < 0) el.classList.add("down");
-  else el.classList.add("flat");
-}
-
-function updateHeaderIndicesFromApi(data) {
-  // supports BOTH shapes:
-  // - data.header.left.pct / data.header.right.pct
-  // - compat aliases (btcPct / totalMarketPct), if present
-  const leftPct =
-    data?.header?.left?.pct ??
-    data?.header?.btcPct ??
-    data?.header?.leftPct ??
-    null;
-
-  const rightPct =
-    data?.header?.right?.pct ??
-    data?.header?.totalMarketPct ??
-    data?.header?.rightPct ??
-    null;
-
-  setIdxValue(document.getElementById("idxLeftValue"), leftPct);
-  setIdxValue(document.getElementById("idxRightValue"), rightPct);
-}

@@ -1,5 +1,6 @@
 /**
  * StockJelli Alerts Modal - Frontend JavaScript
+ * Uses same modal pattern as Privacy/Terms/About/Contact modals
  */
 
 (() => {
@@ -25,8 +26,8 @@
     const summaryEmail = document.getElementById("summaryEmail");
     const summaryFrequency = document.getElementById("summaryFrequency");
     
-    const stepDots = document.querySelectorAll(".step-dot");
-    const modalSteps = document.querySelectorAll(".modal-step");
+    const stepDots = document.querySelectorAll("#alertsModal .step-dot");
+    const modalSteps = document.querySelectorAll("#alertsModal .modal-step");
   
     // State
     let currentStep = 1;
@@ -57,29 +58,33 @@
       modalSteps.forEach(section => {
         section.hidden = section.dataset.step !== "success";
       });
-      document.querySelector(".steps")?.classList.add("hidden");
+      const stepsEl = modal?.querySelector(".steps");
+      if (stepsEl) stepsEl.classList.add("hidden");
     }
   
+    // Use same open/close pattern as your other modals (is-open class)
     function openModal() {
       if (!modal) return;
+      modal.classList.add("is-open");
       modal.setAttribute("aria-hidden", "false");
-      modal.classList.add("modal-open");
       document.body.style.overflow = "hidden";
       
+      // Check if returning from successful Stripe checkout
       const params = new URLSearchParams(window.location.search);
       if (params.get("alerts") === "success") {
         showSuccess();
         window.history.replaceState({}, "", window.location.pathname);
       } else {
         showStep(1);
-        document.querySelector(".steps")?.classList.remove("hidden");
+        const stepsEl = modal?.querySelector(".steps");
+        if (stepsEl) stepsEl.classList.remove("hidden");
       }
     }
   
     function closeModal() {
       if (!modal) return;
+      modal.classList.remove("is-open");
       modal.setAttribute("aria-hidden", "true");
-      modal.classList.remove("modal-open");
       document.body.style.overflow = "";
     }
   
@@ -108,20 +113,27 @@
     }
   
     // Event Handlers
-    enableAlertsBtn?.addEventListener("click", openModal);
+    enableAlertsBtn?.addEventListener("click", (e) => {
+      e.preventDefault();
+      openModal();
+    });
+    
     closeModalBtn?.addEventListener("click", closeModal);
     closeSuccessBtn?.addEventListener("click", closeModal);
     
+    // Click outside to close (on the overlay, not the modal content)
     modal?.addEventListener("click", (e) => {
       if (e.target === modal) closeModal();
     });
   
+    // ESC to close
     document.addEventListener("keydown", (e) => {
-      if (e.key === "Escape" && modal?.getAttribute("aria-hidden") === "false") {
+      if (e.key === "Escape" && modal?.classList.contains("is-open")) {
         closeModal();
       }
     });
   
+    // Frequency selector
     frequencyControl?.addEventListener("click", (e) => {
       const btn = e.target.closest(".segmented-btn");
       if (btn) setFrequency(btn.dataset.value);
@@ -140,19 +152,27 @@
       if (emailError) emailError.style.display = "none";
       userEmail = email;
       
-      const status = await checkStatus(email);
-      if (status.subscribed) {
-        alert("You're already subscribed! Check your email for alerts.");
-        closeModal();
-        return;
+      // Check if already subscribed
+      try {
+        const status = await checkStatus(email);
+        if (status.subscribed) {
+          alert("You're already subscribed! Check your email for alerts.");
+          closeModal();
+          return;
+        }
+      } catch (err) {
+        // Continue anyway if status check fails
+        console.warn("Status check failed:", err);
       }
       
+      // Update summary
       if (summaryEmail) summaryEmail.textContent = email;
       if (summaryFrequency) summaryFrequency.textContent = `${selectedFrequency} alert${selectedFrequency > 1 ? 's' : ''}/day`;
       
       showStep(2);
     });
   
+    // Back button
     backToStep1Btn?.addEventListener("click", () => showStep(1));
   
     // Stripe Checkout
@@ -173,19 +193,24 @@
           throw new Error("No checkout URL");
         }
       } catch (err) {
+        console.error("Checkout error:", err);
         alert("Failed to start checkout. Please try again.");
         stripeCheckoutBtn.disabled = false;
         stripeCheckoutBtn.textContent = "Subscribe with Stripe →";
       }
     });
   
-    // Check URL on load for success redirect
+    // Check URL on page load for success redirect from Stripe
     const params = new URLSearchParams(window.location.search);
     if (params.get("alerts") === "success") {
+      // Wait for DOM to be ready, then show success
       setTimeout(() => {
         openModal();
         showSuccess();
         window.history.replaceState({}, "", window.location.pathname);
-      }, 500);
+      }, 300);
+    } else if (params.get("alerts") === "cancelled") {
+      // Clean up URL if checkout was cancelled
+      window.history.replaceState({}, "", window.location.pathname);
     }
   })();

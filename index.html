@@ -384,20 +384,26 @@
               <!-- Row 1: Market Cap -->
               <div class="filter-card">
                 <div class="filter-title-row">
-                  <label class="filter-title" for="mcapRange">Market Cap (Max)</label>
+                  <label id="mcapLabel" class="filter-title" for="mcapRange">
+                    Market Cap (Max)
+                  </label>
+                  
                 </div>
           
                 <div class="filter-control-row">
                   <input id="mcapRange" class="slider" type="range" min="1" max="500" value="50" />
-                  <div class="pill">
-                    $<input id="mcapNum" class="num" type="number" value="50" min="1" max="500" />B
+                  <div class="pill" id="mcapPill">
+                    <span id="mcapPillPrefix">$</span>
+                    <input id="mcapNum" class="num" type="number" value="50" min="1" max="500" />
+                    <span id="mcapPillSuffix">B</span>
                   </div>
                 </div>
           
                 <div class="filter-meta">
-                  <span class="muted">Min</span><span class="muted">$0.3B</span>
+                  <span id="mcapMetaLeft" class="muted">Min</span>
+                  <span id="mcapMetaRight" class="muted">$0.3B</span>
                 </div>
-              </div>
+                
           
               <!-- Row 1: Price Cap -->
               <div class="filter-card">
@@ -655,7 +661,7 @@
     </div>
   </div>
   
-  <script src="app.js"></script>
+
 
 </body>
 </html>

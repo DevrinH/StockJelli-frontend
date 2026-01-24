@@ -108,6 +108,27 @@
     });
   }
 
+  function fmtMoneyShort(n) {
+    if (!Number.isFinite(n)) return "—";
+    const abs = Math.abs(n);
+    if (abs >= 1e12) return `$${(n / 1e12).toFixed(2)}T`;
+    if (abs >= 1e9)  return `$${(n / 1e9).toFixed(1)}B`;
+    if (abs >= 1e6)  return `$${(n / 1e6).toFixed(0)}M`;
+    return `$${Math.round(n).toLocaleString()}`;
+  }
+  
+  // sliderValue: 0..1000  ->  mcapMin: 2e8 .. 1e11
+  function cryptoMcapFromSlider(sliderValue) {
+    const t = clamp(sliderValue, 0, 1000) / 1000;      // 0..1
+    const min = 2e8;                                    // 200M
+    const max = 1e11;                                   // 100B
+    const logMin = Math.log10(min);
+    const logMax = Math.log10(max);
+    const logVal = logMin + (logMax - logMin) * t;
+    return Math.round(Math.pow(10, logVal));
+  }
+  
+
   // ----------------------------
   // Drawer Menu
   // ----------------------------
@@ -413,36 +434,39 @@ const MODE_DEFAULTS = {
   },
 };
 
-function readFiltersForMode(mode) {
-  const d = MODE_DEFAULTS[mode];
+// --- Market cap min ---
+let mcapMin = d.mcapMin;
 
-  // mcapMin slider is in BILLIONS in the UI (e.g. 6 => 6B)
+if (mode === "crypto") {
+  // mcapRange is a 0..1000 log dial
+  const dial = filterEls.mcapMinRange ? Number(filterEls.mcapMinRange.value) : 0;
+  mcapMin = cryptoMcapFromSlider(dial);
+} else {
+  // stocks: keep your existing behavior (billions slider -> dollars)
   const mcapMinB = filterEls.mcapMinRange ? Number(filterEls.mcapMinRange.value) : 1;
-  const mcapMin = Number.isFinite(mcapMinB) ? Math.round(mcapMinB * 1e9) : d.mcapMin;
-
-  // price max slider in dollars
-  const priceMax = filterEls.priceMaxRange ? Number(filterEls.priceMaxRange.value) : (d.priceMax ?? 300);
-  const priceMaxFinal = Number.isFinite(priceMax) ? priceMax : d.priceMax;
-
-  // vol min slider in raw dollars (your UI currently goes 0..50M; crypto default is 100M)
-  const volMinUi = filterEls.volMinRange ? Number(filterEls.volMinRange.value) : d.volMin;
-  const volMin = Number.isFinite(volMinUi) ? Math.round(volMinUi) : d.volMin;
-
-  // checkbox
-  const newsRequired =
-    filterEls.newsRequiredChk ? !!filterEls.newsRequiredChk.checked : d.newsRequired;
-
-  return {
-    limit: d.limit,
-    pctMin: d.pctMin,
-    volMin,
-    mcapMin,
-    mcapMax: d.mcapMax,
-    priceMin: d.priceMin,
-    priceMax: priceMaxFinal,
-    newsRequired,
-  };
+  mcapMin = Number.isFinite(mcapMinB) ? Math.round(mcapMinB * 1e9) : d.mcapMin;
 }
+
+function updateMcapDisplayForMode(mode) {
+  if (!filterEls.mcapMinRange) return;
+
+  if (mode === "crypto") {
+    const dial = Number(filterEls.mcapMinRange.value);
+    const dollars = cryptoMcapFromSlider(dial);
+
+    // Show as "$200M+" style
+    if (filterEls.mcapMinNum) filterEls.mcapMinNum.value = `${fmtMoneyShort(dollars)}+`;
+    else {
+      // if you don’t have mcapNum, you can update a label span instead
+    }
+  } else {
+    // stocks: slider is billions
+    const b = Number(filterEls.mcapMinRange.value);
+    if (filterEls.mcapMinNum) filterEls.mcapMinNum.value = `$ ${b}B`;
+  }
+}
+filterEls.mcapMinRange?.addEventListener("input", () => updateMcapDisplayForMode(currentMode));
+
 
 function buildApiPath(mode) {
   const f = readFiltersForMode(mode);

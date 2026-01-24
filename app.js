@@ -221,6 +221,50 @@
     `;
   }
 
+  // Generate news HTML with tier styling
+  function renderNewsCell(news) {
+    if (!Array.isArray(news) || news.length === 0) {
+      return '<span class="news-none">—</span>';
+    }
+    
+    // Get the best (lowest tier) news item
+    const item = news[0];
+    if (!item) return '<span class="news-none">—</span>';
+    
+    const source = item.source || "News";
+    const tier = item.tier || 3;
+    const tierClass = tier === 1 ? "news-tier1" : tier === 2 ? "news-tier2" : "news-tier3";
+    
+    if (item.url) {
+      return `<a class="news-source ${tierClass}" href="${item.url}" target="_blank" rel="noopener" title="${item.title || source}">${source}</a>`;
+    }
+    return `<span class="news-source ${tierClass}" title="${item.title || ''}">${source}</span>`;
+  }
+
+  // Generate TradingView URL for a symbol
+  function getTradingViewUrl(symbol, type = "stock") {
+    // TradingView URL format
+    if (type === "crypto") {
+      // For crypto, use BINANCE or COINBASE prefix
+      return `https://www.tradingview.com/chart/?symbol=BINANCE:${symbol}USDT`;
+    }
+    // For stocks, use default exchange detection
+    return `https://www.tradingview.com/chart/?symbol=${symbol}`;
+  }
+
+  // Render ticker cell with TradingView hover tooltip
+  function renderTickerCell(symbol, type = "stock") {
+    const tvUrl = getTradingViewUrl(symbol, type);
+    return `
+      <span class="ticker-wrap">
+        <span class="ticker-symbol">${symbol}</span>
+        <a class="ticker-tv-link" href="${tvUrl}" target="_blank" rel="noopener" title="Open ${symbol} on TradingView">
+          <span class="ticker-tv-tooltip">Open in TradingView ↗</span>
+        </a>
+      </span>
+    `;
+  }
+
   function renderStocks(rows) {
     const tbody = document.getElementById("stocksTbody");
     if (!tbody) return;
@@ -236,20 +280,16 @@
       
       // Range indicator using day low/high
       const rangeHtml = renderRangeIndicator(x.dayLow ?? x.rangeLow, x.dayHigh ?? x.rangeHigh, x.price);
-
-      let newsHtml = "—";
-      if (Array.isArray(x.news) && x.news.length) {
-        const item = x.news[0];
-        if (item?.url) {
-          newsHtml = `<a class="news-source" href="${item.url}" target="_blank" rel="noopener">${item.source || "News"}</a>`;
-        } else {
-          newsHtml = item?.source || "News";
-        }
-      }
+      
+      // News with tier styling
+      const newsHtml = renderNewsCell(x.news);
+      
+      // Ticker with TradingView link
+      const tickerHtml = renderTickerCell(x.symbol || "—", "stock");
 
       return `
         <tr>
-          <td class="ticker">${x.symbol || "—"}</td>
+          <td class="ticker">${tickerHtml}</td>
           <td>${fmtUsd(x.price)}</td>
           <td class="${changeClass}">
             <span class="change-wrap">
@@ -282,10 +322,13 @@
       
       // Range indicator using 24h low/high
       const rangeHtml = renderRangeIndicator(x.low24h ?? x.rangeLow, x.high24h ?? x.rangeHigh, x.price);
+      
+      // Ticker with TradingView link
+      const tickerHtml = renderTickerCell(x.coinSymbol || "—", "crypto");
 
       return `
         <tr>
-          <td class="ticker">${x.coinSymbol || "—"}</td>
+          <td class="ticker">${tickerHtml}</td>
           <td>${fmtUsd(x.price, priceDecimals)}</td>
           <td class="${changeClass}">
             <span class="change-wrap">

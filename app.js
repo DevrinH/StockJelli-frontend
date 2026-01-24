@@ -798,3 +798,52 @@
     });
   })();
 })();
+
+    // About / Contact
+    const aboutModal = document.getElementById("aboutModal");
+    const contactModal = document.getElementById("contactModal");
+
+    const openAboutBtn = document.getElementById("openAboutBtn");
+    const openContactBtn = document.getElementById("openContactBtn");
+
+    const closeAboutBtn = document.getElementById("closeAboutBtn");
+    const closeContactBtn = document.getElementById("closeContactBtn");
+    const contactCancelBtn = document.getElementById("contactCancelBtn");
+
+    function openModalSafe(modalEl) {
+      if (!modalEl) return;
+      modalEl.classList.add("is-open");
+      modalEl.setAttribute("aria-hidden", "false");
+      document.body.style.overflow = "hidden";
+    }
+
+    function closeModalSafe(modalEl) {
+      if (!modalEl) return;
+      modalEl.classList.remove("is-open");
+      modalEl.setAttribute("aria-hidden", "true");
+      document.body.style.overflow = "";
+    }
+
+    openAboutBtn?.addEventListener("click", () => openModalSafe(aboutModal));
+    openContactBtn?.addEventListener("click", () => openModalSafe(contactModal));
+
+    closeAboutBtn?.addEventListener("click", () => closeModalSafe(aboutModal));
+    closeContactBtn?.addEventListener("click", () => closeModalSafe(contactModal));
+    contactCancelBtn?.addEventListener("click", () => closeModalSafe(contactModal));
+
+    aboutModal?.addEventListener("click", (e) => {
+      if (e.target === aboutModal) closeModalSafe(aboutModal);
+    });
+
+    contactModal?.addEventListener("click", (e) => {
+      if (e.target === contactModal) closeModalSafe(contactModal);
+    });
+
+    // Contact form placeholder (no backend yet)
+    const contactForm = document.getElementById("contactForm");
+    contactForm?.addEventListener("submit", (e) => {
+      e.preventDefault();
+      alert("Thanks! Your message is noted (placeholder). Wire /api/contact next.");
+      closeModalSafe(contactModal);
+      contactForm.reset();
+    });

@@ -23,6 +23,13 @@
       window.ezstandalone = window.ezstandalone || {};
       ezstandalone.cmd = ezstandalone.cmd || [];
     </script>
+
+<div id="ezoic-pub-ad-placeholder-101"></div>
+<script>
+    ezstandalone.cmd.push(function () {
+        ezstandalone.showAds(101);
+    });
+</script>
   
     <!-- Google Analytics (GA4) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-FM3HXT7ECV"></script>
@@ -343,7 +350,7 @@
                   <th>Coin</th>
                   <th>Price</th>
                   <th>% Change 24h</th>
-                  <th>Volume 24h</th>
+                  <th>Vol 24h</th>
                   <th>Market Cap</th>
                 </tr>
               </thead>
@@ -544,6 +551,12 @@
       ·
       <button class="footer-link" id="openTermsBtn" type="button">Terms of Service</button>
     </p>
+    <div class="footer-links">
+      <button class="footer-link" id="openAboutBtn" type="button">About</button>
+      <span class="muted">•</span>
+      <button class="footer-link" id="openContactBtn" type="button">Contact</button>
+    </div>
+
   </div>
 </footer>
 
@@ -807,6 +820,105 @@
         Questions? Email: <span class="legal-email">support@stockjelli.com</span>
       </p>
     </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="aboutModal" aria-hidden="true">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="aboutTitle">
+    <button class="modal-close" type="button" id="closeAboutBtn" aria-label="Close">✕</button>
+
+    <div class="modal-header">
+      <div class="modal-kicker">StockJelli</div>
+      <h2 class="modal-title" id="aboutTitle">About</h2>
+      <p class="modal-subtitle muted">
+        Clean momentum. No noise.
+      </p>
+    </div>
+
+    <div class="card">
+      <h3 class="card-title">What StockJelli is</h3>
+      <p class="muted card-sub">
+        StockJelli is a lightweight momentum screener for stocks and crypto. It’s designed to help you quickly spot unusual strength
+        without drowning in dashboards, indicators, or hype.
+      </p>
+
+      <div style="height:12px"></div>
+
+      <h3 class="card-title">What it’s not</h3>
+      <p class="muted card-sub">
+        Not financial advice. Not a signal service. Use at your own risk and always do your own research.
+      </p>
+
+      <div style="height:12px"></div>
+
+      <h3 class="card-title">Data sources</h3>
+      <p class="muted card-sub">
+        Prices, volume, and market data are pulled from third-party providers and may be delayed or inaccurate at times.
+      </p>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="contactModal" aria-hidden="true">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="contactTitle">
+    <button class="modal-close" type="button" id="closeContactBtn" aria-label="Close">✕</button>
+
+    <div class="modal-header">
+      <div class="modal-kicker">StockJelli</div>
+      <h2 class="modal-title" id="contactTitle">Contact</h2>
+      <p class="modal-subtitle muted">
+        Send feedback, report a bug, or request a feature.
+      </p>
+    </div>
+
+    <section class="card">
+      <h3 class="card-title">Message</h3>
+      <p class="muted card-sub">We typically respond within a few days.</p>
+
+      <form id="contactForm">
+        <div class="form-grid" style="margin-top: 10px;">
+          <div class="form-group">
+            <label class="form-label" for="contactName">Name</label>
+            <input id="contactName" class="input" type="text" autocomplete="name" placeholder="Your name" />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="contactEmail">Email</label>
+            <input id="contactEmail" class="input" type="email" autocomplete="email" placeholder="you@email.com" required />
+          </div>
+
+          <div class="form-group" style="grid-column: 1 / -1;">
+            <label class="form-label" for="contactTopic">Topic</label>
+            <select id="contactTopic" class="input">
+              <option value="feedback">Feedback</option>
+              <option value="bug">Bug report</option>
+              <option value="feature">Feature request</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+
+          <div class="form-group" style="grid-column: 1 / -1;">
+            <label class="form-label" for="contactMessage">Message</label>
+            <textarea
+              id="contactMessage"
+              class="input"
+              rows="5"
+              placeholder="Write your message..."
+              required
+            ></textarea>
+          </div>
+        </div>
+
+        <div class="modal-actions" style="margin-top: 14px;">
+          <button class="btn btn-ghost" type="button" id="contactCancelBtn">Cancel</button>
+          <button class="btn btn-primary" type="submit">Send</button>
+        </div>
+
+        <p class="fineprint muted" style="margin-top:10px;">
+          (Placeholder: wire to your backend endpoint later, e.g. /api/contact.)
+        </p>
+      </form>
+    </section>
   </div>
 </div>
 

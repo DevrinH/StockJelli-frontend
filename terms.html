@@ -3,7 +3,35 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Terms of Service — StockJelli</title>
+  
+  <!-- Primary Meta Tags -->
+  <title>Terms of Service — StockJelli | Stock & Crypto Momentum Screener</title>
+  <meta name="title" content="Terms of Service — StockJelli | Stock & Crypto Momentum Screener" />
+  <meta name="description" content="Read StockJelli's terms of service. StockJelli is an educational tool only — not financial advice. Learn about acceptable use, subscriptions, and limitations." />
+  <meta name="robots" content="index, follow" />
+  <meta name="author" content="StockJelli" />
+  
+  <!-- Canonical URL -->
+  <link rel="canonical" href="https://stockjelli.com/terms.html" />
+  
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://stockjelli.com/terms.html" />
+  <meta property="og:title" content="Terms of Service — StockJelli" />
+  <meta property="og:description" content="Read StockJelli's terms of service. Educational tool only — not financial advice." />
+  <meta property="og:image" content="https://stockjelli.com/og-image.png" />
+  <meta property="og:site_name" content="StockJelli" />
+  <meta property="og:locale" content="en_US" />
+  
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:url" content="https://stockjelli.com/terms.html" />
+  <meta name="twitter:title" content="Terms of Service — StockJelli" />
+  <meta name="twitter:description" content="Read StockJelli's terms of service. Educational tool only — not financial advice." />
+  <meta name="twitter:image" content="https://stockjelli.com/og-image.png" />
+  
+  <!-- Additional Meta Tags -->
+  <meta name="theme-color" content="#0d1117" />
   
   <link rel="stylesheet" href="style.css" />
   
@@ -12,6 +40,60 @@
   <link rel="icon" type="image/png" sizes="32x32" href="/StockJelli-S-Logo.png">
   <link rel="icon" type="image/png" sizes="48x48" href="/StockJelli-S-Logo.png">
   <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+
+  <!-- JSON-LD Structured Data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebPage",
+        "@id": "https://stockjelli.com/terms.html#webpage",
+        "url": "https://stockjelli.com/terms.html",
+        "name": "Terms of Service — StockJelli",
+        "description": "Read StockJelli's terms of service. StockJelli is an educational tool only — not financial advice.",
+        "isPartOf": {
+          "@id": "https://stockjelli.com/#website"
+        },
+        "inLanguage": "en-US",
+        "datePublished": "2026-01-24",
+        "dateModified": "2026-01-24"
+      },
+      {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          {
+            "@type": "ListItem",
+            "position": 1,
+            "name": "Home",
+            "item": "https://stockjelli.com/"
+          },
+          {
+            "@type": "ListItem",
+            "position": 2,
+            "name": "Terms of Service",
+            "item": "https://stockjelli.com/terms.html"
+          }
+        ]
+      },
+      {
+        "@type": "Organization",
+        "@id": "https://stockjelli.com/#organization",
+        "name": "StockJelli",
+        "url": "https://stockjelli.com/",
+        "logo": {
+          "@type": "ImageObject",
+          "url": "https://stockjelli.com/StockJelli-Logo.png"
+        },
+        "contactPoint": {
+          "@type": "ContactPoint",
+          "email": "support@stockjelli.com",
+          "contactType": "customer support"
+        }
+      }
+    ]
+  }
+  </script>
 
   <style>
     /* Page-specific styles */
@@ -132,8 +214,8 @@
   
   <header class="legal-header">
     <div class="legal-header-inner">
-      <a href="/">
-        <img class="legal-logo" src="StockJelli-Logo.png" alt="StockJelli" />
+      <a href="/" aria-label="StockJelli Home">
+        <img class="legal-logo" src="StockJelli-Logo.png" alt="StockJelli - Stock and Crypto Momentum Screener" width="120" height="32" />
       </a>
       <a href="/" class="back-link">
         ← Back to StockJelli
@@ -246,12 +328,17 @@
 
   <footer class="legal-footer">
     <p>
-      © 2026 StockJelli · 
+      © <span id="copyright-year">2026</span> StockJelli · 
       <a href="/privacy.html">Privacy Policy</a> · 
       <a href="/terms.html">Terms of Service</a> · 
       <a href="/">Home</a>
     </p>
   </footer>
+
+  <script>
+    // Auto-update copyright year
+    document.getElementById('copyright-year').textContent = new Date().getFullYear();
+  </script>
 
 </body>
 </html>

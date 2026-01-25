@@ -29,7 +29,7 @@
     },
   };
 
-  const CRYPTO_MCAP_MIN = 2e8;   // 200M
+  const CRYPTO_MCAP_MIN = 5e7;   // 50M (was 200M)
   const CRYPTO_MCAP_MAX = 1e11;  // 100B
 
   // ----------------------------
@@ -423,7 +423,7 @@
       if (filterEls.mcapPillCrypto) filterEls.mcapPillCrypto.style.display = "";
 
       // Update meta labels for crypto
-      if (filterEls.mcapMetaLeft) filterEls.mcapMetaLeft.textContent = "$200M";
+      if (filterEls.mcapMetaLeft) filterEls.mcapMetaLeft.textContent = "$50M";
       if (filterEls.mcapMetaRight) filterEls.mcapMetaRight.textContent = "$100B+";
 
       // Get the current dial value (either from state or slider)

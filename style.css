@@ -2528,3 +2528,13 @@
   padding: 20px 24px;
   border-top: 1px solid var(--border, rgba(255,255,255,0.08));
 }
+
+.header-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 32px;  /* Increased from 16px to 32px */
+  /* ... other styles ... */
+}

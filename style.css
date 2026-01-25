@@ -2535,6 +2535,6 @@
   justify-content: space-between;
   max-width: 1400px;
   margin: 0 auto;
-  padding: 0 32px;  /* Increased from 16px to 32px */
+  padding: 0 22px;  /* Increased from 16px to 32px */
   /* ... other styles ... */
 }

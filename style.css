@@ -2538,3 +2538,9 @@
   padding: 12px 2px;  /* Increased from 16px to 32px */
   /* ... other styles ... */
 }
+
+/* Scrollable modals */
+.modal-overlay .modal {
+  max-height: 85vh;
+  overflow-y: auto;
+}

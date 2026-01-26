@@ -17,7 +17,7 @@
       volMin: 1_000_000,
       priceMax: 300,
       mcapMaxB: 50,     // billions
-      newsRequired: true,
+      newsRequired: false,
     },
     crypto: {
       limit: 15,

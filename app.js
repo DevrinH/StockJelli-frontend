@@ -854,11 +854,51 @@
 
     // Contact form placeholder (no backend yet)
     const contactForm = document.getElementById("contactForm");
-    contactForm?.addEventListener("submit", (e) => {
+    contactForm?.addEventListener("submit", async (e) => {
       e.preventDefault();
-      alert("Thanks! Your message is noted (placeholder). Wire /api/contact next.");
-      closeModalSafe(contactModal);
-      contactForm.reset();
+      
+      const formData = new FormData(contactForm);
+      const name = formData.get("name")?.trim();
+      const email = formData.get("email")?.trim();
+      const message = formData.get("message")?.trim();
+      
+      if (!name || !email || !message) {
+        alert("Please fill in all fields.");
+        return;
+      }
+      
+      const submitBtn = contactForm.querySelector('button[type="submit"]');
+      const originalText = submitBtn?.textContent;
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.textContent = "Sending...";
+      }
+      
+      try {
+        const res = await fetch(`${API_BASE}/api/contact`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ name, email, message }),
+        });
+        
+        const data = await res.json();
+        
+        if (res.ok) {
+          alert("Thanks! Your message has been sent.");
+          closeModalSafe(contactModal);
+          contactForm.reset();
+        } else {
+          alert(data.error || "Failed to send message. Please try again.");
+        }
+      } catch (err) {
+        console.error("Contact form error:", err);
+        alert("Failed to send message. Please try again.");
+      } finally {
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.textContent = originalText;
+        }
+      }
     });
   })();
 

@@ -2565,3 +2565,13 @@
   border-radius: 50%;
   background: #ef4444;
 }
+
+/* Hide desktop banner, show a mobile banner instead */
+@media (max-width: 768px) {
+  .ad-banner { display: none !important; }
+  .ad-banner-mobile { display: block !important; }
+}
+
+@media (min-width: 769px) {
+  .ad-banner-mobile { display: none !important; }
+}

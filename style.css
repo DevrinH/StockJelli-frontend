@@ -2544,3 +2544,29 @@
   max-height: 85vh;
   overflow-y: auto;
 }
+
+.market-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 4px;
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+
+.market-status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #ef4444; /* red for closed */
+}
+
+.market-status.market-open .market-status-dot {
+  background: #22c55e; /* green for open */
+}
+
+.market-status.market-open .market-status-text {
+  color: #22c55e;
+}

@@ -2545,35 +2545,23 @@
   overflow-y: auto;
 }
 
-.market-status-bar {
+.market-closed-notice {
+  position: sticky;
+  top: 60px; /* Adjust based on your header height */
+  z-index: 99;
   display: flex;
-  justify-content: center;
-  padding: 8px 0;
-  background: rgba(0, 0, 0, 0.2);
-}
-
-.market-status {
-  display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 6px;
-  padding: 4px 12px;
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 4px;
+  padding: 6px 0;
   font-size: 0.75rem;
-  color: var(--muted);
+  color: #ef4444;
+  background: rgba(239, 68, 68, 0.1);
 }
 
-.market-status-dot {
+.market-closed-dot {
   width: 8px;
   height: 8px;
   border-radius: 50%;
   background: #ef4444;
-}
-
-.market-status.market-open .market-status-dot {
-  background: #22c55e;
-}
-
-.market-status.market-open .market-status-text {
-  color: #22c55e;
 }

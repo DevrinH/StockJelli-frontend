@@ -2545,11 +2545,18 @@
   overflow-y: auto;
 }
 
+.market-status-bar {
+  display: flex;
+  justify-content: center;
+  padding: 8px 0;
+  background: rgba(0, 0, 0, 0.2);
+}
+
 .market-status {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 4px 10px;
+  padding: 4px 12px;
   background: rgba(255, 255, 255, 0.05);
   border-radius: 4px;
   font-size: 0.75rem;
@@ -2560,11 +2567,11 @@
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: #ef4444; /* red for closed */
+  background: #ef4444;
 }
 
 .market-status.market-open .market-status-dot {
-  background: #22c55e; /* green for open */
+  background: #22c55e;
 }
 
 .market-status.market-open .market-status-text {

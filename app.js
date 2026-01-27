@@ -396,15 +396,17 @@
     idxWrap?.classList.toggle("crypto", currentMode === "crypto");
     
     // Market status indicator (stocks only)
+    const marketStatusBar = document.getElementById("marketStatusBar");
     const marketStatus = document.getElementById("marketStatus");
-    if (marketStatus && currentMode === "stocks") {
+
+    if (marketStatusBar && marketStatus && currentMode === "stocks") {
       const isOpen = data?.marketOpen === true;
-      marketStatus.style.display = "inline-flex";
+      marketStatusBar.style.display = "flex";
       marketStatus.classList.toggle("market-open", isOpen);
       marketStatus.querySelector(".market-status-text").textContent = isOpen ? "Market Open" : "Market Closed";
-    } else if (marketStatus) {
+    } else if (marketStatusBar) {
       // Hide for crypto (24/7 market)
-      marketStatus.style.display = "none";
+      marketStatusBar.style.display = "none";
     }
   }
 

@@ -250,12 +250,6 @@
           <span id="idxRightValue" class="idx-value down">-0.31%</span>
         </span>
       </div>
-
-      <div class="market-status" id="marketStatus" style="display: none;">
-        <span class="market-status-dot"></span>
-        <span class="market-status-text">Market Closed</span>
-      </div>
-      
   
       <div class="header-right">
         <button class="menu-btn" id="menuBtn" aria-label="Open navigation menu">
@@ -263,7 +257,15 @@
         </button>
       </div>
     </div>
-  </header>  
+  </header>
+
+  <!-- Market Status - Below header, centered -->
+  <div class="market-status-bar" id="marketStatusBar" style="display: none;">
+    <div class="market-status" id="marketStatus">
+      <span class="market-status-dot"></span>
+      <span class="market-status-text">Market Closed</span>
+    </div>
+  </div>
   
   
   <!-- Drawer -->

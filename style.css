@@ -142,15 +142,7 @@
     min-width: 0;
   }
   
-  /* Hide ad rails on smaller screens */
-  @media (max-width: 1200px) {
-    .page {
-      grid-template-columns: 1fr;
-    }
-    .ad-rail {
-      display: none;
-    }
-  }
+
   
   /* Hero */
   .hero {
@@ -978,12 +970,7 @@
     height: 200px;
   }
 }
-/* Hide side ad rails on mobile */
-@media (max-width: 900px) {
-  .ad-rail {
-    display: none;
-  }
-}
+
 @media (max-width: 768px) {
   .header-inner {
     grid-template-columns: 1fr auto;
@@ -2574,4 +2561,20 @@
 
 @media (min-width: 769px) {
   .ad-banner-mobile { display: none !important; }
+}
+/* Page layout with ad rails - Desktop only */
+.page {
+  display: grid;
+  grid-template-columns: 220px 1fr 220px;
+  gap: 0;
+}
+
+/* Hide ad rails on tablets and below (iPad is ~1024px wide) */
+@media (max-width: 1400px) {
+  .page {
+    grid-template-columns: 1fr;
+  }
+  .ad-rail {
+    display: none !important;
+  }
 }

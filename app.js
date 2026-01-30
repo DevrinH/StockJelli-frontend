@@ -326,10 +326,10 @@
     }
   
     tbody.innerHTML = rows.map((x) => {
-      const pct = x.pctChange;
+      const pct = x.pctChange || 0;
       const changeClass = classUpDown(pct);
   
-      // Price formatting for crypto:
+      // Price formatting for crypto
       let priceDecimals = 2;
       if (x.price !== null && x.price !== undefined) {
         const p = Number(x.price);
@@ -347,17 +347,23 @@
       const mcap = x.marketCap || 0;
       const vol = x.volume || 0;
       const rangePos = x.rangePosition ?? 0.5;
-      
+  
       // Potential rug pull indicators:
-      // 1. Price crashed to bottom of range (<15%) despite being a "gainer" (was pumped, now dumping)
-      // 2. Very low market cap (<$10M) with volume > 50% of mcap (easy to manipulate)
-      // 3. Extreme volume to mcap ratio suggesting wash trading or dump
-      const isLowMcap = mcap > 0 && mcap < 10_000_000;
-      const isCrashedRange = rangePos < 0.15;
-      const isHighVolRatio = mcap > 0 && (vol / mcap) > 0.5;
-      
-      if (isCrashedRange || (isLowMcap && isHighVolRatio)) {
-        rugWarning = '<span class="rug-warning" title="⚠️ Potential rug pull - extreme caution advised">⚠️</span>';
+      const isExtremeGain = pct > 500;
+      const isMassiveGain = pct > 1000;
+      const isCrashedRange = rangePos < 0.20;
+      const isHighVolRatio = mcap > 0 && (vol / mcap) > 1.0;
+      const isMediumVolRatio = mcap > 0 && (vol / mcap) > 0.5;
+  
+      const showWarning = 
+        isMassiveGain ||
+        (isExtremeGain && isCrashedRange) ||
+        (isExtremeGain && isHighVolRatio) ||
+        (isCrashedRange && isMediumVolRatio) ||
+        (pct > 200 && isCrashedRange && isMediumVolRatio);
+  
+      if (showWarning) {
+        rugWarning = '<span class="rug-warning" title="⚠️ Potential rug pull - extreme gains and/or suspicious trading patterns">⚠️</span>';
       }
       
       // Ticker with TradingView link

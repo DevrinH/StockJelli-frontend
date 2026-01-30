@@ -2578,3 +2578,117 @@
     display: none !important;
   }
 }
+
+/* Rug Pull Warning */
+.rug-warning {
+  margin-right: 6px;
+  font-size: 1rem;
+  cursor: help;
+  animation: pulse-warning 2s ease-in-out infinite;
+}
+
+@keyframes pulse-warning {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+.ticker-wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+   /* ============================================
+       OPTION B - Minimal / Clean
+       ============================================ */
+       .banner-b {
+        width: 160px;
+        height: 600px;
+        background: #0f0f1a;
+        border: 1px solid #2a2a4a;
+        border-radius: 8px;
+        padding: 25px 15px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-decoration: none;
+        transition: border-color 0.2s ease;
+      }
+  
+      .banner-b:hover {
+        border-color: #4ecdc4;
+      }
+  
+      .banner-b .logo {
+        width: 36px;
+        height: 36px;
+        background: #2962ff;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 15px;
+      }
+  
+      .banner-b .logo svg {
+        width: 20px;
+        height: 20px;
+        fill: white;
+      }
+  
+      .banner-b .brand {
+        color: #ffffff;
+        font-size: 14px;
+        font-weight: 600;
+        margin-bottom: 6px;
+      }
+  
+      .banner-b .tagline {
+        color: #666;
+        font-size: 11px;
+        text-align: center;
+        margin-bottom: 30px;
+      }
+  
+      .banner-b .divider {
+        width: 40px;
+        height: 1px;
+        background: #2a2a4a;
+        margin-bottom: 30px;
+      }
+  
+      .banner-b .benefit {
+        color: #a0a0a0;
+        font-size: 12px;
+        text-align: center;
+        margin-bottom: 10px;
+        line-height: 1.4;
+      }
+  
+      .banner-b .benefit strong {
+        color: #ffffff;
+        display: block;
+        font-size: 20px;
+        margin-bottom: 2px;
+      }
+  
+      .banner-b .spacer {
+        flex: 1;
+      }
+  
+      .banner-b .cta {
+        width: 100%;
+        padding: 10px 0;
+        border: 1px solid #4ecdc4;
+        color: #4ecdc4;
+        font-size: 12px;
+        font-weight: 500;
+        text-align: center;
+        border-radius: 5px;
+        transition: all 0.2s ease;
+      }
+  
+      .banner-b:hover .cta {
+        background: #4ecdc4;
+        color: #0f0f1a;
+      }

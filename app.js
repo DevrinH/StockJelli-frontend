@@ -319,39 +319,58 @@
   function renderCrypto(rows) {
     const tbody = document.getElementById("cryptoTbody");
     if (!tbody) return;
-
+  
     if (!rows || rows.length === 0) {
       tbody.innerHTML = `<tr><td class="ticker">—</td><td>$—</td><td>—</td><td>—</td><td>—</td></tr>`;
       return;
     }
-
+  
     tbody.innerHTML = rows.map((x) => {
       const pct = x.pctChange;
       const changeClass = classUpDown(pct);
-
+  
       // Price formatting for crypto:
-      // Default: 2 decimal places ($0.08, $25.50)
-      // Only show more decimals for very tiny prices (< $0.01)
       let priceDecimals = 2;
       if (x.price !== null && x.price !== undefined) {
         const p = Number(x.price);
         if (p > 0 && p < 0.01) {
-          // For very small prices like $0.00045, find enough precision
-          // to show at least 2 significant digits
           priceDecimals = Math.max(2, Math.ceil(-Math.log10(p)) + 1);
-          priceDecimals = Math.min(priceDecimals, 6); // cap at 6
+          priceDecimals = Math.min(priceDecimals, 6);
         }
       }
       
       // Range indicator using 24h low/high
       const rangeHtml = renderRangeIndicator(x.low24h ?? x.rangeLow, x.high24h ?? x.rangeHigh, x.price);
       
+      // Rug pull warning detection
+      let rugWarning = "";
+      const mcap = x.marketCap || 0;
+      const vol = x.volume || 0;
+      const rangePos = x.rangePosition ?? 0.5;
+      
+      // Potential rug pull indicators:
+      // 1. Price crashed to bottom of range (<15%) despite being a "gainer" (was pumped, now dumping)
+      // 2. Very low market cap (<$10M) with volume > 50% of mcap (easy to manipulate)
+      // 3. Extreme volume to mcap ratio suggesting wash trading or dump
+      const isLowMcap = mcap > 0 && mcap < 10_000_000;
+      const isCrashedRange = rangePos < 0.15;
+      const isHighVolRatio = mcap > 0 && (vol / mcap) > 0.5;
+      
+      if (isCrashedRange || (isLowMcap && isHighVolRatio)) {
+        rugWarning = '<span class="rug-warning" title="⚠️ Potential rug pull - extreme caution advised">⚠️</span>';
+      }
+      
       // Ticker with TradingView link
       const tickerHtml = renderTickerCell(x.coinSymbol || "—", "crypto");
-
+  
       return `
         <tr>
-          <td class="ticker">${tickerHtml}</td>
+          <td class="ticker">
+            <span class="ticker-wrap">
+              ${rugWarning}
+              ${tickerHtml}
+            </span>
+          </td>
           <td>${fmtUsd(x.price, priceDecimals)}</td>
           <td class="${changeClass}">
             <span class="change-wrap">

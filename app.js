@@ -363,7 +363,7 @@
         (pct > 200 && isCrashedRange && isMediumVolRatio);
   
       if (showWarning) {
-        rugWarning = '<span class="rug-warning" title="⚠️ Potential rug pull - extreme gains and/or suspicious trading patterns">⚠️</span>';
+        rugWarning = '<span class="risk-warning" title="⚠️ Elevated risk: extreme move and/or unusual volume vs market cap (informational only)">⚠️</span>';
       }
       
       // Ticker with TradingView link

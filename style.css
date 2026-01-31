@@ -2714,8 +2714,8 @@
       
       /* Closed - Red */
       .session-closed {
-        color: #ef4444;
-        background: rgba(239, 68, 68, 0.1);
+        color: #ffffff;
+        
       }
       .session-closed .market-session-dot {
         background: #ef4444;

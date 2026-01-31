@@ -254,28 +254,29 @@
   }
 
   // Generate TradingView URL for a symbol
-  function getTradingViewUrl(symbol, type = "stock") {
-    // TradingView URL format
-    if (type === "crypto") {
-      // For crypto, use BINANCE or COINBASE prefix
-      return `https://www.tradingview.com/chart/?symbol=BINANCE:${symbol}USDT`;
-    }
-    // For stocks, use default exchange detection
-    return `https://www.tradingview.com/chart/?symbol=${symbol}`;
+// Generate TradingView URL for a symbol (with affiliate link)
+function getTradingViewUrl(symbol, type = "stock") {
+  const affiliateId = "162729";
+  if (type === "crypto") {
+    // For crypto, link to the symbol page with affiliate
+    return `https://www.tradingview.com/chart/?symbol=BINANCE:${symbol}USDT&aff_id=${affiliateId}`;
   }
+  // For stocks, use default exchange detection with affiliate
+  return `https://www.tradingview.com/chart/?symbol=${symbol}&aff_id=${affiliateId}`;
+}
 
-  // Render ticker cell with TradingView hover tooltip
-  function renderTickerCell(symbol, type = "stock") {
-    const tvUrl = getTradingViewUrl(symbol, type);
-    return `
-      <span class="ticker-wrap">
-        <span class="ticker-symbol">${symbol}</span>
-        <a class="ticker-tv-link" href="${tvUrl}" target="_blank" rel="noopener" title="Open ${symbol} on TradingView">
-          <span class="ticker-tv-tooltip">Open in TradingView ↗</span>
-        </a>
-      </span>
-    `;
-  }
+// Render ticker cell with TradingView hover tooltip (affiliate link)
+function renderTickerCell(symbol, type = "stock") {
+  const tvUrl = getTradingViewUrl(symbol, type);
+  return `
+    <span class="ticker-wrap">
+      <span class="ticker-symbol">${symbol}</span>
+      <a class="ticker-tv-link" href="${tvUrl}" target="_blank" rel="noopener" title="Open ${symbol} on TradingView">
+        <span class="ticker-tv-tooltip">Open in TradingView ↗</span>
+      </a>
+    </span>
+  `;
+}
 
   function renderStocks(rows) {
     const tbody = document.getElementById("stocksTbody");
@@ -363,7 +364,7 @@
         (pct > 200 && isCrashedRange && isMediumVolRatio);
   
       if (showWarning) {
-        rugWarning = '<span class="risk-warning" title="⚠️ Elevated risk: extreme move and/or unusual volume vs market cap (informational only)">⚠️</span>';
+        rugWarning = '<span class="rug-warning" title="⚠️ Elevated risk: extreme move and/or unusual volume vs market cap">⚠️</span>';
       }
       
       // Ticker with TradingView link
@@ -373,8 +374,8 @@
         <tr>
           <td class="ticker">
             <span class="ticker-wrap">
-              ${rugWarning}
               ${tickerHtml}
+              ${rugWarning}
             </span>
           </td>
           <td>${fmtUsd(x.price, priceDecimals)}</td>
@@ -422,7 +423,6 @@
     
     // Market session indicator (stocks only)
     const marketSessionNotice = document.getElementById("marketClosedNotice");
-    const marketSessionDot = marketSessionNotice?.querySelector(".market-session-dot");
     const marketSessionText = marketSessionNotice?.querySelector(".market-session-text");
   
     if (marketSessionNotice && currentMode === "stocks") {

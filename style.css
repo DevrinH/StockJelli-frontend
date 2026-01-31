@@ -2744,3 +2744,16 @@
         0%, 100% { opacity: 1; }
         50% { opacity: 0.5; }
       }
+
+      /* Liquidity indicator dot */
+.liquidity-dot {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  margin-left: 6px;
+  vertical-align: middle;
+  background: var(--liq-color);
+  box-shadow: 0 0 4px var(--liq-color), 0 0 8px var(--liq-color);
+  cursor: help;
+}

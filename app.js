@@ -317,6 +317,27 @@ function renderTickerCell(symbol, type = "stock") {
     }).join("");
   }
 
+  // Liquidity indicator dot for crypto
+function renderLiquidityDot(volume, marketCap) {
+  if (!volume || !marketCap || marketCap === 0) return "";
+  
+  const ratio = volume / marketCap;
+  
+  let level, color;
+  if (ratio >= 0.50) {
+    level = "High Liquidity";
+    color = "#22c55e"; // green
+  } else if (ratio >= 0.10) {
+    level = "Medium Liquidity";
+    color = "#f59e0b"; // amber
+  } else {
+    level = "Low Liquidity — exit may cause slippage";
+    color = "#ef4444"; // red
+  }
+  
+  return ` <span class="liquidity-dot" style="--liq-color: ${color}" title="${level} (Vol/MCap: ${(ratio * 100).toFixed(1)}%)"></span>`;
+}
+
   function renderCrypto(rows) {
     const tbody = document.getElementById("cryptoTbody");
     if (!tbody) return;
@@ -385,7 +406,7 @@ function renderTickerCell(symbol, type = "stock") {
               ${rangeHtml}
             </span>
           </td>
-          <td>${fmtVolumeCompact(x.volume)}</td>
+          <td>${fmtVolumeCompact(x.volume)}${renderLiquidityDot(x.volume, x.marketCap)}</td>
           <td>${fmtCompactUsd(x.marketCap, 1)}</td>
         </tr>
       `;

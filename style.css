@@ -2746,14 +2746,43 @@
       }
 
       /* Liquidity indicator dot */
+/* Liquidity indicator */
+.liquidity-wrap {
+  position: relative;
+  display: inline-block;
+  vertical-align: middle;
+  margin-left: 6px;
+  cursor: help;
+}
+
 .liquidity-dot {
   display: inline-block;
   width: 7px;
   height: 7px;
   border-radius: 50%;
-  margin-left: 6px;
-  vertical-align: middle;
   background: var(--liq-color);
   box-shadow: 0 0 4px var(--liq-color), 0 0 8px var(--liq-color);
-  cursor: help;
+}
+
+.liquidity-tooltip {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  font-size: 0.7rem;
+  padding: 5px 10px;
+  border-radius: 6px;
+  background: #1e293b;
+  color: #f1f5f9;
+  border: 1px solid var(--liq-color);
+  box-shadow: 0 0 6px rgba(0, 0, 0, 0.4);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s ease;
+  z-index: 50;
+}
+
+.liquidity-wrap:hover .liquidity-tooltip {
+  opacity: 1;
 }

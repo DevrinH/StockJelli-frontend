@@ -317,7 +317,7 @@ function renderTickerCell(symbol, type = "stock") {
     }).join("");
   }
 
-  // Liquidity indicator dot for crypto
+// Liquidity indicator dot for crypto
 function renderLiquidityDot(volume, marketCap) {
   if (!volume || !marketCap || marketCap === 0) return "";
   
@@ -335,7 +335,7 @@ function renderLiquidityDot(volume, marketCap) {
     color = "#ef4444"; // red
   }
   
-  return ` <span class="liquidity-dot" style="--liq-color: ${color}" title="${level} (Vol/MCap: ${(ratio * 100).toFixed(1)}%)"></span>`;
+  return ` <span class="liquidity-wrap"><span class="liquidity-dot" style="--liq-color: ${color}"></span><span class="liquidity-tooltip" style="--liq-color: ${color}">${level} (Vol/MCap: ${(ratio * 100).toFixed(1)}%)</span></span>`;
 }
 
   function renderCrypto(rows) {

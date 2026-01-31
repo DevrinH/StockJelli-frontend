@@ -2692,3 +2692,55 @@
         background: #4ecdc4;
         color: #0f0f1a;
       }
+
+      .market-session-notice {
+        position: sticky;
+        top: 60px;
+        z-index: 99;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 6px 0;
+        font-size: 0.75rem;
+        font-weight: 500;
+      }
+      
+      .market-session-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+      }
+      
+      /* Closed - Red */
+      .session-closed {
+        color: #ef4444;
+        background: rgba(239, 68, 68, 0.1);
+      }
+      .session-closed .market-session-dot {
+        background: #ef4444;
+      }
+      
+      /* Pre-Market - Amber/Yellow */
+      .session-premarket {
+        color: #f59e0b;
+        background: rgba(245, 158, 11, 0.1);
+      }
+      .session-premarket .market-session-dot {
+        background: #f59e0b;
+        animation: pulse-dot 2s ease-in-out infinite;
+      }
+      
+      /* After-Hours - Purple */
+      .session-afterhours {
+        color: #8b5cf6;
+        background: rgba(139, 92, 246, 0.1);
+      }
+      .session-afterhours .market-session-dot {
+        background: #8b5cf6;
+      }
+      
+      @keyframes pulse-dot {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.5; }
+      }

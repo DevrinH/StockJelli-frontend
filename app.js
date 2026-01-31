@@ -420,12 +420,31 @@
   
     idxWrap?.classList.toggle("crypto", currentMode === "crypto");
     
-    // Market status indicator (stocks only)
-    const marketClosedNotice = document.getElementById("marketClosedNotice");
-
-    if (marketClosedNotice) {
-      const showNotice = currentMode === "stocks" && data?.marketOpen === false;
-      marketClosedNotice.style.display = showNotice ? "flex" : "none";
+    // Market session indicator (stocks only)
+    const marketSessionNotice = document.getElementById("marketClosedNotice");
+    const marketSessionDot = marketSessionNotice?.querySelector(".market-session-dot");
+    const marketSessionText = marketSessionNotice?.querySelector(".market-session-text");
+  
+    if (marketSessionNotice && currentMode === "stocks") {
+      const session = data?.marketSession || "closed";
+      
+      // Remove all session classes
+      marketSessionNotice.classList.remove("session-closed", "session-premarket", "session-afterhours", "session-open");
+      
+      if (session === "open") {
+        // Hide when market is open
+        marketSessionNotice.style.display = "none";
+      } else {
+        marketSessionNotice.style.display = "flex";
+        marketSessionNotice.classList.add(`session-${session}`);
+        
+        if (marketSessionText) {
+          marketSessionText.textContent = data?.marketSessionLabel || "Market Closed";
+        }
+      }
+    } else if (marketSessionNotice) {
+      // Hide for crypto (24/7 market)
+      marketSessionNotice.style.display = "none";
     }
   }
 

@@ -2831,3 +2831,11 @@
 .new-badge-wrap:hover .new-badge-tooltip {
   opacity: 1;
 }
+
+.new-badge-wrap {
+  position: relative;
+  display: inline-block;
+  vertical-align: middle;
+  margin-right: 6px;
+  cursor: help;
+}

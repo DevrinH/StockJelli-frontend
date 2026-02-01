@@ -361,80 +361,70 @@ function renderLiquidityDot(volume, marketCap) {
   return ` <span class="liquidity-wrap"><span class="liquidity-dot" style="--liq-color: ${color}"></span><span class="liquidity-tooltip" style="--liq-color: ${color}">${level} (Vol/MCap: ${(ratio * 100).toFixed(1)}%)</span></span>`;
 }
 
-  function renderCrypto(rows) {
-    const tbody = document.getElementById("cryptoTbody");
-    if (!tbody) return;
-  
-    if (!rows || rows.length === 0) {
-      tbody.innerHTML = `<tr><td class="ticker">—</td><td>$—</td><td>—</td><td>—</td><td>—</td></tr>`;
-      return;
-    }
-  
-    tbody.innerHTML = rows.map((x) => {
-      const pct = x.pctChange || 0;
-      const changeClass = classUpDown(pct);
-  
-      // Price formatting for crypto
-      let priceDecimals = 2;
-      if (x.price !== null && x.price !== undefined) {
-        const p = Number(x.price);
-        if (p > 0 && p < 0.01) {
-          priceDecimals = Math.max(2, Math.ceil(-Math.log10(p)) + 1);
-          priceDecimals = Math.min(priceDecimals, 6);
-        }
-      }
-      
-      // Range indicator using 24h low/high
-      const rangeHtml = renderRangeIndicator(x.low24h ?? x.rangeLow, x.high24h ?? x.rangeHigh, x.price);
-      
-      // Rug pull warning detection
-      let rugWarning = "";
-      const mcap = x.marketCap || 0;
-      const vol = x.volume || 0;
-      const rangePos = x.rangePosition ?? 0.5;
-  
-      // Potential rug pull indicators:
-      const isExtremeGain = pct > 500;
-      const isMassiveGain = pct > 1000;
-      const isCrashedRange = rangePos < 0.20;
-      const isHighVolRatio = mcap > 0 && (vol / mcap) > 1.0;
-      const isMediumVolRatio = mcap > 0 && (vol / mcap) > 0.5;
-  
-      const showWarning = 
-        isMassiveGain ||
-        (isExtremeGain && isCrashedRange) ||
-        (isExtremeGain && isHighVolRatio) ||
-        (isCrashedRange && isMediumVolRatio) ||
-        (pct > 200 && isCrashedRange && isMediumVolRatio);
-  
-      if (showWarning) {
-        rugWarning = '<span class="rug-warning" title="⚠️ Elevated risk: extreme move and/or unusual volume vs market cap">⚠️</span>';
-      }
-      
-      // Ticker with TradingView link
-      const tickerHtml = renderTickerCell(x.coinSymbol || "—", "crypto");
-  
-      return `
-        <tr>
-          <td class="ticker">${tickerHtml}${rugWarning}${renderNewBadge(x.enteredAt)}</td>
-            <span class="ticker-wrap">
-              ${tickerHtml}
-              ${rugWarning}
-            </span>
-          </td>
-          <td>${fmtUsd(x.price, priceDecimals)}</td>
-          <td class="${changeClass}">
-            <span class="change-wrap">
-              <span class="change-pct">${fmtPct(pct)}</span>
-              ${rangeHtml}
-            </span>
-          </td>
-          <td>${fmtVolumeCompact(x.volume)}${renderLiquidityDot(x.volume, x.marketCap)}</td>
-          <td>${fmtCompactUsd(x.marketCap, 1)}</td>
-        </tr>
-      `;
-    }).join("");
+function renderCrypto(rows) {
+  const tbody = document.getElementById("cryptoTbody");
+  if (!tbody) return;
+
+  if (!rows || rows.length === 0) {
+    tbody.innerHTML = `<tr><td class="ticker">—</td><td>$—</td><td>—</td><td>—</td><td>—</td></tr>`;
+    return;
   }
+
+  tbody.innerHTML = rows.map((x) => {
+    const pct = x.pctChange || 0;
+    const changeClass = classUpDown(pct);
+
+    let priceDecimals = 2;
+    if (x.price !== null && x.price !== undefined) {
+      const p = Number(x.price);
+      if (p > 0 && p < 0.01) {
+        priceDecimals = Math.max(2, Math.ceil(-Math.log10(p)) + 1);
+        priceDecimals = Math.min(priceDecimals, 6);
+      }
+    }
+
+    const rangeHtml = renderRangeIndicator(x.low24h ?? x.rangeLow, x.high24h ?? x.rangeHigh, x.price);
+
+    let rugWarning = "";
+    const mcap = x.marketCap || 0;
+    const vol = x.volume || 0;
+    const rangePos = x.rangePosition ?? 0.5;
+
+    const isExtremeGain = pct > 500;
+    const isMassiveGain = pct > 1000;
+    const isCrashedRange = rangePos < 0.20;
+    const isHighVolRatio = mcap > 0 && (vol / mcap) > 1.0;
+    const isMediumVolRatio = mcap > 0 && (vol / mcap) > 0.5;
+
+    const showWarning =
+      isMassiveGain ||
+      (isExtremeGain && isCrashedRange) ||
+      (isExtremeGain && isHighVolRatio) ||
+      (isCrashedRange && isMediumVolRatio) ||
+      (pct > 200 && isCrashedRange && isMediumVolRatio);
+
+    if (showWarning) {
+      rugWarning = ' <span class="rug-warning" title="⚠️ Elevated risk: extreme move and/or unusual volume vs market cap">⚠️</span>';
+    }
+
+    const tickerHtml = renderTickerCell(x.coinSymbol || "—", "crypto");
+
+    return `
+      <tr>
+        <td class="ticker">${renderNewBadge(x.enteredAt)}${tickerHtml}${rugWarning}</td>
+        <td>${fmtUsd(x.price, priceDecimals)}</td>
+        <td class="${changeClass}">
+          <span class="change-wrap">
+            <span class="change-pct">${fmtPct(pct)}</span>
+            ${rangeHtml}
+          </span>
+        </td>
+        <td>${fmtVolumeCompact(x.volume)}${renderLiquidityDot(x.volume, x.marketCap)}</td>
+        <td>${fmtCompactUsd(x.marketCap, 1)}</td>
+      </tr>
+    `;
+  }).join("");
+}
 
   // ----------------------------
   // Header indices

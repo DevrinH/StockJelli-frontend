@@ -36,6 +36,12 @@
     // Add these for stocks:
   const STOCK_MCAP_MIN = 1e8;    // 100M
   const STOCK_MCAP_MAX = 5e11;   // 500B
+
+  // Track last visit for "new since last visit" markers
+const LAST_VISIT_KEY = "stockjelli_last_visit";
+const previousVisitTime = localStorage.getItem(LAST_VISIT_KEY) || null;
+// Update last visit to NOW so next visit compares against this one
+localStorage.setItem(LAST_VISIT_KEY, new Date().toISOString());
   // ----------------------------
   // Helpers
   // ----------------------------
@@ -253,6 +259,24 @@
     return `<span class="news-source ${tierClass}" title="${item.title || ''}">${source}</span>`;
   }
 
+  // "NEW" badge for tickers that entered since user's last visit
+function renderNewBadge(enteredAt) {
+  if (!previousVisitTime || !enteredAt) return "";
+  
+  try {
+    const enteredTime = new Date(enteredAt).getTime();
+    const lastVisit = new Date(previousVisitTime).getTime();
+    
+    if (enteredTime > lastVisit) {
+      return ' <span class="new-badge-wrap"><span class="new-badge">NEW</span><span class="new-badge-tooltip">New since last visit</span></span>';
+    }
+  } catch (e) {
+    // Invalid date, skip
+  }
+  
+  return "";
+}
+
   // Generate TradingView URL for a symbol
 // Generate TradingView URL for a symbol (with affiliate link)
 function getTradingViewUrl(symbol, type = "stock") {
@@ -302,8 +326,7 @@ function renderTickerCell(symbol, type = "stock") {
 
       return `
         <tr>
-          <td class="ticker">${tickerHtml}</td>
-          <td>${fmtUsd(x.price)}</td>
+        <td class="ticker">${renderTickerCell(x.symbol || "—", "stock")}${renderNewBadge(x.enteredAt)}</td>          <td>${fmtUsd(x.price)}</td>
           <td class="${changeClass}">
             <span class="change-wrap">
               <span class="change-pct">${fmtPct(pct)}</span>
@@ -393,7 +416,7 @@ function renderLiquidityDot(volume, marketCap) {
   
       return `
         <tr>
-          <td class="ticker">
+          <td class="ticker">${tickerHtml}${rugWarning}${renderNewBadge(x.enteredAt)}</td>
             <span class="ticker-wrap">
               ${tickerHtml}
               ${rugWarning}

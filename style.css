@@ -2786,3 +2786,48 @@
 .liquidity-wrap:hover .liquidity-tooltip {
   opacity: 1;
 }
+
+/* NEW badge */
+.new-badge-wrap {
+  position: relative;
+  display: inline-block;
+  vertical-align: middle;
+  margin-left: 6px;
+  cursor: help;
+}
+
+.new-badge {
+  display: inline-block;
+  font-size: 0.55rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  padding: 1px 5px;
+  border-radius: 4px;
+  background: #3b82f6;
+  color: #fff;
+  box-shadow: 0 0 4px rgba(59, 130, 246, 0.5), 0 0 8px rgba(59, 130, 246, 0.3);
+  line-height: 1.4;
+}
+
+.new-badge-tooltip {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  font-size: 0.7rem;
+  padding: 5px 10px;
+  border-radius: 6px;
+  background: #1e293b;
+  color: #f1f5f9;
+  border: 1px solid #3b82f6;
+  box-shadow: 0 0 6px rgba(0, 0, 0, 0.4);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s ease;
+  z-index: 50;
+}
+
+.new-badge-wrap:hover .new-badge-tooltip {
+  opacity: 1;
+}

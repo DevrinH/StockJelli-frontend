@@ -326,7 +326,8 @@ function renderTickerCell(symbol, type = "stock") {
 
       return `
         <tr>
-        <td class="ticker">${renderTickerCell(x.symbol || "—", "stock")}${renderNewBadge(x.enteredAt)}</td>          <td>${fmtUsd(x.price)}</td>
+        <td class="ticker">${renderTickerCell(x.symbol || "—", "stock")}${renderNewBadge(x.enteredAt)}</td>
+         <td>${fmtUsd(x.price)}</td>
           <td class="${changeClass}">
             <span class="change-wrap">
               <span class="change-pct">${fmtPct(pct)}</span>
@@ -411,7 +412,7 @@ function renderCrypto(rows) {
 
     return `
       <tr>
-        <td class="ticker">${renderNewBadge(x.enteredAt)}${tickerHtml}${rugWarning}</td>
+      <td class="ticker">${tickerHtml}${rugWarning}${renderNewBadge(x.enteredAt)}</td>
         <td>${fmtUsd(x.price, priceDecimals)}</td>
         <td class="${changeClass}">
           <span class="change-wrap">

@@ -470,12 +470,22 @@ function renderCrypto(rows) {
         // Hide when market is open
         marketSessionNotice.style.display = "none";
       } else {
-        marketSessionNotice.style.display = "flex";
-        marketSessionNotice.classList.add(`session-${session}`);
-        
-        if (marketSessionText) {
-          marketSessionText.textContent = data?.marketSessionLabel || "Market Closed";
-        }
+// NEW:
+marketSessionNotice.style.display = "flex";
+marketSessionNotice.classList.add(`session-${session}`);
+
+if (marketSessionText) {
+  const affiliateId = "162729";
+  const tvLink = `https://www.tradingview.com/markets/stocks-usa/market-movers-active/?aff_id=${affiliateId}`;
+  
+  if (session === "premarket") {
+    marketSessionText.innerHTML = `Pre-Market — Showing last close · <a href="${tvLink}" target="_blank" rel="noopener" class="session-tv-link">Check live pre-market on TradingView ↗</a>`;
+  } else if (session === "afterhours") {
+    marketSessionText.innerHTML = `After-Hours — Showing last close · <a href="${tvLink}" target="_blank" rel="noopener" class="session-tv-link">Check live after-hours on TradingView ↗</a>`;
+  } else {
+    marketSessionText.textContent = data?.marketSessionLabel || "Market Closed";
+  }
+}
       }
     } else if (marketSessionNotice) {
       // Hide for crypto (24/7 market)

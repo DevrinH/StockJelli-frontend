@@ -1133,12 +1133,12 @@
         <div class="form-grid" style="margin-top: 10px;">
           <div class="form-group">
             <label class="form-label" for="contactName">Name</label>
-            <input id="contactName" class="input" type="text" autocomplete="name" placeholder="Your name" />
+            <input id="contactName" name="name" class="input" type="text" autocomplete="name" placeholder="Your name" />
           </div>
 
           <div class="form-group">
             <label class="form-label" for="contactEmail">Email</label>
-            <input id="contactEmail" class="input" type="email" autocomplete="email" placeholder="you@email.com" required />
+            <input id="contactEmail" name="email" class="input" type="email" autocomplete="email" placeholder="you@email.com" required />
           </div>
 
           <div class="form-group" style="grid-column: 1 / -1;">
@@ -1153,13 +1153,7 @@
 
           <div class="form-group" style="grid-column: 1 / -1;">
             <label class="form-label" for="contactMessage">Message</label>
-            <textarea
-              id="contactMessage"
-              class="input"
-              rows="5"
-              placeholder="Write your message..."
-              required
-            ></textarea>
+            <textarea id="contactMessage" name="message" class="input" rows="5" placeholder="Write your message..." required></textarea>
           </div>
         </div>
 

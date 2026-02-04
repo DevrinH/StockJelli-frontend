@@ -2861,3 +2861,156 @@
   top: 0;
   z-index: 100;
 }
+
+/* ===========================================
+   Promo Toast Notification
+   Add to your style.css
+   =========================================== */
+
+   .promo-toast {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    width: 320px;
+    max-width: calc(100vw - 48px);
+    
+    background: rgba(15, 23, 42, 0.95);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    box-shadow: 
+      0 20px 40px rgba(0, 0, 0, 0.4),
+      0 0 0 1px rgba(255, 255, 255, 0.05) inset;
+    
+    padding: 20px;
+    z-index: 1000;
+    
+    /* Animation setup */
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    pointer-events: none;
+  }
+  
+  .promo-toast-visible {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    pointer-events: auto;
+  }
+  
+  /* Close button */
+  .promo-toast-close {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    width: 28px;
+    height: 28px;
+    border: none;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 18px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s ease, color 0.15s ease;
+  }
+  
+  .promo-toast-close:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.8);
+  }
+  
+  /* Icon */
+  .promo-toast-icon {
+    font-size: 28px;
+    margin-bottom: 12px;
+  }
+  
+  /* Content */
+  .promo-toast-content {
+    margin-bottom: 16px;
+  }
+  
+  .promo-toast-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: #f1f5f9;
+    margin-bottom: 6px;
+  }
+  
+  .promo-toast-text {
+    font-size: 13px;
+    color: #94a3b8;
+    line-height: 1.5;
+  }
+  
+  /* Actions */
+  .promo-toast-actions {
+    display: flex;
+    gap: 10px;
+  }
+  
+  .promo-toast-btn {
+    flex: 1;
+    padding: 10px 16px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  
+  .promo-toast-btn-primary {
+    background: #3ef08f;
+    color: #0f172a;
+    border: none;
+  }
+  
+  .promo-toast-btn-primary:hover {
+    background: #2dd57a;
+    transform: translateY(-1px);
+  }
+  
+  .promo-toast-btn-ghost {
+    background: transparent;
+    color: #94a3b8;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  
+  .promo-toast-btn-ghost:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: #e2e8f0;
+  }
+  
+  /* Mobile adjustments */
+  @media (max-width: 480px) {
+    .promo-toast {
+      bottom: 16px;
+      right: 16px;
+      left: 16px;
+      width: auto;
+      max-width: none;
+    }
+    
+    .promo-toast-actions {
+      flex-direction: column;
+    }
+    
+    .promo-toast-btn {
+      width: 100%;
+    }
+  }
+  
+  /* Respect reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    .promo-toast {
+      transition: opacity 0.15s ease;
+      transform: none;
+    }
+    
+    .promo-toast-visible {
+      transform: none;
+    }
+  }

@@ -795,134 +795,147 @@
   Stripe-only flow (no Google OAuth)
 -->
 
-<!-- Alerts Modal -->
-<div class="modal-overlay" id="alertsModal" aria-hidden="true">
-  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
-    <button class="modal-close" type="button" id="closeModalBtn" aria-label="Close">
-      ✕
-    </button>
+<!-- UPDATED ALERTS MODAL - Replace your current alertsModal in index.html -->
+<!-- Adds region selector for Americas vs Global (crypto-only) -->
+
+<div id="alertsModal" class="modal-overlay" aria-hidden="true">
+  <div class="modal">
+    <button class="modal-close" id="closeModalBtn">✕</button>
 
     <div class="modal-header">
-      <div class="modal-kicker">StockJelli Alerts</div>
-      <h2 class="modal-title" id="modalTitle">Get morning alerts for $5/month</h2>
+      <div class="modal-kicker">MOMENTUM ALERTS</div>
+      <h2 class="modal-title">Get Notified When It Matters</h2>
       <p class="modal-subtitle muted">
-        No spam. Strict momentum criteria only. Cancel anytime.
+        Receive email alerts when stocks &amp; crypto hit strict momentum criteria.
       </p>
     </div>
 
-    <!-- Steps -->
+    <!-- Step dots -->
     <div class="steps">
-      <div class="step-dot step-active" data-step="1">1</div>
-      <div class="step-line"></div>
-      <div class="step-dot" data-step="2">2</div>
+      <span class="step-dot step-active" data-step="1">1</span>
+      <span class="step-line"></span>
+      <span class="step-dot" data-step="2">2</span>
     </div>
 
-    <!-- Step 1: Email + Preferences -->
-    <section class="modal-step" data-step="1">
+    <!-- STEP 1: Email + Region + Frequency -->
+    <div class="modal-step" data-step="1">
       <div class="card">
-        <h3 class="card-title">Enter your email</h3>
-        <p class="muted card-sub">
-          We'll send your morning momentum alerts here.
-        </p>
+        <h3 class="card-title">Set Up Your Alerts</h3>
+        <p class="card-sub muted">Choose your region and how often you want alerts.</p>
 
-        <div class="form-group" style="margin-bottom: 24px;">
-          <label class="form-label" for="alertEmail">Email address</label>
-          <input 
-            type="email" 
-            id="alertEmail" 
-            class="form-input" 
-            placeholder="you@example.com"
-            required
-          />
-          <p class="hint muted" id="emailError" style="color: #ef4444; display: none;">
-            Please enter a valid email address
+        <div class="form-grid">
+          <!-- Email -->
+          <div>
+            <label class="form-label">Email Address</label>
+            <input
+              type="email"
+              id="alertEmail"
+              class="form-input"
+              placeholder="you@email.com"
+              autocomplete="email"
+              required
+            />
+            <p id="emailError" class="hint muted" style="display: none; color: #ef4444;">
+              Please enter a valid email address.
+            </p>
+          </div>
+
+          <!-- Region Selector -->
+          <div>
+            <label class="form-label">Your Region</label>
+            <div class="segmented" id="regionControl">
+              <button type="button" class="segmented-btn segmented-on" data-value="americas">
+                🌎 Americas
+              </button>
+              <button type="button" class="segmented-btn" data-value="global">
+                🌍 Global
+              </button>
+            </div>
+            <p class="hint muted" id="regionHint" style="margin-top: 8px;">
+              Stocks + Crypto alerts timed for US market hours (ET)
+            </p>
+          </div>
+
+          <!-- Frequency -->
+          <div>
+            <label class="form-label">Alert Frequency</label>
+            <div class="segmented" id="frequencyControl">
+              <button type="button" class="segmented-btn segmented-on" data-value="1">1/day</button>
+              <button type="button" class="segmented-btn" data-value="2">2/day</button>
+              <button type="button" class="segmented-btn" data-value="3">3/day</button>
+              <button type="button" class="segmented-btn" data-value="4">4/day</button>
+            </div>
+            <p class="hint muted" id="frequencyHint" style="margin-top: 8px;">
+              First hour momentum alert (10:00 AM ET)
+            </p>
+          </div>
+        </div>
+
+        <!-- Alert Features -->
+        <div class="alert-features" style="margin-top: 16px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,0.08);">
+          <p class="muted" style="font-size: 0.85rem; margin: 0;">
+            ✓ Only plays near day's high (70%+ range)<br>
+            ✓ Liquidity-checked crypto (no rug pulls)<br>
+            ✓ TradingView links + news sources<br>
+            ✓ Cancel anytime
           </p>
         </div>
 
-        <div class="form-group">
-          <label class="form-label">Alert frequency</label>
-          <div class="segmented" id="frequencyControl">
-            <button class="segmented-btn segmented-on" type="button" data-value="1">1/day</button>
-            <button class="segmented-btn" type="button" data-value="2">2/day</button>
-            <button class="segmented-btn" type="button" data-value="3">3/day</button>
-            <button class="segmented-btn" type="button" data-value="4">4/day</button>
-          </div>
-          <p class="hint muted">More alerts = more opportunities, but also more noise.</p>
-        </div>
+        <button class="btn btn-primary btn-wide" id="toStep2Btn" style="margin-top: 16px;">
+          Continue →
+        </button>
       </div>
+    </div>
 
-      <div class="modal-actions">
-        <button class="btn btn-primary" type="button" id="toStep2Btn">Continue</button>
-      </div>
-    </section>
-
-    <!-- Step 2: Checkout Summary -->
-    <section class="modal-step" data-step="2" hidden>
+    <!-- STEP 2: Confirm + Checkout -->
+    <div class="modal-step" data-step="2" hidden>
       <div class="card">
-        <h3 class="card-title">Confirm subscription</h3>
-        <p class="muted card-sub">
-          Review your settings before checkout.
-        </p>
+        <h3 class="card-title">Confirm Your Subscription</h3>
+        <p class="card-sub muted">Review your settings before checkout.</p>
 
         <div class="checkout-box">
           <div class="checkout-row">
-            <span class="muted">Plan</span>
-            <span class="strong">StockJelli Alerts</span>
-          </div>
-          <div class="checkout-row">
-            <span class="muted">Price</span>
-            <span class="strong">$5 / month</span>
-          </div>
-          <div class="checkout-row">
             <span class="muted">Email</span>
-            <span class="strong" id="summaryEmail">—</span>
+            <span id="summaryEmail" class="strong">—</span>
+          </div>
+          <div class="checkout-row">
+            <span class="muted">Region</span>
+            <span id="summaryRegion" class="strong">—</span>
           </div>
           <div class="checkout-row">
             <span class="muted">Frequency</span>
-            <span class="strong" id="summaryFrequency">1 alert/day</span>
+            <span id="summaryFrequency" class="strong">—</span>
+          </div>
+          <div class="checkout-row">
+            <span class="muted">Price</span>
+            <span class="strong">$5/month</span>
           </div>
         </div>
 
-        <div class="alert-features" style="margin-top: 20px;">
-          <h4 style="color: var(--text-primary); font-size: 14px; margin-bottom: 12px;">What you'll get:</h4>
-          <ul style="color: var(--text-muted); font-size: 13px; padding-left: 20px; margin: 0; line-height: 1.8;">
-            <li><strong>Morning alerts</strong> — First half hour of market open (10:00 AM ET)</li>
-            <li><strong>Stocks + Crypto</strong> — On trading days</li>
-            <li><strong>Crypto only</strong> — On weekends & holidays</li>
-            <li><strong>TradingView links</strong> — One click to charts</li>
-            <li><strong>Tiered news sources</strong> — Quality catalysts highlighted</li>
-          </ul>
+        <p class="fineprint muted">
+          Billed monthly. Cancel anytime from your Stripe dashboard.
+        </p>
+
+        <div class="modal-actions">
+          <button class="btn btn-ghost" id="backToStep1Btn">← Back</button>
+          <button class="btn btn-primary" id="stripeCheckoutBtn">Subscribe with Stripe →</button>
         </div>
-
-        <button class="btn btn-primary btn-wide" type="button" id="stripeCheckoutBtn" style="margin-top: 24px;">
-          Subscribe with Stripe →
-        </button>
-
-        <p class="fineprint muted" style="margin-top: 12px; text-align: center;">
-          🔒 Secure checkout powered by Stripe. Cancel anytime.
-        </p>
       </div>
+    </div>
 
-      <div class="modal-actions">
-        <button class="btn btn-ghost" type="button" id="backToStep1Btn">Back</button>
-      </div>
-    </section>
-
-    <!-- Success State (shown after successful checkout) -->
-    <section class="modal-step" data-step="success" hidden>
-      <div class="card" style="text-align: center;">
+    <!-- SUCCESS STATE -->
+    <div class="modal-step" data-step="success" hidden>
+      <div class="card" style="text-align: center; padding: 32px 24px;">
         <div style="font-size: 48px; margin-bottom: 16px;">🎉</div>
-        <h3 class="card-title">You're subscribed!</h3>
-        <p class="muted card-sub">
-          Check your email for a welcome message.<br>
-          Your first alert arrives tomorrow morning.
+        <h3 class="card-title">You're Subscribed!</h3>
+        <p class="card-sub muted">
+          Check your inbox for a welcome email. Your first alert will arrive at the next scheduled time.
         </p>
-
-        <button class="btn btn-primary btn-wide" type="button" id="closeSuccessBtn" style="margin-top: 24px;">
+        <button class="btn btn-primary btn-wide" id="closeSuccessBtn" style="margin-top: 16px;">
           Done
         </button>
       </div>
-    </section>
+    </div>
 
   </div>
 </div>

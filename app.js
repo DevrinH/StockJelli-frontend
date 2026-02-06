@@ -1172,6 +1172,14 @@ if (marketSessionText) {
    ============================================ */
 
 
+/* ============================================
+   StockJelli — All Feature JS Additions
+   
+   Append inside your app.js IIFE (before the closing })(); )
+   REPLACES all previously appended JS blocks.
+   ============================================ */
+
+
 // 0. STICKY HEADER + TICKER MEASUREMENT
 (function initStickyMeasure() {
   const header = document.querySelector(".header");
@@ -1196,41 +1204,111 @@ if (marketSessionText) {
     return `${n > 0 ? "+" : ""}${Number(n).toFixed(1)}%`;
   }
 
-  function buildItems(pulse, stocks, crypto) {
-    const items = [];
-    if (pulse?.pulse) {
-      items.push(`<span class="ticker-pulse-text"><span class="ticker-pulse-dot"></span>${pulse.pulse}</span>`);
-      items.push(`<span class="ticker-separator"></span>`);
+  // Generate pulse summary from actual live data (not from /api/pulse)
+  function buildPulseSummary(stocks, crypto, isMarketOpen) {
+    const allStocks = (stocks || []).filter(r => r.pctChange >= 4).sort((a,b) => b.pctChange - a.pctChange);
+    const allCrypto = (crypto || []).filter(r => r.pctChange >= 3).sort((a,b) => b.pctChange - a.pctChange);
+    const totalMovers = allStocks.length + allCrypto.length;
+
+    if (totalMovers === 0) {
+      return isMarketOpen ? "Scanning for momentum…" : "Markets closed · Watching crypto";
     }
-    const topS = (stocks || []).filter(r => r.pctChange >= 4).sort((a,b) => b.pctChange - a.pctChange).slice(0, 5);
+
+    // Find the actual leader across both asset types
+    const leader = (allStocks[0]?.pctChange || 0) >= (allCrypto[0]?.pctChange || 0)
+      ? allStocks[0] : allCrypto[0];
+    const leaderSym = leader?.coinSymbol || leader?.symbol || "—";
+    const leaderPct = fmtPct(leader?.pctChange);
+
+    const parts = [];
+    if (!isMarketOpen) parts.push("Market closed");
+
+    if (allStocks.length > 0 && allCrypto.length > 0) {
+      parts.push(`${allStocks.length} stocks & ${allCrypto.length} crypto moving, led by ${leaderSym} (${leaderPct})`);
+    } else if (allStocks.length > 0) {
+      parts.push(`${allStocks.length} stocks moving, led by ${leaderSym} (${leaderPct})`);
+    } else {
+      parts.push(`${allCrypto.length} crypto still moving, led by ${leaderSym} (${leaderPct})`);
+    }
+
+    return parts.join(" · ");
+  }
+
+  function buildItems(stocks, crypto, isMarketOpen) {
+    const items = [];
+
+    // Build pulse summary from actual data
+    const summary = buildPulseSummary(stocks, crypto, isMarketOpen);
+    items.push(`<span class="ticker-pulse-text"><span class="ticker-pulse-dot"></span>${summary}</span>`);
+    items.push(`<span class="ticker-separator"></span>`);
+
+    // Show up to 8 stocks (lowered threshold to 3% for more content)
+    const topS = (stocks || []).filter(r => r.pctChange >= 3).sort((a,b) => b.pctChange - a.pctChange).slice(0, 8);
     for (const s of topS) {
       const cls = s.pctChange >= 0 ? "up" : "down";
       items.push(`<span class="ticker-item"><span class="ticker-item-symbol">${s.symbol}</span> <span class="ticker-item-pct ${cls}">${fmtPct(s.pctChange)}</span></span>`);
     }
+
     if (topS.length > 0 && crypto?.length > 0) items.push(`<span class="ticker-separator"></span>`);
-    const topC = (crypto || []).filter(r => r.pctChange >= 3).sort((a,b) => b.pctChange - a.pctChange).slice(0, 5);
+
+    // Show up to 8 crypto (lowered threshold to 2% for more content)
+    const topC = (crypto || []).filter(r => r.pctChange >= 2).sort((a,b) => b.pctChange - a.pctChange).slice(0, 8);
     for (const c of topC) {
       const cls = c.pctChange >= 0 ? "up" : "down";
       items.push(`<span class="ticker-item"><span class="ticker-item-symbol">${c.coinSymbol || c.symbol}</span> <span class="ticker-item-pct ${cls}">${fmtPct(c.pctChange)}</span></span>`);
     }
+
     return items;
+  }
+
+  // Detect if US stock market is currently open
+  function isUSMarketOpen() {
+    const now = new Date();
+    const et = new Date(now.toLocaleString("en-US", { timeZone: "America/New_York" }));
+    const day = et.getDay();
+    const h = et.getHours(), m = et.getMinutes();
+    const mins = h * 60 + m;
+    // Mon–Fri, 9:30 AM – 4:00 PM ET
+    return day >= 1 && day <= 5 && mins >= 570 && mins < 960;
   }
 
   async function fetchTicker() {
     try {
-      const [p, s, c] = await Promise.all([
-        fetch("https://api.stockjelli.com/api/pulse", {cache:"no-store"}).then(r => r.ok ? r.json() : null).catch(() => null),
-        fetch("https://api.stockjelli.com/api/stocks?limit=10", {cache:"no-store"}).then(r => r.ok ? r.json() : null).catch(() => null),
-        fetch("https://api.stockjelli.com/api/crypto?limit=10", {cache:"no-store"}).then(r => r.ok ? r.json() : null).catch(() => null),
+      const [s, c] = await Promise.all([
+        fetch("https://api.stockjelli.com/api/stocks?limit=20", {cache:"no-store"}).then(r => r.ok ? r.json() : null).catch(() => null),
+        fetch("https://api.stockjelli.com/api/crypto?limit=20", {cache:"no-store"}).then(r => r.ok ? r.json() : null).catch(() => null),
       ]);
-      const items = buildItems(p, s?.rows, c?.rows);
-      if (items.length === 0) items.push(`<span class="ticker-pulse-text"><span class="ticker-pulse-dot"></span>${p?.pulse || "Scanning for momentum..."}</span>`);
-      const html = items.join("");
-      track.innerHTML = html + html;
+      const items = buildItems(s?.rows, c?.rows, isUSMarketOpen());
+      if (items.length <= 2) {
+        items.push(`<span class="ticker-pulse-text"><span class="ticker-pulse-dot"></span>Scanning for momentum…</span>`);
+      }
+      const onePass = items.join("");
+
+      // Repeat content enough times to fill wide screens (min 3x)
+      const viewW = window.innerWidth || 1920;
+      track.innerHTML = onePass;
+      const contentW = track.scrollWidth || viewW;
+      const repeats = Math.max(3, Math.ceil((viewW * 2.5) / contentW));
+      track.innerHTML = onePass.repeat(repeats);
+
       ticker.style.display = "";
       requestAnimationFrame(() => {
-        const dur = Math.max(15, (track.scrollWidth / 2) / 50);
+        // Calculate one pass width and set scroll distance
+        const onePassEl = document.createElement("div");
+        onePassEl.style.cssText = "display:inline-flex;visibility:hidden;position:absolute";
+        onePassEl.innerHTML = onePass;
+        track.parentNode.appendChild(onePassEl);
+        const onePassW = onePassEl.scrollWidth;
+        onePassEl.remove();
+
+        // Set the scroll distance to exactly one pass
+        track.style.setProperty("--ticker-scroll", `-${onePassW}px`);
+        // Speed: ~45px/sec
+        const dur = Math.max(12, onePassW / 45);
         track.style.animationDuration = `${dur}s`;
+        track.style.animationName = "tickerScroll";
+        track.style.animationTimingFunction = "linear";
+        track.style.animationIterationCount = "infinite";
       });
     } catch {}
   }
@@ -1330,7 +1408,6 @@ if (marketSessionText) {
     setTimeout(dismiss, 15_000);
   }, 90_000);
 })();
-
 
 
 

@@ -3014,3 +3014,145 @@
       transform: none;
     }
   }
+
+  /* ============================================
+   StockJelli Homepage Updates — CSS Additions
+   
+   Add these styles to your existing style.css
+   These cover the new elements added to index.html:
+   1. Live update timestamp badge (replaces static "Updates every 1 min" badge)
+   2. Inline alert CTA (between screener table and filters)
+   ============================================ */
+
+
+/* -------------------------------------------
+   1. LIVE UPDATE BADGE (replaces .badge)
+   ------------------------------------------- */
+
+.live-update-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: 20px;
+  background: rgba(34, 197, 94, 0.08);
+  border: 1px solid rgba(34, 197, 94, 0.15);
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.5);
+  white-space: nowrap;
+  transition: opacity 0.3s ease;
+}
+
+.live-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #22c55e;
+  animation: livePulse 2s ease-in-out infinite;
+  flex-shrink: 0;
+}
+
+@keyframes livePulse {
+  0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.4); }
+  50% { opacity: 0.6; box-shadow: 0 0 0 4px rgba(34, 197, 94, 0); }
+}
+
+.live-text {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.45);
+  letter-spacing: 0.01em;
+}
+
+/* Flash green briefly after each refresh */
+.live-update-badge.just-updated {
+  border-color: rgba(34, 197, 94, 0.35);
+  background: rgba(34, 197, 94, 0.12);
+}
+.live-update-badge.just-updated .live-text {
+  color: rgba(34, 197, 94, 0.7);
+}
+
+
+/* -------------------------------------------
+   2. INLINE ALERT CTA (between table & filters)
+   ------------------------------------------- */
+
+.inline-alert-cta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 20px;
+  margin: 20px 0 24px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.06) 0%, rgba(34, 197, 94, 0.02) 100%);
+  border: 1px solid rgba(34, 197, 94, 0.12);
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.inline-alert-cta:hover {
+  border-color: rgba(34, 197, 94, 0.22);
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.08) 0%, rgba(34, 197, 94, 0.03) 100%);
+}
+
+.inline-alert-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.inline-alert-icon {
+  font-size: 1.25rem;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.inline-alert-title {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.88);
+  line-height: 1.3;
+}
+
+.inline-alert-sub {
+  display: block;
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.4);
+  line-height: 1.4;
+  margin-top: 2px;
+}
+
+/* Small primary button variant for inline CTA */
+.btn-sm {
+  padding: 8px 18px;
+  font-size: 0.8rem;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* Mobile: stack the inline CTA */
+@media (max-width: 600px) {
+  .inline-alert-cta {
+    flex-direction: column;
+    align-items: stretch;
+    text-align: center;
+    padding: 16px;
+    gap: 12px;
+  }
+
+  .inline-alert-left {
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .inline-alert-icon {
+    font-size: 1.5rem;
+  }
+
+  .btn-sm {
+    width: 100%;
+    text-align: center;
+  }
+}

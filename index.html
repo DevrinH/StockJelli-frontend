@@ -70,9 +70,6 @@
     <script src="alerts-frontend.js" defer></script>
     <!-- JSON-LD Structured Data -->
     <script type="application/ld+json">
-
-      
-      
     {
       "@context": "https://schema.org",
       "@graph": [
@@ -214,7 +211,6 @@
     </script>
   </head>
   
-  
 
 <body>
 
@@ -248,20 +244,15 @@
     </div>
   </header>
 
-  <!-- Market Status - Below header, centered -->
- 
 <!-- Market Session Notice - Below header, centered -->
 <div class="market-session-notice" id="marketClosedNotice" style="display: none;">
   <span class="market-session-dot"></span>
   <span class="market-session-text">Market Closed</span>
 </div>
- 
-  
   
   <!-- Drawer -->
   <div class="drawer-overlay" id="drawerOverlay"></div>
 
-  
   <aside class="drawer" id="drawer" aria-hidden="true">
     <div class="drawer-top">
       <div class="drawer-title">Menu</div>
@@ -280,7 +271,6 @@
       <div class="muted">Educational tool only.</div>
     </div>
   </aside>
-  
   
 
   <!-- Page layout with side ad rails -->
@@ -315,20 +305,20 @@
     <!-- Main content -->
     <div class="content">
 
-     <!-- Hero -->
+     <!-- Hero — UPDATED: urgency-focused copy -->
 <section class="hero">
   <div class="container hero-grid">
     <div class="hero-left">
-      <h1>Clean momentum.<br>No noise.</h1>
+      <h1>Catch the move early.</h1>
       <p>
-        A simple momentum stock and crypto screener. <strong>Free to use</strong>. 
+        Live momentum screener for stocks &amp; crypto. Updated every 60 seconds. <strong>Free to use</strong>.
       </p>
     </div>
 
     <div class="hero-right" aria-hidden="true">
       <div class="hero-chart">
 
-        <!-- STOCKS CHART (unchanged from your original working one) -->
+        <!-- STOCKS CHART -->
         <svg id="heroChartStocks" viewBox="0 0 520 220" class="spark" role="img" aria-label="Stock momentum chart visualization">
           <defs>
             <linearGradient id="lineGradStocks" x1="0" y1="0" x2="1" y2="0">
@@ -352,13 +342,11 @@
               </feMerge>
             </filter>
 
-            <!-- Mask used to animate a soft reveal sweep -->
             <mask id="revealMaskStocks">
               <rect class="reveal" x="-40" y="0" width="240" height="220" fill="white" />
             </mask>
           </defs>
 
-          <!-- subtle grid -->
           <g class="grid">
             <line x1="0" y1="40" x2="520" y2="40"></line>
             <line x1="0" y1="90" x2="520" y2="90"></line>
@@ -366,7 +354,6 @@
             <line x1="0" y1="190" x2="520" y2="190"></line>
           </g>
 
-          <!-- shadow fill -->
           <path
             class="fill"
             d="M0 190
@@ -379,7 +366,6 @@
             mask="url(#revealMaskStocks)"
           />
 
-          <!-- main line -->
           <path
             class="line"
             d="M0 190
@@ -394,11 +380,10 @@
             mask="url(#revealMaskStocks)"
           />
 
-          <!-- tiny highlight dot -->
           <circle class="dot" cx="370" cy="72" r="4" />
         </svg>
 
-        <!-- CRYPTO CHART (same reveal animation via mask + same .reveal CSS) -->
+        <!-- CRYPTO CHART -->
         <svg
           id="heroChartCrypto"
           viewBox="0 0 520 220"
@@ -428,7 +413,6 @@
               </feMerge>
             </filter>
 
-            <!-- IMPORTANT: crypto also uses the reveal sweep -->
             <mask id="revealMaskCrypto">
               <rect class="reveal" x="-40" y="0" width="240" height="220" fill="white" />
             </mask>
@@ -474,10 +458,6 @@
 </section>
 
       
-
-
-      
-
       <!-- Screener -->
       <section class="screener" id="screener" aria-labelledby="screener-heading">
         <div class="container">
@@ -485,7 +465,6 @@
             <div class="section-head-left">
               <h2 id="screener-heading">Momentum</h2>
 
-          
               <!-- Stocks / Crypto toggle -->
               <div class="segmented segmented-small" id="assetControl" role="tablist" aria-label="Asset type selector">
                 <button class="segmented-btn segmented-on" type="button" data-value="stocks" role="tab" aria-selected="true">Stocks</button>
@@ -493,7 +472,11 @@
               </div>
             </div>
           
-            <span class="badge">Updates every 1 min</span>
+            <!-- UPDATED: Live timestamp instead of static badge -->
+            <div class="live-update-badge">
+              <span class="live-dot"></span>
+              <span class="live-text">Updated <span id="liveTimestamp">just now</span></span>
+            </div>
           </div>
           
 
@@ -540,7 +523,6 @@
                   <td class="news"><a class="news-source" href="#" target="_blank" rel="noopener">—</a></td>
                 </tr>
               </tbody>
-              
             </table>
           
             <!-- CRYPTO TABLE -->
@@ -584,11 +566,21 @@
                   <td>—</td>
                 </tr>
               </tbody>
-              
             </table>
           
           </div>
-          
+
+          <!-- NEW: Inline alert callout — immediately after screener table, before filters -->
+          <div class="inline-alert-cta" id="inlineAlertCta">
+            <div class="inline-alert-left">
+              <span class="inline-alert-icon">⚡</span>
+              <div>
+                <span class="inline-alert-title">Get breakout alerts before they trend</span>
+                <span class="inline-alert-sub">Strict criteria. Only plays near the day's high. Delivered to your inbox.</span>
+              </div>
+            </div>
+            <button class="btn btn-primary btn-sm" id="inlineAlertBtn">$5/mo →</button>
+          </div>
           
 
           <!-- Filters (clean) -->
@@ -602,7 +594,6 @@
               <div class="filters-actions">
                 <button class="btn btn-primary" id="filtersApplyBtn" type="button">Apply</button>
                 <button class="btn btn-ghost" id="filtersResetBtn" type="button">Reset</button>
-                
               </div>
             </div>
           
@@ -614,8 +605,6 @@
                 </div>
               
                 <div class="filter-control-row">
-                  <!-- stocks: 1..500 = billions
-                       crypto: 0..1000 = log dial -->
                   <input id="mcapRange" class="slider" type="range" min="1" max="500" value="50" aria-describedby="mcapMetaRight" />
               
                   <!-- STOCKS pill (editable) -->
@@ -636,7 +625,6 @@
               </div>
               
                 
-          
               <!-- Row 1: Price Cap -->
               <div class="filter-card">
                 <div class="filter-title-row">
@@ -686,8 +674,6 @@
                     <span class="check-text">News required</span>
                   </label>
                   
-
-      
                   <label class="check">
                     <input type="checkbox" />
                     <span class="check-ui"></span>
@@ -710,33 +696,28 @@
               </div>
             </div>
           </div>
-          
-          <!-- Banner ad slot between filters and pricing -->
-          <div class="ad-banner" aria-label="Advertisement">
-            <div class="ad-box ad-box-banner">
-              <div class="ad-label">Ad</div>
-              <div class="ad-size">728×90</div>
-              <div class="ad-note">Between filters and pricing</div>
-            </div>
-          </div>
+
+          <!-- REMOVED: Placeholder ad banner between filters and pricing -->
+          <!-- Previously had an empty 728x90 ad box here — removed to reduce friction to pricing CTA -->
 
         </div>
       </section>
 
+<!-- UPDATED: Pricing section — more compelling copy, higher urgency -->
 <section class="pricing" id="pricing" aria-labelledby="pricing-heading">
-        <div class="container">
-          <div class="pricing-inner">
-            <div>
-              <h2 id="pricing-heading">Optional Alerts — $5/month</h2>
-              <p class="muted">
-                Alerts only fire when strict momentum criteria are met. No spam. No hype.
-              </p>
-            </div>
-      
-            <button class="btn btn-primary" id="enableAlertsBtn">Enable Alerts — $5/mo</button>
-          </div>
-        </div>
-      </section>
+  <div class="container">
+    <div class="pricing-inner">
+      <div>
+        <h2 id="pricing-heading">Get Alerted When Momentum Spikes</h2>
+        <p class="muted">
+          Up to 4 daily emails when stocks &amp; crypto hit strict breakout criteria. Only plays near the day's high. No spam. Cancel anytime.
+        </p>
+      </div>
+
+      <button class="btn btn-primary" id="enableAlertsBtn">Enable Alerts — $5/mo</button>
+    </div>
+  </div>
+</section>
       
       
 <!-- Footer -->
@@ -790,14 +771,6 @@
   </main>
 
   <!-- Alerts Modal -->
-<!-- 
-  UPDATED Alerts Modal - Replace the existing modal in index.html
-  Stripe-only flow (no Google OAuth)
--->
-
-<!-- UPDATED ALERTS MODAL - Replace your current alertsModal in index.html -->
-<!-- Adds region selector for Americas vs Global (crypto-only) -->
-
 <div id="alertsModal" class="modal-overlay" aria-hidden="true">
   <div class="modal">
     <button class="modal-close" id="closeModalBtn">✕</button>
@@ -1102,7 +1075,6 @@
         <li><strong>Live Indices</strong> — NASDAQ, S&P 500, BTC, and total crypto market at a glance</li>
         <li><strong>Smart Filters</strong> — Adjust market cap, price, volume, and news requirements</li>
         <li><strong>TradingView Links</strong> — One click to open any ticker in TradingView</li>
-      <!-- <li><strong>Morning Alerts</strong> — Optional email alerts before market open (coming soon)</li>-->
       </ul>
 
       <div style="height:16px"></div>

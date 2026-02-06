@@ -1194,21 +1194,26 @@ if (marketSessionText) {
     return `${n > 0 ? "+" : ""}${Number(n).toFixed(1)}%`;
   }
 
-  // Generate pulse summary from actual live data (not from /api/pulse)
+  // Generate pulse summary from actual live data
+  // Rows are already filtered by the backend — just use what we get
   function buildPulseSummary(stocks, crypto, isMarketOpen) {
-    const allStocks = (stocks || []).filter(r => r.pctChange >= 4).sort((a,b) => b.pctChange - a.pctChange);
-    const allCrypto = (crypto || []).filter(r => r.pctChange >= 3).sort((a,b) => b.pctChange - a.pctChange);
+    const allStocks = (stocks || []).filter(r => r.pctChange > 0).sort((a,b) => b.pctChange - a.pctChange);
+    const allCrypto = (crypto || []).filter(r => r.pctChange > 0).sort((a,b) => b.pctChange - a.pctChange);
     const totalMovers = allStocks.length + allCrypto.length;
 
     if (totalMovers === 0) {
       return isMarketOpen ? "Scanning for momentum…" : "Markets closed · Watching crypto";
     }
 
-    // Find the actual leader across both asset types
-    const leader = (allStocks[0]?.pctChange || 0) >= (allCrypto[0]?.pctChange || 0)
-      ? allStocks[0] : allCrypto[0];
-    const leaderSym = leader?.coinSymbol || leader?.symbol || "—";
-    const leaderPct = fmtPct(leader?.pctChange);
+    // Merge and find absolute leader
+    const allMovers = [
+      ...allStocks.map(r => ({ sym: r.symbol, pct: r.pctChange })),
+      ...allCrypto.map(r => ({ sym: r.coinSymbol || r.symbol, pct: r.pctChange })),
+    ].sort((a, b) => b.pct - a.pct);
+
+    const leader = allMovers[0];
+    const leaderSym = leader?.sym || "—";
+    const leaderPct = fmtPct(leader?.pct);
 
     const parts = [];
     if (!isMarketOpen) parts.push("Market closed");
@@ -1232,8 +1237,8 @@ if (marketSessionText) {
     items.push(`<span class="ticker-pulse-text"><span class="ticker-pulse-dot"></span>${summary}</span>`);
     items.push(`<span class="ticker-separator"></span>`);
 
-    // Show up to 8 stocks (lowered threshold to 3% for more content)
-    const topS = (stocks || []).filter(r => r.pctChange >= 3).sort((a,b) => b.pctChange - a.pctChange).slice(0, 8);
+    // Show up to 8 stocks — all positive movers the API returned
+    const topS = (stocks || []).filter(r => r.pctChange > 0).sort((a,b) => b.pctChange - a.pctChange).slice(0, 8);
     for (const s of topS) {
       const cls = s.pctChange >= 0 ? "up" : "down";
       items.push(`<span class="ticker-item"><span class="ticker-item-symbol">${s.symbol}</span> <span class="ticker-item-pct ${cls}">${fmtPct(s.pctChange)}</span></span>`);
@@ -1241,8 +1246,8 @@ if (marketSessionText) {
 
     if (topS.length > 0 && crypto?.length > 0) items.push(`<span class="ticker-separator"></span>`);
 
-    // Show up to 8 crypto (lowered threshold to 2% for more content)
-    const topC = (crypto || []).filter(r => r.pctChange >= 2).sort((a,b) => b.pctChange - a.pctChange).slice(0, 8);
+    // Show up to 8 crypto — all positive movers the API returned
+    const topC = (crypto || []).filter(r => r.pctChange > 0).sort((a,b) => b.pctChange - a.pctChange).slice(0, 8);
     for (const c of topC) {
       const cls = c.pctChange >= 0 ? "up" : "down";
       items.push(`<span class="ticker-item"><span class="ticker-item-symbol">${c.coinSymbol || c.symbol}</span> <span class="ticker-item-pct ${cls}">${fmtPct(c.pctChange)}</span></span>`);

@@ -1163,311 +1163,172 @@ if (marketSessionText) {
    ============================================ */
 
 
-// ----------------------------
+
+/* ============================================
+   StockJelli — All Feature JS Additions
+   
+   Append inside your app.js IIFE (before the closing })(); )
+   REPLACES all previously appended JS blocks.
+   ============================================ */
+
+
+// 0. STICKY HEADER + TICKER MEASUREMENT
+(function initStickyMeasure() {
+  const header = document.querySelector(".header");
+  if (!header) return;
+  function measure() {
+    document.documentElement.style.setProperty("--header-h", header.getBoundingClientRect().height + "px");
+  }
+  measure();
+  window.addEventListener("resize", measure);
+  if (document.fonts?.ready) document.fonts.ready.then(measure);
+})();
+
+
 // 1. SCROLLING PULSE TICKER
-// ----------------------------
 (function initPulseTicker() {
   const ticker = document.getElementById("pulseTicker");
   const track = document.getElementById("pulseTickerTrack");
   if (!ticker || !track) return;
 
   function fmtPct(n) {
-    if (n === null || n === undefined) return "—";
-    const sign = n > 0 ? "+" : "";
-    return `${sign}${Number(n).toFixed(1)}%`;
+    if (n == null) return "—";
+    return `${n > 0 ? "+" : ""}${Number(n).toFixed(1)}%`;
   }
 
-  function buildTickerItems(pulseData, stockRows, cryptoRows) {
+  function buildItems(pulse, stocks, crypto) {
     const items = [];
-
-    // Add pulse summary text with green dot
-    if (pulseData?.pulse) {
-      items.push(`<span class="ticker-pulse-text"><span class="ticker-pulse-dot"></span>${pulseData.pulse}</span>`);
+    if (pulse?.pulse) {
+      items.push(`<span class="ticker-pulse-text"><span class="ticker-pulse-dot"></span>${pulse.pulse}</span>`);
       items.push(`<span class="ticker-separator"></span>`);
     }
-
-    // Add top stocks
-    const topStocks = (stockRows || [])
-      .filter(r => r.pctChange !== null && r.pctChange >= 4)
-      .sort((a, b) => (b.pctChange ?? 0) - (a.pctChange ?? 0))
-      .slice(0, 5);
-
-    for (const s of topStocks) {
-      const pctClass = s.pctChange >= 0 ? "up" : "down";
-      items.push(`<span class="ticker-item"><span class="ticker-item-symbol">${s.symbol}</span> <span class="ticker-item-pct ${pctClass}">${fmtPct(s.pctChange)}</span></span>`);
+    const topS = (stocks || []).filter(r => r.pctChange >= 4).sort((a,b) => b.pctChange - a.pctChange).slice(0, 5);
+    for (const s of topS) {
+      const cls = s.pctChange >= 0 ? "up" : "down";
+      items.push(`<span class="ticker-item"><span class="ticker-item-symbol">${s.symbol}</span> <span class="ticker-item-pct ${cls}">${fmtPct(s.pctChange)}</span></span>`);
     }
-
-    if (topStocks.length > 0 && cryptoRows?.length > 0) {
-      items.push(`<span class="ticker-separator"></span>`);
+    if (topS.length > 0 && crypto?.length > 0) items.push(`<span class="ticker-separator"></span>`);
+    const topC = (crypto || []).filter(r => r.pctChange >= 3).sort((a,b) => b.pctChange - a.pctChange).slice(0, 5);
+    for (const c of topC) {
+      const cls = c.pctChange >= 0 ? "up" : "down";
+      items.push(`<span class="ticker-item"><span class="ticker-item-symbol">${c.coinSymbol || c.symbol}</span> <span class="ticker-item-pct ${cls}">${fmtPct(c.pctChange)}</span></span>`);
     }
-
-    // Add top crypto
-    const topCrypto = (cryptoRows || [])
-      .filter(r => r.pctChange !== null && r.pctChange >= 3)
-      .sort((a, b) => (b.pctChange ?? 0) - (a.pctChange ?? 0))
-      .slice(0, 5);
-
-    for (const c of topCrypto) {
-      const pctClass = c.pctChange >= 0 ? "up" : "down";
-      const sym = c.coinSymbol || c.symbol;
-      items.push(`<span class="ticker-item"><span class="ticker-item-symbol">${sym}</span> <span class="ticker-item-pct ${pctClass}">${fmtPct(c.pctChange)}</span></span>`);
-    }
-
     return items;
   }
 
-  async function fetchTickerData() {
+  async function fetchTicker() {
     try {
-      const [pulseRes, stocksRes, cryptoRes] = await Promise.all([
-        fetch("https://api.stockjelli.com/api/pulse", { cache: "no-store" }).then(r => r.ok ? r.json() : null).catch(() => null),
-        fetch("https://api.stockjelli.com/api/stocks?limit=10", { cache: "no-store" }).then(r => r.ok ? r.json() : null).catch(() => null),
-        fetch("https://api.stockjelli.com/api/crypto?limit=10", { cache: "no-store" }).then(r => r.ok ? r.json() : null).catch(() => null),
+      const [p, s, c] = await Promise.all([
+        fetch("https://api.stockjelli.com/api/pulse", {cache:"no-store"}).then(r => r.ok ? r.json() : null).catch(() => null),
+        fetch("https://api.stockjelli.com/api/stocks?limit=10", {cache:"no-store"}).then(r => r.ok ? r.json() : null).catch(() => null),
+        fetch("https://api.stockjelli.com/api/crypto?limit=10", {cache:"no-store"}).then(r => r.ok ? r.json() : null).catch(() => null),
       ]);
-
-      const items = buildTickerItems(pulseRes, stocksRes?.rows, cryptoRes?.rows);
-
-      if (items.length === 0) {
-        // Fallback: show a simple message
-        const fallback = pulseRes?.pulse || "Scanning for momentum...";
-        items.push(`<span class="ticker-pulse-text"><span class="ticker-pulse-dot"></span>${fallback}</span>`);
-      }
-
+      const items = buildItems(p, s?.rows, c?.rows);
+      if (items.length === 0) items.push(`<span class="ticker-pulse-text"><span class="ticker-pulse-dot"></span>${p?.pulse || "Scanning for momentum..."}</span>`);
       const html = items.join("");
-
-      // Duplicate content for seamless loop
       track.innerHTML = html + html;
       ticker.style.display = "";
-
-      // Adjust speed based on content width
-      const halfWidth = track.scrollWidth / 2;
-      const speed = 50; // pixels per second
-      const duration = halfWidth / speed;
-      track.style.animationDuration = `${duration}s`;
-
-    } catch (e) {
-      // Silently fail
-    }
+      requestAnimationFrame(() => {
+        const dur = Math.max(15, (track.scrollWidth / 2) / 50);
+        track.style.animationDuration = `${dur}s`;
+      });
+    } catch {}
   }
 
-  // Fetch on load and every 60s
-  fetchTickerData();
-  setInterval(fetchTickerData, 60_000);
+  fetchTicker();
+  setInterval(fetchTicker, 60_000);
 })();
 
 
-// ----------------------------
 // 2. LIVE TIMESTAMP UPDATER
-// ----------------------------
 (function initLiveTimestamp() {
-  const timestampEl = document.getElementById("liveTimestamp");
-  const badgeEl = timestampEl?.closest(".live-update-badge");
-  if (!timestampEl) return;
+  const el = document.getElementById("liveTimestamp");
+  const badge = el?.closest(".live-update-badge");
+  if (!el) return;
+  let lastRefresh = Date.now();
 
-  let lastRefreshTime = Date.now();
+  setInterval(() => {
+    const s = Math.floor((Date.now() - lastRefresh) / 1000);
+    el.textContent = s < 5 ? "just now" : s < 60 ? `${s}s ago` : `${Math.floor(s/60)}m ago`;
+  }, 1000);
 
-  function updateTimestampDisplay() {
-    const elapsed = Math.floor((Date.now() - lastRefreshTime) / 1000);
-
-    if (elapsed < 5) {
-      timestampEl.textContent = "just now";
-    } else if (elapsed < 60) {
-      timestampEl.textContent = `${elapsed}s ago`;
-    } else {
-      const mins = Math.floor(elapsed / 60);
-      timestampEl.textContent = `${mins}m ago`;
-    }
-  }
-
-  setInterval(updateTimestampDisplay, 1000);
-
-  // Patch fetch to detect API refreshes
-  const originalFetch = window.fetch;
-  window.fetch = function (...args) {
+  const _fetch = window.fetch;
+  window.fetch = function(...args) {
     const url = typeof args[0] === "string" ? args[0] : args[0]?.url || "";
-    const promise = originalFetch.apply(this, args);
-
+    const p = _fetch.apply(this, args);
     if (url.includes("api.stockjelli.com/api/stocks") || url.includes("api.stockjelli.com/api/crypto")) {
-      promise.then((res) => {
-        if (res.ok) {
-          lastRefreshTime = Date.now();
-          if (badgeEl) {
-            badgeEl.classList.add("just-updated");
-            setTimeout(() => badgeEl.classList.remove("just-updated"), 1500);
-          }
-        }
-      }).catch(() => {});
+      p.then(r => { if (r.ok) { lastRefresh = Date.now(); if (badge) { badge.classList.add("just-updated"); setTimeout(() => badge.classList.remove("just-updated"), 1500); } } }).catch(() => {});
     }
-
-    return promise;
+    return p;
   };
 })();
 
 
-// ----------------------------
 // 3. INLINE ALERT CTA WIRING
-// ----------------------------
-(function initInlineAlertCta() {
-  const inlineBtn = document.getElementById("inlineAlertBtn");
-  if (!inlineBtn) return;
-
-  inlineBtn.addEventListener("click", () => {
-    const alertsBtn = document.getElementById("enableAlertsBtn");
-    if (alertsBtn) alertsBtn.click();
-  });
+(function() {
+  const btn = document.getElementById("inlineAlertBtn");
+  if (btn) btn.addEventListener("click", () => { const m = document.getElementById("enableAlertsBtn"); if (m) m.click(); });
 })();
 
 
-// ----------------------------
 // 4. YESTERDAY'S TOP MOVERS
-// ----------------------------
-(function initYesterdayMovers() {
+(function initYesterday() {
   const section = document.getElementById("yesterdaySection");
   const toggle = document.getElementById("yesterdayToggle");
   const body = document.getElementById("yesterdayBody");
   const arrow = document.getElementById("yesterdayArrow");
   const dateEl = document.getElementById("yesterdayDate");
-  const stocksGroup = document.getElementById("yesterdayStocksGroup");
-  const stocksList = document.getElementById("yesterdayStocksList");
-  const cryptoGroup = document.getElementById("yesterdayCryptoGroup");
-  const cryptoList = document.getElementById("yesterdayCryptoList");
-  const emptyEl = document.getElementById("yesterdayEmpty");
-
+  const sGroup = document.getElementById("yesterdayStocksGroup");
+  const sList = document.getElementById("yesterdayStocksList");
+  const cGroup = document.getElementById("yesterdayCryptoGroup");
+  const cList = document.getElementById("yesterdayCryptoList");
+  const empty = document.getElementById("yesterdayEmpty");
   if (!section || !toggle || !body) return;
 
-  let isOpen = false;
+  let open = false;
+  toggle.addEventListener("click", () => { open = !open; body.style.display = open ? "" : "none"; arrow.classList.toggle("open", open); });
 
-  toggle.addEventListener("click", () => {
-    isOpen = !isOpen;
-    body.style.display = isOpen ? "" : "none";
-    arrow.classList.toggle("open", isOpen);
-  });
-
-  function fmtPct(n) {
-    if (n === null || n === undefined) return "—";
-    const sign = n > 0 ? "+" : "";
-    return `${sign}${Number(n).toFixed(1)}%`;
+  function fmtPct(n) { return n == null ? "—" : `${n > 0 ? "+" : ""}${Number(n).toFixed(1)}%`; }
+  function fmtUsd(n) { return n == null ? "$—" : n >= 1 ? `$${Number(n).toFixed(2)}` : `$${Number(n).toPrecision(4)}`; }
+  function fmtDate(s) { if (!s) return ""; try { const p = s.split("-"); return ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"][parseInt(p[1],10)-1] + " " + parseInt(p[2],10); } catch { return s; } }
+  function tvUrl(sym, type) { return type === "crypto" ? `https://www.tradingview.com/chart/?symbol=BINANCE:${sym}USDT&aff_id=162729` : `https://www.tradingview.com/chart/?symbol=${sym}&aff_id=162729`; }
+  function chip(item, type) {
+    const sym = type === "crypto" ? item.coinSymbol : item.symbol;
+    const cls = item.pctChange >= 0 ? "up" : "down";
+    return `<a class="yesterday-chip" href="${tvUrl(sym,type)}" target="_blank" rel="noopener"><span class="yesterday-chip-symbol">${sym}</span><span class="yesterday-chip-pct ${cls}">${fmtPct(item.pctChange)}</span><span class="yesterday-chip-price">${fmtUsd(item.price)}</span></a>`;
   }
 
-  function fmtUsd(n) {
-    if (n === null || n === undefined) return "$—";
-    if (n >= 1) return `$${Number(n).toFixed(2)}`;
-    return `$${Number(n).toPrecision(4)}`;
-  }
-
-  function formatDate(dateStr) {
-    if (!dateStr) return "";
+  (async () => {
     try {
-      const parts = dateStr.split("-");
-      const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-      return `${months[parseInt(parts[1], 10) - 1]} ${parseInt(parts[2], 10)}`;
-    } catch { return dateStr; }
-  }
-
-  function getTradingViewUrl(symbol, type) {
-    const aff = "162729";
-    if (type === "crypto") {
-      return `https://www.tradingview.com/chart/?symbol=BINANCE:${symbol}USDT&aff_id=${aff}`;
-    }
-    return `https://www.tradingview.com/chart/?symbol=${symbol}&aff_id=${aff}`;
-  }
-
-  function renderChip(item, type) {
-    const symbol = type === "crypto" ? item.coinSymbol : item.symbol;
-    const pct = item.pctChange;
-    const pctClass = pct >= 0 ? "up" : "down";
-    const tvUrl = getTradingViewUrl(symbol, type);
-
-    return `<a class="yesterday-chip" href="${tvUrl}" target="_blank" rel="noopener" title="${item.name || symbol}">
-      <span class="yesterday-chip-symbol">${symbol}</span>
-      <span class="yesterday-chip-pct ${pctClass}">${fmtPct(pct)}</span>
-      <span class="yesterday-chip-price">${fmtUsd(item.price)}</span>
-    </a>`;
-  }
-
-  async function fetchYesterday() {
-    try {
-      const res = await fetch("https://api.stockjelli.com/api/yesterday", { cache: "no-store" });
+      const res = await fetch("https://api.stockjelli.com/api/yesterday", {cache:"no-store"});
       if (!res.ok) return;
-      const data = await res.json();
-
-      if (!data.available) {
-        // No snapshot yet — section stays hidden
-        return;
-      }
-
-      if (dateEl) dateEl.textContent = formatDate(data.date);
-
-      const hasStocks = data.stocks && data.stocks.length > 0;
-      const hasCrypto = data.crypto && data.crypto.length > 0;
-
-      if (!hasStocks && !hasCrypto) {
-        if (emptyEl) emptyEl.style.display = "";
-        section.style.display = "";
-        return;
-      }
-
-      if (hasStocks && stocksList && stocksGroup) {
-        stocksList.innerHTML = data.stocks.map(s => renderChip(s, "stock")).join("");
-        stocksGroup.style.display = "";
-      }
-
-      if (hasCrypto && cryptoList && cryptoGroup) {
-        cryptoList.innerHTML = data.crypto.map(c => renderChip(c, "crypto")).join("");
-        cryptoGroup.style.display = "";
-      }
-
+      const d = await res.json();
+      if (!d.available) return;
+      if (dateEl) dateEl.textContent = fmtDate(d.date);
+      const hasS = d.stocks?.length > 0, hasC = d.crypto?.length > 0;
+      if (!hasS && !hasC) { if (empty) empty.style.display = ""; section.style.display = ""; return; }
+      if (hasS && sList && sGroup) { sList.innerHTML = d.stocks.map(s => chip(s,"stock")).join(""); sGroup.style.display = ""; }
+      if (hasC && cList && cGroup) { cList.innerHTML = d.crypto.map(c => chip(c,"crypto")).join(""); cGroup.style.display = ""; }
       section.style.display = "";
-    } catch (e) {
-      // Silently fail — section stays hidden
-    }
-  }
-
-  fetchYesterday();
+    } catch {}
+  })();
 })();
 
 
-// ----------------------------
 // 5. BOOKMARK PROMPT
-// ----------------------------
-(function initBookmarkPrompt() {
-  const STORAGE_KEY = "sj_bookmark_prompted";
-  const DELAY_MS = 90_000;
-
-  if (localStorage.getItem(STORAGE_KEY)) return;
-  if (localStorage.getItem("sj_promo_dismissed")) return;
-
-  function createPrompt() {
-    const isMac = navigator.platform?.toLowerCase().includes("mac") ||
-                  navigator.userAgent?.toLowerCase().includes("mac");
-    const shortcut = isMac ? "⌘+D" : "Ctrl+D";
-
+(function() {
+  if (localStorage.getItem("sj_bookmark_prompted") || localStorage.getItem("sj_promo_dismissed")) return;
+  setTimeout(() => {
+    const isMac = /mac/i.test(navigator.platform || navigator.userAgent || "");
     const el = document.createElement("div");
     el.className = "bookmark-prompt";
-    el.innerHTML = `
-      <span class="bookmark-prompt-icon">📌</span>
-      <span class="bookmark-prompt-text">
-        <strong>Add StockJelli to your morning scan.</strong>
-        Bookmark this page <kbd>${shortcut}</kbd>
-      </span>
-      <button class="bookmark-prompt-close" aria-label="Close">×</button>
-    `;
+    el.innerHTML = `<span class="bookmark-prompt-icon">📌</span><span class="bookmark-prompt-text"><strong>Add StockJelli to your morning scan.</strong> Bookmark this page <kbd>${isMac ? "⌘+D" : "Ctrl+D"}</kbd></span><button class="bookmark-prompt-close" aria-label="Close">×</button>`;
     document.body.appendChild(el);
-
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => el.classList.add("visible"));
-    });
-
-    function dismiss() {
-      localStorage.setItem(STORAGE_KEY, "1");
-      el.classList.remove("visible");
-      setTimeout(() => el.remove(), 400);
-    }
-
+    requestAnimationFrame(() => requestAnimationFrame(() => el.classList.add("visible")));
+    function dismiss() { localStorage.setItem("sj_bookmark_prompted","1"); el.classList.remove("visible"); setTimeout(() => el.remove(), 400); }
     el.querySelector(".bookmark-prompt-close").addEventListener("click", dismiss);
     setTimeout(dismiss, 15_000);
-  }
-
-  setTimeout(createPrompt, DELAY_MS);
+  }, 90_000);
 })();
 
 

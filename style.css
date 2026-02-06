@@ -3400,3 +3400,434 @@
       display: none;
     }
   }
+
+  /* ============================================
+   StockJelli — All Feature CSS Additions
+   Append to your existing style.css
+   
+   Covers:
+   1. Scrolling Pulse Ticker (below header)
+   2. Live Update Badge
+   3. Inline Alert CTA
+   4. Yesterday's Top Movers
+   5. Bookmark Prompt
+   ============================================ */
+
+
+/* -------------------------------------------
+   1. SCROLLING PULSE TICKER (news-style)
+   ------------------------------------------- */
+
+.pulse-ticker {
+  width: 100%;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.02);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  position: relative;
+  height: 28px;
+}
+
+/* Fade edges */
+.pulse-ticker::before,
+.pulse-ticker::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 40px;
+  z-index: 2;
+  pointer-events: none;
+}
+.pulse-ticker::before {
+  left: 0;
+  background: linear-gradient(to right, var(--bg, #0d1117) 0%, transparent 100%);
+}
+.pulse-ticker::after {
+  right: 0;
+  background: linear-gradient(to left, var(--bg, #0d1117) 0%, transparent 100%);
+}
+
+.pulse-ticker-track {
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+  height: 28px;
+  animation: tickerScroll 30s linear infinite;
+  will-change: transform;
+}
+
+.pulse-ticker-track:hover {
+  animation-play-state: paused;
+}
+
+@keyframes tickerScroll {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.ticker-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 24px;
+  font-size: 0.72rem;
+  color: rgba(255, 255, 255, 0.4);
+  letter-spacing: 0.01em;
+}
+
+.ticker-item-symbol {
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.ticker-item-pct {
+  font-weight: 500;
+}
+
+.ticker-item-pct.up {
+  color: #22c55e;
+}
+
+.ticker-item-pct.down {
+  color: #ef4444;
+}
+
+.ticker-separator {
+  display: inline-block;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.12);
+  margin: 0 4px;
+  flex-shrink: 0;
+}
+
+.ticker-pulse-text {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 24px;
+  font-size: 0.72rem;
+  color: rgba(255, 255, 255, 0.35);
+}
+
+.ticker-pulse-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #22c55e;
+  animation: livePulse 2s ease-in-out infinite;
+  flex-shrink: 0;
+}
+
+
+/* -------------------------------------------
+   2. LIVE UPDATE BADGE
+   ------------------------------------------- */
+
+.live-update-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: 20px;
+  background: rgba(34, 197, 94, 0.08);
+  border: 1px solid rgba(34, 197, 94, 0.15);
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.5);
+  white-space: nowrap;
+  transition: opacity 0.3s ease;
+}
+
+.live-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #22c55e;
+  animation: livePulse 2s ease-in-out infinite;
+  flex-shrink: 0;
+}
+
+@keyframes livePulse {
+  0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.4); }
+  50% { opacity: 0.6; box-shadow: 0 0 0 4px rgba(34, 197, 94, 0); }
+}
+
+.live-text {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.45);
+  letter-spacing: 0.01em;
+}
+
+.live-update-badge.just-updated {
+  border-color: rgba(34, 197, 94, 0.35);
+  background: rgba(34, 197, 94, 0.12);
+}
+.live-update-badge.just-updated .live-text {
+  color: rgba(34, 197, 94, 0.7);
+}
+
+
+/* -------------------------------------------
+   3. INLINE ALERT CTA
+   ------------------------------------------- */
+
+.inline-alert-cta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 20px;
+  margin: 20px 0 24px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.06) 0%, rgba(34, 197, 94, 0.02) 100%);
+  border: 1px solid rgba(34, 197, 94, 0.12);
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.inline-alert-cta:hover {
+  border-color: rgba(34, 197, 94, 0.22);
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.08) 0%, rgba(34, 197, 94, 0.03) 100%);
+}
+
+.inline-alert-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.inline-alert-icon {
+  font-size: 1.25rem;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.inline-alert-title {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.88);
+  line-height: 1.3;
+}
+
+.inline-alert-sub {
+  display: block;
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.4);
+  line-height: 1.4;
+  margin-top: 2px;
+}
+
+.btn-sm {
+  padding: 8px 18px;
+  font-size: 0.8rem;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+@media (max-width: 600px) {
+  .inline-alert-cta {
+    flex-direction: column;
+    align-items: stretch;
+    text-align: center;
+    padding: 16px;
+    gap: 12px;
+  }
+  .inline-alert-left {
+    flex-direction: column;
+    gap: 6px;
+  }
+  .btn-sm {
+    width: 100%;
+    text-align: center;
+  }
+}
+
+
+/* -------------------------------------------
+   4. YESTERDAY'S TOP MOVERS
+   ------------------------------------------- */
+
+.yesterday-section {
+  margin: 0 0 24px;
+}
+
+.yesterday-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 10px 0;
+  background: none;
+  border: none;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  cursor: pointer;
+  text-align: left;
+  transition: opacity 0.15s ease;
+}
+
+.yesterday-toggle:hover {
+  opacity: 0.8;
+}
+
+.yesterday-toggle-text {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.5);
+  letter-spacing: 0.02em;
+}
+
+.yesterday-date {
+  font-size: 0.72rem;
+  color: rgba(255, 255, 255, 0.25);
+  margin-left: auto;
+}
+
+.yesterday-arrow {
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.3);
+  transition: transform 0.2s ease;
+  margin-left: 4px;
+}
+
+.yesterday-arrow.open {
+  transform: rotate(180deg);
+}
+
+.yesterday-body {
+  padding: 8px 0 4px;
+}
+
+.yesterday-group {
+  margin-bottom: 12px;
+}
+
+.yesterday-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.3);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 6px;
+}
+
+.yesterday-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.yesterday-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  font-size: 0.78rem;
+  text-decoration: none;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.yesterday-chip:hover {
+  border-color: rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.yesterday-chip-symbol {
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.yesterday-chip-pct {
+  font-weight: 500;
+  font-size: 0.73rem;
+}
+
+.yesterday-chip-pct.up { color: #22c55e; }
+.yesterday-chip-pct.down { color: #ef4444; }
+
+.yesterday-chip-price {
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.3);
+}
+
+.yesterday-empty {
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.25);
+  padding: 8px 0;
+}
+
+
+/* -------------------------------------------
+   5. BOOKMARK PROMPT
+   ------------------------------------------- */
+
+.bookmark-prompt {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%) translateY(80px);
+  z-index: 900;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 20px;
+  border-radius: 10px;
+  background: rgba(17, 24, 39, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  opacity: 0;
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.35s ease;
+  max-width: 420px;
+  width: calc(100% - 32px);
+}
+
+.bookmark-prompt.visible {
+  transform: translateX(-50%) translateY(0);
+  opacity: 1;
+}
+
+.bookmark-prompt-icon { font-size: 1.1rem; flex-shrink: 0; }
+
+.bookmark-prompt-text {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.7);
+  line-height: 1.4;
+  flex: 1;
+}
+
+.bookmark-prompt-text strong { color: rgba(255, 255, 255, 0.9); }
+
+.bookmark-prompt-text kbd {
+  display: inline-block;
+  padding: 1px 5px;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  font-family: inherit;
+  font-size: 0.72rem;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.bookmark-prompt-close {
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.35);
+  font-size: 1rem;
+  cursor: pointer;
+  padding: 2px;
+  line-height: 1;
+  flex-shrink: 0;
+  transition: color 0.15s ease;
+}
+
+.bookmark-prompt-close:hover { color: rgba(255, 255, 255, 0.6); }
+
+@media (max-width: 480px) {
+  .bookmark-prompt { bottom: 16px; padding: 10px 14px; gap: 8px; }
+  .bookmark-prompt-text kbd { display: none; }
+}

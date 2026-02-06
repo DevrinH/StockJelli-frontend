@@ -615,6 +615,12 @@
     border-radius: 14px;
     overflow: hidden;
     backdrop-filter: blur(8px);
+    animation: tableIn 150ms ease-out;
+  }
+  
+  @keyframes tableIn {
+    from { opacity: 0; transform: translateY(4px); }
+    to   { opacity: 1; transform: translateY(0); }
   }
   
   table { width: 100%; border-collapse: collapse; }
@@ -622,6 +628,15 @@
   th, td { padding: 14px; border-bottom: 1px solid #1c2330; text-align: left; }
   th { color: #8b95a5; font-size: 0.8rem; font-weight: 650; }
   tbody tr:hover { background: rgba(255, 255, 255, 0.02); }
+  
+  /* #1 gainer row highlight */
+  tbody tr:first-child {
+    background: rgba(34, 197, 94, 0.035);
+    border-left: 3px solid rgba(34, 197, 94, 0.45);
+  }
+  tbody tr:first-child:hover {
+    background: rgba(34, 197, 94, 0.06);
+  }
   
   .ticker { font-weight: 720; letter-spacing: 0.2px; }
   

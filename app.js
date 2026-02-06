@@ -1161,7 +1161,6 @@ if (marketSessionText) {
    4. Yesterday's Top Movers (fetches /api/yesterday)
    5. Bookmark Prompt
    ============================================ */
-
 /* ============================================
    StockJelli — All Feature JS Additions
    
@@ -1346,6 +1345,25 @@ if (marketSessionText) {
 (function() {
   const btn = document.getElementById("inlineAlertBtn");
   if (btn) btn.addEventListener("click", () => { const m = document.getElementById("enableAlertsBtn"); if (m) m.click(); });
+})();
+
+
+// 3b. TOGGLE FADE TRANSITION
+(function() {
+  const assetControl = document.getElementById("assetControl");
+  if (!assetControl) return;
+
+  assetControl.addEventListener("click", (e) => {
+    const btn = e.target.closest(".segmented-btn");
+    if (!btn) return;
+    // Re-trigger the tableIn animation by briefly removing and re-adding it
+    const wrap = document.querySelector(".table-wrap");
+    if (wrap) {
+      wrap.style.animation = "none";
+      wrap.offsetHeight; // force reflow
+      wrap.style.animation = "";
+    }
+  });
 })();
 
 

@@ -1149,4 +1149,211 @@ if (marketSessionText) {
   });
 })();
 
+// ----------------------------
+// 1. MARKET PULSE
+// ----------------------------
+(function initMarketPulse() {
+  const pulseEl = document.getElementById("marketPulse");
+  const pulseText = document.getElementById("pulseText");
+  if (!pulseEl || !pulseText) return;
+
+  async function fetchPulse() {
+    try {
+      const res = await fetch("https://api.stockjelli.com/api/pulse", { cache: "no-store" });
+      if (!res.ok) return;
+      const data = await res.json();
+      
+      if (data.pulse) {
+        pulseText.textContent = data.pulse;
+        pulseEl.style.display = "";
+      }
+    } catch (e) {
+      // Silently fail — pulse is non-critical
+    }
+  }
+
+  // Fetch on load and on each poll cycle
+  fetchPulse();
+  setInterval(fetchPulse, 60_000);
+})();
+
+
+// ----------------------------
+// 2. YESTERDAY'S TOP MOVERS
+// ----------------------------
+(function initYesterdayMovers() {
+  const section = document.getElementById("yesterdaySection");
+  const toggle = document.getElementById("yesterdayToggle");
+  const body = document.getElementById("yesterdayBody");
+  const arrow = document.getElementById("yesterdayArrow");
+  const dateEl = document.getElementById("yesterdayDate");
+  const stocksGroup = document.getElementById("yesterdayStocksGroup");
+  const stocksList = document.getElementById("yesterdayStocksList");
+  const cryptoGroup = document.getElementById("yesterdayCryptoGroup");
+  const cryptoList = document.getElementById("yesterdayCryptoList");
+  const emptyEl = document.getElementById("yesterdayEmpty");
+
+  if (!section || !toggle || !body) return;
+
+  let isOpen = false;
+
+  // Toggle expand/collapse
+  toggle.addEventListener("click", () => {
+    isOpen = !isOpen;
+    body.style.display = isOpen ? "" : "none";
+    arrow.classList.toggle("open", isOpen);
+  });
+
+  function fmtPct(n) {
+    if (n === null || n === undefined) return "—";
+    const sign = n > 0 ? "+" : "";
+    return `${sign}${Number(n).toFixed(1)}%`;
+  }
+
+  function fmtUsd(n) {
+    if (n === null || n === undefined) return "$—";
+    return `$${Number(n).toFixed(2)}`;
+  }
+
+  function formatDate(dateStr) {
+    if (!dateStr) return "";
+    try {
+      const parts = dateStr.split("-");
+      const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+      return `${months[parseInt(parts[1], 10) - 1]} ${parseInt(parts[2], 10)}`;
+    } catch {
+      return dateStr;
+    }
+  }
+
+  function getTradingViewUrl(symbol, type) {
+    const affiliateId = "162729";
+    if (type === "crypto") {
+      return `https://www.tradingview.com/chart/?symbol=BINANCE:${symbol}USDT&aff_id=${affiliateId}`;
+    }
+    return `https://www.tradingview.com/chart/?symbol=${symbol}&aff_id=${affiliateId}`;
+  }
+
+  function renderChip(item, type) {
+    const symbol = type === "crypto" ? item.coinSymbol : item.symbol;
+    const pct = item.pctChange;
+    const pctClass = pct >= 0 ? "up" : "down";
+    const tvUrl = getTradingViewUrl(symbol, type);
+
+    return `<a class="yesterday-chip" href="${tvUrl}" target="_blank" rel="noopener" title="${item.name || symbol} — ${fmtUsd(item.price)}">
+      <span class="yesterday-chip-symbol">${symbol}</span>
+      <span class="yesterday-chip-pct ${pctClass}">${fmtPct(pct)}</span>
+      <span class="yesterday-chip-price">${fmtUsd(item.price)}</span>
+    </a>`;
+  }
+
+  async function fetchYesterday() {
+    try {
+      const res = await fetch("https://api.stockjelli.com/api/yesterday", { cache: "no-store" });
+      if (!res.ok) return;
+      const data = await res.json();
+
+      if (!data.available) return;
+
+      // Format date
+      if (dateEl) dateEl.textContent = formatDate(data.date);
+
+      const hasStocks = data.stocks && data.stocks.length > 0;
+      const hasCrypto = data.crypto && data.crypto.length > 0;
+
+      if (!hasStocks && !hasCrypto) {
+        emptyEl.style.display = "";
+        section.style.display = "";
+        return;
+      }
+
+      // Render stocks
+      if (hasStocks && stocksList && stocksGroup) {
+        stocksList.innerHTML = data.stocks.map(s => renderChip(s, "stock")).join("");
+        stocksGroup.style.display = "";
+      }
+
+      // Render crypto
+      if (hasCrypto && cryptoList && cryptoGroup) {
+        cryptoList.innerHTML = data.crypto.map(c => renderChip(c, "crypto")).join("");
+        cryptoGroup.style.display = "";
+      }
+
+      section.style.display = "";
+    } catch (e) {
+      // Silently fail
+    }
+  }
+
+  // Fetch once on load
+  fetchYesterday();
+})();
+
+
+// ----------------------------
+// 3. BOOKMARK PROMPT
+// ----------------------------
+(function initBookmarkPrompt() {
+  const STORAGE_KEY = "sj_bookmark_prompted";
+  const DELAY_MS = 90_000; // 90 seconds
+
+  // Don't show if already prompted
+  if (localStorage.getItem(STORAGE_KEY)) return;
+
+  // Don't show if promo toast was dismissed (avoid double prompts)
+  if (localStorage.getItem("sj_promo_dismissed")) return;
+
+  function createPrompt() {
+    // Detect platform for keyboard shortcut
+    const isMac = navigator.platform?.toLowerCase().includes("mac") || 
+                  navigator.userAgent?.toLowerCase().includes("mac");
+    const shortcut = isMac ? "⌘+D" : "Ctrl+D";
+
+    const el = document.createElement("div");
+    el.className = "bookmark-prompt";
+    el.innerHTML = `
+      <span class="bookmark-prompt-icon">📌</span>
+      <span class="bookmark-prompt-text">
+        <strong>Add StockJelli to your morning scan.</strong> 
+        Bookmark this page <kbd>${shortcut}</kbd>
+      </span>
+      <button class="bookmark-prompt-close" aria-label="Close">×</button>
+    `;
+    document.body.appendChild(el);
+
+    // Animate in
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        el.classList.add("visible");
+      });
+    });
+
+    function dismiss() {
+      localStorage.setItem(STORAGE_KEY, "1");
+      el.classList.remove("visible");
+      setTimeout(() => el.remove(), 400);
+    }
+
+    el.querySelector(".bookmark-prompt-close").addEventListener("click", dismiss);
+
+    // Auto-dismiss after 15 seconds
+    setTimeout(dismiss, 15_000);
+  }
+
+  setTimeout(createPrompt, DELAY_MS);
+})();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 })();

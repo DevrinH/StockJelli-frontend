@@ -478,6 +478,15 @@
               <span class="live-text">Updated <span id="liveTimestamp">just now</span></span>
             </div>
           </div>
+
+
+        <!-- Market Pulse — one-line summary -->
+        <div class="market-pulse" id="marketPulse" style="display: none;">
+          <span class="pulse-dot"></span>
+          <span class="pulse-text" id="pulseText"></span>
+        </div>
+
+
           
 
           <div class="table-wrap">
@@ -581,6 +590,33 @@
             </div>
             <button class="btn btn-primary btn-sm" id="inlineAlertBtn">$5/mo →</button>
           </div>
+
+          <!-- Yesterday's Top Movers (collapsed by default) -->
+<div class="yesterday-section" id="yesterdaySection" style="display: none;">
+  <button class="yesterday-toggle" id="yesterdayToggle" type="button">
+    <span class="yesterday-toggle-text">Yesterday's Top Movers</span>
+    <span class="yesterday-date" id="yesterdayDate"></span>
+    <span class="yesterday-arrow" id="yesterdayArrow">▾</span>
+  </button>
+  
+  <div class="yesterday-body" id="yesterdayBody" style="display: none;">
+    <!-- Stocks -->
+    <div class="yesterday-group" id="yesterdayStocksGroup" style="display: none;">
+      <div class="yesterday-label">Stocks</div>
+      <div class="yesterday-list" id="yesterdayStocksList"></div>
+    </div>
+    
+    <!-- Crypto -->
+    <div class="yesterday-group" id="yesterdayCryptoGroup" style="display: none;">
+      <div class="yesterday-label">Crypto</div>
+      <div class="yesterday-list" id="yesterdayCryptoList"></div>
+    </div>
+    
+    <div class="yesterday-empty" id="yesterdayEmpty" style="display: none;">
+      No movers met strict criteria yesterday.
+    </div>
+  </div>
+</div>
           
 
           <!-- Filters (clean) -->

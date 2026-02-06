@@ -3156,3 +3156,247 @@
     text-align: center;
   }
 }
+
+/* ============================================
+   StockJelli — Retention Features CSS
+   Append to your style.css
+   
+   1. Market Pulse one-liner
+   2. Yesterday's Top Movers
+   3. Bookmark prompt
+   ============================================ */
+
+
+/* -------------------------------------------
+   1. MARKET PULSE
+   ------------------------------------------- */
+
+   .market-pulse {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 0 4px;
+    margin-bottom: 2px;
+  }
+  
+  .pulse-dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    flex-shrink: 0;
+  }
+  
+  .pulse-text {
+    font-size: 0.78rem;
+    color: rgba(255, 255, 255, 0.38);
+    line-height: 1.4;
+    letter-spacing: 0.01em;
+  }
+  
+  
+  /* -------------------------------------------
+     2. YESTERDAY'S TOP MOVERS
+     ------------------------------------------- */
+  
+  .yesterday-section {
+    margin: 0 0 24px;
+  }
+  
+  .yesterday-toggle {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    padding: 10px 0;
+    background: none;
+    border: none;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+    cursor: pointer;
+    text-align: left;
+    transition: opacity 0.15s ease;
+  }
+  
+  .yesterday-toggle:hover {
+    opacity: 0.8;
+  }
+  
+  .yesterday-toggle-text {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.5);
+    letter-spacing: 0.02em;
+  }
+  
+  .yesterday-date {
+    font-size: 0.72rem;
+    color: rgba(255, 255, 255, 0.25);
+    margin-left: auto;
+  }
+  
+  .yesterday-arrow {
+    font-size: 0.7rem;
+    color: rgba(255, 255, 255, 0.3);
+    transition: transform 0.2s ease;
+    margin-left: 4px;
+  }
+  
+  .yesterday-arrow.open {
+    transform: rotate(180deg);
+  }
+  
+  .yesterday-body {
+    padding: 8px 0 4px;
+  }
+  
+  .yesterday-group {
+    margin-bottom: 12px;
+  }
+  
+  .yesterday-label {
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.3);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 6px;
+  }
+  
+  .yesterday-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  
+  .yesterday-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 10px;
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    font-size: 0.78rem;
+    text-decoration: none;
+    transition: border-color 0.15s ease, background 0.15s ease;
+  }
+  
+  .yesterday-chip:hover {
+    border-color: rgba(255, 255, 255, 0.12);
+    background: rgba(255, 255, 255, 0.06);
+  }
+  
+  .yesterday-chip-symbol {
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.75);
+  }
+  
+  .yesterday-chip-pct {
+    font-weight: 500;
+    font-size: 0.73rem;
+  }
+  
+  .yesterday-chip-pct.up {
+    color: #22c55e;
+  }
+  
+  .yesterday-chip-pct.down {
+    color: #ef4444;
+  }
+  
+  .yesterday-chip-price {
+    font-size: 0.7rem;
+    color: rgba(255, 255, 255, 0.3);
+  }
+  
+  .yesterday-empty {
+    font-size: 0.78rem;
+    color: rgba(255, 255, 255, 0.25);
+    padding: 8px 0;
+  }
+  
+  
+  /* -------------------------------------------
+     3. BOOKMARK PROMPT
+     ------------------------------------------- */
+  
+  .bookmark-prompt {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(80px);
+    z-index: 900;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 20px;
+    border-radius: 10px;
+    background: rgba(17, 24, 39, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(12px);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    opacity: 0;
+    transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.35s ease;
+    max-width: 420px;
+    width: calc(100% - 32px);
+  }
+  
+  .bookmark-prompt.visible {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+  }
+  
+  .bookmark-prompt-icon {
+    font-size: 1.1rem;
+    flex-shrink: 0;
+  }
+  
+  .bookmark-prompt-text {
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.7);
+    line-height: 1.4;
+    flex: 1;
+  }
+  
+  .bookmark-prompt-text strong {
+    color: rgba(255, 255, 255, 0.9);
+  }
+  
+  .bookmark-prompt-text kbd {
+    display: inline-block;
+    padding: 1px 5px;
+    border-radius: 3px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    font-family: inherit;
+    font-size: 0.72rem;
+    color: rgba(255, 255, 255, 0.6);
+  }
+  
+  .bookmark-prompt-close {
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.35);
+    font-size: 1rem;
+    cursor: pointer;
+    padding: 2px;
+    line-height: 1;
+    flex-shrink: 0;
+    transition: color 0.15s ease;
+  }
+  
+  .bookmark-prompt-close:hover {
+    color: rgba(255, 255, 255, 0.6);
+  }
+  
+  @media (max-width: 480px) {
+    .bookmark-prompt {
+      bottom: 16px;
+      padding: 10px 14px;
+      gap: 8px;
+    }
+    
+    .bookmark-prompt-text kbd {
+      display: none;
+    }
+  }

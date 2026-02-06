@@ -104,7 +104,9 @@
     position: sticky;
     top: 0;
     z-index: 1001;
-    background: #0b0e18;
+    background: rgba(11, 14, 24, 0.82);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
     border-bottom: 1px solid rgba(255, 255, 255, 0.06);
   }
   
@@ -261,7 +263,9 @@
     z-index: 999;
     width: 100%;
     overflow: hidden;
-    background: #0b0e18;
+    background: rgba(11, 14, 24, 0.78);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
     border-bottom: 1px solid rgba(255, 255, 255, 0.04);
     height: 28px;
   }
@@ -279,11 +283,11 @@
   }
   .pulse-ticker::before {
     left: 0;
-    background: linear-gradient(to right, #0b0e18, transparent);
+    background: linear-gradient(to right, rgba(11, 14, 24, 0.85), transparent);
   }
   .pulse-ticker::after {
     right: 0;
-    background: linear-gradient(to left, #0b0e18, transparent);
+    background: linear-gradient(to left, rgba(11, 14, 24, 0.85), transparent);
   }
   
   .pulse-ticker-track {

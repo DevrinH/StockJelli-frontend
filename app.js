@@ -1269,9 +1269,14 @@ if (marketSessionText) {
 
   async function fetchTicker() {
     try {
+      // Read current filter values from the page if available, otherwise use relaxed defaults
+      // This ensures the ticker matches what the user sees in the table
+      const stockMcap = document.getElementById("mcapSlider")?.value || 100000000;
+      const cryptoMcap = 50000000; // Low enough to catch small-cap movers like SKR
+
       const [s, c] = await Promise.all([
-        fetch("https://api.stockjelli.com/api/stocks?limit=20", {cache:"no-store"}).then(r => r.ok ? r.json() : null).catch(() => null),
-        fetch("https://api.stockjelli.com/api/crypto?limit=20", {cache:"no-store"}).then(r => r.ok ? r.json() : null).catch(() => null),
+        fetch(`https://api.stockjelli.com/api/stocks?limit=20&mcapMin=${stockMcap}`, {cache:"no-store"}).then(r => r.ok ? r.json() : null).catch(() => null),
+        fetch(`https://api.stockjelli.com/api/crypto?limit=20&mcapMin=${cryptoMcap}`, {cache:"no-store"}).then(r => r.ok ? r.json() : null).catch(() => null),
       ]);
       const items = buildItems(s?.rows, c?.rows, isUSMarketOpen());
       if (items.length <= 2) {

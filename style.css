@@ -3520,6 +3520,28 @@
   flex-shrink: 0;
 }
 
+/* Header must be sticky */
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+/* Ticker sticky right under header */
+.pulse-ticker {
+  position: sticky;
+  top: var(--header-h, 64px); /* JS will set this */
+  z-index: 999;              /* just below header */
+  backdrop-filter: blur(10px);
+}
+
+/* Optional: keep ticker visible above content */
+.pulse-ticker {
+  background: rgba(13, 17, 23, 0.85); /* match your theme */
+}
+
+/* IMPORTANT: sticky breaks if a parent has overflow hidden/auto */
+body, html { overflow-x: hidden; } /* ok */
 
 /* -------------------------------------------
    2. LIVE UPDATE BADGE

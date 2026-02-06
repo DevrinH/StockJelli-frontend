@@ -42,8 +42,17 @@
   
   body {
     margin: 0;
-    background: #24283b;
+    background: #0b0e18;
+    background-image:
+      /* Subtle purple glow — left of center */
+      radial-gradient(ellipse 70% 40% at 30% 0%, rgba(88, 60, 180, 0.06) 0%, transparent 50%),
+      /* Subtle blue glow — right of center */
+      radial-gradient(ellipse 60% 40% at 70% 20%, rgba(45, 120, 200, 0.05) 0%, transparent 50%),
+      /* Main vertical gradient */
+      linear-gradient(180deg, #0b0e18 0%, #0f1420 40%, #121826 70%, #151d2d 100%);
+    background-attachment: fixed;
     color: #e6e8eb;
+    min-height: 100vh;
   }
   
   .muted { color: #8b95a5; }
@@ -95,7 +104,7 @@
     position: sticky;
     top: 0;
     z-index: 1001;
-    background: #0d1117;
+    background: #0b0e18;
     border-bottom: 1px solid rgba(255, 255, 255, 0.06);
   }
   
@@ -252,7 +261,7 @@
     z-index: 999;
     width: 100%;
     overflow: hidden;
-    background: #0d1117;
+    background: #0b0e18;
     border-bottom: 1px solid rgba(255, 255, 255, 0.04);
     height: 28px;
   }
@@ -270,11 +279,11 @@
   }
   .pulse-ticker::before {
     left: 0;
-    background: linear-gradient(to right, #0d1117, transparent);
+    background: linear-gradient(to right, #0b0e18, transparent);
   }
   .pulse-ticker::after {
     right: 0;
-    background: linear-gradient(to left, #0d1117, transparent);
+    background: linear-gradient(to left, #0b0e18, transparent);
   }
   
   .pulse-ticker-track {
@@ -470,9 +479,45 @@
   
   
   /* ===========================================
-     7. HERO
+     7. HERO → COMPACT TAGLINE
      =========================================== */
   
+  /* Full hero is removed from HTML. This compact bar replaces it. */
+  .hero-compact {
+    padding: 28px 0 0;
+  }
+  
+  .hero-compact-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+  }
+  
+  .hero-compact h1 {
+    font-size: 1.5rem;
+    line-height: 1.2;
+    margin: 0;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+    background: linear-gradient(135deg, #e6e8eb 0%, rgba(77, 163, 255, 0.85) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  
+  .hero-compact p {
+    margin: 0;
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.35);
+  }
+  
+  @media (max-width: 640px) {
+    .hero-compact-inner { flex-direction: column; align-items: flex-start; gap: 4px; }
+    .hero-compact h1 { font-size: 1.25rem; }
+  }
+  
+  /* Keep old hero styles for backwards compat if HTML not updated yet */
   .hero { padding: 80px 0 44px; }
   
   .hero h1 { font-size: 3rem; line-height: 1.05; margin: 0 0 16px; }
@@ -526,7 +571,7 @@
      8. SCREENER SECTION
      =========================================== */
   
-  .screener { padding: 26px 0 54px; }
+  .screener { padding: 12px 0 54px; }
   
   .section-head {
     display: flex;
@@ -562,10 +607,11 @@
      =========================================== */
   
   .table-wrap {
-    background: #121826;
-    border: 1px solid #1c2330;
+    background: rgba(18, 24, 38, 0.65);
+    border: 1px solid rgba(255, 255, 255, 0.06);
     border-radius: 14px;
     overflow: hidden;
+    backdrop-filter: blur(8px);
   }
   
   table { width: 100%; border-collapse: collapse; }
@@ -932,9 +978,10 @@
   .filters {
     margin-top: 16px;
     padding: 16px;
-    background: #0f1522;
-    border: 1px solid #1c2330;
+    background: rgba(15, 21, 34, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.06);
     border-radius: 14px;
+    backdrop-filter: blur(8px);
   }
   
   .filters-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
@@ -995,8 +1042,9 @@
   
   .pricing-inner {
     display: flex; align-items: center; justify-content: space-between; gap: 18px;
-    background: rgba(10, 14, 24, 0.55); border-radius: 18px;
-    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06), 0 18px 55px rgba(0, 0, 0, 0.35);
+    background: rgba(10, 14, 24, 0.45); border-radius: 18px;
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06), 0 18px 55px rgba(0, 0, 0, 0.25);
+    backdrop-filter: blur(8px);
     padding: 22px;
   }
   

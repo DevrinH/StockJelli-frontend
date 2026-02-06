@@ -3414,16 +3414,36 @@
    ============================================ */
 
 
+/* ============================================
+   StockJelli — Feature Additions (CLEAN)
+   
+   REPLACES all previously appended CSS blocks.
+   Delete everything after your base style.css
+   and paste this single block instead.
+   ============================================ */
+
+
 /* -------------------------------------------
-   1. SCROLLING PULSE TICKER (news-style)
+   STICKY HEADER + TICKER
    ------------------------------------------- */
 
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  background: rgba(13, 17, 23, 0.95);
+  backdrop-filter: blur(12px);
+}
+
 .pulse-ticker {
+  position: sticky;
+  top: var(--header-h, 56px);
+  z-index: 999;
   width: 100%;
   overflow: hidden;
-  background: rgba(255, 255, 255, 0.02);
+  background: rgba(13, 17, 23, 0.92);
+  backdrop-filter: blur(10px);
   border-bottom: 1px solid rgba(255, 255, 255, 0.04);
-  position: relative;
   height: 28px;
 }
 
@@ -3440,11 +3460,11 @@
 }
 .pulse-ticker::before {
   left: 0;
-  background: linear-gradient(to right, var(--bg, #0d1117) 0%, transparent 100%);
+  background: linear-gradient(to right, rgba(13,17,23,1) 0%, transparent 100%);
 }
 .pulse-ticker::after {
   right: 0;
-  background: linear-gradient(to left, var(--bg, #0d1117) 0%, transparent 100%);
+  background: linear-gradient(to left, rgba(13,17,23,1) 0%, transparent 100%);
 }
 
 .pulse-ticker-track {
@@ -3480,17 +3500,9 @@
   color: rgba(255, 255, 255, 0.6);
 }
 
-.ticker-item-pct {
-  font-weight: 500;
-}
-
-.ticker-item-pct.up {
-  color: #22c55e;
-}
-
-.ticker-item-pct.down {
-  color: #ef4444;
-}
+.ticker-item-pct { font-weight: 500; }
+.ticker-item-pct.up { color: #22c55e; }
+.ticker-item-pct.down { color: #ef4444; }
 
 .ticker-separator {
   display: inline-block;
@@ -3520,31 +3532,9 @@
   flex-shrink: 0;
 }
 
-/* Header must be sticky */
-.site-header {
-  position: sticky;
-  top: 0;
-  z-index: 1000;
-}
-
-/* Ticker sticky right under header */
-.pulse-ticker {
-  position: sticky;
-  top: var(--header-h, 64px); /* JS will set this */
-  z-index: 999;              /* just below header */
-  backdrop-filter: blur(10px);
-}
-
-/* Optional: keep ticker visible above content */
-.pulse-ticker {
-  background: rgba(13, 17, 23, 0.85); /* match your theme */
-}
-
-/* IMPORTANT: sticky breaks if a parent has overflow hidden/auto */
-body, html { overflow-x: hidden; } /* ok */
 
 /* -------------------------------------------
-   2. LIVE UPDATE BADGE
+   LIVE UPDATE BADGE
    ------------------------------------------- */
 
 .live-update-badge {
@@ -3591,7 +3581,7 @@ body, html { overflow-x: hidden; } /* ok */
 
 
 /* -------------------------------------------
-   3. INLINE ALERT CTA
+   INLINE ALERT CTA
    ------------------------------------------- */
 
 .inline-alert-cta {
@@ -3619,11 +3609,7 @@ body, html { overflow-x: hidden; } /* ok */
   min-width: 0;
 }
 
-.inline-alert-icon {
-  font-size: 1.25rem;
-  flex-shrink: 0;
-  line-height: 1;
-}
+.inline-alert-icon { font-size: 1.25rem; flex-shrink: 0; line-height: 1; }
 
 .inline-alert-title {
   display: block;
@@ -3656,24 +3642,17 @@ body, html { overflow-x: hidden; } /* ok */
     padding: 16px;
     gap: 12px;
   }
-  .inline-alert-left {
-    flex-direction: column;
-    gap: 6px;
-  }
-  .btn-sm {
-    width: 100%;
-    text-align: center;
-  }
+  .inline-alert-left { flex-direction: column; gap: 6px; }
+  .inline-alert-icon { font-size: 1.5rem; }
+  .btn-sm { width: 100%; text-align: center; }
 }
 
 
 /* -------------------------------------------
-   4. YESTERDAY'S TOP MOVERS
+   YESTERDAY'S TOP MOVERS
    ------------------------------------------- */
 
-.yesterday-section {
-  margin: 0 0 24px;
-}
+.yesterday-section { margin: 0 0 24px; }
 
 .yesterday-toggle {
   display: flex;
@@ -3688,10 +3667,7 @@ body, html { overflow-x: hidden; } /* ok */
   text-align: left;
   transition: opacity 0.15s ease;
 }
-
-.yesterday-toggle:hover {
-  opacity: 0.8;
-}
+.yesterday-toggle:hover { opacity: 0.8; }
 
 .yesterday-toggle-text {
   font-size: 0.82rem;
@@ -3712,18 +3688,10 @@ body, html { overflow-x: hidden; } /* ok */
   transition: transform 0.2s ease;
   margin-left: 4px;
 }
+.yesterday-arrow.open { transform: rotate(180deg); }
 
-.yesterday-arrow.open {
-  transform: rotate(180deg);
-}
-
-.yesterday-body {
-  padding: 8px 0 4px;
-}
-
-.yesterday-group {
-  margin-bottom: 12px;
-}
+.yesterday-body { padding: 8px 0 4px; }
+.yesterday-group { margin-bottom: 12px; }
 
 .yesterday-label {
   font-size: 0.7rem;
@@ -3734,11 +3702,7 @@ body, html { overflow-x: hidden; } /* ok */
   margin-bottom: 6px;
 }
 
-.yesterday-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-}
+.yesterday-list { display: flex; flex-wrap: wrap; gap: 6px; }
 
 .yesterday-chip {
   display: inline-flex;
@@ -3752,29 +3716,16 @@ body, html { overflow-x: hidden; } /* ok */
   text-decoration: none;
   transition: border-color 0.15s ease, background 0.15s ease;
 }
-
 .yesterday-chip:hover {
   border-color: rgba(255, 255, 255, 0.12);
   background: rgba(255, 255, 255, 0.06);
 }
 
-.yesterday-chip-symbol {
-  font-weight: 600;
-  color: rgba(255, 255, 255, 0.75);
-}
-
-.yesterday-chip-pct {
-  font-weight: 500;
-  font-size: 0.73rem;
-}
-
+.yesterday-chip-symbol { font-weight: 600; color: rgba(255, 255, 255, 0.75); }
+.yesterday-chip-pct { font-weight: 500; font-size: 0.73rem; }
 .yesterday-chip-pct.up { color: #22c55e; }
 .yesterday-chip-pct.down { color: #ef4444; }
-
-.yesterday-chip-price {
-  font-size: 0.7rem;
-  color: rgba(255, 255, 255, 0.3);
-}
+.yesterday-chip-price { font-size: 0.7rem; color: rgba(255, 255, 255, 0.3); }
 
 .yesterday-empty {
   font-size: 0.78rem;
@@ -3784,7 +3735,7 @@ body, html { overflow-x: hidden; } /* ok */
 
 
 /* -------------------------------------------
-   5. BOOKMARK PROMPT
+   BOOKMARK PROMPT
    ------------------------------------------- */
 
 .bookmark-prompt {
@@ -3807,7 +3758,6 @@ body, html { overflow-x: hidden; } /* ok */
   max-width: 420px;
   width: calc(100% - 32px);
 }
-
 .bookmark-prompt.visible {
   transform: translateX(-50%) translateY(0);
   opacity: 1;
@@ -3821,9 +3771,7 @@ body, html { overflow-x: hidden; } /* ok */
   line-height: 1.4;
   flex: 1;
 }
-
 .bookmark-prompt-text strong { color: rgba(255, 255, 255, 0.9); }
-
 .bookmark-prompt-text kbd {
   display: inline-block;
   padding: 1px 5px;
@@ -3846,10 +3794,92 @@ body, html { overflow-x: hidden; } /* ok */
   flex-shrink: 0;
   transition: color 0.15s ease;
 }
-
 .bookmark-prompt-close:hover { color: rgba(255, 255, 255, 0.6); }
 
 @media (max-width: 480px) {
   .bookmark-prompt { bottom: 16px; padding: 10px 14px; gap: 8px; }
   .bookmark-prompt-text kbd { display: none; }
+}
+
+
+/* -------------------------------------------
+   PROMO TOAST
+   ------------------------------------------- */
+
+.promo-toast {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  width: 320px;
+  max-width: calc(100vw - 48px);
+  background: rgba(15, 23, 42, 0.95);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.05) inset;
+  padding: 20px;
+  z-index: 1000;
+  opacity: 0;
+  transform: translateY(20px) scale(0.95);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  pointer-events: none;
+}
+.promo-toast-visible {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  pointer-events: auto;
+}
+
+.promo-toast-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 28px;
+  height: 28px;
+  border: none;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 18px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.promo-toast-close:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.promo-toast-icon { font-size: 28px; margin-bottom: 12px; }
+.promo-toast-content { margin-bottom: 16px; }
+.promo-toast-title { font-size: 16px; font-weight: 700; color: #f1f5f9; margin-bottom: 6px; }
+.promo-toast-text { font-size: 13px; color: #94a3b8; line-height: 1.5; }
+
+.promo-toast-actions { display: flex; gap: 10px; }
+
+.promo-toast-btn {
+  flex: 1;
+  padding: 10px 16px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.promo-toast-btn-primary { background: #3ef08f; color: #0f172a; border: none; }
+.promo-toast-btn-primary:hover { background: #2dd57a; transform: translateY(-1px); }
+.promo-toast-btn-ghost { background: transparent; color: #94a3b8; border: 1px solid rgba(255, 255, 255, 0.1); }
+.promo-toast-btn-ghost:hover { background: rgba(255, 255, 255, 0.05); color: #e2e8f0; }
+
+@media (max-width: 480px) {
+  .promo-toast { bottom: 16px; right: 16px; left: 16px; width: auto; max-width: none; }
+  .promo-toast-actions { flex-direction: column; }
+  .promo-toast-btn { width: 100%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .promo-toast { transition: opacity 0.15s ease; transform: none; }
+  .promo-toast-visible { transform: none; }
 }

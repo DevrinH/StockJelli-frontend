@@ -942,22 +942,26 @@
   
   .yesterday-section { margin: 0 0 24px; }
   
+  /* Static header row (no toggle/dropdown) */
   .yesterday-toggle {
     display: flex; align-items: center; gap: 8px; width: 100%; padding: 10px 0;
     background: none; border: none; border-top: 1px solid rgba(255, 255, 255, 0.06);
-    cursor: pointer; text-align: left; transition: opacity 0.15s ease;
+    pointer-events: none; text-align: left;
   }
-  .yesterday-toggle:hover { opacity: 0.8; }
   
   .yesterday-toggle-text { font-size: 0.82rem; font-weight: 600; color: rgba(255, 255, 255, 0.5); letter-spacing: 0.02em; }
   .yesterday-date { font-size: 0.72rem; color: rgba(255, 255, 255, 0.25); margin-left: auto; }
-  .yesterday-arrow { font-size: 0.7rem; color: rgba(255, 255, 255, 0.3); transition: transform 0.2s ease; margin-left: 4px; }
-  .yesterday-arrow.open { transform: rotate(180deg); }
   
-  .yesterday-body { padding: 8px 0 4px; }
-  .yesterday-group { margin-bottom: 12px; }
+  /* Hide the arrow since there's no dropdown */
+  .yesterday-arrow { display: none; }
+  
+  .yesterday-body { padding: 0 0 4px; }
+  .yesterday-group { margin-bottom: 0; }
   .yesterday-label { font-size: 0.7rem; font-weight: 600; color: rgba(255, 255, 255, 0.3); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 6px; }
-  .yesterday-list { display: flex; flex-wrap: wrap; gap: 6px; }
+  
+  /* Single row of chips — no wrap */
+  .yesterday-list { display: flex; flex-wrap: nowrap; gap: 6px; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+  .yesterday-list::-webkit-scrollbar { display: none; }
   
   .yesterday-chip {
     display: inline-flex; align-items: center; gap: 6px; padding: 5px 10px; border-radius: 6px;

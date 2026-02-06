@@ -455,22 +455,19 @@
             <button class="btn btn-primary btn-sm" id="inlineAlertBtn">$5/mo →</button>
           </div>
 
-          <!-- Yesterday's Top Movers (collapsed by default) -->
+<!-- Yesterday's Top Movers (always visible, no dropdown) -->
 <div class="yesterday-section" id="yesterdaySection" style="display: none;">
-  <button class="yesterday-toggle" id="yesterdayToggle" type="button">
+  <div class="yesterday-toggle" id="yesterdayToggle">
     <span class="yesterday-toggle-text">Yesterday's Top Movers</span>
     <span class="yesterday-date" id="yesterdayDate"></span>
-    <span class="yesterday-arrow" id="yesterdayArrow">▾</span>
-  </button>
+  </div>
   
-  <div class="yesterday-body" id="yesterdayBody" style="display: none;">
-    <!-- Stocks -->
+  <div class="yesterday-body" id="yesterdayBody">
     <div class="yesterday-group" id="yesterdayStocksGroup" style="display: none;">
       <div class="yesterday-label">Stocks</div>
       <div class="yesterday-list" id="yesterdayStocksList"></div>
     </div>
     
-    <!-- Crypto -->
     <div class="yesterday-group" id="yesterdayCryptoGroup" style="display: none;">
       <div class="yesterday-label">Crypto</div>
       <div class="yesterday-list" id="yesterdayCryptoList"></div>

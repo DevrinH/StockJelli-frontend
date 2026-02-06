@@ -1162,16 +1162,6 @@ if (marketSessionText) {
    5. Bookmark Prompt
    ============================================ */
 
-
-
-/* ============================================
-   StockJelli — All Feature JS Additions
-   
-   Append inside your app.js IIFE (before the closing })(); )
-   REPLACES all previously appended JS blocks.
-   ============================================ */
-
-
 /* ============================================
    StockJelli — All Feature JS Additions
    
@@ -1349,22 +1339,47 @@ if (marketSessionText) {
 })();
 
 
-// 4. YESTERDAY'S TOP MOVERS
+// 4. YESTERDAY'S TOP MOVERS (always visible, respects Stocks/Crypto toggle)
 (function initYesterday() {
   const section = document.getElementById("yesterdaySection");
-  const toggle = document.getElementById("yesterdayToggle");
   const body = document.getElementById("yesterdayBody");
-  const arrow = document.getElementById("yesterdayArrow");
   const dateEl = document.getElementById("yesterdayDate");
   const sGroup = document.getElementById("yesterdayStocksGroup");
   const sList = document.getElementById("yesterdayStocksList");
   const cGroup = document.getElementById("yesterdayCryptoGroup");
   const cList = document.getElementById("yesterdayCryptoList");
   const empty = document.getElementById("yesterdayEmpty");
-  if (!section || !toggle || !body) return;
+  const assetControl = document.getElementById("assetControl");
+  if (!section || !body) return;
 
-  let open = false;
-  toggle.addEventListener("click", () => { open = !open; body.style.display = open ? "" : "none"; arrow.classList.toggle("open", open); });
+  // Remove toggle behavior — always open
+  body.style.display = "";
+
+  let hasStocks = false;
+  let hasCrypto = false;
+
+  function syncWithAssetTab() {
+    const activeBtn = assetControl?.querySelector(".segmented-on");
+    const mode = activeBtn?.dataset?.value || "stocks";
+
+    if (mode === "stocks") {
+      if (sGroup) sGroup.style.display = hasStocks ? "" : "none";
+      if (cGroup) cGroup.style.display = "none";
+      if (empty) empty.style.display = (!hasStocks) ? "" : "none";
+    } else {
+      if (sGroup) sGroup.style.display = "none";
+      if (cGroup) cGroup.style.display = hasCrypto ? "" : "none";
+      if (empty) empty.style.display = (!hasCrypto) ? "" : "none";
+    }
+  }
+
+  if (assetControl) {
+    assetControl.addEventListener("click", (e) => {
+      const btn = e.target.closest(".segmented-btn");
+      if (!btn) return;
+      setTimeout(syncWithAssetTab, 50);
+    });
+  }
 
   function fmtPct(n) { return n == null ? "—" : `${n > 0 ? "+" : ""}${Number(n).toFixed(1)}%`; }
   function fmtUsd(n) { return n == null ? "$—" : n >= 1 ? `$${Number(n).toFixed(2)}` : `$${Number(n).toPrecision(4)}`; }
@@ -1383,11 +1398,28 @@ if (marketSessionText) {
       const d = await res.json();
       if (!d.available) return;
       if (dateEl) dateEl.textContent = fmtDate(d.date);
-      const hasS = d.stocks?.length > 0, hasC = d.crypto?.length > 0;
-      if (!hasS && !hasC) { if (empty) empty.style.display = ""; section.style.display = ""; return; }
-      if (hasS && sList && sGroup) { sList.innerHTML = d.stocks.map(s => chip(s,"stock")).join(""); sGroup.style.display = ""; }
-      if (hasC && cList && cGroup) { cList.innerHTML = d.crypto.map(c => chip(c,"crypto")).join(""); cGroup.style.display = ""; }
+
+      // Limit to 6 each
+      const stocks = (d.stocks || []).slice(0, 6);
+      const crypto = (d.crypto || []).slice(0, 6);
+      hasStocks = stocks.length > 0;
+      hasCrypto = crypto.length > 0;
+
+      if (!hasStocks && !hasCrypto) {
+        if (empty) empty.style.display = "";
+        section.style.display = "";
+        return;
+      }
+
+      if (hasStocks && sList && sGroup) {
+        sList.innerHTML = stocks.map(s => chip(s, "stock")).join("");
+      }
+      if (hasCrypto && cList && cGroup) {
+        cList.innerHTML = crypto.map(c => chip(c, "crypto")).join("");
+      }
+
       section.style.display = "";
+      syncWithAssetTab();
     } catch {}
   })();
 })();

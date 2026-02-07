@@ -278,3 +278,99 @@
     .blog-body { font-size: 0.95rem; }
     .blog-paywall-card { padding: 24px 20px; margin: 0 10px; }
   }
+
+  /* ===========================================
+     4. SCROLLING PULSE TICKER
+     =========================================== */
+  
+     .pulse-ticker {
+      position: sticky;
+      top: var(--header-h, 56px);
+      z-index: 999;
+      width: 100%;
+      overflow: hidden;
+      background: rgba(11, 14, 24, 0.78);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      height: 28px;
+    }
+    
+    /* Fade edges */
+    .pulse-ticker::before,
+    .pulse-ticker::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 40px;
+      z-index: 2;
+      pointer-events: none;
+    }
+    .pulse-ticker::before {
+      left: 0;
+      background: linear-gradient(to right, rgba(11, 14, 24, 0.85), transparent);
+    }
+    .pulse-ticker::after {
+      right: 0;
+      background: linear-gradient(to left, rgba(11, 14, 24, 0.85), transparent);
+    }
+    
+    .pulse-ticker-track {
+      display: inline-flex;
+      align-items: center;
+      white-space: nowrap;
+      height: 28px;
+      will-change: transform;
+    }
+    
+    .pulse-ticker-track:hover { animation-play-state: paused; }
+    
+    @keyframes tickerScroll {
+      0%   { transform: translateX(0); }
+      100% { transform: translateX(var(--ticker-scroll, -50%)); }
+    }
+    
+    .ticker-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 0 14px;
+      font-size: 0.72rem;
+      color: rgba(255, 255, 255, 0.4);
+      letter-spacing: 0.01em;
+    }
+    
+    .ticker-item-symbol { font-weight: 600; color: rgba(255, 255, 255, 0.6); }
+    .ticker-item-pct { font-weight: 500; }
+    .ticker-item-pct.up { color: #22c55e; }
+    .ticker-item-pct.down { color: #ef4444; }
+    
+    .ticker-separator {
+      display: inline-block;
+      width: 3px;
+      height: 3px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.12);
+      margin: 0 2px;
+      flex-shrink: 0;
+    }
+    
+    .ticker-pulse-text {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 0 14px;
+      font-size: 0.72rem;
+      color: rgba(255, 255, 255, 0.35);
+    }
+    
+    .ticker-pulse-dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: #22c55e;
+      animation: livePulse 2s ease-in-out infinite;
+      flex-shrink: 0;
+    }
+    

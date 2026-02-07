@@ -419,7 +419,7 @@
     opacity: 0;
     visibility: hidden;
     transition: opacity 0.3s, visibility 0.3s;
-    z-index: 998;
+    z-index: 1100;
   }
   
   .drawer-overlay.is-open { opacity: 1; visibility: visible; }
@@ -438,7 +438,7 @@
     box-shadow: -8px 0 32px rgba(0, 0, 0, 0.4);
     transform: translateX(100%);
     transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    z-index: 999;
+    z-index: 1101;
     display: flex;
     flex-direction: column;
   }

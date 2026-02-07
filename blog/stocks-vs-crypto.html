@@ -3,32 +3,80 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
   <title>Crypto vs Stocks: How Momentum Differs | StockJelli Blog</title>
   <meta name="description" content="How momentum works differently in crypto vs stocks. Market hours, volume patterns, catalysts, and what to watch on a momentum screener for each asset class." />
   <meta name="robots" content="index, follow" />
+  
+  <!-- Recommended: add these for better SEO/social sharing consistency -->
+  <meta name="title" content="Crypto vs Stocks: How Momentum Differs | StockJelli Blog" />
+  <meta name="keywords" content="momentum trading, crypto momentum, stock momentum, trading differences, stock screener, crypto screener" />
   <link rel="canonical" href="https://stockjelli.com/blog/crypto-vs-stocks-momentum" />
+  
+  <!-- Open Graph -->
   <meta property="og:title" content="Crypto vs Stocks: How Momentum Differs" />
   <meta property="og:description" content="Key differences in how momentum plays out in crypto versus traditional stocks — timing, volume, catalysts, and more." />
   <meta property="og:image" content="https://stockjelli.com/blog/thumbs/crypto-vs-stocks.png" />
   <meta property="og:type" content="article" />
-  <link rel="icon" type="image/png" href="/StockJelli-S-Logo.png">
+  <meta property="og:url" content="https://stockjelli.com/blog/crypto-vs-stocks-momentum" />
+  <meta property="og:site_name" content="StockJelli" />
+  
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Crypto vs Stocks: How Momentum Differs" />
+  <meta name="twitter:description" content="Key differences in how momentum plays out in crypto versus traditional stocks — timing, volume, catalysts, and more." />
+  <meta name="twitter:image" content="https://stockjelli.com/blog/thumbs/crypto-vs-stocks.png" />
+  
+  <link rel="icon" type="image/png" sizes="32x32" href="/StockJelli-S-Logo.png" />
   <link rel="stylesheet" href="/style.css" />
   <link rel="stylesheet" href="/blog.css" />
+  
+  <!-- Google Analytics (matching the main page) -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-FM3HXT7ECV"></script>
-  <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date());gtag('config','G-FM3HXT7ECV',{anonymize_ip:true});</script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-FM3HXT7ECV', { anonymize_ip: true });
+  </script>
 </head>
 <body>
 
   <header class="header">
     <div class="header-inner">
       <div class="header-left">
-        <a href="/" aria-label="StockJelli Home"><img class="logo" src="/StockJelli-Logo.png" alt="StockJelli" width="150" height="32" /></a>
+        <a href="/" aria-label="StockJelli Home">
+          <img class="logo" src="/StockJelli-Logo.png" alt="StockJelli - Stock and Crypto Momentum Screener" width="150" height="32" />
+        </a>
       </div>
+  
+      <div class="header-center market-indices">
+        <span id="idxLeft" class="idx">
+          <span id="idxLeftLabel">NASDAQ</span>
+          <span id="idxLeftValue" class="idx-value up">+1.24%</span>
+        </span>
+      
+        <span class="divider">|</span>
+      
+        <span id="idxRight" class="idx">
+          <span id="idxRightLabel">S&P 500</span>
+          <span id="idxRightValue" class="idx-value down">-0.31%</span>
+        </span>
+      </div>
+  
       <div class="header-right">
         <a href="/" style="color: rgba(255,255,255,0.6); text-decoration: none; font-size: 0.85rem;">← Back to Screener</a>
       </div>
     </div>
   </header>
+
+
+  <div class="pulse-ticker" id="pulseTicker" style="display: none;">
+    <div class="pulse-ticker-track" id="pulseTickerTrack">
+      <!-- JS fills this with scrolling items -->
+    </div>
+  </div>
+
 
   <article class="blog-page">
     <a href="/blog" class="blog-back">← All posts</a>

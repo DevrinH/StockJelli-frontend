@@ -1188,7 +1188,7 @@
   
   .blog-card-img {
     width: 100%;
-    aspect-ratio: 16 / 9;
+    aspect-ratio: 5 / 3;
     object-fit: cover;
     display: block;
     border-bottom: 1px solid rgba(255, 255, 255, 0.04);
@@ -1220,6 +1220,7 @@
     margin: 0;
     display: -webkit-box;
     -webkit-line-clamp: 2;
+    line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
   }

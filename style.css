@@ -179,33 +179,40 @@
   
   /* Hamburger button */
   .menu-btn {
-    width: 44px;
-    height: 44px;
-    border-radius: 12px;
-    border: 1px solid rgba(255, 255, 255, 0.10);
-    background: rgba(255, 255, 255, 0.04);
-    display: grid;
-    place-items: center;
-    gap: 6px;
+    width: 40px;
+    height: 40px;
+    border-radius: 0;
+    border: none;
+    background: transparent;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
     cursor: pointer;
-    transition: transform 0.12s ease, background 0.12s ease;
+    padding: 6px;
+    transition: opacity 0.15s ease;
   }
   
   .menu-btn:hover {
-    background: rgba(255, 255, 255, 0.06);
-    border-color: rgba(255, 255, 255, 0.16);
+    opacity: 0.8;
+    background: transparent;
+    border-color: transparent;
   }
   
-  .menu-btn:active { transform: scale(0.98); }
+  .menu-btn:active { transform: scale(0.95); }
   
   .menu-btn span {
     display: block;
-    width: 18px;
-    height: 2px;
-    background: rgba(255, 255, 255, 0.85);
-    border-radius: 2px;
-    transition: transform 0.18s ease, opacity 0.18s ease;
+    height: 3px;
+    border-radius: 3px;
+    background: linear-gradient(90deg, #4dd9e8, #4da3ff, #6c7cff);
+    transition: transform 0.2s ease, opacity 0.2s ease, width 0.2s ease;
   }
+  
+  .menu-btn span:nth-child(1) { width: 22px; }
+  .menu-btn span:nth-child(2) { width: 18px; }
+  .menu-btn span:nth-child(3) { width: 22px; }
   
   /* MOBILE HEADER */
   @media (max-width: 640px) {

@@ -68,16 +68,21 @@
       items.push(`<span class="ticker-pulse-text"><span class="ticker-pulse-dot"></span>${summary}</span>`);
       items.push(`<span class="ticker-separator"></span>`);
   
+      const medals = ["🥇", "🥈", "🥉"];
       const topS = (stocks || []).filter(r => r.pctChange > 0).sort((a, b) => b.pctChange - a.pctChange).slice(0, 8);
-      for (const s of topS) {
-        items.push(`<span class="ticker-item"><span class="ticker-item-symbol">${s.symbol}</span> <span class="ticker-item-pct up">${fmtPct(s.pctChange)}</span></span>`);
+      for (let i = 0; i < topS.length; i++) {
+        const s = topS[i];
+        const medal = i < 3 ? `<span class="ticker-medal">${medals[i]}</span> ` : "";
+        items.push(`<span class="ticker-item">${medal}<span class="ticker-item-symbol">${s.symbol}</span> <span class="ticker-item-pct up">${fmtPct(s.pctChange)}</span></span>`);
       }
   
       if (topS.length > 0 && crypto?.length > 0) items.push(`<span class="ticker-separator"></span>`);
   
       const topC = (crypto || []).filter(r => r.pctChange > 0).sort((a, b) => b.pctChange - a.pctChange).slice(0, 8);
-      for (const c of topC) {
-        items.push(`<span class="ticker-item"><span class="ticker-item-symbol">${c.coinSymbol || c.symbol}</span> <span class="ticker-item-pct up">${fmtPct(c.pctChange)}</span></span>`);
+      for (let i = 0; i < topC.length; i++) {
+        const c = topC[i];
+        const medal = i < 3 ? `<span class="ticker-medal">${medals[i]}</span> ` : "";
+        items.push(`<span class="ticker-item">${medal}<span class="ticker-item-symbol">${c.coinSymbol || c.symbol}</span> <span class="ticker-item-pct up">${fmtPct(c.pctChange)}</span></span>`);
       }
       return items;
     }

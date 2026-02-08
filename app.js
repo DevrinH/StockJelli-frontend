@@ -1169,6 +1169,14 @@ if (marketSessionText) {
    ============================================ */
 
 
+/* ============================================
+   StockJelli — All Feature JS Additions
+   
+   Append inside your app.js IIFE (before the closing })(); )
+   REPLACES all previously appended JS blocks.
+   ============================================ */
+
+
 // 0. STICKY HEADER + TICKER MEASUREMENT
 (function initStickyMeasure() {
   const header = document.querySelector(".header");
@@ -1237,19 +1245,22 @@ if (marketSessionText) {
     items.push(`<span class="ticker-separator"></span>`);
 
     // Show up to 8 stocks — all positive movers the API returned
+    const medals = ["🥇", "🥈", "🥉"];
     const topS = (stocks || []).filter(r => r.pctChange > 0).sort((a,b) => b.pctChange - a.pctChange).slice(0, 8);
-    for (const s of topS) {
-      const cls = s.pctChange >= 0 ? "up" : "down";
-      items.push(`<span class="ticker-item"><span class="ticker-item-symbol">${s.symbol}</span> <span class="ticker-item-pct ${cls}">${fmtPct(s.pctChange)}</span></span>`);
+    for (let i = 0; i < topS.length; i++) {
+      const s = topS[i];
+      const medal = i < 3 ? `<span class="ticker-medal">${medals[i]}</span> ` : "";
+      items.push(`<span class="ticker-item">${medal}<span class="ticker-item-symbol">${s.symbol}</span> <span class="ticker-item-pct up">${fmtPct(s.pctChange)}</span></span>`);
     }
 
     if (topS.length > 0 && crypto?.length > 0) items.push(`<span class="ticker-separator"></span>`);
 
     // Show up to 8 crypto — all positive movers the API returned
     const topC = (crypto || []).filter(r => r.pctChange > 0).sort((a,b) => b.pctChange - a.pctChange).slice(0, 8);
-    for (const c of topC) {
-      const cls = c.pctChange >= 0 ? "up" : "down";
-      items.push(`<span class="ticker-item"><span class="ticker-item-symbol">${c.coinSymbol || c.symbol}</span> <span class="ticker-item-pct ${cls}">${fmtPct(c.pctChange)}</span></span>`);
+    for (let i = 0; i < topC.length; i++) {
+      const c = topC[i];
+      const medal = i < 3 ? `<span class="ticker-medal">${medals[i]}</span> ` : "";
+      items.push(`<span class="ticker-item">${medal}<span class="ticker-item-symbol">${c.coinSymbol || c.symbol}</span> <span class="ticker-item-pct up">${fmtPct(c.pctChange)}</span></span>`);
     }
 
     return items;

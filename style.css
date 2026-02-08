@@ -337,6 +337,12 @@
     flex-shrink: 0;
   }
   
+  .ticker-medal {
+    font-size: 0.6rem;
+    line-height: 1;
+    vertical-align: middle;
+  }
+  
   .ticker-pulse-text {
     display: inline-flex;
     align-items: center;
@@ -1003,7 +1009,7 @@
     pointer-events: none; text-align: left;
   }
   
-  .yesterday-toggle-text { font-size: 0.82rem; font-weight: 600; color: rgba(255, 255, 255, 0.949); letter-spacing: 0.02em; }
+  .yesterday-toggle-text { font-size: 0.82rem; font-weight: 600; color: rgba(255, 255, 255, 0.5); letter-spacing: 0.02em; }
   .yesterday-date { font-size: 0.72rem; color: rgba(255, 255, 255, 0.25); margin-left: auto; }
   
   /* Hide the arrow since there's no dropdown */
@@ -1011,7 +1017,7 @@
   
   .yesterday-body { padding: 0 0 4px; }
   .yesterday-group { margin-bottom: 0; }
-  .yesterday-label { font-size: 0.7rem; font-weight: 600; color: rgb(247, 255, 6); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 6px; }
+  .yesterday-label { font-size: 0.7rem; font-weight: 600; color: rgba(255, 255, 255, 0.3); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 6px; }
   
   /* Single row of chips — no wrap */
   .yesterday-list { display: flex; flex-wrap: nowrap; gap: 6px; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }

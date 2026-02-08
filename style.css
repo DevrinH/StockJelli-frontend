@@ -1003,7 +1003,7 @@
     pointer-events: none; text-align: left;
   }
   
-  .yesterday-toggle-text { font-size: 0.82rem; font-weight: 600; color: rgba(255, 255, 255, 0.5); letter-spacing: 0.02em; }
+  .yesterday-toggle-text { font-size: 0.82rem; font-weight: 600; color: rgba(255, 255, 255, 0.949); letter-spacing: 0.02em; }
   .yesterday-date { font-size: 0.72rem; color: rgba(255, 255, 255, 0.25); margin-left: auto; }
   
   /* Hide the arrow since there's no dropdown */
@@ -1517,49 +1517,4 @@
     border-radius: 10px; color: #e6e8eb; font-size: 0.95rem;
   }
 
-  /* Social Section */
-.social-section {
-  text-align: center;
-  padding: 36px 20px 44px;
-}
-
-.social-label {
-  font-size: 0.82rem;
-  color: rgba(255, 255, 255, 0.3);
-  letter-spacing: 0.04em;
-  margin: 0 0 16px;
-}
-
-.social-icons {
-  display: inline-flex;
-  gap: 18px;
-  align-items: center;
-}
-
-.social-link {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 44px;
-  height: 44px;
-  border-radius: 12px;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  transition: background 0.15s, border-color 0.15s, transform 0.15s;
-}
-
-.social-link:hover {
-  background: rgba(255, 255, 255, 0.08);
-  border-color: rgba(255, 255, 255, 0.12);
-  transform: translateY(-2px);
-}
-
-.social-link img {
-  opacity: 0.5;
-  transition: opacity 0.15s;
-  filter: brightness(0) invert(1);
-}
-
-.social-link:hover img {
-  opacity: 0.85;
-}
+  

@@ -277,6 +277,30 @@ function renderNewBadge(enteredAt) {
   return "";
 }
 
+// SJ Score cell renderer
+// Top 3 rows show score, rest are blurred for non-subscribers
+function renderSJScore(score, idx) {
+  if (score === null || score === undefined) return '<span class="sj-cell sj-na">—</span>';
+  
+  const s = Number(score);
+  let tier = "sj-low";
+  let icon = "";
+  if (s >= 75) { tier = "sj-high"; icon = " 🔥"; }
+  else if (s >= 60) { tier = "sj-mid"; }
+  
+  // First 3 rows: always visible
+  if (idx < 3) {
+    return `<span class="sj-cell ${tier}" title="SJ Momentum Strength Score">${s}${icon}</span>`;
+  }
+  
+  // Rows 4+: blurred with unlock prompt
+  return `<span class="sj-cell sj-blurred-wrap">
+    <span class="sj-blurred ${tier}">${s}${icon}</span>
+    <button class="sj-unlock-btn" title="Subscribe to unlock all SJ Scores">🔒</button>
+  </span>`;
+}
+
+
   // Generate TradingView URL for a symbol
 // Generate TradingView URL for a symbol (with affiliate link)
 function getTradingViewUrl(symbol, type = "stock") {
@@ -307,7 +331,7 @@ function renderTickerCell(symbol, type = "stock") {
     if (!tbody) return;
 
     if (!rows || rows.length === 0) {
-      tbody.innerHTML = `<tr><td class="ticker">—</td><td>$—</td><td>—</td><td>—</td><td class="news">—</td></tr>`;
+      tbody.innerHTML = `<tr><td class="ticker">—</td><td>$—</td><td>—</td><td>—</td><td class="news">—</td><td class="sj">—</td></tr>`;
       return;
     }
 
@@ -337,6 +361,7 @@ tbody.innerHTML = rows.map((x, idx) => {
           </td>
           <td>${fmtVolumeCompact(x.volume)}</td>
           <td class="news">${newsHtml}</td>
+          <td class="sj">${renderSJScore(x.sjScore, idx)}</td>
         </tr>
       `;
     }).join("");
@@ -368,7 +393,7 @@ function renderCrypto(rows) {
   if (!tbody) return;
 
   if (!rows || rows.length === 0) {
-    tbody.innerHTML = `<tr><td class="ticker">—</td><td>$—</td><td>—</td><td>—</td><td>—</td></tr>`;
+    tbody.innerHTML = `<tr><td class="ticker">—</td><td>$—</td><td>—</td><td>—</td><td>—</td><td class="sj">—</td></tr>`;
     return;
   }
 
@@ -424,6 +449,7 @@ tbody.innerHTML = rows.map((x, idx) => {
         </td>
         <td>${fmtVolumeCompact(x.volume)}${renderLiquidityDot(x.volume, x.marketCap)}</td>
         <td>${fmtCompactUsd(x.marketCap, 1)}</td>
+        <td class="sj">${renderSJScore(x.sjScore, idx)}</td>
       </tr>
     `;
   }).join("");
@@ -1070,7 +1096,14 @@ if (marketSessionText) {
   })();
 
 
-
+// SJ Score unlock — open alerts modal (subscription flow)
+document.addEventListener("click", (e) => {
+  const btn = e.target.closest(".sj-unlock-btn");
+  if (!btn) return;
+  // Open the alerts/subscribe modal
+  const alertsBtn = document.getElementById("enableAlertsBtn");
+  if (alertsBtn) alertsBtn.click();
+});
 
 
 

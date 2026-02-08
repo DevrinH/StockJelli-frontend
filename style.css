@@ -1583,3 +1583,99 @@
 .social-link:hover img {
   opacity: 0.85;
 }
+
+/* ===========================================
+   SJ SCORE — Momentum Continuation Strength
+   =========================================== */
+
+   .sj-header {
+    position: relative;
+    cursor: help;
+    white-space: nowrap;
+  }
+  
+  .sj-header-tooltip {
+    display: none;
+    position: absolute;
+    bottom: calc(100% + 6px);
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 5px 10px;
+    background: #1e293b;
+    color: #f1f5f9;
+    font-size: 0.7rem;
+    font-weight: 400;
+    white-space: nowrap;
+    border-radius: 6px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    z-index: 50;
+  }
+  
+  .sj-header:hover .sj-header-tooltip {
+    display: block;
+  }
+  
+  .sj-cell {
+    display: inline-flex;
+    align-items: center;
+    font-weight: 700;
+    font-size: 0.9rem;
+    letter-spacing: 0.02em;
+    padding: 3px 8px;
+    border-radius: 6px;
+  }
+  
+  .sj-high {
+    color: #4ade80;
+    background: rgba(74, 222, 128, 0.1);
+    text-shadow: 0 0 8px rgba(74, 222, 128, 0.3);
+  }
+  
+  .sj-mid {
+    color: #e2e8f0;
+    background: rgba(255, 255, 255, 0.05);
+  }
+  
+  .sj-low {
+    color: #64748b;
+    background: rgba(100, 116, 139, 0.08);
+  }
+  
+  .sj-na {
+    color: #475569;
+  }
+  
+  /* Blurred scores (rows 4+) */
+  .sj-blurred-wrap {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+  
+  .sj-blurred {
+    filter: blur(5px);
+    user-select: none;
+    pointer-events: none;
+  }
+  
+  .sj-unlock-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 0.75rem;
+    padding: 2px;
+    opacity: 0.5;
+    transition: opacity 0.15s ease, transform 0.15s ease;
+  }
+  
+  .sj-unlock-btn:hover {
+    opacity: 1;
+    transform: scale(1.15);
+  }
+  
+  /* Hide SJ column on very small screens */
+  @media (max-width: 640px) {
+    .sj-header, td.sj { display: none; }
+  }

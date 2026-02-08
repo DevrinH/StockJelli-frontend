@@ -22,13 +22,30 @@
   <header class="header">
     <div class="header-inner">
       <div class="header-left">
-        <a href="/" aria-label="StockJelli Home"><img class="logo" src="/StockJelli-Logo.png" alt="StockJelli" width="150" height="32" /></a>
+        <a href="/" aria-label="StockJelli Home">
+          <img class="logo" src="/StockJelli-Logo.png" alt="StockJelli" width="150" height="32" />
+        </a>
+      </div>
+      <div class="header-center market-indices">
+        <span id="idxLeft" class="idx">
+          <span id="idxLeftLabel">NASDAQ</span>
+          <span id="idxLeftValue" class="idx-value">—</span>
+        </span>
+        <span class="divider">|</span>
+        <span id="idxRight" class="idx">
+          <span id="idxRightLabel">S&P 500</span>
+          <span id="idxRightValue" class="idx-value">—</span>
+        </span>
       </div>
       <div class="header-right">
         <a href="/" style="color: rgba(255,255,255,0.6); text-decoration: none; font-size: 0.85rem;">← Back to Screener</a>
       </div>
     </div>
   </header>
+
+  <div class="pulse-ticker" id="pulseTicker">
+    <div class="pulse-ticker-track" id="pulseTickerTrack"></div>
+  </div>
 
   <article class="blog-page">
     <a href="/blog" class="blog-back">← All posts</a>

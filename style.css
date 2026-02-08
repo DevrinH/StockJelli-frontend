@@ -338,10 +338,10 @@
   }
   
   .ticker-medal {
-    font-size: 0.85rem;
+    font-size: 0.9rem;
     line-height: 1;
-    vertical-align: middle;
-    margin-right: 2px;
+    display: inline-flex;
+    align-items: center;
   }
   
   .ticker-pulse-text {

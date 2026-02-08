@@ -112,10 +112,20 @@
       .tier-grid { grid-template-columns: 1fr; }
     }
   </style>
+  <!-- GA4 -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-FM3HXT7ECV"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-FM3HXT7ECV', { anonymize_ip: true });
+  </script>
+  <script src="/blog-ticker.js" defer></script>
 </head>
 <body>
 
   <!-- Header -->
+  <!-- Minimal header for blog pages -->
   <header class="header">
     <div class="header-inner">
       <div class="header-left">
@@ -123,11 +133,27 @@
           <img class="logo" src="/StockJelli-Logo.png" alt="StockJelli" width="150" height="32" />
         </a>
       </div>
+      <div class="header-center market-indices">
+        <span id="idxLeft" class="idx">
+          <span id="idxLeftLabel">NASDAQ</span>
+          <span id="idxLeftValue" class="idx-value">—</span>
+        </span>
+        <span class="divider">|</span>
+        <span id="idxRight" class="idx">
+          <span id="idxRightLabel">S&P 500</span>
+          <span id="idxRightValue" class="idx-value">—</span>
+        </span>
+      </div>
       <div class="header-right">
-        <a href="/blog" style="color: #94a3b8; font-size: 0.85rem; text-decoration: none;">Blog</a>
+        <a href="/" style="color: rgba(255,255,255,0.6); text-decoration: none; font-size: 0.85rem;">← Back to Screener</a>
       </div>
     </div>
   </header>
+  <div class="pulse-ticker" id="pulseTicker">
+    <div class="pulse-ticker-track" id="pulseTickerTrack"></div>
+  </div>
+
+
 
   <article class="blog-post">
     <a href="/blog" class="blog-post-back">← Back to Blog</a>

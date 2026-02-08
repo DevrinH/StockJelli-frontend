@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>What Is the SJ Score? — StockJelli</title>
+  <meta name="description" content="Learn how StockJelli's SJ Score measures momentum continuation strength using five weighted factors. Understand what the score means and how to use it." />
+  <meta name="keywords" content="SJ Score, momentum score, continuation strength, stock screener, crypto screener, momentum trading, StockJelli" />
+  <meta name="author" content="StockJelli" />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="https://stockjelli.com/blog/what-is-sj-score" />
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://stockjelli.com/blog/what-is-sj-score" />
+  <meta property="og:title" content="What Is the SJ Score? — StockJelli" />
+  <meta property="og:description" content="Learn how StockJelli's SJ Score measures momentum continuation strength using five weighted factors." />
+  <meta property="og:image" content="https://stockjelli.com/blog/thumbs/sj-score.png" />
+  <meta property="og:site_name" content="StockJelli" />
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="What Is the SJ Score? — StockJelli" />
+  <meta name="twitter:description" content="Learn how StockJelli's SJ Score measures momentum continuation strength using five weighted factors." />
+  <meta name="twitter:image" content="https://stockjelli.com/blog/thumbs/sj-score.png" />
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/StockJelli-S-Logo.png">
+  <link rel="stylesheet" href="/style.css" />
+
+  <!-- JSON-LD -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": "What Is the SJ Score? Momentum Continuation Strength, Explained",
+    "description": "Learn how StockJelli's SJ Score measures momentum continuation strength using five weighted factors including price action, volume conviction, and market alignment.",
+    "author": {
+      "@type": "Organization",
+      "name": "StockJelli"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "StockJelli",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://stockjelli.com/StockJelli-Logo.png"
+      }
+    },
+    "datePublished": "2026-02-08",
+    "dateModified": "2026-02-08",
+    "mainEntityOfPage": "https://stockjelli.com/blog/what-is-sj-score",
+    "image": "https://stockjelli.com/blog/thumbs/sj-score.png"
+  }
+  </script>
+
+  <style>
+    /* Blog post specific styles */
+    .blog-post { max-width: 720px; margin: 0 auto; padding: 40px 20px 80px; }
+    .blog-post-back { display: inline-flex; align-items: center; gap: 6px; color: #94a3b8; font-size: 0.85rem; text-decoration: none; margin-bottom: 24px; transition: color 0.15s; }
+    .blog-post-back:hover { color: #e2e8f0; }
+    .blog-post-tag { display: inline-block; padding: 4px 10px; background: rgba(96, 165, 250, 0.12); color: #60a5fa; font-size: 0.75rem; font-weight: 600; border-radius: 4px; letter-spacing: 0.04em; text-transform: uppercase; margin-bottom: 12px; }
+    .blog-post h1 { font-size: 2rem; font-weight: 800; color: #f1f5f9; line-height: 1.2; margin: 0 0 12px; }
+    .blog-post-meta { color: #64748b; font-size: 0.85rem; margin-bottom: 32px; }
+    .blog-post-body { color: #cbd5e1; font-size: 1rem; line-height: 1.75; }
+    .blog-post-body h2 { color: #f1f5f9; font-size: 1.35rem; font-weight: 700; margin: 40px 0 12px; }
+    .blog-post-body h3 { color: #e2e8f0; font-size: 1.1rem; font-weight: 600; margin: 28px 0 8px; }
+    .blog-post-body p { margin: 0 0 16px; }
+    .blog-post-body strong { color: #f1f5f9; }
+    .blog-post-body a { color: #60a5fa; text-decoration: underline; }
+    .blog-post-body a:hover { color: #93c5fd; }
+
+    /* Score breakdown table */
+    .score-table { width: 100%; border-collapse: collapse; margin: 20px 0 28px; font-size: 0.9rem; }
+    .score-table th { text-align: left; padding: 10px 14px; background: rgba(255,255,255,0.04); color: #e2e8f0; font-weight: 600; border-bottom: 1px solid rgba(255,255,255,0.08); }
+    .score-table td { padding: 10px 14px; border-bottom: 1px solid rgba(255,255,255,0.04); color: #cbd5e1; }
+    .score-table tr:last-child td { border-bottom: none; }
+    .score-table .pts { color: #4ade80; font-weight: 700; white-space: nowrap; }
+
+    /* Tier boxes */
+    .tier-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 20px 0 28px; }
+    .tier-box { padding: 16px; border-radius: 10px; text-align: center; }
+    .tier-box-high { background: rgba(74, 222, 128, 0.08); border: 1px solid rgba(74, 222, 128, 0.2); }
+    .tier-box-mid { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); }
+    .tier-box-low { background: rgba(100, 116, 139, 0.06); border: 1px solid rgba(100, 116, 139, 0.15); }
+    .tier-box .tier-score { font-size: 1.4rem; font-weight: 800; margin-bottom: 4px; }
+    .tier-box-high .tier-score { color: #4ade80; }
+    .tier-box-mid .tier-score { color: #e2e8f0; }
+    .tier-box-low .tier-score { color: #64748b; }
+    .tier-box .tier-label { font-size: 0.8rem; color: #94a3b8; }
+
+    /* Example scenarios */
+    .scenario { padding: 16px 20px; border-radius: 10px; margin: 16px 0; border-left: 3px solid; }
+    .scenario-green { background: rgba(74, 222, 128, 0.04); border-left-color: #4ade80; }
+    .scenario-yellow { background: rgba(245, 158, 11, 0.04); border-left-color: #f59e0b; }
+    .scenario-red { background: rgba(239, 68, 68, 0.04); border-left-color: #ef4444; }
+    .scenario-title { font-weight: 700; color: #f1f5f9; margin-bottom: 6px; }
+    .scenario-detail { font-size: 0.88rem; color: #94a3b8; line-height: 1.6; }
+
+    /* CTA box */
+    .blog-cta { margin: 40px 0; padding: 24px; background: linear-gradient(135deg, rgba(59, 130, 246, 0.08), rgba(139, 92, 246, 0.06)); border: 1px solid rgba(96, 165, 250, 0.15); border-radius: 12px; text-align: center; }
+    .blog-cta h3 { color: #f1f5f9; margin: 0 0 8px; }
+    .blog-cta p { color: #94a3b8; font-size: 0.9rem; margin: 0 0 16px; }
+    .blog-cta .btn { display: inline-block; padding: 10px 24px; background: #3b82f6; color: #fff; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 0.9rem; transition: background 0.15s; }
+    .blog-cta .btn:hover { background: #2563eb; }
+
+    /* Disclaimer */
+    .disclaimer { margin-top: 40px; padding: 16px 20px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06); border-radius: 8px; }
+    .disclaimer p { color: #64748b; font-size: 0.82rem; margin: 0; line-height: 1.6; }
+
+    @media (max-width: 640px) {
+      .blog-post h1 { font-size: 1.5rem; }
+      .tier-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header class="header">
+    <div class="header-inner">
+      <div class="header-left">
+        <a href="/" aria-label="StockJelli Home">
+          <img class="logo" src="/StockJelli-Logo.png" alt="StockJelli" width="150" height="32" />
+        </a>
+      </div>
+      <div class="header-right">
+        <a href="/blog" style="color: #94a3b8; font-size: 0.85rem; text-decoration: none;">Blog</a>
+      </div>
+    </div>
+  </header>
+
+  <article class="blog-post">
+    <a href="/blog" class="blog-post-back">← Back to Blog</a>
+
+    <span class="blog-post-tag">Feature</span>
+    <h1>What Is the SJ Score? Momentum Continuation Strength, Explained</h1>
+    <div class="blog-post-meta">February 8, 2026 · 4 min read</div>
+
+    <div class="blog-post-body">
+
+      <p>
+        You may have noticed a new column on the StockJelli screener: <strong>SJ</strong>. This is the <strong>SJ Score</strong> — a 0 to 90 momentum continuation strength score that helps you quickly assess how likely a move is to keep running based on historical momentum factors.
+      </p>
+
+      <p>
+        The SJ Score isn't a price prediction. It's a way to separate clean breakouts from noisy pumps using the same data points experienced momentum traders look at — condensed into a single number.
+      </p>
+
+      <h2>How It Works</h2>
+
+      <p>
+        The SJ Score is calculated from five weighted components, each measuring a different aspect of momentum quality. Together they answer the question: <em>does this move have the characteristics that historically lead to follow-through?</em>
+      </p>
+
+      <table class="score-table">
+        <thead>
+          <tr>
+            <th>Factor</th>
+            <th>What It Measures</th>
+            <th>Max Points</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Price Strength</strong></td>
+            <td>Is the gain in the "sweet spot" (15–30%) or overextended?</td>
+            <td class="pts">25 pts</td>
+          </tr>
+          <tr>
+            <td><strong>Volume Conviction</strong></td>
+            <td>Is volume high relative to market cap? Measures real buying pressure.</td>
+            <td class="pts">25 pts</td>
+          </tr>
+          <tr>
+            <td><strong>Range Position</strong></td>
+            <td>Is the price near the day's high? Closer to highs = stronger momentum.</td>
+            <td class="pts">15 pts</td>
+          </tr>
+          <tr>
+            <td><strong>Market Alignment</strong></td>
+            <td>Is the broader market (NASDAQ for stocks, BTC for crypto) trending up?</td>
+            <td class="pts">10 pts</td>
+          </tr>
+          <tr>
+            <td><strong>Market Cap Sweet Spot</strong></td>
+            <td>Mid-caps ($200M–$5B stocks, $100M–$2B crypto) score highest — small enough to move, large enough to trust.</td>
+            <td class="pts">15 pts</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <p>
+        The maximum possible score is <strong>90</strong>. We intentionally cap it below 100 to signal that no momentum setup is ever "perfect" — there's always risk.
+      </p>
+
+      <h2>Score Tiers</h2>
+
+      <p>Scores fall into three tiers that are color-coded on the screener:</p>
+
+      <div class="tier-grid">
+        <div class="tier-box tier-box-high">
+          <div class="tier-score">75+ 🔥</div>
+          <div class="tier-label">Strong continuation signals</div>
+        </div>
+        <div class="tier-box tier-box-mid">
+          <div class="tier-score">60–74</div>
+          <div class="tier-label">Moderate momentum</div>
+        </div>
+        <div class="tier-box tier-box-low">
+          <div class="tier-score">Below 60</div>
+          <div class="tier-label">Weak or exhausted</div>
+        </div>
+      </div>
+
+      <h2>Real Examples</h2>
+
+      <p>Here's how the score behaves in three different scenarios:</p>
+
+      <div class="scenario scenario-green">
+        <div class="scenario-title">Clean Breakout — Score: 82</div>
+        <div class="scenario-detail">
+          +18% gain · High volume relative to market cap · Price at 92% of day's high · Market trending up · $800M market cap<br>
+          <strong>Why it scores high:</strong> Moderate gain (not overextended), confirmed by volume, holding near highs with market support. This is exactly the pattern that tends to follow through.
+        </div>
+      </div>
+
+      <div class="scenario scenario-yellow">
+        <div class="scenario-title">Overextended Pump — Score: 55</div>
+        <div class="scenario-detail">
+          +95% gain · Extreme volume · Price at 55% of high (already fading) · $30M market cap<br>
+          <strong>Why it scores low:</strong> The gain is too extreme (penalized above 60%), already pulling back from highs, and micro-cap. These moves look exciting but statistically tend to fade.
+        </div>
+      </div>
+
+      <div class="scenario scenario-red">
+        <div class="scenario-title">Weak Drift — Score: 33</div>
+        <div class="scenario-detail">
+          +5% gain · Normal volume · Price at 45% of range · Market red · $150B mega-cap<br>
+          <strong>Why it scores low:</strong> Modest gain with no volume conviction, trading in the middle of its range while the market is down. Mega-caps rarely sustain momentum breakouts.
+        </div>
+      </div>
+
+      <h2>Why Extreme Gains Score Lower</h2>
+
+      <p>
+        This is one of the most important design decisions in the SJ Score. A stock up 80% might <em>feel</em> exciting, but historically, moves above 60% have a much higher fade rate. The "sweet spot" for continuation tends to be in the 15–30% range — strong enough to signal institutional interest, but not so extreme that it triggers profit-taking cascades.
+      </p>
+
+      <p>
+        That's why you'll sometimes see a coin up 100% with a lower SJ Score than one up 20%. The score isn't measuring <em>how much</em> something moved — it's measuring <em>how likely it is to keep moving</em>.
+      </p>
+
+      <h2>Volume/Market Cap Ratio</h2>
+
+      <p>
+        Instead of using traditional relative volume (which requires 30 days of historical data), the SJ Score uses a <strong>volume-to-market-cap ratio</strong> as a proxy. This captures a similar signal: when a disproportionate amount of money flows into a relatively small asset, it suggests strong conviction behind the move.
+      </p>
+
+      <p>
+        For crypto, a ratio above 50% is notable. For stocks, even 5% vol/mcap suggests unusual interest. The thresholds are calibrated differently for each asset class.
+      </p>
+
+      <h2>Who Sees the Score?</h2>
+
+      <p>
+        The top 3 momentum leaders (your 🥇🥈🥉 medal winners) always show their SJ Score to everyone. Scores for rows 4 and below are <strong>exclusive to subscribers</strong> — part of the $5/month plan that also includes email alerts and weekly reports.
+      </p>
+
+      <div class="blog-cta">
+        <h3>Unlock All SJ Scores</h3>
+        <p>Get momentum strength scores for every row, plus email alerts and weekly reports.</p>
+        <a href="/#pricing" class="btn">Subscribe — $5/mo</a>
+      </div>
+
+      <h2>What SJ Score Is Not</h2>
+
+      <p>
+        The SJ Score reflects <strong>historical continuation tendencies based on momentum factors</strong>. It is not a prediction, probability, or guarantee of any kind. A high SJ Score does not mean a stock or crypto will go up. A low score does not mean it will go down.
+      </p>
+
+      <p>
+        Always do your own research. The SJ Score is one data point in your decision-making process — not a replacement for analysis, risk management, or common sense.
+      </p>
+
+      <h2>What's Next</h2>
+
+      <p>
+        This is v1 of the SJ Score. We're actively collecting data to backtest and refine the scoring model over time. Future versions may incorporate historical continuation rates, time-to-peak analysis, and machine learning trained on actual breakout outcomes.
+      </p>
+
+      <p>
+        For now, treat it as a fast way to separate signal from noise. When you're scanning 15 momentum plays and need to decide which ones deserve a closer look, the SJ Score gives you a starting point.
+      </p>
+
+      <div class="disclaimer">
+        <p>
+          <strong>Disclaimer:</strong> StockJelli is an educational tool. The SJ Score reflects historical momentum factor analysis and does not constitute financial advice, a recommendation, or a guarantee of any outcome. Trading involves substantial risk of loss. Always do your own research and consult a qualified financial advisor before making investment decisions.
+        </p>
+      </div>
+
+    </div>
+  </article>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container footer-inner">
+      <p>Educational tool only. Not financial advice.</p>
+      <p class="muted">
+        © 2026 StockJelli ·
+        <a href="/privacy.html" class="footer-link">Privacy</a> ·
+        <a href="/terms.html" class="footer-link">Terms</a> ·
+        <a href="/blog" class="footer-link">Blog</a>
+      </p>
+    </div>
+  </footer>
+
+</body>
+</html>

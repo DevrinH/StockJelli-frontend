@@ -1150,7 +1150,7 @@ if (marketSessionText) {
 })();
 
 /* ============================================
-   StockJelli — All Feature JS Additions
+   StockJelli — All Feature JS Additionss
    
    Append inside your app.js IIFE (before the closing })(); )
    

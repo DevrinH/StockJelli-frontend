@@ -414,7 +414,7 @@ tbody.innerHTML = rows.map((x, idx) => {
 
     return `
       <tr>
-      <td class="ticker">${renderTickerCell(x.symbol || "—", "stock")}${idx < 3 ? ' <span class="ticker-medal">' + medals[idx] + '</span>' : ''}${renderNewBadge(x.enteredAt)}</td>
+<td class="ticker">${tickerHtml}${idx < 3 ? ' <span class="ticker-medal">' + medals[idx] + '</span>' : ''}${rugWarning}${renderNewBadge(x.enteredAt)}</td>
         <td>${fmtUsd(x.price, priceDecimals)}</td>
         <td class="${changeClass}">
           <span class="change-wrap">

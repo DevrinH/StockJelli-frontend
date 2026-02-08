@@ -279,6 +279,8 @@ function renderNewBadge(enteredAt) {
 
 // SJ Score cell renderer
 // Top 3 rows show score, rest are blurred for non-subscribers
+// SJ Score cell renderer
+// Checks localStorage for subscriber status
 function renderSJScore(score, idx) {
   if (score === null || score === undefined) return '<span class="sj-cell sj-na">—</span>';
   
@@ -288,15 +290,18 @@ function renderSJScore(score, idx) {
   if (s >= 75) { tier = "sj-high"; icon = " 🔥"; }
   else if (s >= 60) { tier = "sj-mid"; }
   
-  // First 3 rows: always visible
-  if (idx < 3) {
+  // Check if subscriber (unlocked)
+  const isUnlocked = !!localStorage.getItem("sj_subscriber_email");
+  
+  // First 3 rows OR subscriber: always visible
+  if (idx < 3 || isUnlocked) {
     return `<span class="sj-cell ${tier}" title="SJ Momentum Strength Score">${s}${icon}</span>`;
   }
   
   // Rows 4+: blurred with unlock prompt
   return `<span class="sj-cell sj-blurred-wrap">
     <span class="sj-blurred ${tier}">${s}${icon}</span>
-    <button class="sj-unlock-btn" title="Subscribe to unlock all SJ Scores">🔒</button>
+    <button class="sj-unlock-btn" title="Unlock all SJ Scores">🔒</button>
   </span>`;
 }
 
@@ -1097,13 +1102,119 @@ if (marketSessionText) {
 
 
 // SJ Score unlock — open alerts modal (subscription flow)
+// SJ Score unlock — open SJ unlock modal (NOT the subscribe modal)
 document.addEventListener("click", (e) => {
   const btn = e.target.closest(".sj-unlock-btn");
   if (!btn) return;
-  // Open the alerts/subscribe modal
-  const alertsBtn = document.getElementById("enableAlertsBtn");
-  if (alertsBtn) alertsBtn.click();
+  
+  const sjModal = document.getElementById("sjUnlockModal");
+  if (sjModal) {
+    sjModal.classList.add("is-open");
+    sjModal.setAttribute("aria-hidden", "false");
+    document.body.style.overflow = "hidden";
+    // Focus the email input
+    const emailInput = document.getElementById("sjUnlockEmail");
+    if (emailInput) setTimeout(() => emailInput.focus(), 100);
+  }
 });
+
+// SJ Unlock modal — close handlers
+(function initSjUnlockModal() {
+  const modal = document.getElementById("sjUnlockModal");
+  const closeBtn = document.getElementById("closeSjUnlockBtn");
+  const verifyBtn = document.getElementById("sjUnlockVerifyBtn");
+  const emailInput = document.getElementById("sjUnlockEmail");
+  const errorEl = document.getElementById("sjUnlockError");
+  const successEl = document.getElementById("sjUnlockSuccess");
+  const subscribeLink = document.getElementById("sjUnlockSubscribeLink");
+  
+  if (!modal) return;
+  
+  function closeModal() {
+    modal.classList.remove("is-open");
+    modal.setAttribute("aria-hidden", "true");
+    document.body.style.overflow = "";
+  }
+  
+  closeBtn?.addEventListener("click", closeModal);
+  modal.addEventListener("click", (e) => {
+    if (e.target === modal) closeModal();
+  });
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && modal.classList.contains("is-open")) closeModal();
+  });
+  
+  // Subscribe link → close this modal, open alerts modal
+  subscribeLink?.addEventListener("click", (e) => {
+    e.preventDefault();
+    closeModal();
+    const alertsBtn = document.getElementById("enableAlertsBtn");
+    if (alertsBtn) alertsBtn.click();
+  });
+  
+  // Verify button
+  verifyBtn?.addEventListener("click", async () => {
+    const email = (emailInput?.value || "").trim().toLowerCase();
+    
+    // Hide previous messages
+    if (errorEl) errorEl.style.display = "none";
+    if (successEl) successEl.style.display = "none";
+    
+    if (!email || !email.includes("@")) {
+      if (errorEl) {
+        errorEl.textContent = "Please enter a valid email address.";
+        errorEl.style.display = "block";
+      }
+      return;
+    }
+    
+    // Show loading state
+    verifyBtn.disabled = true;
+    verifyBtn.textContent = "Verifying...";
+    
+    try {
+      const res = await fetch(`${API_BASE}/api/verify-subscriber?email=${encodeURIComponent(email)}`);
+      const data = await res.json();
+      
+      if (data.active) {
+        // Save to localStorage
+        localStorage.setItem("sj_subscriber_email", email);
+        
+        if (successEl) {
+          successEl.textContent = "✓ Verified! All SJ Scores are now unlocked.";
+          successEl.style.display = "block";
+        }
+        
+        // Force re-render to unblur all scores
+        setTimeout(() => {
+          closeModal();
+          // Trigger a refresh to re-render with unblurred scores
+          refreshOnce();
+        }, 1200);
+        
+      } else {
+        if (errorEl) {
+          errorEl.textContent = "No active subscription found for this email. Subscribe below to unlock.";
+          errorEl.style.display = "block";
+        }
+      }
+    } catch (err) {
+      console.error("[sj-unlock] Verification error:", err);
+      if (errorEl) {
+        errorEl.textContent = "Verification failed. Please try again.";
+        errorEl.style.display = "block";
+      }
+    } finally {
+      verifyBtn.disabled = false;
+      verifyBtn.textContent = "Verify & Unlock";
+    }
+  });
+  
+  // Enter key submits
+  emailInput?.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") verifyBtn?.click();
+  });
+})();
 
 
 

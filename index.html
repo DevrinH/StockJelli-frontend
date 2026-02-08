@@ -1160,6 +1160,57 @@
   </div>
 </div>
 
+<!-- SJ Score Unlock Modal -->
+<div class="modal-overlay" id="sjUnlockModal" aria-hidden="true">
+  <div class="modal modal-compact" role="dialog" aria-modal="true" aria-labelledby="sjUnlockTitle">
+    <button class="modal-close" type="button" id="closeSjUnlockBtn" aria-label="Close">✕</button>
+
+    <div class="modal-header">
+      <div class="modal-kicker">SJ SCORE</div>
+      <h2 class="modal-title" id="sjUnlockTitle">Unlock All SJ Scores</h2>
+      <p class="modal-subtitle muted">
+        Enter your subscriber email to unlock momentum strength scores for every row.
+      </p>
+    </div>
+
+    <!-- Verify Step -->
+    <div class="card" id="sjUnlockVerifyCard">
+      <div class="form-grid">
+        <div>
+          <label class="form-label">Subscriber Email</label>
+          <input
+            type="email"
+            id="sjUnlockEmail"
+            class="form-input"
+            placeholder="you@email.com"
+            autocomplete="email"
+          />
+          <p id="sjUnlockError" class="hint muted" style="display: none; color: #ef4444;"></p>
+          <p id="sjUnlockSuccess" class="hint" style="display: none; color: #4ade80;"></p>
+        </div>
+      </div>
+
+      <button class="btn btn-primary btn-wide" id="sjUnlockVerifyBtn" style="margin-top: 16px;">
+        Verify & Unlock
+      </button>
+
+      <div style="margin-top: 16px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,0.08);">
+        <p class="muted" style="font-size: 0.85rem; margin: 0; text-align: center;">
+          Not a subscriber yet? <a href="#" id="sjUnlockSubscribeLink" style="color: #60a5fa; text-decoration: underline;">Get alerts + SJ Scores for $5/mo →</a>
+        </p>
+      </div>
+    </div>
+
+    <!-- What is SJ Score info -->
+    <div style="margin-top: 12px; padding: 12px 16px; background: rgba(255,255,255,0.03); border-radius: 8px; border: 1px solid rgba(255,255,255,0.06);">
+      <p class="muted" style="font-size: 0.8rem; margin: 0; line-height: 1.5;">
+        <strong style="color: #e2e8f0;">What is SJ Score?</strong><br>
+        A 0–90 momentum continuation strength score based on price action, volume conviction, range position, market alignment, and market cap. 
+        <a href="/blog/what-is-sj-score" style="color: #60a5fa;">Learn more →</a>
+      </p>
+    </div>
+  </div>
+</div>
 
 </body>
 </html>

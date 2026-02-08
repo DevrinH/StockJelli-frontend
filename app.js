@@ -372,7 +372,8 @@ function renderCrypto(rows) {
     return;
   }
 
-  tbody.innerHTML = rows.map((x) => {
+  const medals = ["🥇", "🥈", "🥉"];
+tbody.innerHTML = rows.map((x, idx) => {
     const pct = x.pctChange || 0;
     const changeClass = classUpDown(pct);
 
@@ -413,7 +414,7 @@ function renderCrypto(rows) {
 
     return `
       <tr>
-      <td class="ticker">${tickerHtml}${rugWarning}${renderNewBadge(x.enteredAt)}</td>
+      <td class="ticker">${idx < 3 ? '<span class="ticker-medal">' + medals[idx] + '</span> ' : ''}${tickerHtml}${rugWarning}${renderNewBadge(x.enteredAt)}</td>
         <td>${fmtUsd(x.price, priceDecimals)}</td>
         <td class="${changeClass}">
           <span class="change-wrap">

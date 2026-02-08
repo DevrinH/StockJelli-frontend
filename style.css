@@ -1011,7 +1011,7 @@
   
   .yesterday-body { padding: 0 0 4px; }
   .yesterday-group { margin-bottom: 0; }
-  .yesterday-label { font-size: 0.7rem; font-weight: 600; color: rgba(255, 255, 255, 0.3); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 6px; }
+  .yesterday-label { font-size: 0.7rem; font-weight: 600; color: rgb(247, 255, 6); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 6px; }
   
   /* Single row of chips — no wrap */
   .yesterday-list { display: flex; flex-wrap: nowrap; gap: 6px; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }

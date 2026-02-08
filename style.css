@@ -1560,6 +1560,15 @@
   filter: brightness(0) invert(1);
 }
 
+/* StockTwits logo is already white-on-transparent, skip the invert */
+.social-link--stocktwits img {
+  filter: none;
+  opacity: 0.45;
+}
+.social-link--stocktwits:hover img {
+  opacity: 0.8;
+}
+
 .social-link:hover img {
   opacity: 0.85;
 }

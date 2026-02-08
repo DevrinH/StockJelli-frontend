@@ -343,7 +343,11 @@
     display: inline-flex;
     align-items: center;
   }
-  
+  .stocks-table .ticker-medal {
+    font-size: 1.1rem;
+    margin-right: 4px;
+    vertical-align: middle;
+  }
   .ticker-pulse-text {
     display: inline-flex;
     align-items: center;

@@ -12,9 +12,10 @@
   <link rel="stylesheet" href="/blog.css" />
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-FM3HXT7ECV"></script>
   <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date());gtag('config','G-FM3HXT7ECV',{anonymize_ip:true});</script>
+  
 
   <style>
-    .blog-index { max-width: 900px; margin: 0 auto; padding: 100px 20px 60px; }
+    .blog-index { max-width: 900px; margin: 0 auto; padding: 120px 20px 60px; }
     .blog-index-title { font-size: 1.6rem; font-weight: 800; color: #e6edf3; margin-bottom: 6px; }
     .blog-index-sub { font-size: 0.9rem; color: rgba(255,255,255,0.45); margin-bottom: 32px; }
     .blog-index-grid {
@@ -27,10 +28,24 @@
 </head>
 <body>
 
+  <!-- HEADER (matches main site) -->
   <header class="header">
     <div class="header-inner">
       <div class="header-left">
-        <a href="/" aria-label="StockJelli Home"><img class="logo" src="/StockJelli-Logo.png" alt="StockJelli" width="150" height="32" /></a>
+        <a href="/" aria-label="StockJelli Home">
+          <img class="logo" src="/StockJelli-Logo.png" alt="StockJelli" width="150" height="32" />
+        </a>
+      </div>
+      <div class="header-center market-indices">
+        <span id="idxLeft" class="idx">
+          <span id="idxLeftLabel">NASDAQ</span>
+          <span id="idxLeftValue" class="idx-value">—</span>
+        </span>
+        <span class="divider">|</span>
+        <span id="idxRight" class="idx">
+          <span id="idxRightLabel">S&P 500</span>
+          <span id="idxRightValue" class="idx-value">—</span>
+        </span>
       </div>
       <div class="header-right">
         <a href="/" style="color: rgba(255,255,255,0.6); text-decoration: none; font-size: 0.85rem;">← Back to Screener</a>
@@ -38,10 +53,19 @@
     </div>
   </header>
 
+  <!-- PULSE TICKER -->
+  <div class="pulse-ticker" id="pulseTicker">
+    <div class="pulse-ticker-track" id="pulseTickerTrack"></div>
+  </div>
+
   <div class="blog-index">
     <h1 class="blog-index-title">Insights & Reports</h1>
     <p class="blog-index-sub">Momentum trading guides, strategies, and weekly reports for StockJelli subscribers.</p>
 
+    <!-- ======================== -->
+    <!-- PERMANENT ARTICLES       -->
+    <!-- ======================== -->
+    <div class="blog-section-divider">Guides & Education</div>
     <div class="blog-index-grid">
 
       <a href="/blog/how-to-read-momentum-signals" class="blog-card">
@@ -62,23 +86,12 @@
         </div>
       </a>
 
-      <a href="/blog/weekly-stocks-report-feb-6" class="blog-card">
-        <img class="blog-card-img" src="/blog/thumbs/weekly-stocks.png" alt="Weekly Stocks Report" loading="lazy" />
+      <a href="/blog/stocks-vs-crypto.html" class="blog-card">
+        <img class="blog-card-img" src="/blog/thumbs/stocks-vs-crypto.png" alt="Crypto vs Stocks" loading="lazy" />
         <div class="blog-card-body">
-          <span class="blog-card-tag tag-subscribers">Subscribers</span>
-          <h3 class="blog-card-title">Weekly Stocks Report — Feb 6, 2026</h3>
+          <span class="blog-card-tag">Education</span>
+          <h3 class="blog-card-title">How Stocks and Crypto Momentum Differ</h3>
           <div class="blog-card-date">Feb 6, 2026</div>
-          <div class="blog-card-lock">🔒 Subscriber content</div>
-        </div>
-      </a>
-
-      <a href="/blog/weekly-crypto-report-feb-6" class="blog-card">
-        <img class="blog-card-img" src="/blog/thumbs/weekly-crypto.png" alt="Weekly Crypto Report" loading="lazy" />
-        <div class="blog-card-body">
-          <span class="blog-card-tag tag-subscribers">Subscribers</span>
-          <h3 class="blog-card-title">Weekly Crypto Report — Feb 6, 2026</h3>
-          <div class="blog-card-date">Feb 6, 2026</div>
-          <div class="blog-card-lock">🔒 Subscriber content</div>
         </div>
       </a>
 
@@ -91,16 +104,78 @@
         </div>
       </a>
 
-      <a href="/blog/stocks-vs-crypto.html" class="blog-card">
-        <img class="blog-card-img" src="/blog/thumbs/stocks-vs-crypto.png" alt="Stocks Vs Crypto" loading="lazy" />
-        <div class="blog-card-body">
-            <span class="blog-card-tag">Stocks Vs Crypto</span>
-            <h3 class="blog-card-title">How Stocks and Crypto Momentum Differ</h3>
-            <div class="blog-card-date">Feb 6, 2026</div>
-        </div>
-      </a>
-
     </div>
+
+    <!-- ======================== -->
+    <!-- WEEKLY REPORTS (dropdowns) -->
+    <!-- ======================== -->
+    <div class="blog-section-divider">Weekly Reports 🔒</div>
+
+    <!-- Week of Feb 3–7, 2026 (OPEN by default — most recent) -->
+    <div class="blog-week-group open">
+      <div class="blog-week-header" onclick="this.parentElement.classList.toggle('open')">
+        <div>
+          <span class="blog-week-label">Week of Feb 3 – Feb 7, 2026</span>
+          <span class="blog-week-count">2 reports</span>
+        </div>
+        <span class="blog-week-arrow">▼</span>
+      </div>
+      <div class="blog-week-content">
+        <a href="/blog/weekly-stocks-report-feb-6" class="blog-card">
+          <img class="blog-card-img" src="/blog/thumbs/weekly-stocks.png" alt="Weekly Stocks Report" loading="lazy" />
+          <div class="blog-card-body">
+            <span class="blog-card-tag tag-subscribers">Subscribers</span>
+            <h3 class="blog-card-title">Weekly Stocks Report — Feb 6, 2026</h3>
+            <div class="blog-card-date">Feb 6, 2026</div>
+            <div class="blog-card-lock">🔒 Subscriber content</div>
+          </div>
+        </a>
+
+        <a href="/blog/weekly-crypto-report-feb-6" class="blog-card">
+          <img class="blog-card-img" src="/blog/thumbs/weekly-crypto.png" alt="Weekly Crypto Report" loading="lazy" />
+          <div class="blog-card-body">
+            <span class="blog-card-tag tag-subscribers">Subscribers</span>
+            <h3 class="blog-card-title">Weekly Crypto Report — Feb 6, 2026</h3>
+            <div class="blog-card-date">Feb 6, 2026</div>
+            <div class="blog-card-lock">🔒 Subscriber content</div>
+          </div>
+        </a>
+      </div>
+    </div>
+
+    <!-- TEMPLATE: Copy this block for each new week, newest first -->
+    <!--
+    <div class="blog-week-group">
+      <div class="blog-week-header" onclick="this.parentElement.classList.toggle('open')">
+        <div>
+          <span class="blog-week-label">Week of Jan 27 – Jan 31, 2026</span>
+          <span class="blog-week-count">2 reports</span>
+        </div>
+        <span class="blog-week-arrow">▼</span>
+      </div>
+      <div class="blog-week-content">
+        <a href="/blog/weekly-stocks-report-jan-30" class="blog-card">
+          <img class="blog-card-img" src="/blog/thumbs/weekly-stocks.png" alt="Weekly Stocks Report" loading="lazy" />
+          <div class="blog-card-body">
+            <span class="blog-card-tag tag-subscribers">Subscribers</span>
+            <h3 class="blog-card-title">Weekly Stocks Report — Jan 30, 2026</h3>
+            <div class="blog-card-date">Jan 30, 2026</div>
+            <div class="blog-card-lock">🔒 Subscriber content</div>
+          </div>
+        </a>
+        <a href="/blog/weekly-crypto-report-jan-30" class="blog-card">
+          <img class="blog-card-img" src="/blog/thumbs/weekly-crypto.png" alt="Weekly Crypto Report" loading="lazy" />
+          <div class="blog-card-body">
+            <span class="blog-card-tag tag-subscribers">Subscribers</span>
+            <h3 class="blog-card-title">Weekly Crypto Report — Jan 30, 2026</h3>
+            <div class="blog-card-date">Jan 30, 2026</div>
+            <div class="blog-card-lock">🔒 Subscriber content</div>
+          </div>
+        </a>
+      </div>
+    </div>
+    -->
+
   </div>
 
   <footer class="footer">
@@ -110,5 +185,6 @@
     </div>
   </footer>
 
+  <script src="/blog-ticker.js" defer></script>
 </body>
 </html>

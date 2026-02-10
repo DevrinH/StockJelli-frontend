@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>StockJelli FAQ: Everything You Need to Know | StockJelli Blog</title>
+  <meta name="description" content="Frequently asked questions about StockJelli — how the SJ Score works, how data is updated, email alerts, subscription details, and how to use the momentum screener." />
+  <meta name="robots" content="index, follow" />
+  
+  <meta name="title" content="StockJelli FAQ: Everything You Need to Know | StockJelli Blog" />
+  <meta name="keywords" content="StockJelli FAQ, SJ Score explained, momentum screener FAQ, stock screener help, crypto screener help, email alerts, how StockJelli works" />
+  <link rel="canonical" href="https://stockjelli.com/blog/stockjelli-faq.html" />
+  
+  <!-- Open Graph -->
+  <meta property="og:title" content="StockJelli FAQ: Everything You Need to Know" />
+  <meta property="og:description" content="Answers to the most common questions about StockJelli — SJ Scores, data updates, email alerts, subscriptions, and more." />
+  <meta property="og:image" content="https://stockjelli.com/blog/thumbs/stockjelli-faq.png" />
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://stockjelli.com/blog/stockjelli-faq.html" />
+  <meta property="og:site_name" content="StockJelli" />
+  
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="StockJelli FAQ: Everything You Need to Know" />
+  <meta name="twitter:description" content="Answers to the most common questions about StockJelli — SJ Scores, data updates, email alerts, subscriptions, and more." />
+  <meta name="twitter:image" content="https://stockjelli.com/blog/thumbs/stockjelli-faq.png" />
+
+  <!-- FAQ Schema for SEO -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "What is StockJelli?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "StockJelli is a momentum screener for stocks and crypto. It surfaces tickers showing unusual upward price movement backed by volume, helping you spot emerging momentum before it becomes mainstream news."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What is an SJ Score?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "The SJ Score is StockJelli's proprietary momentum rating from 1 to 10. It combines price action, volume strength, and momentum factors into a single number that tells you how strong a move is at a glance. Higher scores indicate stronger, more confirmed momentum."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How is the SJ Score calculated?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "The SJ Score weighs multiple factors including percentage price change, volume relative to average, market cap, and the consistency of the move. The exact formula is proprietary, but the general principle is that a stock or crypto needs both price movement and volume confirmation to score well."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How often is the data updated?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Stock data updates during US market hours (9:30 AM – 4:00 PM ET, Monday through Friday). Crypto data updates around the clock, 24/7, since crypto markets never close."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Can I get email alerts?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes. StockJelli offers email alert subscriptions that notify you when new tickers hit the screener. Alerts are available for both stocks and crypto, with regional options for Americas and Global delivery windows."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Is StockJelli free?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "The core screener is free to use. You can view all tickers, percentage changes, volume, and news links without paying anything. SJ Scores and email alerts are available to subscribers."
+        }
+      }
+    ]
+  }
+  </script>
+  
+  <link rel="icon" type="image/png" sizes="32x32" href="/StockJelli-S-Logo.png" />
+  <link rel="stylesheet" href="/style.css" />
+  <link rel="stylesheet" href="/blog.css" />
+  
+  <!-- Google Analytics (matching the main page) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-FM3HXT7ECV"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-FM3HXT7ECV', { anonymize_ip: true });
+  </script>
+  <script src="promo-toast.js" defer></script>
+  <script src="/blog-ticker.js" defer></script>
+
+</head>
+<body>
+
+  <header class="header">
+    <div class="header-inner">
+      <div class="header-left">
+        <a href="/" aria-label="StockJelli Home">
+          <img class="logo" src="/StockJelli-Logo.png" alt="StockJelli - Stock and Crypto Momentum Screener" width="150" height="32" />
+        </a>
+      </div>
+  
+      <div class="header-center market-indices">
+        <span id="idxLeft" class="idx">
+          <span id="idxLeftLabel">NASDAQ</span>
+          <span id="idxLeftValue" class="idx-value up">+1.24%</span>
+        </span>
+      
+        <span class="divider">|</span>
+      
+        <span id="idxRight" class="idx">
+          <span id="idxRightLabel">S&P 500</span>
+          <span id="idxRightValue" class="idx-value down">-0.31%</span>
+        </span>
+      </div>
+  
+      <div class="header-right">
+        <a href="/" style="color: rgba(255,255,255,0.6); text-decoration: none; font-size: 0.85rem;">← Back to Screener</a>
+      </div>
+    </div>
+  </header>
+
+
+  <div class="pulse-ticker" id="pulseTicker">
+    <div class="pulse-ticker-track" id="pulseTickerTrack">
+      <!-- JS fills this with scrolling items -->
+    </div>
+  </div>
+
+
+  <article class="blog-page">
+    <a href="/blog" class="blog-back">← All posts</a>
+
+    <img class="blog-hero-img" src="/blog/thumbs/stockjelli-faq.png" alt="StockJelli FAQ" onerror="this.style.display='none'" />
+
+    <span class="blog-tag">Support</span>
+    <h1 class="blog-post-title">StockJelli FAQ: Everything You Need to Know</h1>
+    <div class="blog-meta">Feb 9, 2026 · 5 min read</div>
+
+    <div class="blog-body">
+      <p>
+        Whether you just found StockJelli or you've been using the screener for a while, this page answers the most common questions we get. If something isn't covered here, feel free to reach out — we're always happy to help.
+      </p>
+
+      <h2>What is StockJelli?</h2>
+      <p>
+        StockJelli is a momentum screener for stocks and crypto. It surfaces tickers that are showing unusual upward price movement backed by volume — the two key ingredients of momentum. Think of it as a radar for what's moving right now, filtered to show only the moves that meet a minimum threshold of significance.
+      </p>
+      <p>
+        The screener has two tabs: <strong>Stocks</strong> and <strong>Crypto</strong>. Each applies different criteria appropriate to that asset class (different percentage thresholds, volume requirements, and market cap minimums). You can toggle between them at any time from the main page.
+      </p>
+
+      <h2>What is an SJ Score?</h2>
+      <p>
+        The SJ Score is StockJelli's proprietary momentum rating. Every ticker on the screener receives a score from <strong>1 to 10</strong> that tells you how strong the current move is at a glance. A higher score means stronger, more confirmed momentum — the kind of move that has both price action and volume working together.
+      </p>
+      <p>
+        Think of it as a quick filter: if you only have time to look at a few tickers, start with the highest SJ Scores. They represent the moves where the data is most aligned. For a deeper dive into how the score works, check out our full article on <a href="/blog/what-is-sj-score.html" style="color: #f0b90b;">SJ Score Explained</a>.
+      </p>
+
+      <h2>How is the SJ Score calculated?</h2>
+      <p>
+        The SJ Score weighs multiple factors including percentage price change, volume relative to average, market cap, and the consistency of the move. The exact formula is proprietary, but the general principle is straightforward: a stock or crypto needs both meaningful price movement <em>and</em> volume confirmation to score well. A 10% gainer on low volume won't score as high as an 8% gainer on 5x its average volume.
+      </p>
+      <p>
+        SJ Scores are dynamic — they update as the trading session progresses. A ticker might start the day at a 6 and climb to an 8 as volume builds, or fade from a 7 to a 4 as the move loses steam.
+      </p>
+
+      <h2>How often is the data updated?</h2>
+      <p>
+        It depends on the asset class:
+      </p>
+      <ul>
+        <li><strong>Stocks:</strong> Data updates during US market hours (9:30 AM – 4:00 PM ET, Monday through Friday). The screener is most active in the first 60–90 minutes after market open, when most momentum moves emerge.</li>
+        <li><strong>Crypto:</strong> Data updates around the clock, 24 hours a day, 7 days a week. Crypto markets never close, so the screener is always scanning for new entries — including weekends and holidays.</li>
+      </ul>
+      <p>
+        When markets are closed (evenings, weekends for stocks), the stocks tab will show the most recent session's data. The crypto tab always shows live data.
+      </p>
+
+      <h2>Can I get email alerts?</h2>
+      <p>
+        Yes. StockJelli offers email alert subscriptions that notify you when new tickers hit the screener. Instead of watching the page all day, you get a summary delivered to your inbox with the day's top momentum movers.
+      </p>
+      <p>
+        Alerts are available for both <strong>stocks</strong> and <strong>crypto</strong>, and you can subscribe to either or both. We also offer regional delivery windows:
+      </p>
+      <ul>
+        <li><strong>Americas:</strong> Alerts timed to US market hours.</li>
+        <li><strong>Global:</strong> Alerts timed for international users across different time zones.</li>
+      </ul>
+      <p>
+        Email alerts are a subscriber feature. You can sign up directly from the screener page.
+      </p>
+
+      <h2>Is StockJelli free?</h2>
+      <p>
+        The core screener is completely free. You can view all tickers, percentage changes, volume data, and news links without paying anything or creating an account. StockJelli's free tier gives you a fully functional momentum screener — no paywalls on the main data.
+      </p>
+      <p>
+        Subscriber features include <strong>SJ Scores</strong> (the 1–10 momentum rating) and <strong>email alerts</strong>. These are premium features designed for traders who want an extra layer of analysis and the convenience of inbox delivery. The subscription helps support the platform and keep the core screener free for everyone.
+      </p>
+
+      <h2>What are the minimum requirements for a ticker to appear?</h2>
+      <p>
+        Not every stock or crypto that moves shows up on StockJelli. The screener applies minimum filters to ensure that only meaningful moves are displayed:
+      </p>
+      <ul>
+        <li><strong>Stocks:</strong> Must be up at least 4% on the session with a minimum of 1 million shares traded. This filters out illiquid penny stocks and minor fluctuations.</li>
+        <li><strong>Crypto:</strong> Must be up at least 3% over 24 hours with sufficient volume relative to market cap. This accounts for crypto's higher baseline volatility while still capturing significant moves.</li>
+      </ul>
+      <p>
+        These thresholds are designed to surface genuine momentum — not noise. If a ticker doesn't appear on the screener, it hasn't met these minimum criteria.
+      </p>
+
+      <h2>Why do stocks and crypto have different thresholds?</h2>
+      <p>
+        Because they're fundamentally different markets. A 4% daily move on an individual stock is roughly 4–5x the average daily movement for most equities — that's notable. In crypto, a 4% move is closer to normal daily volatility for many tokens, so the threshold is set at 3% to capture meaningful moves without flooding the screener with routine fluctuations.
+      </p>
+      <p>
+        We cover this in detail in our article on <a href="/blog/crypto-vs-stocks-momentum" style="color: #f0b90b;">how momentum differs between crypto and stocks</a>.
+      </p>
+
+      <h2>What does the news column show?</h2>
+      <p>
+        On the stocks screener, each ticker includes a link to relevant news — earnings reports, analyst upgrades, FDA approvals, partnership announcements, or whatever catalyst is driving the move. This helps you quickly understand <em>why</em> something is moving, not just <em>that</em> it's moving.
+      </p>
+      <p>
+        On the crypto screener, you'll see a <strong>Market Cap</strong> column instead of news. Crypto catalysts are harder to aggregate from traditional news sources (they often originate on Twitter/X, Discord, or Telegram), so market cap serves as a more useful data point for quickly assessing the scale and relative risk of a token.
+      </p>
+
+      <h2>Does StockJelli provide buy or sell recommendations?</h2>
+      <p>
+        No. StockJelli is an <strong>educational and informational tool</strong>. The screener shows you what's moving with momentum — it does not tell you to buy or sell anything. Every ticker on the screener is data, not a recommendation.
+      </p>
+      <p>
+        How you use that data is up to you. Some traders use the screener to find potential entries. Others use it to monitor what sectors or themes are active. Some just use it to stay informed about market activity. StockJelli provides the signal — you provide the strategy and risk management.
+      </p>
+
+      <h2>Can I use StockJelli on mobile?</h2>
+      <p>
+        Yes. StockJelli is fully responsive and works on phones, tablets, and desktops. The screener, blog, and all features are accessible from any modern mobile browser — no app download required.
+      </p>
+
+      <h2>How do I cancel my subscription?</h2>
+      <p>
+        Subscription management is handled through Stripe, our payment processor. You can cancel anytime — there are no long-term contracts or cancellation fees. When you cancel, you'll retain access to subscriber features through the end of your current billing period.
+      </p>
+
+      <div class="blog-callout">
+        <div class="blog-callout-title">💡 Still have questions?</div>
+        <p style="margin:0; color: rgba(255,255,255,0.65); font-size: 0.9rem;">
+          We're building StockJelli to be as clear and useful as possible. If something isn't covered here, let us know — your question might help us improve the platform for everyone.
+        </p>
+      </div>
+
+      <p>
+        <em>StockJelli is an educational tool. This page is for informational purposes only and does not constitute financial advice.</em>
+      </p>
+
+      <div class="blog-bottom-cta">
+        <p>See what's moving right now</p>
+        <a href="/">Open the Screener</a>
+      </div>
+    </div>
+  </article>
+
+  <footer class="footer">
+    <div class="container footer-inner">
+      <p>Educational tool only. Not financial advice.</p>
+      <p class="muted">© 2026 StockJelli · <a href="/privacy.html" class="footer-link">Privacy</a> · <a href="/terms.html" class="footer-link">Terms</a></p>
+    </div>
+  </footer>
+
+</body>
+</html>

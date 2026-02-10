@@ -812,7 +812,9 @@ if (marketSessionText) {
   // ----------------------------
   // Polling + Mode switching
   // ----------------------------
-  let currentMode = "stocks";
+  const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || "";
+const isNorthAmerica = tz.startsWith("America/");
+let currentMode = isNorthAmerica ? "stocks" : "crypto";
   let pollTimer = null;
 
   async function refreshOnce() {

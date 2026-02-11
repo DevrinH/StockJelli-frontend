@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>Position Sizing: Why Small Wins Big | StockJelli Blog</title>
+  <meta name="description" content="Why position sizing matters more than picking winners. Learn how controlling trade size protects your capital, compounds gains, and separates profitable traders from blown-up accounts." />
+  <meta name="robots" content="index, follow" />
+  
+  <meta name="title" content="Position Sizing: Why Small Wins Big | StockJelli Blog" />
+  <meta name="keywords" content="position sizing, risk management, trade size, portfolio management, trading strategy, momentum trading, stock screener, risk per trade" />
+  <link rel="canonical" href="https://stockjelli.com/blog/position-sizing-why-small-wins-big.html" />
+  
+  <!-- Open Graph -->
+  <meta property="og:title" content="Position Sizing: Why Small Wins Big" />
+  <meta property="og:description" content="Why controlling your trade size matters more than your win rate — and how proper position sizing turns small, consistent gains into real portfolio growth." />
+  <meta property="og:image" content="https://stockjelli.com/blog/thumbs/position-sizing-why-small-wins-big.png" />
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://stockjelli.com/blog/position-sizing-why-small-wins-big.html" />
+  <meta property="og:site_name" content="StockJelli" />
+  
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Position Sizing: Why Small Wins Big" />
+  <meta name="twitter:description" content="Why controlling your trade size matters more than your win rate — and how proper position sizing turns small, consistent gains into real portfolio growth." />
+  <meta name="twitter:image" content="https://stockjelli.com/blog/thumbs/position-sizing-why-small-wins-big.png" />
+  
+  <link rel="icon" type="image/png" sizes="32x32" href="/StockJelli-S-Logo.png" />
+  <link rel="stylesheet" href="/style.css" />
+  <link rel="stylesheet" href="/blog.css" />
+  
+  <!-- Google Analytics (matching the main page) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-FM3HXT7ECV"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-FM3HXT7ECV', { anonymize_ip: true });
+  </script>
+  <script src="promo-toast.js" defer></script>
+  <script src="/blog-ticker.js" defer></script>
+
+</head>
+<body>
+
+  <header class="header">
+    <div class="header-inner">
+      <div class="header-left">
+        <a href="/" aria-label="StockJelli Home">
+          <img class="logo" src="/StockJelli-Logo.png" alt="StockJelli - Stock and Crypto Momentum Screener" width="150" height="32" />
+        </a>
+      </div>
+  
+      <div class="header-center market-indices">
+        <span id="idxLeft" class="idx">
+          <span id="idxLeftLabel">NASDAQ</span>
+          <span id="idxLeftValue" class="idx-value up">+1.24%</span>
+        </span>
+      
+        <span class="divider">|</span>
+      
+        <span id="idxRight" class="idx">
+          <span id="idxRightLabel">S&P 500</span>
+          <span id="idxRightValue" class="idx-value down">-0.31%</span>
+        </span>
+      </div>
+  
+      <div class="header-right">
+        <a href="/" style="color: rgba(255,255,255,0.6); text-decoration: none; font-size: 0.85rem;">← Back to Screener</a>
+      </div>
+    </div>
+  </header>
+
+
+  <div class="pulse-ticker" id="pulseTicker">
+    <div class="pulse-ticker-track" id="pulseTickerTrack">
+      <!-- JS fills this with scrolling items -->
+    </div>
+  </div>
+
+
+  <article class="blog-page">
+    <a href="/blog" class="blog-back">← All posts</a>
+
+    <img class="blog-hero-img" src="/blog/thumbs/position-sizing-why-small-wins-big.png" alt="Position Sizing: Why Small Wins Big" onerror="this.style.display='none'" />
+
+    <span class="blog-tag">Strategy</span>
+    <h1 class="blog-post-title">Position Sizing: Why Small Wins Big</h1>
+    <div class="blog-meta">Feb 9, 2026 · 7 min read</div>
+
+    <div class="blog-body">
+      <p>
+        There's a fantasy version of trading that a lot of beginners carry around: find the one perfect trade, go all in, and walk away rich. It's the single-bet mentality — the idea that conviction alone justifies concentration. In reality, this approach is the fastest way to blow up an account. The traders who actually survive and compound wealth over time do the opposite: they size small, spread risk across multiple trades, and let math do the heavy lifting.
+      </p>
+      <p>
+        Position sizing isn't glamorous. Nobody posts about it on social media. But it's the single most important skill that separates traders who last from traders who don't.
+      </p>
+
+      <h2>The Math Behind Blowing Up</h2>
+      <p>
+        Let's start with the uncomfortable math. If you put 100% of your account into one trade and it drops 50%, you've lost half your capital. To get back to breakeven, you now need a 100% return — not 50%. The recovery math is asymmetric, and it gets worse the deeper the hole.
+      </p>
+      <p>
+        Here's how the recovery curve looks:
+      </p>
+      <ul>
+        <li><strong>10% loss</strong> → needs 11% gain to recover</li>
+        <li><strong>25% loss</strong> → needs 33% gain to recover</li>
+        <li><strong>50% loss</strong> → needs 100% gain to recover</li>
+        <li><strong>75% loss</strong> → needs 300% gain to recover</li>
+        <li><strong>90% loss</strong> → needs 900% gain to recover</li>
+      </ul>
+      <p>
+        This is why a single oversized bet that goes wrong can effectively end a trading account. It's not that recovery is impossible — it's that the returns required become unrealistic, and the psychological damage of a massive drawdown almost always leads to worse decisions going forward.
+      </p>
+      <p>
+        Now compare that to risking 2% of your account per trade. Even five consecutive losses — which happens to every trader at some point — only draws your account down about 10%. That's recoverable. That's survivable. That keeps you in the game.
+      </p>
+
+      <h2>Why Small Positions Compound</h2>
+      <p>
+        The power of small position sizing isn't just about limiting damage — it's about enabling consistent compounding. Consider two traders starting with $10,000:
+      </p>
+      <p>
+        <strong>Trader A</strong> goes big. They put $5,000 (50% of their account) into each trade. They find two great trades that return 20% each — that's +$2,000 total. But then they hit one bad trade that drops 30%, costing them $1,500. Net result after three trades: +$500 (5% return), and they spent the whole time one bad trade away from catastrophe.
+      </p>
+      <p>
+        <strong>Trader B</strong> sizes small. They risk $1,000 (10% of their account) per trade across ten positions over the same period. Six trades make 8% each (+$480 total), and four trades lose 5% each (-$200 total). Net result: +$280 (2.8% return). Smaller absolute gain — but achieved with dramatically less risk, more data points to learn from, and a stable equity curve that compounds over weeks and months.
+      </p>
+      <p>
+        Over 50 trades, Trader B's approach — small gains, controlled losses, high frequency of at-bats — almost always outperforms Trader A's concentrated bets. Compounding works best when you avoid the big drawdowns that interrupt it.
+      </p>
+
+      <h2>The 1–2% Rule</h2>
+      <p>
+        The most widely used position sizing framework among professional traders is the percentage risk model. Here's how it works:
+      </p>
+      <p>
+        Decide the maximum percentage of your account you're willing to lose on any single trade — typically 1% for conservative traders and 2% for more aggressive ones. Then calculate your position size based on where your stop-loss is.
+      </p>
+      <p>
+        <strong>Example:</strong> You have a $20,000 account and you're willing to risk 1% per trade ($200). You want to buy a stock at $50 and your stop-loss is at $48 — a $2 risk per share. Your position size is $200 ÷ $2 = 100 shares ($5,000 position).
+      </p>
+      <p>
+        Notice what this does: the tighter your stop, the larger the position you can take. The wider your stop, the smaller the position. Your risk in dollar terms stays constant regardless of the setup. This means your account can absorb a string of losses without significant damage, and every trade carries the same weight in your portfolio.
+      </p>
+      <p>
+        This approach also forces you to define your stop-loss before entering — which, as we discussed in our article on <a href="/blog/why-most-day-traders-lose-money.html" style="color: #f0b90b;">why most day traders lose money</a>, is one of the most critical habits for survival.
+      </p>
+
+      <h2>Position Sizing for Crypto</h2>
+      <p>
+        Everything above applies to crypto, but with an important adjustment: crypto is more volatile, so the same percentage-based framework naturally produces smaller position sizes — and that's a feature, not a bug.
+      </p>
+      <p>
+        If you're trading a stock with typical daily moves of 2–3%, a stop-loss 3% below your entry might make sense. For a crypto token that regularly moves 10–15% in a day, your stop needs to be wider — maybe 8–10%. With the 1% risk rule, that wider stop automatically reduces your position size, keeping your dollar risk the same but accounting for the asset's volatility.
+      </p>
+      <p>
+        This is particularly important for altcoins showing up on StockJelli's crypto screener. A token that's gained 25% in 24 hours is already in a volatile state. Sizing into that move with a full-size stock position is a recipe for outsized losses if it reverses. Let the math dictate the size — not the excitement of the move.
+      </p>
+
+      <h2>Diversification Is Position Sizing Too</h2>
+      <p>
+        Position sizing isn't just about how much you put into one trade — it's about how your capital is distributed across all your open positions. Even if each individual trade is sized at 2% risk, holding ten correlated positions (say, ten tech stocks during a sector rotation) creates hidden concentration risk.
+      </p>
+      <p>
+        Smart traders think in terms of <strong>total portfolio risk</strong>. If you have five open positions each risking 2%, your total account risk is 10%. That's the real number to manage. Many professional traders cap total portfolio risk at 6–10%, meaning they might only hold three to five positions at a time — even if the screener is showing twenty interesting setups.
+      </p>
+      <p>
+        This connects back to the discipline of selectivity. A momentum screener surfaces opportunities; your position sizing rules determine which ones you actually take and how much capital you allocate. The screener shows you what's moving — you decide what fits within your risk budget.
+      </p>
+
+      <h2>The Psychology of Small</h2>
+      <p>
+        There's a psychological benefit to small position sizing that doesn't show up in any formula: it removes emotional pressure. When a single trade represents 2% of your account versus 50%, you make better decisions. You hold winners longer because you're not terrified of giving back a huge gain. You cut losers faster because the loss is small enough to accept without ego involvement.
+      </p>
+      <p>
+        The traders who blow up almost always describe the same feeling: they knew the position was too big, they felt the anxiety of watching every tick, and they made a bad decision under that pressure — usually holding a loser too long or selling a winner too early. Proper sizing eliminates this dynamic entirely. Each trade becomes one data point in a long series, not a life-or-death event.
+      </p>
+      <p>
+        This is also why paper trading or small-account trading is valuable for beginners. It's not just about practicing setups — it's about building the habit of treating each trade as statistically insignificant on its own, while the process is what matters.
+      </p>
+
+      <h2>Scaling Into Winners</h2>
+      <p>
+        One of the most effective techniques that proper position sizing enables is <strong>scaling</strong> — adding to winning positions rather than averaging into losers. Here's how it works:
+      </p>
+      <p>
+        You enter a position with your standard size (say, 1% risk). The trade moves in your favor and confirms the thesis — volume is increasing, the breakout is holding, momentum is building. You add a second position with another 1% risk, using the original entry as part of your new stop-loss calculation. Your total risk is still controlled, but your exposure to a winning move has increased.
+      </p>
+      <p>
+        This is the opposite of what losing traders do. Losing traders add to losers ("it's cheaper now, I'll average down") and take quick profits on winners. Winning traders cut losers fast and add to trades that are working. Position sizing makes this approach possible because each addition is calculated, not emotional.
+      </p>
+
+      <div class="blog-callout">
+        <div class="blog-callout-title">📊 Key Takeaway</div>
+        <p style="margin:0; color: rgba(255,255,255,0.65); font-size: 0.9rem;">
+          The single-bet approach feels exciting but destroys accounts. Small, consistent position sizing — risking 1–2% per trade — survives losing streaks, enables compounding, and removes the emotional pressure that leads to bad decisions. Ten controlled trades will almost always outperform one big bet over time. Size small, stay in the game, and let compounding do the work.
+        </p>
+      </div>
+
+      <h2>Putting It Into Practice</h2>
+      <p>
+        Here's a simple framework you can start using today. Before every trade, answer three questions: What's my entry price? Where's my stop-loss? And based on my 1–2% risk rule, how many shares or tokens should I buy? If the answer to that third question feels "too small," that's actually a sign you're doing it right.
+      </p>
+      <p>
+        Use StockJelli's screener to identify what's moving, then apply your sizing rules to determine whether the setup fits your risk budget. A stock up 8% on heavy volume might be a great momentum play — but if the logical stop-loss is 5% below current price and that requires a position size larger than your rules allow, it's not a trade for you today. There will always be another setup tomorrow.
+      </p>
+      <p>
+        The goal isn't to win big on any single trade. The goal is to win small, consistently, across hundreds of trades — and never take a loss large enough to set you back significantly. That's how professionals think about position sizing. And it's why small wins big.
+      </p>
+
+      <p>
+        <em>StockJelli is an educational tool. This article is for informational purposes only and does not constitute financial advice.</em>
+      </p>
+
+      <div class="blog-bottom-cta">
+        <p>See what's moving right now</p>
+        <a href="/">Open the Screener</a>
+      </div>
+    </div>
+  </article>
+
+  <footer class="footer">
+    <div class="container footer-inner">
+      <p>Educational tool only. Not financial advice.</p>
+      <p class="muted">© 2026 StockJelli · <a href="/privacy.html" class="footer-link">Privacy</a> · <a href="/terms.html" class="footer-link">Terms</a></p>
+    </div>
+  </footer>
+
+</body>
+</html>

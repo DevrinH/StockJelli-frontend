@@ -1374,7 +1374,7 @@
      21. SEGMENTED CONTROLS
      =========================================== */
   
-  .segmented { display: flex; flex-wrap: wrap; gap: 8px; }
+     .segmented { display: flex; flex-wrap: nowrap; gap: 8px; }
   
   .segmented-btn {
     border: 1px solid #1c2330; background: #121826; color: #cfd6e0;

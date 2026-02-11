@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>Real Breakout vs Fake Pump: How to Tell the Difference | StockJelli Blog</title>
+  <meta name="description" content="Not every big green candle is a real breakout. Learn how to distinguish genuine momentum from fake pumps using volume, liquidity, market context, and screener data." />
+  <meta name="robots" content="index, follow" />
+  
+  <meta name="title" content="Real Breakout vs Fake Pump: How to Tell the Difference | StockJelli Blog" />
+  <meta name="keywords" content="real breakout, fake pump, pump and dump, volume analysis, breakout trading, momentum screener, stock breakout, crypto pump, how to spot fake pumps" />
+  <link rel="canonical" href="https://stockjelli.com/blog/real-breakout-vs-fake-pump.html" />
+  
+  <!-- Open Graph -->
+  <meta property="og:title" content="Real Breakout vs Fake Pump: How to Tell the Difference" />
+  <meta property="og:description" content="Not every big move is worth chasing. Here's how to separate real breakouts from fake pumps using volume, liquidity, and market context." />
+  <meta property="og:image" content="https://stockjelli.com/blog/thumbs/real-breakout-vs-fake-pump.png" />
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://stockjelli.com/blog/real-breakout-vs-fake-pump.html" />
+  <meta property="og:site_name" content="StockJelli" />
+  
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Real Breakout vs Fake Pump: How to Tell the Difference" />
+  <meta name="twitter:description" content="Not every big move is worth chasing. Here's how to separate real breakouts from fake pumps using volume, liquidity, and market context." />
+  <meta name="twitter:image" content="https://stockjelli.com/blog/thumbs/real-breakout-vs-fake-pump.png" />
+  
+  <link rel="icon" type="image/png" sizes="32x32" href="/StockJelli-S-Logo.png" />
+  <link rel="stylesheet" href="/style.css" />
+  <link rel="stylesheet" href="/blog.css" />
+  
+  <!-- Google Analytics (matching the main page) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-FM3HXT7ECV"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-FM3HXT7ECV', { anonymize_ip: true });
+  </script>
+  <script src="promo-toast.js" defer></script>
+  <script src="/blog-ticker.js" defer></script>
+
+</head>
+<body>
+
+  <header class="header">
+    <div class="header-inner">
+      <div class="header-left">
+        <a href="/" aria-label="StockJelli Home">
+          <img class="logo" src="/StockJelli-Logo.png" alt="StockJelli - Stock and Crypto Momentum Screener" width="150" height="32" />
+        </a>
+      </div>
+  
+      <div class="header-center market-indices">
+        <span id="idxLeft" class="idx">
+          <span id="idxLeftLabel">NASDAQ</span>
+          <span id="idxLeftValue" class="idx-value up">+1.24%</span>
+        </span>
+      
+        <span class="divider">|</span>
+      
+        <span id="idxRight" class="idx">
+          <span id="idxRightLabel">S&P 500</span>
+          <span id="idxRightValue" class="idx-value down">-0.31%</span>
+        </span>
+      </div>
+  
+      <div class="header-right">
+        <a href="/" style="color: rgba(255,255,255,0.6); text-decoration: none; font-size: 0.85rem;">← Back to Screener</a>
+      </div>
+    </div>
+  </header>
+
+
+  <div class="pulse-ticker" id="pulseTicker">
+    <div class="pulse-ticker-track" id="pulseTickerTrack">
+      <!-- JS fills this with scrolling items -->
+    </div>
+  </div>
+
+
+  <article class="blog-page">
+    <a href="/blog" class="blog-back">← All posts</a>
+
+    <img class="blog-hero-img" src="/blog/thumbs/real-breakout-vs-fake-pump.png" alt="Real Breakout vs Fake Pump" onerror="this.style.display='none'" />
+
+    <span class="blog-tag">Education</span>
+    <h1 class="blog-post-title">Real Breakout vs Fake Pump: How to Tell the Difference</h1>
+    <div class="blog-meta">Feb 10, 2026 · 7 min read</div>
+
+    <div class="blog-body">
+      <p>
+        A stock is up 15%. A crypto token just doubled. The chart looks explosive and social media is on fire. The question that separates profitable traders from bag holders is simple: is this a real breakout or a fake pump?
+      </p>
+      <p>
+        Both look similar on the surface — big green candles, surging price, excitement everywhere. But underneath, they have very different mechanics. Real breakouts are driven by genuine demand and tend to hold or continue. Fake pumps are driven by manipulation, hype, or thin liquidity and tend to reverse hard. Learning to tell them apart is one of the most valuable skills you can develop as a trader.
+      </p>
+
+      <h2>The Volume Test</h2>
+      <p>
+        Volume is the single most reliable indicator for distinguishing real breakouts from fake pumps. It's the first thing you should check — before the chart pattern, before the news, before anything else.
+      </p>
+      <p>
+        A <strong>real breakout</strong> is accompanied by volume that is significantly above average. We're talking 3x, 5x, or even 10x the normal daily volume. This kind of participation means that real capital — institutional funds, algorithmic traders, serious retail — is flowing into the name. High volume on an up move indicates broad demand, not just a handful of accounts pushing price around.
+      </p>
+      <p>
+        A <strong>fake pump</strong> often moves price on surprisingly low volume, or volume that looks high in absolute terms but is actually thin relative to the stock's normal activity. This is especially common in low-float stocks and small-cap crypto tokens where a relatively small amount of money can move the price dramatically. If a token's price doubles but the dollar volume is only a few hundred thousand, the move is fragile — there's no depth behind it.
+      </p>
+      <p>
+        This is exactly why StockJelli enforces minimum volume thresholds. Stocks need at least 1 million shares traded to appear on the screener. For crypto, volume is evaluated relative to market cap. These filters exist specifically to screen out the low-liquidity moves that are most likely to be fake pumps.
+      </p>
+
+      <h2>Liquidity and Float Matter</h2>
+      <p>
+        Closely related to volume is liquidity — how easily a position can be entered and exited without significantly moving the price. Low-liquidity assets are the natural habitat of fake pumps.
+      </p>
+      <p>
+        In stocks, watch out for <strong>low-float names</strong> — companies with a very small number of shares available for trading. A stock with only 2 million shares in its float can spike 50% on a few hundred thousand dollars of buying pressure. It looks dramatic on a chart, but the move is built on sand. When buyers dry up, there's nobody left to support the price and it collapses just as fast.
+      </p>
+      <p>
+        In crypto, the equivalent is <strong>low market cap tokens</strong> with thin order books. A token with a $5 million market cap can be moved 100% by a single wallet. These are the assets that populate "top gainers" lists and attract FOMO buyers — who then become exit liquidity when the original buyer sells into the excitement.
+      </p>
+      <p>
+        Real breakouts happen in assets with enough liquidity that price movement requires genuine, broad-based demand. A mid-cap stock moving 8% on 5x volume is far more meaningful than a micro-cap moving 40% on a thin float.
+      </p>
+
+      <h2>The Catalyst Check</h2>
+      <p>
+        Real breakouts almost always have an identifiable catalyst — a reason for the move that makes fundamental sense. This might be a strong earnings report, an FDA approval, a major partnership, an analyst upgrade, or a sector-wide catalyst like a policy change.
+      </p>
+      <p>
+        The key word is <strong>identifiable</strong>. You should be able to find the catalyst within a few minutes of looking. StockJelli links to news sources for stock entries, which makes this check fast. If you see a stock up 12% and the linked article explains that they just beat earnings by 30% and raised guidance, that's a real catalyst backing a real move.
+      </p>
+      <p>
+        Fake pumps often have either <strong>no visible catalyst</strong> or a catalyst that doesn't justify the magnitude of the move. A press release about a vague "strategic partnership" that sends a micro-cap stock up 60%? Suspicious. A crypto token spiking because an influencer tweeted about it? That's social manipulation, not fundamental demand.
+      </p>
+      <p>
+        Not every real breakout has a catalyst you can find immediately — sometimes institutional buying precedes public news. But the absence of any logical explanation combined with low liquidity is a red flag worth paying attention to.
+      </p>
+
+      <h2>Strength vs. the Broader Market</h2>
+      <p>
+        One of the most underappreciated filters for separating real breakouts from fake pumps is <strong>relative strength</strong> — how the asset is performing compared to the broader market.
+      </p>
+      <p>
+        A stock breaking out to new highs on a day when the S&P 500 is also up is less impressive than a stock breaking out on a flat or red market day. When the tide is rising, everything floats. True relative strength means an asset is outperforming regardless of market conditions — it's moving on its own merit, not just riding the wave.
+      </p>
+      <p>
+        Fake pumps, by contrast, often happen in clusters during broad market rallies. When the market is hot, speculative money flows into the lowest-quality names. Everything goes up, traders feel invincible, and pump targets find their easiest victims. When the market pulls back even slightly, these fake moves evaporate first.
+      </p>
+      <p>
+        StockJelli displays live index data (NASDAQ, S&P 500, BTC) right in the header so you can instantly see the broader context. If you're seeing a screener entry on a day when the indices are red, that relative strength makes the signal more meaningful.
+      </p>
+
+      <h2>The Time Signature</h2>
+      <p>
+        How a move develops over time tells you a lot about whether it's real or manufactured.
+      </p>
+      <p>
+        <strong>Real breakouts</strong> tend to build. They might gap up on news, consolidate for 15–30 minutes as traders assess, then push higher on continued volume. There's a sense of sustained demand — each pullback is bought, and new highs are made on increasing participation. The intraday chart shows a staircase pattern: higher highs and higher lows.
+      </p>
+      <p>
+        <strong>Fake pumps</strong> tend to spike and fade. They shoot up in a near-vertical line — often in just a few minutes — then immediately begin to bleed. The intraday chart looks like a mountain peak: sharp up, sharp down. Volume is concentrated in the spike and drops off quickly. There's no consolidation, no base-building, no second wave of buying.
+      </p>
+      <p>
+        If you missed the initial move, this is actually useful information. A stock that's up 10% and has been holding those gains for an hour with steady volume is telling you something different than a stock that's up 10% but was up 20% thirty minutes ago and is already giving back half the move.
+      </p>
+
+      <h2>The Social Media Signal</h2>
+      <p>
+        Social media is both a tool and a trap when it comes to identifying breakouts versus pumps. The key is understanding the sequence.
+      </p>
+      <p>
+        For real breakouts, social media attention typically <strong>follows</strong> the move. The stock breaks out on news and volume, then traders start talking about it. The discussion is often analytical — people are citing the catalyst, looking at the chart, debating price targets. The social activity is a response to something that's already happening in the market.
+      </p>
+      <p>
+        For fake pumps, social media attention often <strong>precedes or drives</strong> the move. You'll see coordinated hype — multiple accounts posting about the same low-cap token simultaneously, influencers urging followers to buy "before it's too late," Telegram groups counting down to a "send." The social activity isn't a response to market data; it <em>is</em> the catalyst. And when the hype machine turns off, the price has nothing to sustain it.
+      </p>
+      <p>
+        A good rule of thumb: if you heard about a ticker on social media before you saw it on a screener, be extra skeptical. If you saw it on a screener first and then noticed social buzz building around it, that's a healthier sequence.
+      </p>
+
+      <h2>Red Flags Checklist</h2>
+      <p>
+        Here's a quick reference for warning signs that a move might be a fake pump rather than a real breakout:
+      </p>
+      <ul>
+        <li><strong>Low volume relative to the price move</strong> — big percentage gain on thin participation.</li>
+        <li><strong>Extremely low float or market cap</strong> — easy to manipulate with small amounts of capital.</li>
+        <li><strong>No identifiable catalyst</strong> — or a catalyst that doesn't match the size of the move.</li>
+        <li><strong>Spike-and-fade price action</strong> — sharp vertical move that immediately begins reversing.</li>
+        <li><strong>Coordinated social media hype</strong> — multiple accounts pushing the same ticker simultaneously.</li>
+        <li><strong>Move happens in after-hours or on thin markets</strong> — when liquidity is lowest and manipulation is easiest.</li>
+        <li><strong>The asset has a history of pump-and-dump patterns</strong> — check the 3-month chart for previous spikes that fully reversed.</li>
+      </ul>
+      <p>
+        No single red flag is conclusive on its own. But if a move checks three or more of these boxes, approach with extreme caution — or simply move on to the next opportunity.
+      </p>
+
+      <div class="blog-callout">
+        <div class="blog-callout-title">📊 Key Takeaway</div>
+        <p style="margin:0; color: rgba(255,255,255,0.65); font-size: 0.9rem;">
+          Real breakouts have high volume, identifiable catalysts, relative strength versus the broader market, and price action that builds over time. Fake pumps have thin liquidity, no clear catalyst, spike-and-fade charts, and are often driven by social media hype. The screener gets you in the door — but these filters help you decide which moves are worth your capital.
+        </p>
+      </div>
+
+      <h2>How StockJelli Helps Filter</h2>
+      <p>
+        StockJelli's screener is already doing some of this work for you. The minimum volume and market cap requirements filter out the thinnest, most manipulation-prone names. The <a href="/blog/what-is-sj-score.html" style="color: #f0b90b;">SJ Score</a> weighs volume confirmation alongside price movement, so a high-scoring entry is more likely to be a real breakout than a thin-volume spike.
+      </p>
+      <p>
+        But no screener can make the final call for you. The data gets you 80% of the way there — the last 20% is your judgment. Check the volume. Find the catalyst. Compare it to the broader market. Look at how the price is behaving over time. These checks take two minutes and can save you from being someone else's exit liquidity.
+      </p>
+      <p>
+        As we covered in our article on <a href="/blog/why-most-day-traders-lose-money.html" style="color: #f0b90b;">why most day traders lose money</a>, chasing pumps is one of the top reasons traders blow up. Learning to distinguish real breakouts from fake pumps is one of the most direct ways to stop making that mistake.
+      </p>
+
+      <p>
+        <em>StockJelli is an educational tool. This article is for informational purposes only and does not constitute financial advice.</em>
+      </p>
+
+      <div class="blog-bottom-cta">
+        <p>See what's moving right now</p>
+        <a href="/">Open the Screener</a>
+      </div>
+    </div>
+  </article>
+
+  <footer class="footer">
+    <div class="container footer-inner">
+      <p>Educational tool only. Not financial advice.</p>
+      <p class="muted">© 2026 StockJelli · <a href="/privacy.html" class="footer-link">Privacy</a> · <a href="/terms.html" class="footer-link">Terms</a></p>
+    </div>
+  </footer>
+
+</body>
+</html>

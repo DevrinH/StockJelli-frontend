@@ -1110,7 +1110,7 @@
    18. MARKET REGIME (replaces pricing CTA)
    =========================================== */
 
-   .market-regime { padding: 22px 0 40px; }
+   .market-regime { padding: 0 0 24px; }
 
    .regime-inner {
      display: flex;

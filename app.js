@@ -305,6 +305,56 @@ function renderSJScore(score, idx) {
   </span>`;
 }
 
+// ── Market Regime Indicator ──────────────────────────────────────────────
+function renderRegime(regime) {
+  const bar = document.getElementById("regimeBar");
+  const desc = document.getElementById("regimeDescription");
+  const subDetail = document.getElementById("regimeSubDetail");
+  
+  if (!bar || !regime) return;
+  
+  // Update active segment
+  bar.querySelectorAll(".regime-segment").forEach(seg => {
+    seg.classList.toggle("regime-active", seg.dataset.regime === regime.regime);
+  });
+  
+  // Update description
+  if (desc) {
+    desc.textContent = regime.description || "Analyzing market conditions…";
+  }
+  
+  // Update subscriber detail
+  if (subDetail) {
+    const isSubscriber = !!localStorage.getItem("sj_subscriber_email");
+    
+    if (isSubscriber) {
+      const impactClass = regime.sjMultiplier > 1
+        ? "regime-impact-positive"
+        : regime.sjMultiplier < 1
+          ? "regime-impact-negative"
+          : "regime-impact-neutral";
+      
+      subDetail.innerHTML = `<span class="regime-sub-text ${impactClass}">${regime.sjImpactLabel || ""}</span>`;
+    } else {
+      subDetail.innerHTML = `
+        <span class="regime-locked">
+          🔒 SJ impact hidden · <a href="#" id="regimeUnlockLink">Unlock with alerts →</a>
+        </span>
+      `;
+      
+      // Wire unlock link to alerts modal
+      const link = document.getElementById("regimeUnlockLink");
+      if (link) {
+        link.addEventListener("click", (e) => {
+          e.preventDefault();
+          const alertsBtn = document.getElementById("enableAlertsBtn");
+          if (alertsBtn) alertsBtn.click();
+        });
+      }
+    }
+  }
+}
+
 
   // Generate TradingView URL for a symbol
 // Generate TradingView URL for a symbol (with affiliate link)
@@ -821,11 +871,14 @@ let currentMode = isNorthAmerica ? "stocks" : "crypto";
     try {
       const path = buildApiPath(currentMode);
       const data = await apiGet(path);
-
+  
       applyHeaderFromApi(data);
-
+  
       if (currentMode === "crypto") renderCrypto(data.rows);
       else renderStocks(data.rows);
+      
+      // NEW: Render regime indicator
+      renderRegime(data.regime);
     } catch (e) {
       console.error("[StockJelli] refreshOnce failed:", e);
     }

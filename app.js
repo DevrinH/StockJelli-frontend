@@ -562,9 +562,9 @@ if (marketSessionText) {
   const tvLink = `https://www.tradingview.com/markets/stocks-usa/market-movers-active/?aff_id=${affiliateId}`;
   
   if (session === "premarket") {
-    marketSessionText.innerHTML = `Pre-Market — Showing last close · <a href="${tvLink}" target="_blank" rel="noopener" class="session-tv-link">Check live pre-market on TradingView ↗</a>`;
+    marketSessionText.innerHTML = `Pre-Market — Live extended hours prices`;
   } else if (session === "afterhours") {
-    marketSessionText.innerHTML = `After-Hours — Showing last close · <a href="${tvLink}" target="_blank" rel="noopener" class="session-tv-link">Check live after-hours on TradingView ↗</a>`;
+    marketSessionText.innerHTML = `After-Hours — Live extended hours prices`;
   } else {
     marketSessionText.textContent = data?.marketSessionLabel || "Market Closed";
   }

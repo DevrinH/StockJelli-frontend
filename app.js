@@ -926,8 +926,7 @@ let currentMode = isNorthAmerica ? "stocks" : "crypto";
     }
   }
 
-  shortenMobileHeaders();
-    startPolling();
+  
 
   function startPolling() {
     if (pollTimer) clearInterval(pollTimer);

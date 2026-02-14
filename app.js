@@ -420,6 +420,7 @@ tbody.innerHTML = rows.map((x, idx) => {
         </tr>
       `;
     }).join("");
+    trimMobileDecimals();  // ← add this
   }
 
 // Liquidity indicator dot for crypto
@@ -508,6 +509,9 @@ tbody.innerHTML = rows.map((x, idx) => {
       </tr>
     `;
   }).join("");
+
+  trimMobileDecimals();  // ← add this
+
 }
 
 
@@ -530,6 +534,18 @@ function trimMobileDecimals() {
       const num = parseFloat(match[1] + match[2]);
       el.textContent = (num >= 0 ? '+' : '') + num.toFixed(1) + '%';
     }
+  });
+}
+
+/** Mobile: shorten table header labels */
+function shortenMobileHeaders() {
+  if (window.innerWidth > 640) return;
+  document.querySelectorAll('.stocks-table thead th').forEach(th => {
+    const text = th.textContent.trim();
+    if (text === '% Change 24h') th.textContent = '% Chg';
+    if (text === '% Change')     th.textContent = '% Chg';
+    if (text === 'Vol 24h')      th.textContent = 'Vol';
+    if (text === 'Market Cap')   th.textContent = 'MCap';
   });
 }
 
@@ -909,6 +925,9 @@ let currentMode = isNorthAmerica ? "stocks" : "crypto";
       console.error("[StockJelli] refreshOnce failed:", e);
     }
   }
+
+  shortenMobileHeaders();
+    startPolling();
 
   function startPolling() {
     if (pollTimer) clearInterval(pollTimer);

@@ -792,20 +792,24 @@
     }
 
     /* First-child highlight border thinner */
-    tbody tr:first-child {
-      border-left-width: 2px;
-    }
-  }
+/* First-child highlight border thinner */
+tbody tr:first-child {
+  border-left-width: 2px;
+}
+}
 
-    /* Tighten % change column on mobile — JS handles decimal trimming */
-    .change-pct {
-      font-size: 0.75rem;
-    }
+/* Tighten % change column on mobile — JS handles decimal trimming */
+.change-pct {
+  font-size: 0.75rem;
+}
 
-    /* Shrink the range track a bit more to reduce squeeze */
-    .range-indicator {
-      min-width: 24px;
-    }
+/* Shrink the range track a bit more to reduce squeeze */
+.range-indicator {
+  min-width: 24px;
+}
+
+
+/* Extra-small phones (iPhone SE, etc) */
   
 
   /* Extra-small phones (iPhone SE, etc) */

@@ -957,6 +957,7 @@ let currentMode = isNorthAmerica ? "stocks" : "crypto";
 
     setUiDefaultsForMode(mode);
     localStorage.setItem("sj_asset_mode", mode);
+    shortenMobileHeaders();  // ← HERE
     startPolling();
   }
 

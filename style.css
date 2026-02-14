@@ -793,20 +793,23 @@
 
     /* First-child highlight border thinner */
 /* First-child highlight border thinner */
+/* First-child highlight border thinner */
 tbody tr:first-child {
   border-left-width: 2px;
 }
-}
 
-/* Tighten % change column on mobile — JS handles decimal trimming */
+/* Tighten % change column on mobile */
 .change-pct {
   font-size: 0.75rem;
 }
 
-/* Shrink the range track a bit more to reduce squeeze */
+/* Shrink the range track a bit more */
 .range-indicator {
   min-width: 24px;
 }
+}
+
+/* Extra-small phones (iPhone SE, etc) */
 
 
 /* Extra-small phones (iPhone SE, etc) */

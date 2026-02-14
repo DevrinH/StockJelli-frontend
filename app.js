@@ -510,6 +510,32 @@ tbody.innerHTML = rows.map((x, idx) => {
   }).join("");
 }
 
+
+/**
+ * Mobile: trim percent-change values to 1 decimal place
+ * Drop this into app.js wherever you build/update table rows,
+ * or call it after each data refresh.
+ *
+ * Example usage:
+ *   if (window.innerWidth <= 640) trimMobileDecimals();
+ */
+function trimMobileDecimals() {
+  if (window.innerWidth > 640) return;
+
+  document.querySelectorAll('.change-pct').forEach(el => {
+    const text = el.textContent.trim();
+    // Match patterns like +34.36% or -2.15%
+    const match = text.match(/^([+-]?)(\d+\.\d{2,})%$/);
+    if (match) {
+      const num = parseFloat(match[1] + match[2]);
+      el.textContent = (num >= 0 ? '+' : '') + num.toFixed(1) + '%';
+    }
+  });
+}
+
+// Run after each table render / data refresh
+// You can also integrate this directly into your renderStocksTable / renderCryptoTable functions
+
   // ----------------------------
   // Header indices
   // ----------------------------

@@ -783,9 +783,9 @@
       display: table-cell !important;
     }
     .sj-cell {
-      font-size: 0.55rem;
+      font-size: 0.65rem;
       padding: 1px 4px;
-      border-radius: 4px;
+      border-radius: 3px;
     }
     .sj-unlock-btn {
       font-size: 0.65rem;
@@ -796,6 +796,17 @@
       border-left-width: 2px;
     }
   }
+
+    /* Tighten % change column on mobile — JS handles decimal trimming */
+    .change-pct {
+      font-size: 0.75rem;
+    }
+
+    /* Shrink the range track a bit more to reduce squeeze */
+    .range-indicator {
+      min-width: 24px;
+    }
+  
 
   /* Extra-small phones (iPhone SE, etc) */
   @media (max-width: 380px) {

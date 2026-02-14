@@ -660,14 +660,15 @@
      9. TABLES
      =========================================== */
   
-  .table-wrap {
-    background: rgba(18, 24, 38, 0.65);
-    border: 1px solid rgba(255, 255, 255, 0.06);
-    border-radius: 14px;
-    overflow: hidden;
-    backdrop-filter: blur(8px);
-    animation: tableIn 150ms ease-out;
-  }
+     .table-wrap {
+      background: rgba(18, 24, 38, 0.88);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 14px;
+      overflow: hidden;
+      /* Remove backdrop-filter — causes column rendering bugs in Arc/Perplexity */
+      /* backdrop-filter: blur(8px); */
+      animation: tableIn 150ms ease-out;
+    }
   
   @keyframes tableIn {
     from { opacity: 0; transform: translateY(4px); }

@@ -1,6 +1,6 @@
 /* ============================================
    StockJelli — Complete Stylesheet (Clean)
-   Last updated: 2026-02-05
+   Last updated: 2026-02-13
    
    Table of contents:
    1. Reset & Base
@@ -219,7 +219,7 @@
       grid-template-rows: auto auto;
       align-items: center;
       gap: 8px 10px;
-      padding: 12px 14px;
+      padding: 10px 12px;
     }
   
     .header-left {
@@ -235,8 +235,8 @@
     }
   
     .header .logo {
-      height: 32px;
-      max-width: 180px;
+      height: 28px;
+      max-width: 160px;
     }
   
     .header-center {
@@ -248,10 +248,10 @@
       transform: none !important;
       display: inline-flex;
       align-items: baseline;
-      gap: 12px;
+      gap: 10px;
       white-space: nowrap;
       pointer-events: auto;
-      font-size: 14px;
+      font-size: 12px;
       opacity: 0.95;
     }
   }
@@ -563,8 +563,10 @@
   }
   
   @media (max-width: 640px) {
-    .hero-compact-inner { flex-direction: column; align-items: flex-start; gap: 4px; }
-    .hero-compact h1 { font-size: 1.25rem; }
+    .hero-compact { padding: 16px 0 0; }
+    .hero-compact-inner { flex-direction: column; align-items: flex-start; gap: 2px; }
+    .hero-compact h1 { font-size: 1.1rem; }
+    .hero-compact p { font-size: 0.72rem; }
   }
   
   /* Keep old hero styles for backwards compat if HTML not updated yet */
@@ -638,8 +640,10 @@
   .segmented-small { transform: scale(0.92); transform-origin: left center; }
   
   @media (max-width: 520px) {
-    .section-head-left { flex-direction: column; align-items: flex-start; gap: 10px; }
+    .section-head-left { flex-direction: column; align-items: flex-start; gap: 8px; }
     .segmented-small { transform: none; }
+    .section-head { margin-bottom: 10px; }
+    .section-head h2 { font-size: 1.15rem; }
   }
   
   .badge {
@@ -698,8 +702,113 @@
   .stocks-table td.ticker { font-weight: 700; letter-spacing: 0.02em; }
   .stocks-table td.news { max-width: 420px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 140px; }
   
+  /* Desktop: hide News on narrow-ish screens */
   @media (max-width: 640px) {
     .stocks-table th:nth-child(5), .stocks-table td:nth-child(5) { display: none; }
+  }
+
+  /* ===========================================
+     9b. MOBILE TABLE — COMPACT DENSITY
+     Inspired by Robinhood's tight mobile layout.
+     Show more rows per screen, keep all key data.
+     =========================================== */
+
+  @media (max-width: 640px) {
+    .table-wrap {
+      border-radius: 10px;
+    }
+
+    .stocks-table th, .stocks-table td {
+      padding: 8px 8px;
+      font-size: 0.75rem;
+      line-height: 1.3;
+    }
+
+    .stocks-table thead th {
+      font-size: 0.68rem;
+      padding: 6px 8px;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+      color: rgba(255, 255, 255, 0.4);
+    }
+
+    .stocks-table td.ticker {
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.01em;
+    }
+
+    /* Tighter ticker medal on mobile */
+    .stocks-table .ticker-medal {
+      font-size: 0.85rem;
+      margin-right: 2px;
+    }
+
+    /* Compact NEW badge on mobile */
+    .new-badge {
+      font-size: 0.48rem;
+      padding: 0px 4px;
+      letter-spacing: 0.3px;
+    }
+
+    /* Smaller liquidity dot */
+    .liquidity-dot {
+      width: 5px;
+      height: 5px;
+    }
+    .liquidity-wrap {
+      margin-left: 4px;
+    }
+
+    /* Compact change % */
+    .up, .down {
+      font-size: 0.75rem;
+    }
+
+    /* Range indicator — smaller on mobile */
+    .range-indicator {
+      min-width: 30px;
+      height: 12px;
+    }
+    .range-dot {
+      width: 5px;
+      height: 5px;
+    }
+    .change-wrap {
+      gap: 4px;
+    }
+
+    /* SJ column — show on mobile now with compact sizing */
+    .sj-header, td.sj {
+      display: table-cell !important;
+    }
+    .sj-cell {
+      font-size: 0.72rem;
+      padding: 2px 5px;
+      border-radius: 4px;
+    }
+    .sj-unlock-btn {
+      font-size: 0.65rem;
+    }
+
+    /* First-child highlight border thinner */
+    tbody tr:first-child {
+      border-left-width: 2px;
+    }
+  }
+
+  /* Extra-small phones (iPhone SE, etc) */
+  @media (max-width: 380px) {
+    .stocks-table th, .stocks-table td {
+      padding: 6px 5px;
+      font-size: 0.7rem;
+    }
+    .stocks-table thead th {
+      font-size: 0.62rem;
+    }
+    .stocks-table td.ticker {
+      font-size: 0.72rem;
+    }
   }
   
   
@@ -964,6 +1073,15 @@
   
   .live-update-badge.just-updated { border-color: rgba(34, 197, 94, 0.35); background: rgba(34, 197, 94, 0.12); }
   .live-update-badge.just-updated .live-text { color: rgba(34, 197, 94, 0.7); }
+
+  @media (max-width: 640px) {
+    .live-update-badge {
+      padding: 3px 8px;
+      gap: 4px;
+    }
+    .live-text { font-size: 0.65rem; }
+    .live-dot { width: 5px; height: 5px; }
+  }
   
   
   /* ===========================================
@@ -993,8 +1111,10 @@
   .inline-alert-sub { display: block; font-size: 0.75rem; color: rgba(255, 255, 255, 0.4); line-height: 1.4; margin-top: 2px; }
   
   @media (max-width: 600px) {
-    .inline-alert-cta { flex-direction: column; align-items: stretch; text-align: center; padding: 16px; gap: 12px; }
-    .inline-alert-left { flex-direction: column; gap: 6px; }
+    .inline-alert-cta { flex-direction: column; align-items: stretch; text-align: center; padding: 12px; gap: 10px; margin: 14px 0 18px; }
+    .inline-alert-left { flex-direction: column; gap: 4px; }
+    .inline-alert-title { font-size: 0.8rem; }
+    .inline-alert-sub { font-size: 0.7rem; }
   }
   
   
@@ -1038,6 +1158,13 @@
   .yesterday-chip-pct.down { color: #ef4444; }
   .yesterday-chip-price { font-size: 0.7rem; color: rgba(255, 255, 255, 0.3); }
   .yesterday-empty { font-size: 0.78rem; color: rgba(255, 255, 255, 0.25); padding: 8px 0; }
+  
+  @media (max-width: 640px) {
+    .yesterday-toggle-text { font-size: 0.75rem; }
+    .yesterday-date { font-size: 0.65rem; }
+    .yesterday-chip { padding: 4px 8px; font-size: 0.7rem; gap: 4px; }
+    .yesterday-chip-pct { font-size: 0.68rem; }
+  }
   
   
   /* ===========================================
@@ -1101,6 +1228,14 @@
     border: solid #4da3ff; border-width: 0 2px 2px 0; transform: rotate(45deg);
   }
   .check-text { color: #cfd6e0; font-size: 0.92rem; }
+
+  @media (max-width: 640px) {
+    .filters { padding: 12px; margin-top: 12px; border-radius: 10px; }
+    .filters-head h3 { font-size: 0.95rem; }
+    .filter-title { font-size: 0.78rem; }
+    .check-text { font-size: 0.82rem; }
+    .pill { padding: 5px 8px; font-size: 0.78rem; }
+  }
   
   
 /* ===========================================
@@ -1273,13 +1408,16 @@
    }
    
    @media (max-width: 640px) {
+     .regime-inner { padding: 16px; border-radius: 12px; }
      .regime-segment {
        flex: 1;
-       padding: 0 10px;
-       font-size: 0.68rem;
+       padding: 0 8px;
+       font-size: 0.62rem;
        letter-spacing: 0;
      }
-     .regime-bar { height: 34px; }
+     .regime-bar { height: 32px; }
+     .regime-heading { font-size: 0.76rem; }
+     .regime-description { font-size: 0.75rem; }
    }
   
   
@@ -1420,6 +1558,17 @@
     }
     .blog-card { flex: none; }
   }
+
+  @media (max-width: 640px) {
+    .blog-section { padding: 24px 0 8px; }
+    .blog-section-title { font-size: 0.95rem; }
+    .blog-see-all { font-size: 0.75rem; }
+    .blog-card { flex: 0 0 180px; }
+    .blog-card-body { padding: 8px 10px 10px; }
+    .blog-card-tag { font-size: 0.6rem; }
+    .blog-card-title { font-size: 0.75rem; }
+    .blog-card-date { font-size: 0.65rem; }
+  }
   
   .footer { padding: 18px 0; border-top: 1px solid #1c2330; }
   
@@ -1436,6 +1585,17 @@
   .footer-link:hover { opacity: 1; }
   
   .footer-links { display: flex; align-items: center; gap: 8px; }
+
+  @media (max-width: 640px) {
+    .footer { padding: 14px 0; }
+    .footer-inner {
+      flex-direction: column;
+      gap: 8px;
+      font-size: 0.75rem;
+      text-align: center;
+    }
+    .footer-links { gap: 6px; font-size: 0.72rem; flex-wrap: wrap; justify-content: center; }
+  }
   
   
   /* ===========================================
@@ -1537,6 +1697,11 @@
   }
   .segmented-btn:hover { background: rgba(255, 255, 255, 0.06); }
   .segmented-on { border-color: rgba(77, 163, 255, 0.55); background: rgba(77, 163, 255, 0.16); color: #e6f2ff; }
+
+  @media (max-width: 640px) {
+    .segmented { gap: 6px; }
+    .segmented-btn { padding: 7px 10px; font-size: 0.78rem; }
+  }
   
   
   /* ===========================================
@@ -1674,7 +1839,7 @@
   .btn:disabled { opacity: 0.6; cursor: not-allowed; }
   
   @media (max-width: 600px) {
-    .btn-sm { width: 100%; text-align: center; }
+    .btn-sm { width: 100%; text-align: center; padding: 7px 14px; font-size: 0.75rem; }
   }
   
   /* Input */
@@ -1737,6 +1902,13 @@
 
 .social-link:hover img {
   opacity: 0.85;
+}
+
+@media (max-width: 640px) {
+  .social-section { padding: 24px 16px 32px; }
+  .social-label { font-size: 0.75rem; margin-bottom: 12px; }
+  .social-link { width: 38px; height: 38px; border-radius: 10px; }
+  .social-link img { width: 18px; height: 18px; }
 }
 
 /* ===========================================
@@ -1813,7 +1985,7 @@
     transform: scale(1.15);
   }
   
-  /* Hide SJ column on very small screens */
+  /* Hide SJ column on very small screens — NOW OVERRIDDEN in 9b to show */
   @media (max-width: 640px) {
     .sj-header, td.sj { display: none; }
   }

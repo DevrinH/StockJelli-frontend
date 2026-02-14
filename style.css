@@ -41,7 +41,15 @@
   }
   
   body {
-    background: linear-gradient(180deg, #0b0e18 0%, #151d2d 100%);
+    margin: 0;
+    background: #0b0e18; /* Fallback solid color */
+    background-image:
+      radial-gradient(ellipse 70% 40% at 30% 0%, rgba(88, 60, 180, 0.06) 0%, transparent 50%),
+      radial-gradient(ellipse 60% 40% at 70% 20%, rgba(45, 120, 200, 0.05) 0%, transparent 50%),
+      linear-gradient(180deg, #0b0e18 0%, #0f1420 40%, #121826 70%, #151d2d 100%);
+    background-attachment: fixed;
+    color: #e6e8eb;
+    min-height: 100vh;
   }
   
   .muted { color: #8b95a5; }

@@ -24,7 +24,7 @@
    19. Footer
    20. Modals (alerts, legal, about, contact)
    21. Segmented Controls
-   22. Ad Rails (TradingView banners)
+   22. Rails (TradingView banners)
    23. Promo Toast
    24. Bookmark Prompt
    25. Utilities
@@ -81,17 +81,21 @@
   
   .page {
     display: grid;
-    grid-template-columns: 220px 1fr 220px;
+    grid-template-columns: 1fr;
     gap: 0;
+  }
+
+  /* 3-col layout only when side rails exist (resilient to ad blockers) */
+  .page:has(.side-rail-left) {
+    grid-template-columns: 220px 1fr 220px;
   }
   
   .content { min-width: 0; }
   
   @media (max-width: 1400px) {
-    .page { grid-template-columns: 1fr; }
-    .ad-rail { display: none !important; }
+    .page { grid-template-columns: 1fr !important; }
+    .side-rail { display: none !important; }
   }
-  
   
   /* ===========================================
      3. HEADER (sticky, opaque)
@@ -1724,7 +1728,7 @@ tbody tr:first-child {
   
   
   /* ===========================================
-     22. AD RAILS (TradingView banners)
+     22. RAILS (TradingView banners)
      =========================================== */
   
   .ad-rail {

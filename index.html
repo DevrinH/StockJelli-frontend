@@ -545,23 +545,29 @@
                 </div>
               </div>
           
-              <!-- Row 2: Volume -->
-              <div class="filter-card">
-                <div class="filter-title-row">
-                  <label class="filter-title" for="volRange">Volume (Min)</label>
-                </div>
-          
-                <div class="filter-control-row">
-                  <input id="volRange" class="slider" type="range" min="0" max="50000000" value="1000000" step="100000" />
-                  <div class="pill">
-                    <input class="num num-wide" type="number" value="1000000" min="0" step="100000" aria-label="Minimum volume" />+
-                  </div>
-                </div>
-          
-                <div class="filter-meta">
-                  <span class="muted">0</span><span class="muted">50M</span>
-                </div>
-              </div>
+<!-- Row 2: Volume -->
+<div class="filter-card">
+  <div class="filter-title-row">
+    <label class="filter-title" for="volRange">Volume (Min)</label>
+  </div>
+
+  <div class="filter-control-row">
+    <input id="volRange" class="slider" type="range" min="0" max="50000000" value="1000000" step="100000" />
+    <div class="pill">
+      <input class="num num-wide" type="number" value="1000000" min="0" step="100000" aria-label="Minimum volume" />+
+    </div>
+  </div>
+
+  <div class="filter-meta">
+    <span class="muted">0</span><span class="muted">50M</span>
+  </div>
+
+  <label class="check" style="margin-top: 8px;">
+    <input id="highVolChk" type="checkbox" />
+    <span class="check-ui"></span>
+    <span class="check-text">High volume only 🔥</span>
+  </label>
+</div>
           
               <!-- Row 2: Catalyst (checkboxes) -->
               <div class="filter-card">

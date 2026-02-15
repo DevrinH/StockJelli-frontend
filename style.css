@@ -2056,3 +2056,12 @@ tbody tr:first-child {
 .sj-header:hover .sj-header-tooltip {
   display: block;
 }
+
+
+
+/* Volume fire emoji */
+.vol-fire {
+  font-size: 0.85em;
+  cursor: help;
+  position: relative;
+}

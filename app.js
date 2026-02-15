@@ -12,20 +12,12 @@
 
   const MODE_DEFAULTS = {
     stocks: {
-      limit: 15,
-      pctMin: 4,
-      volMin: 1_000_000,
-      priceMax: 300,
-      mcapDial: 0,        // Changed from mcapMaxB to mcapDial (like crypto)
-      newsRequired: false,
+      limit: 15, pctMin: 4, volMin: 1_000_000, priceMax: 300, mcapDial: 0,
+      newsRequired: false, highVolumeOnly: false,
     },
     crypto: {
-      limit: 15,
-      pctMin: 3,
-      volMin: 1_000_000,
-      priceMax: 300,
-      mcapDial: 0,      // 0..1000 (log dial)
-      newsRequired: false,
+      limit: 15, pctMin: 3, volMin: 1_000_000, priceMax: 300, mcapDial: 0,
+      newsRequired: false, highVolumeOnly: false,
     },
   };
 
@@ -414,7 +406,7 @@ tbody.innerHTML = rows.map((x, idx) => {
               ${rangeHtml}
             </span>
           </td>
-          <td>${fmtVolumeCompact(x.volume)}</td>
+          <td>${fmtVolumeCompact(x.volume)}${renderVolumeFire(x.volume, x.avgVolume, x.marketCap, "stock")}</td>
           <td class="news">${newsHtml}</td>
           <td class="sj">${renderSJScore(x.sjScore, idx)}</td>
         </tr>
@@ -503,7 +495,7 @@ tbody.innerHTML = rows.map((x, idx) => {
             ${rangeHtml}
           </span>
         </td>
-        <td>${fmtVolumeCompact(x.volume)}${renderLiquidityDot(x.volume, x.marketCap)}</td>
+        <td>${fmtVolumeCompact(x.volume)}${renderVolumeFire(x.volume, null, x.marketCap, "crypto")}${renderLiquidityDot(x.volume, x.marketCap)}</td>
         <td>${fmtCompactUsd(x.marketCap, 1)}</td>
         <td class="sj">${renderSJScore(x.sjScore, idx)}</td>
       </tr>
@@ -512,6 +504,29 @@ tbody.innerHTML = rows.map((x, idx) => {
 
   trimMobileDecimals();  // ← add this
 
+}
+
+// Volume fire emoji — shows when volume is elevated vs average
+function renderVolumeFire(volume, avgVolume, marketCap, mode) {
+  if (!volume) return "";
+  
+  if (mode === "stock" && avgVolume && avgVolume > 0) {
+    const ratio = volume / avgVolume;
+    if (ratio >= 2.0) {
+      return ` <span class="vol-fire" title="🔥 Volume ${ratio.toFixed(1)}× above average">🔥</span>`;
+    }
+    return "";
+  }
+  
+  // Crypto: use vol/mcap ratio
+  if (mode === "crypto" && marketCap && marketCap > 0) {
+    const ratio = volume / marketCap;
+    if (ratio >= 0.30) {
+      return ` <span class="vol-fire" title="🔥 Elevated volume (${(ratio * 100).toFixed(0)}% of market cap)">🔥</span>`;
+    }
+  }
+  
+  return "";
 }
 
 
@@ -785,6 +800,8 @@ if (marketSessionText) {
   function readFiltersForMode(mode) {
     const d = MODE_DEFAULTS[mode];
   
+    const highVolumeOnly = filterEls.highVolChk ? !!filterEls.highVolChk.checked : false;
+  
     const limit = d.limit;
     const pctMin = d.pctMin;
   
@@ -820,6 +837,7 @@ if (marketSessionText) {
     p.set("volMin", String(f.volMin));
     p.set("priceMax", String(f.priceMax));
     p.set("newsRequired", f.newsRequired ? "true" : "false");
+    p.set("highVolumeOnly", f.highVolumeOnly ? "true" : "false");
     
     // Both modes now use mcapMin
     p.set("mcapMin", String(f.mcapMin));
@@ -913,13 +931,25 @@ let currentMode = isNorthAmerica ? "stocks" : "crypto";
     try {
       const path = buildApiPath(currentMode);
       const data = await apiGet(path);
-  
       applyHeaderFromApi(data);
-  
+      
+      let rows = data.rows;
+      
+      // Client-side high volume filter
+      const highVolOnly = filterEls.highVolChk?.checked || false;
+      if (highVolOnly && rows) {
+        rows = rows.filter(r => {
+          if (currentMode === "stocks") {
+            return r.avgVolume && r.avgVolume > 0 && r.volume >= 2 * r.avgVolume;
+          } else {
+            return r.marketCap && r.marketCap > 0 && (r.volume / r.marketCap) >= 0.30;
+          }
+        });
+      }
+      data.rows = rows;
+      
       if (currentMode === "crypto") renderCrypto(data.rows);
       else renderStocks(data.rows);
-      
-      // NEW: Render regime indicator
       renderRegime(data.regime);
     } catch (e) {
       console.error("[StockJelli] refreshOnce failed:", e);

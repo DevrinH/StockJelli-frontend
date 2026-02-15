@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>Updates & The Future of StockJelli | StockJelli Blog</title>
+  <meta name="description" content="What's new on StockJelli — volume surge indicators, the Market Regime Indicator, and what's coming next including re-entry alerts and premarket data." />
+  <meta name="robots" content="index, follow" />
+  
+  <meta name="title" content="Updates & The Future of StockJelli | StockJelli Blog" />
+  <meta name="keywords" content="StockJelli updates, volume surge indicator, market regime, re-entry alerts, premarket data, stock screener updates, momentum screener features" />
+  <link rel="canonical" href="https://stockjelli.com/blog/updates-and-future-of-stockjelli.html" />
+  
+  <!-- Open Graph -->
+  <meta property="og:title" content="Updates & The Future of StockJelli" />
+  <meta property="og:description" content="Volume surge indicators, Market Regime, re-entry alerts, and premarket data — here's what's new and what's coming to StockJelli." />
+  <meta property="og:image" content="https://stockjelli.com/blog/thumbs/updates-and-future-of-stockjelli.png" />
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://stockjelli.com/blog/updates-and-future-of-stockjelli.html" />
+  <meta property="og:site_name" content="StockJelli" />
+  
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Updates & The Future of StockJelli" />
+  <meta name="twitter:description" content="Volume surge indicators, Market Regime, re-entry alerts, and premarket data — here's what's new and what's coming to StockJelli." />
+  <meta name="twitter:image" content="https://stockjelli.com/blog/thumbs/updates-and-future-of-stockjelli.png" />
+  
+  <link rel="icon" type="image/png" sizes="32x32" href="/StockJelli-S-Logo.png" />
+  <link rel="stylesheet" href="/style.css" />
+  <link rel="stylesheet" href="/blog.css" />
+  
+  <!-- Google Analytics (matching the main page) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-FM3HXT7ECV"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-FM3HXT7ECV', { anonymize_ip: true });
+  </script>
+  <script src="promo-toast.js" defer></script>
+  <script src="/blog-ticker.js" defer></script>
+
+</head>
+<body>
+
+  <header class="header">
+    <div class="header-inner">
+      <div class="header-left">
+        <a href="/" aria-label="StockJelli Home">
+          <img class="logo" src="/StockJelli-Logo.png" alt="StockJelli - Stock and Crypto Momentum Screener" width="150" height="32" />
+        </a>
+      </div>
+  
+      <div class="header-center market-indices">
+        <span id="idxLeft" class="idx">
+          <span id="idxLeftLabel">NASDAQ</span>
+          <span id="idxLeftValue" class="idx-value up">+1.24%</span>
+        </span>
+      
+        <span class="divider">|</span>
+      
+        <span id="idxRight" class="idx">
+          <span id="idxRightLabel">S&P 500</span>
+          <span id="idxRightValue" class="idx-value down">-0.31%</span>
+        </span>
+      </div>
+  
+      <div class="header-right">
+        <a href="/" style="color: rgba(255,255,255,0.6); text-decoration: none; font-size: 0.85rem;">← Back to Screener</a>
+      </div>
+    </div>
+  </header>
+
+
+  <div class="pulse-ticker" id="pulseTicker">
+    <div class="pulse-ticker-track" id="pulseTickerTrack">
+      <!-- JS fills this with scrolling items -->
+    </div>
+  </div>
+
+
+  <article class="blog-page">
+    <a href="/blog" class="blog-back">← All posts</a>
+
+    <img class="blog-hero-img" src="/blog/thumbs/updates-and-future-of-stockjelli.png" alt="Updates and The Future of StockJelli" onerror="this.style.display='none'" />
+
+    <span class="blog-tag">Updates</span>
+    <h1 class="blog-post-title">Updates & The Future of StockJelli</h1>
+    <div class="blog-meta">Feb 15, 2026 · 5 min read</div>
+
+    <div class="blog-body">
+      <p>
+        StockJelli is evolving. We've been shipping features, collecting data, and listening to how traders use the screener — and we're excited to share what's new and what's coming next. This post covers the latest updates that are live right now, plus a look at the roadmap features we're actively building.
+      </p>
+
+      <h2>🔥 New: Volume Surge Indicator</h2>
+      <p>
+        You'll now see a 🔥 fire emoji next to the volume number in the Vol column when a stock or crypto is trading on unusually high volume. This isn't just "above average" — the indicator fires when volume is significantly elevated relative to what's normal for that ticker, signaling that something meaningful is happening with participation.
+      </p>
+      <p>
+        Why does this matter? As we've discussed across several articles on this blog, volume is the single most important confirmation signal for momentum. A stock up 8% on normal volume is a very different situation than a stock up 8% on 5x its average volume. The first might fade by lunch. The second has real capital behind it and is far more likely to sustain.
+      </p>
+      <p>
+        The volume surge indicator gives you that information at a glance — no mental math required. When you're scanning the screener and see the 🔥 next to a ticker's volume, it means: this move has unusually strong participation. It's a quick filter for prioritizing which entries deserve a closer look.
+      </p>
+      <p>
+        This feature is available to all users on both the stocks and crypto tabs.
+      </p>
+
+      <h2>📊 New: Market Regime Indicator</h2>
+      <p>
+        The Market Regime Indicator is now live on the screener. It sits between the pulse ticker and the screener table, providing an at-a-glance read on the current market environment. The regime is classified into one of four states:
+      </p>
+      <ul>
+        <li><strong>🟢 Expansion</strong> — Broad momentum across the market. Breakouts have the highest probability of follow-through.</li>
+        <li><strong>🟡 Rotation</strong> — Mixed signals. Some sectors are working, others aren't. Be selective.</li>
+        <li><strong>🟠 Caution</strong> — Market is weak but individual movers exist. Momentum may not sustain — tighten stops.</li>
+        <li><strong>🔴 Contraction</strong> — Risk-off environment. Few movers, low breadth. The best trade may be no trade.</li>
+      </ul>
+      <p>
+        The regime is computed in real time from three signals StockJelli already tracks: the index trend (NASDAQ for stocks, BTC for crypto), breadth (how many tickers are qualifying on the screener), and the spread between top movers. No new data sources needed — it's a smarter lens on the data you're already seeing.
+      </p>
+      <p>
+        For free users, the regime label is visible — you can see which state the market is in. For subscribers, the regime goes deeper: it directly adjusts SJ Scores with multipliers that reflect the current environment. During Expansion, scores get a boost (+8%). During Contraction, scores are reduced (-15%). This means your SJ Scores automatically account for market conditions — a 7 during Expansion carries more weight than a 7 during Contraction.
+      </p>
+      <p>
+        We wrote a full deep-dive on how the regime works — check out <a href="/blog/market-regime-indicator.html" style="color: #f0b90b;">Market Regime Indicator: How StockJelli Reads the Room</a> for the complete breakdown.
+      </p>
+
+      <h2>🔄 Coming Soon: Re-Entry Alerts</h2>
+      <p>
+        This is the feature we're most excited about on the roadmap. We're actively collecting data on every stock and crypto that enters the screener — tracking not just the initial appearance, but whether that ticker comes back and hits the screener again on a subsequent day.
+      </p>
+      <p>
+        Why? Because <strong>re-entries are one of the strongest signals in momentum trading</strong>. A stock that qualifies for the screener once might be having a single good day. A stock that qualifies on Monday, pulls back Tuesday, and re-enters the screener on Wednesday is showing persistent momentum — the kind of strength that suggests institutional accumulation or a sustained catalyst, not just a one-day spike.
+      </p>
+      <p>
+        Here's how it will work: when a ticker re-enters the screener, you'll see a small number badge on the top-left corner of its SJ Score — indicating which entry this is (2nd, 3rd, 4th, etc.). A "2" means this is the second time it's appeared on the screener this week. A "3" means third.
+      </p>
+      <p>
+        This turns the screener into a swing trading tool, not just a day trading scanner. A ticker with a high SJ Score and a "3" badge is telling you something powerful: this asset has sustained, repeating momentum with volume confirmation across multiple sessions. That's the kind of setup that serious traders build positions around.
+      </p>
+      <p>
+        We're collecting the data now to validate the pattern and calibrate the feature. The goal is to launch re-entry alerts in the coming weeks.
+      </p>
+
+      <h2>🌅 On the Horizon: Premarket Data</h2>
+      <p>
+        One of the most requested features from stock traders: <strong>premarket screener data</strong>. Currently, StockJelli's stock screener activates at market open (9:30 AM ET). But many of the biggest momentum moves begin in the premarket session (4:00–9:30 AM ET) — stocks gapping up on earnings, news, or analyst activity before most traders are even watching.
+      </p>
+      <p>
+        We're working on integrating premarket data through Polygon.io, which would allow StockJelli to surface momentum stocks before the opening bell. Imagine seeing a stock up 12% on heavy premarket volume at 8:00 AM, giving you 90 minutes to research the catalyst, plan your entry, and set your levels before the rest of the market reacts.
+      </p>
+      <p>
+        This is a revenue-dependent feature — premarket data feeds carry additional costs — so we're scaling toward it as the platform grows. It's on the roadmap and actively being planned.
+      </p>
+
+      <h2>Refining the SJ Score</h2>
+      <p>
+        Behind the scenes, every screener entry is being logged and tracked — not just for the weekly reports, but to refine the <a href="/blog/what-is-sj-score.html" style="color: #f0b90b;">SJ Score</a> itself. We're building a dataset of thousands of momentum entries with full metadata: entry price, peak price, volume, market cap, range position, time of entry, whether it had a news catalyst, and whether the move sustained.
+      </p>
+      <p>
+        This data will allow us to continuously improve the scoring algorithm. Which factors actually predict follow-through? Does high range position at entry correlate with continuation? Do entries with news catalysts outperform those without? Is there an optimal volume threshold where momentum becomes more reliable?
+      </p>
+      <p>
+        The answers to these questions will be baked directly into future versions of the SJ Score, making it more accurate over time. The more data we collect, the better the score becomes — and every week of screener activity adds to that dataset.
+      </p>
+
+      <div class="blog-callout">
+        <div class="blog-callout-title">📋 Summary</div>
+        <p style="margin:0; color: rgba(255,255,255,0.65); font-size: 0.9rem;">
+          <strong>Live now:</strong> Volume surge 🔥 indicators in the Vol column and the four-state Market Regime Indicator with SJ Score adjustments for subscribers.<br><br>
+          <strong>Coming soon:</strong> Re-entry alert badges showing how many times a ticker has hit the screener, turning StockJelli into a swing trading tool.<br><br>
+          <strong>On the horizon:</strong> Premarket stock data via Polygon.io, giving you a head start before market open.
+        </p>
+      </div>
+
+      <h2>Built in Public</h2>
+      <p>
+        StockJelli is a small, independent platform — and we're building it in the open. Every feature ships because it makes the screener more useful for traders, not because it looks good in a pitch deck. Your subscription directly funds development, and the feedback from our early subscribers has shaped every feature on this list.
+      </p>
+      <p>
+        If there's something you want to see on StockJelli — a feature, a data point, a different way of looking at momentum — let us know. The roadmap is driven by what traders actually need.
+      </p>
+
+      <p>
+        <em>StockJelli is an educational tool. This article is for informational purposes only and does not constitute financial advice.</em>
+      </p>
+
+      <div class="blog-bottom-cta">
+        <p>See the new features in action</p>
+        <a href="/">Open the Screener</a>
+      </div>
+    </div>
+  </article>
+
+  <footer class="footer">
+    <div class="container footer-inner">
+      <p>Educational tool only. Not financial advice.</p>
+      <p class="muted">© 2026 StockJelli · <a href="/privacy.html" class="footer-link">Privacy</a> · <a href="/terms.html" class="footer-link">Terms</a></p>
+    </div>
+  </footer>
+
+</body>
+</html>

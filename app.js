@@ -151,6 +151,7 @@ localStorage.setItem(LAST_VISIT_KEY, new Date().toISOString());
     priceRange: document.getElementById("priceRange"),
     volRange: document.getElementById("volRange"),
     newsRequiredChk: document.getElementById("newsRequiredChk"),
+    highVolChk: document.getElementById("highVolChk"),
 
     applyBtn: document.getElementById("filtersApplyBtn"),
     resetBtn: document.getElementById("filtersResetBtn"),
@@ -767,7 +768,9 @@ if (marketSessionText) {
     if (filterEls.newsRequiredChk) {
       filterEls.newsRequiredChk.checked = !!d.newsRequired;
     }
-
+    if (filterEls.highVolChk) {
+      filterEls.highVolChk.checked = !!d.highVolumeOnly;
+    }
     // Update all filter UIs for the current mode
     setMcapUiForMode(mode);
     setPriceUiForMode(mode);

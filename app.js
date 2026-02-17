@@ -522,13 +522,17 @@ function renderRvol(volume, avgVolume, marketCap, mode) {
 
   if (mode === "stock") {
     // Prefer avgVolume ratio if available
-    if (avgVolume && avgVolume > 0) {
-      const ratio = volume / avgVolume;
-      let tier = "rvol-normal";
-      let suffix = "";
-      if (ratio >= 3.0) { tier = "rvol-hot"; suffix = " 🔥"; }
-      else if (ratio >= 1.5) { tier = "rvol-warm"; }
-      return `<span class="${tier}" title="Volume is ${ratio.toFixed(1)}× the average">${ratio.toFixed(1)}x${suffix}</span>`;
+    if (mode === "stock") {
+      if (avgVolume && avgVolume > 0) {
+        const ratio = volume / avgVolume;
+        let tier = "rvol-normal";
+        let suffix = "";
+        if (ratio >= 3.0) { tier = "rvol-hot"; suffix = " 🔥"; }
+        else if (ratio >= 1.5) { tier = "rvol-warm"; }
+        return `<span class="${tier}" title="Volume is ${ratio.toFixed(1)}× the average">${ratio.toFixed(1)}x${suffix}</span>`;
+      }
+      // No avgVolume available — show dash instead of misleading vol/mcap ratio
+      return '<span class="rvol-normal" title="Average volume data unavailable">—</span>';
     }
     // Fallback: vol/mcap ratio
     if (marketCap && marketCap > 0) {

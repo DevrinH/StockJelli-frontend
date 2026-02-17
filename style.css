@@ -780,18 +780,18 @@
 
     /* SJ column — show on mobile now with compact sizing */
     .stocks-table .sj-cell {
-      font-size: 0.42rem;
-      padding: 1px 3px;
-      border-radius: 2px;
-      min-width: 16px;
+      font-size: 0.62rem;
+      padding: 2px 5px;
+      border-radius: 3px;
+      min-width: 22px;
       text-align: center;
   }
   
   .stocks-table .sj-unlock-btn {
-      font-size: 0.38rem;
+      font-size: 0.55rem;
   }
   .stocks-table .sj-blurred {
-      font-size: 0.42rem;
+      font-size: 0.62rem;
   }
  
 

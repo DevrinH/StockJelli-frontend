@@ -549,12 +549,11 @@ function renderRvol(volume, avgVolume, marketCap, mode) {
 
   if (mode === "crypto" && marketCap && marketCap > 0) {
     const ratio = volume / marketCap;
-    const pct = (ratio * 100).toFixed(0);
     let tier = "rvol-normal";
     let suffix = "";
     if (ratio >= 0.50) { tier = "rvol-hot"; suffix = " 🔥"; }
     else if (ratio >= 0.15) { tier = "rvol-warm"; }
-    return `<span class="${tier}" title="24h volume is ${pct}% of market cap">${pct}%${suffix}</span>`;
+    return `<span class="${tier}" title="24h volume is ${ratio.toFixed(2)}× market cap">${ratio.toFixed(1)}x${suffix}</span>`;
   }
 
   return '<span class="rvol-normal">—</span>';

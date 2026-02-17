@@ -30,8 +30,6 @@
       return `${n > 0 ? "+" : ""}${Number(n).toFixed(1)}%`;
     }
   
-    // Generate pulse summary from actual live data
-    // Rows are already filtered by the backend — just use what we get
     function buildPulseSummary(stocks, crypto, isMarketOpen) {
       const allStocks = (stocks || []).filter(r => r.pctChange > 0).sort((a,b) => b.pctChange - a.pctChange);
       const allCrypto = (crypto || []).filter(r => r.pctChange > 0).sort((a,b) => b.pctChange - a.pctChange);
@@ -41,7 +39,6 @@
         return isMarketOpen ? "Scanning for momentum…" : "Markets closed · Watching crypto";
       }
   
-      // Merge and find absolute leader
       const allMovers = [
         ...allStocks.map(r => ({ sym: r.symbol, pct: r.pctChange })),
         ...allCrypto.map(r => ({ sym: r.coinSymbol || r.symbol, pct: r.pctChange })),
@@ -68,12 +65,10 @@
     function buildItems(stocks, crypto, isMarketOpen) {
       const items = [];
   
-      // Build pulse summary from actual data
       const summary = buildPulseSummary(stocks, crypto, isMarketOpen);
       items.push(`<span class="ticker-pulse-text"><span class="ticker-pulse-dot"></span>${summary}</span>`);
       items.push(`<span class="ticker-separator"></span>`);
   
-      // Show up to 8 stocks — all positive movers the API returned
       const medals = ["🥇", "🥈", "🥉"];
       const topS = (stocks || []).filter(r => r.pctChange > 0).sort((a,b) => b.pctChange - a.pctChange).slice(0, 8);
       for (let i = 0; i < topS.length; i++) {
@@ -84,7 +79,6 @@
   
       if (topS.length > 0 && crypto?.length > 0) items.push(`<span class="ticker-separator"></span>`);
   
-      // Show up to 8 crypto — all positive movers the API returned
       const topC = (crypto || []).filter(r => r.pctChange > 0).sort((a,b) => b.pctChange - a.pctChange).slice(0, 8);
       for (let i = 0; i < topC.length; i++) {
         const c = topC[i];
@@ -95,23 +89,19 @@
       return items;
     }
   
-    // Detect if US stock market is currently open
     function isUSMarketOpen() {
       const now = new Date();
       const et = new Date(now.toLocaleString("en-US", { timeZone: "America/New_York" }));
       const day = et.getDay();
       const h = et.getHours(), m = et.getMinutes();
       const mins = h * 60 + m;
-      // Mon–Fri, 9:30 AM – 4:00 PM ET
       return day >= 1 && day <= 5 && mins >= 570 && mins < 960;
     }
   
     async function fetchTicker() {
       try {
-        // Read current filter values from the page if available, otherwise use relaxed defaults
-        // This ensures the ticker matches what the user sees in the table
         const stockMcap = document.getElementById("mcapSlider")?.value || 100000000;
-        const cryptoMcap = 50000000; // Low enough to catch small-cap movers like SKR
+        const cryptoMcap = 50000000;
   
         const [s, c] = await Promise.all([
           fetch(`https://api.stockjelli.com/api/stocks?limit=20&mcapMin=${stockMcap}`, {cache:"no-store"}).then(r => r.ok ? r.json() : null).catch(() => null),
@@ -123,7 +113,6 @@
         }
         const onePass = items.join("");
   
-        // Repeat content enough times to fill wide screens (min 3x)
         const viewW = window.innerWidth || 1920;
         track.innerHTML = onePass;
         const contentW = track.scrollWidth || viewW;
@@ -132,7 +121,6 @@
   
         ticker.style.display = "";
         requestAnimationFrame(() => {
-          // Calculate one pass width and set scroll distance
           const onePassEl = document.createElement("div");
           onePassEl.style.cssText = "display:inline-flex;visibility:hidden;position:absolute";
           onePassEl.innerHTML = onePass;
@@ -140,9 +128,7 @@
           const onePassW = onePassEl.scrollWidth;
           onePassEl.remove();
   
-          // Set the scroll distance to exactly one pass
           track.style.setProperty("--ticker-scroll", `-${onePassW}px`);
-          // Speed: ~45px/sec
           const dur = Math.max(12, onePassW / 45);
           track.style.animationDuration = `${dur}s`;
           track.style.animationName = "tickerScroll";
@@ -196,18 +182,17 @@
     assetControl.addEventListener("click", (e) => {
       const btn = e.target.closest(".segmented-btn");
       if (!btn) return;
-      // Re-trigger the tableIn animation by briefly removing and re-adding it
       const wrap = document.querySelector(".table-wrap");
       if (wrap) {
         wrap.style.animation = "none";
-        wrap.offsetHeight; // force reflow
+        wrap.offsetHeight;
         wrap.style.animation = "";
       }
     });
   })();
   
   
-  // 4. YESTERDAY'S TOP MOVERS (always visible, respects Stocks/Crypto toggle)
+  // 4. YESTERDAY'S TOP MOVERS
   (function initYesterday() {
     const section = document.getElementById("yesterdaySection");
     const body = document.getElementById("yesterdayBody");
@@ -220,7 +205,6 @@
     const assetControl = document.getElementById("assetControl");
     if (!section || !body) return;
   
-    // Remove toggle behavior — always open
     body.style.display = "";
   
     let hasStocks = false;
@@ -267,7 +251,6 @@
         if (!d.available) return;
         if (dateEl) dateEl.textContent = fmtDate(d.date);
   
-        // Limit to 6 each
         const stocks = (d.stocks || []).slice(0, 6);
         const crypto = (d.crypto || []).slice(0, 6);
         hasStocks = stocks.length > 0;
@@ -309,59 +292,73 @@
     }, 90_000);
   })();
 
-  // ── EKG ANIMATION ENGINE ─────────────────────────────────────────────────────
-// Append this to feature-additions.js
+
+  // ── 6. EKG ANIMATION ENGINE ─────────────────────────────────────────────────
+  // IMPORTANT: This needs its own copy of REGIME_CONFIG since app.js's is
+  // inside a closure and not accessible from here.
 
 (function initMarketPulseEKG() {
   const canvas = document.getElementById("pulseEkgCanvas");
   if (!canvas) return;
 
+  // Local regime config for the EKG (matches app.js REGIME_CONFIG)
+  const EKG_REGIME_CONFIG = {
+    expansion: {
+      color: "#22c55e", colorRgb: "34, 197, 94",
+      bpm: 62, amplitude: 0.35, frequency: 0.07, spikeStrength: 0.25, noise: 0.02,
+    },
+    rotation: {
+      color: "#3b82f6", colorRgb: "59, 130, 246",
+      bpm: 78, amplitude: 0.45, frequency: 0.10, spikeStrength: 0.35, noise: 0.05,
+    },
+    caution: {
+      color: "#f59e0b", colorRgb: "245, 158, 11",
+      bpm: 95, amplitude: 0.55, frequency: 0.15, spikeStrength: 0.45, noise: 0.10,
+    },
+    contraction: {
+      color: "#ef4444", colorRgb: "239, 68, 68",
+      bpm: 120, amplitude: 0.75, frequency: 0.22, spikeStrength: 0.6, noise: 0.18,
+    },
+  };
+
   const ctx = canvas.getContext("2d");
-  let currentRegime = "rotation"; // default until first data arrives
   let targetRegime = "rotation";
   let animFrame = null;
 
-  // EKG data buffer — stores Y values as the "heartbeat" scrolls
   const BUFFER_SIZE = 300;
   const buffer = new Float32Array(BUFFER_SIZE);
   let writeHead = 0;
   let tick = 0;
 
-  // Interpolated config values (smooth transitions between regimes)
+  // Interpolated config values
   let liveAmplitude = 0.45;
   let liveFrequency = 0.10;
   let liveSpikeStrength = 0.35;
   let liveNoise = 0.05;
   let liveColorR = 59, liveColorG = 130, liveColorB = 246;
 
-  // Expose regime setter for renderRegime() to call
+  // Expose regime setter for renderRegime() in app.js to call
   window.__pulseEkgSetRegime = function (regimeKey) {
-    if (REGIME_CONFIG[regimeKey]) {
+    if (EKG_REGIME_CONFIG[regimeKey]) {
       targetRegime = regimeKey;
     }
   };
 
-  // Generate one sample of the EKG waveform
   function generateSample(t, amp, freq, spike, noise) {
-    // Base sine wave (heartbeat rhythm)
     const base = Math.sin(t * freq) * amp;
-
-    // Sharp spike on the positive phase (the "QRS complex" look)
     const phase = Math.sin(t * freq);
     const spikeVal = Math.pow(Math.max(0, phase), 4) * spike;
-
-    // Secondary smaller bump
     const secondary = Math.sin(t * freq * 2.3) * amp * 0.12;
-
-    // Random noise
     const n = (Math.random() - 0.5) * noise;
-
     return base + spikeVal + secondary + n;
   }
 
-  // Resize canvas to match container
+  // Resize canvas to match container (HiDPI aware)
   function resizeCanvas() {
-    const rect = canvas.parentElement.getBoundingClientRect();
+    const wrap = canvas.parentElement;
+    if (!wrap) return;
+    const rect = wrap.getBoundingClientRect();
+    if (rect.width === 0 || rect.height === 0) return; // not visible yet
     const dpr = window.devicePixelRatio || 1;
     canvas.width = Math.round(rect.width * dpr);
     canvas.height = Math.round(rect.height * dpr);
@@ -371,18 +368,16 @@
   resizeCanvas();
   window.addEventListener("resize", resizeCanvas);
 
-  // Animation loop
   function draw() {
-    const config = REGIME_CONFIG[targetRegime] || REGIME_CONFIG.rotation;
+    const config = EKG_REGIME_CONFIG[targetRegime] || EKG_REGIME_CONFIG.rotation;
 
-    // Smooth interpolation toward target config
+    // Smooth interpolation toward target
     const lerp = 0.03;
     liveAmplitude += (config.amplitude - liveAmplitude) * lerp;
     liveFrequency += (config.frequency - liveFrequency) * lerp;
     liveSpikeStrength += (config.spikeStrength - liveSpikeStrength) * lerp;
     liveNoise += (config.noise - liveNoise) * lerp;
 
-    // Parse target color
     const [tr, tg, tb] = config.colorRgb.split(",").map(s => parseInt(s.trim()));
     liveColorR += (tr - liveColorR) * lerp;
     liveColorG += (tg - liveColorG) * lerp;
@@ -397,9 +392,14 @@
       tick++;
     }
 
-    // Draw
-    const w = canvas.parentElement.getBoundingClientRect().width;
-    const h = canvas.parentElement.getBoundingClientRect().height;
+    // Get actual CSS pixel dimensions
+    const wrap = canvas.parentElement;
+    const w = wrap ? wrap.getBoundingClientRect().width : canvas.width;
+    const h = wrap ? wrap.getBoundingClientRect().height : canvas.height;
+    if (w === 0 || h === 0) {
+      animFrame = requestAnimationFrame(draw);
+      return;
+    }
     const midY = h / 2;
 
     ctx.clearRect(0, 0, w, h);
@@ -414,27 +414,24 @@
       ctx.stroke();
     }
 
-    // Glow layer (thicker, blurred)
     const r = Math.round(liveColorR);
     const g = Math.round(liveColorG);
     const b = Math.round(liveColorB);
 
+    const visibleSamples = Math.min(BUFFER_SIZE, writeHead);
+    const startIdx = Math.max(0, writeHead - visibleSamples);
+
+    // Glow layer (thicker)
     ctx.strokeStyle = `rgba(${r}, ${g}, ${b}, 0.15)`;
     ctx.lineWidth = 4;
     ctx.lineJoin = "round";
     ctx.lineCap = "round";
     ctx.beginPath();
-
-    const visibleSamples = Math.min(BUFFER_SIZE, writeHead);
-    const startIdx = Math.max(0, writeHead - visibleSamples);
-
     for (let i = 0; i < visibleSamples; i++) {
       const x = (i / visibleSamples) * w;
       const val = buffer[(startIdx + i) % BUFFER_SIZE];
       const y = midY - val * midY * 0.8;
-
-      if (i === 0) ctx.moveTo(x, y);
-      else ctx.lineTo(x, y);
+      if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
     }
     ctx.stroke();
 
@@ -442,49 +439,47 @@
     ctx.strokeStyle = `rgba(${r}, ${g}, ${b}, 0.85)`;
     ctx.lineWidth = 1.8;
     ctx.beginPath();
-
     for (let i = 0; i < visibleSamples; i++) {
       const x = (i / visibleSamples) * w;
       const val = buffer[(startIdx + i) % BUFFER_SIZE];
       const y = midY - val * midY * 0.8;
-
-      if (i === 0) ctx.moveTo(x, y);
-      else ctx.lineTo(x, y);
+      if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
     }
     ctx.stroke();
 
-    // Leading dot (bright point at the write head)
+    // Leading dot
     if (visibleSamples > 1) {
       const lastVal = buffer[(writeHead - 1) % BUFFER_SIZE];
-      const dotX = w;
+      const dotX = w - 2;
       const dotY = midY - lastVal * midY * 0.8;
 
       ctx.beginPath();
-      ctx.arc(dotX - 2, dotY, 3, 0, Math.PI * 2);
+      ctx.arc(dotX, dotY, 3, 0, Math.PI * 2);
       ctx.fillStyle = `rgba(${r}, ${g}, ${b}, 0.9)`;
       ctx.fill();
 
-      // Dot glow
       ctx.beginPath();
-      ctx.arc(dotX - 2, dotY, 8, 0, Math.PI * 2);
+      ctx.arc(dotX, dotY, 8, 0, Math.PI * 2);
       ctx.fillStyle = `rgba(${r}, ${g}, ${b}, 0.15)`;
       ctx.fill();
     }
 
-    // Fade-out on left edge
-    const fadeGrad = ctx.createLinearGradient(0, 0, 60, 0);
-    fadeGrad.addColorStop(0, "rgba(16, 23, 37, 1)");
-    fadeGrad.addColorStop(1, "rgba(16, 23, 37, 0)");
+    // Fade-out on left edge — use transparent black since wrap has its own bg
+    const fadeGrad = ctx.createLinearGradient(0, 0, 50, 0);
+    fadeGrad.addColorStop(0, "rgba(0, 0, 0, 1)");
+    fadeGrad.addColorStop(1, "rgba(0, 0, 0, 0)");
+    ctx.globalCompositeOperation = "destination-out";
     ctx.fillStyle = fadeGrad;
-    ctx.fillRect(0, 0, 60, h);
+    ctx.fillRect(0, 0, 50, h);
+    ctx.globalCompositeOperation = "source-over";
 
     animFrame = requestAnimationFrame(draw);
   }
 
-  // Start
+  // Start drawing
   draw();
 
-  // Cleanup on page hide (save battery)
+  // Pause when tab is hidden
   document.addEventListener("visibilitychange", () => {
     if (document.hidden) {
       if (animFrame) cancelAnimationFrame(animFrame);
@@ -494,189 +489,3 @@
     }
   });
 })();
-
-// ── EKG ANIMATION ENGINE ─────────────────────────────────────────────────────
-// Append this to feature-additions.js
-
-(function initMarketPulseEKG() {
-    const canvas = document.getElementById("pulseEkgCanvas");
-    if (!canvas) return;
-  
-    const ctx = canvas.getContext("2d");
-    let currentRegime = "rotation"; // default until first data arrives
-    let targetRegime = "rotation";
-    let animFrame = null;
-  
-    // EKG data buffer — stores Y values as the "heartbeat" scrolls
-    const BUFFER_SIZE = 300;
-    const buffer = new Float32Array(BUFFER_SIZE);
-    let writeHead = 0;
-    let tick = 0;
-  
-    // Interpolated config values (smooth transitions between regimes)
-    let liveAmplitude = 0.45;
-    let liveFrequency = 0.10;
-    let liveSpikeStrength = 0.35;
-    let liveNoise = 0.05;
-    let liveColorR = 59, liveColorG = 130, liveColorB = 246;
-  
-    // Expose regime setter for renderRegime() to call
-    window.__pulseEkgSetRegime = function (regimeKey) {
-      if (REGIME_CONFIG[regimeKey]) {
-        targetRegime = regimeKey;
-      }
-    };
-  
-    // Generate one sample of the EKG waveform
-    function generateSample(t, amp, freq, spike, noise) {
-      // Base sine wave (heartbeat rhythm)
-      const base = Math.sin(t * freq) * amp;
-  
-      // Sharp spike on the positive phase (the "QRS complex" look)
-      const phase = Math.sin(t * freq);
-      const spikeVal = Math.pow(Math.max(0, phase), 4) * spike;
-  
-      // Secondary smaller bump
-      const secondary = Math.sin(t * freq * 2.3) * amp * 0.12;
-  
-      // Random noise
-      const n = (Math.random() - 0.5) * noise;
-  
-      return base + spikeVal + secondary + n;
-    }
-  
-    // Resize canvas to match container
-    function resizeCanvas() {
-      const rect = canvas.parentElement.getBoundingClientRect();
-      const dpr = window.devicePixelRatio || 1;
-      canvas.width = Math.round(rect.width * dpr);
-      canvas.height = Math.round(rect.height * dpr);
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    }
-  
-    resizeCanvas();
-    window.addEventListener("resize", resizeCanvas);
-  
-    // Animation loop
-    function draw() {
-      const config = REGIME_CONFIG[targetRegime] || REGIME_CONFIG.rotation;
-  
-      // Smooth interpolation toward target config
-      const lerp = 0.03;
-      liveAmplitude += (config.amplitude - liveAmplitude) * lerp;
-      liveFrequency += (config.frequency - liveFrequency) * lerp;
-      liveSpikeStrength += (config.spikeStrength - liveSpikeStrength) * lerp;
-      liveNoise += (config.noise - liveNoise) * lerp;
-  
-      // Parse target color
-      const [tr, tg, tb] = config.colorRgb.split(",").map(s => parseInt(s.trim()));
-      liveColorR += (tr - liveColorR) * lerp;
-      liveColorG += (tg - liveColorG) * lerp;
-      liveColorB += (tb - liveColorB) * lerp;
-  
-      // Generate new samples (speed tied to BPM)
-      const samplesPerFrame = Math.max(1, Math.round(config.bpm / 40));
-      for (let i = 0; i < samplesPerFrame; i++) {
-        const sample = generateSample(tick, liveAmplitude, liveFrequency, liveSpikeStrength, liveNoise);
-        buffer[writeHead % BUFFER_SIZE] = sample;
-        writeHead++;
-        tick++;
-      }
-  
-      // Draw
-      const w = canvas.parentElement.getBoundingClientRect().width;
-      const h = canvas.parentElement.getBoundingClientRect().height;
-      const midY = h / 2;
-  
-      ctx.clearRect(0, 0, w, h);
-  
-      // Faint grid lines
-      ctx.strokeStyle = "rgba(255, 255, 255, 0.03)";
-      ctx.lineWidth = 0.5;
-      for (let gy = 0; gy < h; gy += h / 4) {
-        ctx.beginPath();
-        ctx.moveTo(0, gy);
-        ctx.lineTo(w, gy);
-        ctx.stroke();
-      }
-  
-      // Glow layer (thicker, blurred)
-      const r = Math.round(liveColorR);
-      const g = Math.round(liveColorG);
-      const b = Math.round(liveColorB);
-  
-      ctx.strokeStyle = `rgba(${r}, ${g}, ${b}, 0.15)`;
-      ctx.lineWidth = 4;
-      ctx.lineJoin = "round";
-      ctx.lineCap = "round";
-      ctx.beginPath();
-  
-      const visibleSamples = Math.min(BUFFER_SIZE, writeHead);
-      const startIdx = Math.max(0, writeHead - visibleSamples);
-  
-      for (let i = 0; i < visibleSamples; i++) {
-        const x = (i / visibleSamples) * w;
-        const val = buffer[(startIdx + i) % BUFFER_SIZE];
-        const y = midY - val * midY * 0.8;
-  
-        if (i === 0) ctx.moveTo(x, y);
-        else ctx.lineTo(x, y);
-      }
-      ctx.stroke();
-  
-      // Main line (crisp)
-      ctx.strokeStyle = `rgba(${r}, ${g}, ${b}, 0.85)`;
-      ctx.lineWidth = 1.8;
-      ctx.beginPath();
-  
-      for (let i = 0; i < visibleSamples; i++) {
-        const x = (i / visibleSamples) * w;
-        const val = buffer[(startIdx + i) % BUFFER_SIZE];
-        const y = midY - val * midY * 0.8;
-  
-        if (i === 0) ctx.moveTo(x, y);
-        else ctx.lineTo(x, y);
-      }
-      ctx.stroke();
-  
-      // Leading dot (bright point at the write head)
-      if (visibleSamples > 1) {
-        const lastVal = buffer[(writeHead - 1) % BUFFER_SIZE];
-        const dotX = w;
-        const dotY = midY - lastVal * midY * 0.8;
-  
-        ctx.beginPath();
-        ctx.arc(dotX - 2, dotY, 3, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(${r}, ${g}, ${b}, 0.9)`;
-        ctx.fill();
-  
-        // Dot glow
-        ctx.beginPath();
-        ctx.arc(dotX - 2, dotY, 8, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(${r}, ${g}, ${b}, 0.15)`;
-        ctx.fill();
-      }
-  
-      // Fade-out on left edge
-      const fadeGrad = ctx.createLinearGradient(0, 0, 60, 0);
-      fadeGrad.addColorStop(0, "rgba(16, 23, 37, 1)");
-      fadeGrad.addColorStop(1, "rgba(16, 23, 37, 0)");
-      ctx.fillStyle = fadeGrad;
-      ctx.fillRect(0, 0, 60, h);
-  
-      animFrame = requestAnimationFrame(draw);
-    }
-  
-    // Start
-    draw();
-  
-    // Cleanup on page hide (save battery)
-    document.addEventListener("visibilitychange", () => {
-      if (document.hidden) {
-        if (animFrame) cancelAnimationFrame(animFrame);
-        animFrame = null;
-      } else {
-        if (!animFrame) draw();
-      }
-    });
-  })();

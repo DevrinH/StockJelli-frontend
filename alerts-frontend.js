@@ -189,6 +189,11 @@
     e.preventDefault();
     openModal();
   });
+
+  document.getElementById("inlineAlertBtn")?.addEventListener("click", (e) => {
+    e.preventDefault();
+    openModal();
+  });
   
   closeModalBtn?.addEventListener("click", closeModal);
   closeSuccessBtn?.addEventListener("click", closeModal);

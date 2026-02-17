@@ -407,7 +407,7 @@ tbody.innerHTML = rows.map((x, idx) => {
               ${rangeHtml}
             </span>
           </td>
-          <td>${fmtVolumeCompact(x.volume)}${renderVolumeFire(x.volume, x.avgVolume, x.marketCap, "stock")}</td>
+          <td>${fmtVolumeCompact(x.volume)}${renderVolumeFire(x.volume, x.avgVolume, x.marketCap, "stock")}${renderLiquidityDot(x.volume, x.marketCap, "stock")}</td>
           <td class="rvol">${renderRvol(x.volume, x.avgVolume, x.marketCap, "stock")}</td>
           <td class="news">${newsHtml}</td>
           <td class="sj">${renderSJScore(x.sjScore, idx)}</td>

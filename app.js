@@ -520,13 +520,25 @@ function renderVolumeFire(volume, avgVolume, marketCap, mode) {
 function renderRvol(volume, avgVolume, marketCap, mode) {
   if (!volume) return '<span class="rvol-normal">—</span>';
 
-  if (mode === "stock" && avgVolume && avgVolume > 0) {
-    const ratio = volume / avgVolume;
-    let tier = "rvol-normal";
-    let suffix = "";
-    if (ratio >= 3.0) { tier = "rvol-hot"; suffix = " 🔥"; }
-    else if (ratio >= 1.5) { tier = "rvol-warm"; }
-    return `<span class="${tier}" title="Volume is ${ratio.toFixed(1)}× the average">${ratio.toFixed(1)}x${suffix}</span>`;
+  if (mode === "stock") {
+    // Prefer avgVolume ratio if available
+    if (avgVolume && avgVolume > 0) {
+      const ratio = volume / avgVolume;
+      let tier = "rvol-normal";
+      let suffix = "";
+      if (ratio >= 3.0) { tier = "rvol-hot"; suffix = " 🔥"; }
+      else if (ratio >= 1.5) { tier = "rvol-warm"; }
+      return `<span class="${tier}" title="Volume is ${ratio.toFixed(1)}× the average">${ratio.toFixed(1)}x${suffix}</span>`;
+    }
+    // Fallback: vol/mcap ratio
+    if (marketCap && marketCap > 0) {
+      const ratio = volume / marketCap;
+      let tier = "rvol-normal";
+      let suffix = "";
+      if (ratio >= 0.05) { tier = "rvol-hot"; suffix = " 🔥"; }
+      else if (ratio >= 0.01) { tier = "rvol-warm"; }
+      return `<span class="${tier}" title="Volume is ${(ratio * 100).toFixed(1)}% of market cap">${ratio.toFixed(1)}x${suffix}</span>`;
+    }
   }
 
   if (mode === "crypto" && marketCap && marketCap > 0) {

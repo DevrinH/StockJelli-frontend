@@ -379,7 +379,7 @@ function renderTickerCell(symbol, type = "stock") {
     if (!tbody) return;
 
     if (!rows || rows.length === 0) {
-      tbody.innerHTML = `<tr><td class="ticker">—</td><td>$—</td><td>—</td><td>—</td><td class="news">—</td><td class="sj">—</td></tr>`;
+      tbody.innerHTML = `<tr><td class="ticker">—</td><td>$—</td><td>—</td><td>—</td><td class="rvol">—</td><td class="news">—</td><td class="sj">—</td></tr>`;
       return;
     }
 
@@ -408,6 +408,7 @@ tbody.innerHTML = rows.map((x, idx) => {
             </span>
           </td>
           <td>${fmtVolumeCompact(x.volume)}${renderVolumeFire(x.volume, x.avgVolume, x.marketCap, "stock")}</td>
+          <td class="rvol">${renderRvol(x.volume, x.avgVolume, x.marketCap, "stock")}</td>
           <td class="news">${newsHtml}</td>
           <td class="sj">${renderSJScore(x.sjScore, idx)}</td>
         </tr>
@@ -442,7 +443,7 @@ function renderCrypto(rows) {
   if (!tbody) return;
 
   if (!rows || rows.length === 0) {
-    tbody.innerHTML = `<tr><td class="ticker">—</td><td>$—</td><td>—</td><td>—</td><td>—</td><td class="sj">—</td></tr>`;
+    tbody.innerHTML = `<tr><td class="ticker">—</td><td>$—</td><td>—</td><td>—</td><td class="rvol">—</td><td>—</td><td class="sj">—</td></tr>`;
     return;
   }
 
@@ -497,6 +498,7 @@ tbody.innerHTML = rows.map((x, idx) => {
           </span>
         </td>
         <td>${fmtVolumeCompact(x.volume)}${renderVolumeFire(x.volume, null, x.marketCap, "crypto")}${renderLiquidityDot(x.volume, x.marketCap)}</td>
+        <td class="rvol">${renderRvol(x.volume, null, x.marketCap, "crypto")}</td>
         <td>${fmtCompactUsd(x.marketCap, 1)}</td>
         <td class="sj">${renderSJScore(x.sjScore, idx)}</td>
       </tr>
@@ -530,6 +532,33 @@ function renderVolumeFire(volume, avgVolume, marketCap, mode) {
   return "";
 }
 
+// RVOL (Relative Volume) cell renderer
+// Stocks: volume / avgVolume → "3.2x"
+// Crypto: volume / marketCap → "42%"
+function renderRvol(volume, avgVolume, marketCap, mode) {
+  if (!volume) return '<span class="rvol-normal">—</span>';
+
+  if (mode === "stock" && avgVolume && avgVolume > 0) {
+    const ratio = volume / avgVolume;
+    let tier = "rvol-normal";
+    let suffix = "";
+    if (ratio >= 3.0) { tier = "rvol-hot"; suffix = " 🔥"; }
+    else if (ratio >= 1.5) { tier = "rvol-warm"; }
+    return `<span class="${tier}" title="Volume is ${ratio.toFixed(1)}× the average">${ratio.toFixed(1)}x${suffix}</span>`;
+  }
+
+  if (mode === "crypto" && marketCap && marketCap > 0) {
+    const ratio = volume / marketCap;
+    const pct = (ratio * 100).toFixed(0);
+    let tier = "rvol-normal";
+    let suffix = "";
+    if (ratio >= 0.50) { tier = "rvol-hot"; suffix = " 🔥"; }
+    else if (ratio >= 0.15) { tier = "rvol-warm"; }
+    return `<span class="${tier}" title="24h volume is ${pct}% of market cap">${pct}%${suffix}</span>`;
+  }
+
+  return '<span class="rvol-normal">—</span>';
+}
 
 /**
  * Mobile: trim percent-change values to 1 decimal place

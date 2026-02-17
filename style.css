@@ -709,8 +709,8 @@
   
   /* Desktop: hide News on narrow-ish screens */
   @media (max-width: 640px) {
-    .stocks-table th:nth-child(5), .stocks-table td:nth-child(5) { display: none; }
-  }
+    .stocks-table th:nth-child(6), .stocks-table td:nth-child(6) { display: none; }
+}
 
   /* ===========================================
      9b. MOBILE TABLE — COMPACT DENSITY
@@ -2065,3 +2065,50 @@ tbody tr:first-child {
   cursor: help;
   position: relative;
 }
+
+/* ============================================
+   STYLE.CSS — ADD THIS BLOCK
+   
+   Place after the `.vol-fire` rule at the very 
+   end of the file (or in the Tables section 9).
+   ============================================ */
+
+
+/* ===========================================
+   RVOL COLUMN — Relative Volume
+   =========================================== */
+
+   .rvol-header {
+    cursor: help;
+    white-space: nowrap;
+  }
+  
+  td.rvol {
+    white-space: nowrap;
+    font-size: 0.88rem;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+  }
+  
+  /* Color tiers */
+  .rvol-hot {
+    color: #4ade80;
+    text-shadow: 0 0 6px rgba(74, 222, 128, 0.2);
+  }
+  
+  .rvol-warm {
+    color: #fbbf24;
+  }
+  
+  .rvol-normal {
+    color: rgba(255, 255, 255, 0.3);
+    font-weight: 500;
+  }
+  
+  /* ─── MOBILE: Hide RVOL column entirely ─── */
+  @media (max-width: 640px) {
+    .rvol-header,
+    td.rvol {
+      display: none !important;
+    }
+  }

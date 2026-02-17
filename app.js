@@ -253,22 +253,22 @@ localStorage.setItem(LAST_VISIT_KEY, new Date().toISOString());
   }
 
   // "NEW" badge for tickers that entered since user's last visit
-function renderNewBadge(enteredAt) {
-  if (!previousVisitTime || !enteredAt) return "";
-  
-  try {
-    const enteredTime = new Date(enteredAt).getTime();
-    const lastVisit = new Date(previousVisitTime).getTime();
+  function renderNewBadge(enteredAt) {
+    if (!previousVisitTime || !enteredAt) return "";
     
-    if (enteredTime > lastVisit) {
-      return ' <span class="new-badge-wrap"><span class="new-badge">NEW</span><span class="new-badge-tooltip">New since last visit</span></span>';
+    try {
+      const enteredTime = new Date(enteredAt).getTime();
+      const lastVisit = new Date(previousVisitTime).getTime();
+      
+      if (enteredTime > lastVisit) {
+        return ' <span class="new-badge-corner" title="New since last visit"></span>';
+      }
+    } catch (e) {
+      // Invalid date, skip
     }
-  } catch (e) {
-    // Invalid date, skip
+    
+    return "";
   }
-  
-  return "";
-}
 
 // SJ Score cell renderer
 // Top 3 rows show score, rest are blurred for non-subscribers
@@ -949,16 +949,17 @@ let currentMode = isNorthAmerica ? "stocks" : "crypto";
       let rows = data.rows;
       
       // Client-side high volume filter
-      const highVolOnly = filterEls.highVolChk?.checked || false;
-      if (highVolOnly && rows) {
-        rows = rows.filter(r => {
-          if (currentMode === "stocks") {
-            return r.avgVolume && r.avgVolume > 0 && r.volume >= 2 * r.avgVolume;
-          } else {
-            return r.marketCap && r.marketCap > 0 && (r.volume / r.marketCap) >= 0.30;
-          }
-        });
-      }
+// Client-side RVOL filter
+const highVolOnly = filterEls.highVolChk?.checked || false;
+if (highVolOnly && rows) {
+    rows = rows.filter(r => {
+        if (currentMode === "stocks") {
+            return r.avgVolume && r.avgVolume > 0 && (r.volume / r.avgVolume) >= 1.5;
+        } else {
+            return r.marketCap && r.marketCap > 0 && (r.volume / r.marketCap) >= 1.5;
+        }
+    });
+}
       data.rows = rows;
       
       if (currentMode === "crypto") renderCrypto(data.rows);

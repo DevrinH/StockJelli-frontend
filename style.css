@@ -1987,10 +1987,7 @@ tbody tr:first-child {
     transform: scale(1.15);
   }
   
-  /* Hide SJ column on very small screens — NOW OVERRIDDEN in 9b to show */
-  @media (max-width: 640px) {
-    .sj-header, td.sj { display: none; }
-  }
+
 
   /* Fix: allow tooltip to overflow table header */
 .stocks-table thead {

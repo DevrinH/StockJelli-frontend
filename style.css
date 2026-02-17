@@ -783,22 +783,20 @@
       display: table-cell !important;
     }
     .sj-cell {
-      font-size: 0.32rem;
-      padding: 1px 5px;
+      font-size: 0.28rem;
+      padding: 1px 4px;
       border-radius: 3px;
-      min-width: 19px;
+      min-width: 17px;
       text-align: center;
   }
 
   .sj-unlock-btn {
-    font-size: 0.40rem;
+    font-size: 0.35rem;
 }
 .sj-blurred {
-    font-size: 0.62rem;
+    font-size: 0.55rem;
 }
-    .sj-unlock-btn {
-      font-size: 0.65rem;
-    }
+ 
 
     /* First-child highlight border thinner */
 /* First-child highlight border thinner */

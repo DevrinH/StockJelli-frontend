@@ -511,24 +511,6 @@ tbody.innerHTML = rows.map((x, idx) => {
 
 // Volume fire emoji — shows when volume is elevated vs average
 function renderVolumeFire(volume, avgVolume, marketCap, mode) {
-  if (!volume) return "";
-  
-  if (mode === "stock" && avgVolume && avgVolume > 0) {
-    const ratio = volume / avgVolume;
-    if (ratio >= 2.0) {
-      return ` <span class="vol-fire" title="🔥 Volume ${ratio.toFixed(1)}× above average">🔥</span>`;
-    }
-    return "";
-  }
-  
-  // Crypto: use vol/mcap ratio
-  if (mode === "crypto" && marketCap && marketCap > 0) {
-    const ratio = volume / marketCap;
-    if (ratio >= 0.30) {
-      return ` <span class="vol-fire" title="🔥 Elevated volume (${(ratio * 100).toFixed(0)}% of market cap)">🔥</span>`;
-    }
-  }
-  
   return "";
 }
 

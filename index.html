@@ -621,40 +621,65 @@
 
 
 <!-- Market Regime Indicator (replaces pricing CTA) -->
-<section class="market-regime" id="marketRegime">
-  <div class="container">
-    <div class="regime-inner">
-      <div class="regime-info">
-        <h2 class="regime-heading">Market Regime</h2>
-        <p class="regime-description" id="regimeDescription">Analyzing market conditions…</p>
-      </div>
+<!-- ============================================
+     MARKET PULSE (replaces Market Regime section)
+     
+     Drop this into index.html replacing the existing
+     <section class="market-regime" id="marketRegime"> block.
+     ============================================ -->
 
-      <div class="regime-right">
-        <div class="regime-bar" id="regimeBar">
-          <div class="regime-segment" data-regime="expansion">
-            <span class="regime-dot"></span>
-            <span>Expansion</span>
+     <section class="market-pulse" id="marketRegime">
+      <div class="container">
+        <div class="pulse-inner">
+    
+          <!-- Left: Info -->
+          <div class="pulse-info">
+            <div class="pulse-heading-row">
+              <h2 class="pulse-heading">Market Pulse</h2>
+              <div class="pulse-bpm" id="pulseBpm">
+                <span class="pulse-bpm-dot" id="pulseBpmDot"></span>
+                <span class="pulse-bpm-number" id="pulseBpmNumber">—</span>
+                <span class="pulse-bpm-label">BPM</span>
+              </div>
+            </div>
+            <p class="pulse-description" id="regimeDescription">Analyzing market conditions…</p>
           </div>
-          <div class="regime-segment" data-regime="rotation">
-            <span class="regime-dot"></span>
-            <span>Rotation</span>
+    
+          <!-- Right: EKG + Regime bar -->
+          <div class="pulse-right">
+    
+            <!-- EKG Canvas -->
+            <div class="pulse-ekg-wrap">
+              <canvas id="pulseEkgCanvas" class="pulse-ekg-canvas" width="460" height="100"></canvas>
+            </div>
+    
+            <!-- Regime Segments (same data contract) -->
+            <div class="pulse-regime-bar" id="regimeBar">
+              <div class="pulse-regime-seg" data-regime="expansion">
+                <span class="pulse-regime-dot"></span>
+                <span>Expansion</span>
+              </div>
+              <div class="pulse-regime-seg" data-regime="rotation">
+                <span class="pulse-regime-dot"></span>
+                <span>Rotation</span>
+              </div>
+              <div class="pulse-regime-seg" data-regime="caution">
+                <span class="pulse-regime-dot"></span>
+                <span>Caution</span>
+              </div>
+              <div class="pulse-regime-seg" data-regime="contraction">
+                <span class="pulse-regime-dot"></span>
+                <span>Contraction</span>
+              </div>
+            </div>
+    
+            <!-- Subscriber detail -->
+            <div class="pulse-sub-detail" id="regimeSubDetail"></div>
           </div>
-          <div class="regime-segment" data-regime="caution">
-            <span class="regime-dot"></span>
-            <span>Caution</span>
-          </div>
-          <div class="regime-segment" data-regime="contraction">
-            <span class="regime-dot"></span>
-            <span>Contraction</span>
-          </div>
+    
         </div>
-
-        <div class="regime-sub-detail" id="regimeSubDetail"></div>
       </div>
-    </div>
-  </div>
-</section>
-
+    </section>
 
 <!-- Blog / Insights -->
 <section class="blog-section" id="blogSection">

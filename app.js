@@ -299,34 +299,119 @@ function renderSJScore(score, idx) {
 }
 
 // ── Market Regime Indicator ──────────────────────────────────────────────
+// ── REGIME CONFIG ────────────────────────────────────────────────────────────
+// Each regime has a color, BPM (visual heartbeat speed), and EKG waveform params
+const REGIME_CONFIG = {
+  expansion: {
+    color: "#22c55e",
+    colorRgb: "34, 197, 94",
+    bpm: 62,
+    amplitude: 0.35,     // calm, smooth wave
+    frequency: 0.07,
+    spikeStrength: 0.25,
+    noise: 0.02,
+    label: "Expansion",
+  },
+  rotation: {
+    color: "#3b82f6",
+    colorRgb: "59, 130, 246",
+    bpm: 78,
+    amplitude: 0.45,
+    frequency: 0.10,
+    spikeStrength: 0.35,
+    noise: 0.05,
+    label: "Rotation",
+  },
+  caution: {
+    color: "#f59e0b",
+    colorRgb: "245, 158, 11",
+    bpm: 95,
+    amplitude: 0.55,
+    frequency: 0.15,
+    spikeStrength: 0.45,
+    noise: 0.10,
+    label: "Caution",
+  },
+  contraction: {
+    color: "#ef4444",
+    colorRgb: "239, 68, 68",
+    bpm: 120,
+    amplitude: 0.75,
+    frequency: 0.22,
+    spikeStrength: 0.6,
+    noise: 0.18,
+    label: "Contraction",
+  },
+};
+
+
+// ── REPLACE renderRegime() in app.js with this ──────────────────────────────
+// Copy this function and replace the existing renderRegime(regime) in app.js
+
 function renderRegime(regime) {
   const bar = document.getElementById("regimeBar");
   const desc = document.getElementById("regimeDescription");
   const subDetail = document.getElementById("regimeSubDetail");
-  
+  const bpmNumber = document.getElementById("pulseBpmNumber");
+  const bpmDot = document.getElementById("pulseBpmDot");
+  const pulseInner = document.querySelector(".pulse-inner");
+
   if (!bar || !regime) return;
-  
-  // Update active segment
-  bar.querySelectorAll(".regime-segment").forEach(seg => {
-    seg.classList.toggle("regime-active", seg.dataset.regime === regime.regime);
+
+  const regimeKey = regime.regime || "rotation";
+  const config = REGIME_CONFIG[regimeKey] || REGIME_CONFIG.rotation;
+
+  // Update active segment (works with both old .regime-segment and new .pulse-regime-seg)
+  bar.querySelectorAll("[data-regime]").forEach(seg => {
+    seg.classList.toggle("regime-active", seg.dataset.regime === regimeKey);
   });
-  
+
   // Update description
   if (desc) {
     desc.textContent = regime.description || "Analyzing market conditions…";
   }
-  
-  // Update subscriber detail
+
+  // Update BPM display
+  if (bpmNumber) {
+    bpmNumber.textContent = String(config.bpm);
+  }
+
+  // Set CSS custom property for pulse color
+  if (pulseInner) {
+    pulseInner.style.setProperty("--pulse-color", config.color);
+  }
+  if (bpmDot) {
+    bpmDot.style.background = config.color;
+    bpmDot.style.boxShadow = `0 0 6px ${config.color}80`;
+  }
+
+  // Start/update BPM dot flash
+  if (bpmDot && config.bpm) {
+    // Clear any existing interval
+    if (window.__pulseBpmInterval) clearInterval(window.__pulseBpmInterval);
+    const beatMs = (60 / config.bpm) * 1000;
+    window.__pulseBpmInterval = setInterval(() => {
+      bpmDot.classList.add("beat");
+      setTimeout(() => bpmDot.classList.remove("beat"), beatMs * 0.3);
+    }, beatMs);
+  }
+
+  // Notify EKG of regime change
+  if (window.__pulseEkgSetRegime) {
+    window.__pulseEkgSetRegime(regimeKey);
+  }
+
+  // Update subscriber detail (same as before)
   if (subDetail) {
     const isSubscriber = !!localStorage.getItem("sj_subscriber_email");
-    
+
     if (isSubscriber) {
       const impactClass = regime.sjMultiplier > 1
         ? "regime-impact-positive"
         : regime.sjMultiplier < 1
           ? "regime-impact-negative"
           : "regime-impact-neutral";
-      
+
       subDetail.innerHTML = `<span class="regime-sub-text ${impactClass}">${regime.sjImpactLabel || ""}</span>`;
     } else {
       subDetail.innerHTML = `
@@ -334,8 +419,7 @@ function renderRegime(regime) {
           🔒 SJ impact hidden · <a href="#" id="regimeUnlockLink">Unlock with alerts →</a>
         </span>
       `;
-      
-      // Wire unlock link to alerts modal
+
       const link = document.getElementById("regimeUnlockLink");
       if (link) {
         link.addEventListener("click", (e) => {
@@ -347,6 +431,7 @@ function renderRegime(regime) {
     }
   }
 }
+
 
 
   // Generate TradingView URL for a symbol

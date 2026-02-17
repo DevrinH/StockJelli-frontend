@@ -308,3 +308,375 @@
       setTimeout(dismiss, 15_000);
     }, 90_000);
   })();
+
+  // ── EKG ANIMATION ENGINE ─────────────────────────────────────────────────────
+// Append this to feature-additions.js
+
+(function initMarketPulseEKG() {
+  const canvas = document.getElementById("pulseEkgCanvas");
+  if (!canvas) return;
+
+  const ctx = canvas.getContext("2d");
+  let currentRegime = "rotation"; // default until first data arrives
+  let targetRegime = "rotation";
+  let animFrame = null;
+
+  // EKG data buffer — stores Y values as the "heartbeat" scrolls
+  const BUFFER_SIZE = 300;
+  const buffer = new Float32Array(BUFFER_SIZE);
+  let writeHead = 0;
+  let tick = 0;
+
+  // Interpolated config values (smooth transitions between regimes)
+  let liveAmplitude = 0.45;
+  let liveFrequency = 0.10;
+  let liveSpikeStrength = 0.35;
+  let liveNoise = 0.05;
+  let liveColorR = 59, liveColorG = 130, liveColorB = 246;
+
+  // Expose regime setter for renderRegime() to call
+  window.__pulseEkgSetRegime = function (regimeKey) {
+    if (REGIME_CONFIG[regimeKey]) {
+      targetRegime = regimeKey;
+    }
+  };
+
+  // Generate one sample of the EKG waveform
+  function generateSample(t, amp, freq, spike, noise) {
+    // Base sine wave (heartbeat rhythm)
+    const base = Math.sin(t * freq) * amp;
+
+    // Sharp spike on the positive phase (the "QRS complex" look)
+    const phase = Math.sin(t * freq);
+    const spikeVal = Math.pow(Math.max(0, phase), 4) * spike;
+
+    // Secondary smaller bump
+    const secondary = Math.sin(t * freq * 2.3) * amp * 0.12;
+
+    // Random noise
+    const n = (Math.random() - 0.5) * noise;
+
+    return base + spikeVal + secondary + n;
+  }
+
+  // Resize canvas to match container
+  function resizeCanvas() {
+    const rect = canvas.parentElement.getBoundingClientRect();
+    const dpr = window.devicePixelRatio || 1;
+    canvas.width = Math.round(rect.width * dpr);
+    canvas.height = Math.round(rect.height * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+
+  resizeCanvas();
+  window.addEventListener("resize", resizeCanvas);
+
+  // Animation loop
+  function draw() {
+    const config = REGIME_CONFIG[targetRegime] || REGIME_CONFIG.rotation;
+
+    // Smooth interpolation toward target config
+    const lerp = 0.03;
+    liveAmplitude += (config.amplitude - liveAmplitude) * lerp;
+    liveFrequency += (config.frequency - liveFrequency) * lerp;
+    liveSpikeStrength += (config.spikeStrength - liveSpikeStrength) * lerp;
+    liveNoise += (config.noise - liveNoise) * lerp;
+
+    // Parse target color
+    const [tr, tg, tb] = config.colorRgb.split(",").map(s => parseInt(s.trim()));
+    liveColorR += (tr - liveColorR) * lerp;
+    liveColorG += (tg - liveColorG) * lerp;
+    liveColorB += (tb - liveColorB) * lerp;
+
+    // Generate new samples (speed tied to BPM)
+    const samplesPerFrame = Math.max(1, Math.round(config.bpm / 40));
+    for (let i = 0; i < samplesPerFrame; i++) {
+      const sample = generateSample(tick, liveAmplitude, liveFrequency, liveSpikeStrength, liveNoise);
+      buffer[writeHead % BUFFER_SIZE] = sample;
+      writeHead++;
+      tick++;
+    }
+
+    // Draw
+    const w = canvas.parentElement.getBoundingClientRect().width;
+    const h = canvas.parentElement.getBoundingClientRect().height;
+    const midY = h / 2;
+
+    ctx.clearRect(0, 0, w, h);
+
+    // Faint grid lines
+    ctx.strokeStyle = "rgba(255, 255, 255, 0.03)";
+    ctx.lineWidth = 0.5;
+    for (let gy = 0; gy < h; gy += h / 4) {
+      ctx.beginPath();
+      ctx.moveTo(0, gy);
+      ctx.lineTo(w, gy);
+      ctx.stroke();
+    }
+
+    // Glow layer (thicker, blurred)
+    const r = Math.round(liveColorR);
+    const g = Math.round(liveColorG);
+    const b = Math.round(liveColorB);
+
+    ctx.strokeStyle = `rgba(${r}, ${g}, ${b}, 0.15)`;
+    ctx.lineWidth = 4;
+    ctx.lineJoin = "round";
+    ctx.lineCap = "round";
+    ctx.beginPath();
+
+    const visibleSamples = Math.min(BUFFER_SIZE, writeHead);
+    const startIdx = Math.max(0, writeHead - visibleSamples);
+
+    for (let i = 0; i < visibleSamples; i++) {
+      const x = (i / visibleSamples) * w;
+      const val = buffer[(startIdx + i) % BUFFER_SIZE];
+      const y = midY - val * midY * 0.8;
+
+      if (i === 0) ctx.moveTo(x, y);
+      else ctx.lineTo(x, y);
+    }
+    ctx.stroke();
+
+    // Main line (crisp)
+    ctx.strokeStyle = `rgba(${r}, ${g}, ${b}, 0.85)`;
+    ctx.lineWidth = 1.8;
+    ctx.beginPath();
+
+    for (let i = 0; i < visibleSamples; i++) {
+      const x = (i / visibleSamples) * w;
+      const val = buffer[(startIdx + i) % BUFFER_SIZE];
+      const y = midY - val * midY * 0.8;
+
+      if (i === 0) ctx.moveTo(x, y);
+      else ctx.lineTo(x, y);
+    }
+    ctx.stroke();
+
+    // Leading dot (bright point at the write head)
+    if (visibleSamples > 1) {
+      const lastVal = buffer[(writeHead - 1) % BUFFER_SIZE];
+      const dotX = w;
+      const dotY = midY - lastVal * midY * 0.8;
+
+      ctx.beginPath();
+      ctx.arc(dotX - 2, dotY, 3, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(${r}, ${g}, ${b}, 0.9)`;
+      ctx.fill();
+
+      // Dot glow
+      ctx.beginPath();
+      ctx.arc(dotX - 2, dotY, 8, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(${r}, ${g}, ${b}, 0.15)`;
+      ctx.fill();
+    }
+
+    // Fade-out on left edge
+    const fadeGrad = ctx.createLinearGradient(0, 0, 60, 0);
+    fadeGrad.addColorStop(0, "rgba(16, 23, 37, 1)");
+    fadeGrad.addColorStop(1, "rgba(16, 23, 37, 0)");
+    ctx.fillStyle = fadeGrad;
+    ctx.fillRect(0, 0, 60, h);
+
+    animFrame = requestAnimationFrame(draw);
+  }
+
+  // Start
+  draw();
+
+  // Cleanup on page hide (save battery)
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden) {
+      if (animFrame) cancelAnimationFrame(animFrame);
+      animFrame = null;
+    } else {
+      if (!animFrame) draw();
+    }
+  });
+})();
+
+// ── EKG ANIMATION ENGINE ─────────────────────────────────────────────────────
+// Append this to feature-additions.js
+
+(function initMarketPulseEKG() {
+    const canvas = document.getElementById("pulseEkgCanvas");
+    if (!canvas) return;
+  
+    const ctx = canvas.getContext("2d");
+    let currentRegime = "rotation"; // default until first data arrives
+    let targetRegime = "rotation";
+    let animFrame = null;
+  
+    // EKG data buffer — stores Y values as the "heartbeat" scrolls
+    const BUFFER_SIZE = 300;
+    const buffer = new Float32Array(BUFFER_SIZE);
+    let writeHead = 0;
+    let tick = 0;
+  
+    // Interpolated config values (smooth transitions between regimes)
+    let liveAmplitude = 0.45;
+    let liveFrequency = 0.10;
+    let liveSpikeStrength = 0.35;
+    let liveNoise = 0.05;
+    let liveColorR = 59, liveColorG = 130, liveColorB = 246;
+  
+    // Expose regime setter for renderRegime() to call
+    window.__pulseEkgSetRegime = function (regimeKey) {
+      if (REGIME_CONFIG[regimeKey]) {
+        targetRegime = regimeKey;
+      }
+    };
+  
+    // Generate one sample of the EKG waveform
+    function generateSample(t, amp, freq, spike, noise) {
+      // Base sine wave (heartbeat rhythm)
+      const base = Math.sin(t * freq) * amp;
+  
+      // Sharp spike on the positive phase (the "QRS complex" look)
+      const phase = Math.sin(t * freq);
+      const spikeVal = Math.pow(Math.max(0, phase), 4) * spike;
+  
+      // Secondary smaller bump
+      const secondary = Math.sin(t * freq * 2.3) * amp * 0.12;
+  
+      // Random noise
+      const n = (Math.random() - 0.5) * noise;
+  
+      return base + spikeVal + secondary + n;
+    }
+  
+    // Resize canvas to match container
+    function resizeCanvas() {
+      const rect = canvas.parentElement.getBoundingClientRect();
+      const dpr = window.devicePixelRatio || 1;
+      canvas.width = Math.round(rect.width * dpr);
+      canvas.height = Math.round(rect.height * dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+  
+    resizeCanvas();
+    window.addEventListener("resize", resizeCanvas);
+  
+    // Animation loop
+    function draw() {
+      const config = REGIME_CONFIG[targetRegime] || REGIME_CONFIG.rotation;
+  
+      // Smooth interpolation toward target config
+      const lerp = 0.03;
+      liveAmplitude += (config.amplitude - liveAmplitude) * lerp;
+      liveFrequency += (config.frequency - liveFrequency) * lerp;
+      liveSpikeStrength += (config.spikeStrength - liveSpikeStrength) * lerp;
+      liveNoise += (config.noise - liveNoise) * lerp;
+  
+      // Parse target color
+      const [tr, tg, tb] = config.colorRgb.split(",").map(s => parseInt(s.trim()));
+      liveColorR += (tr - liveColorR) * lerp;
+      liveColorG += (tg - liveColorG) * lerp;
+      liveColorB += (tb - liveColorB) * lerp;
+  
+      // Generate new samples (speed tied to BPM)
+      const samplesPerFrame = Math.max(1, Math.round(config.bpm / 40));
+      for (let i = 0; i < samplesPerFrame; i++) {
+        const sample = generateSample(tick, liveAmplitude, liveFrequency, liveSpikeStrength, liveNoise);
+        buffer[writeHead % BUFFER_SIZE] = sample;
+        writeHead++;
+        tick++;
+      }
+  
+      // Draw
+      const w = canvas.parentElement.getBoundingClientRect().width;
+      const h = canvas.parentElement.getBoundingClientRect().height;
+      const midY = h / 2;
+  
+      ctx.clearRect(0, 0, w, h);
+  
+      // Faint grid lines
+      ctx.strokeStyle = "rgba(255, 255, 255, 0.03)";
+      ctx.lineWidth = 0.5;
+      for (let gy = 0; gy < h; gy += h / 4) {
+        ctx.beginPath();
+        ctx.moveTo(0, gy);
+        ctx.lineTo(w, gy);
+        ctx.stroke();
+      }
+  
+      // Glow layer (thicker, blurred)
+      const r = Math.round(liveColorR);
+      const g = Math.round(liveColorG);
+      const b = Math.round(liveColorB);
+  
+      ctx.strokeStyle = `rgba(${r}, ${g}, ${b}, 0.15)`;
+      ctx.lineWidth = 4;
+      ctx.lineJoin = "round";
+      ctx.lineCap = "round";
+      ctx.beginPath();
+  
+      const visibleSamples = Math.min(BUFFER_SIZE, writeHead);
+      const startIdx = Math.max(0, writeHead - visibleSamples);
+  
+      for (let i = 0; i < visibleSamples; i++) {
+        const x = (i / visibleSamples) * w;
+        const val = buffer[(startIdx + i) % BUFFER_SIZE];
+        const y = midY - val * midY * 0.8;
+  
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+  
+      // Main line (crisp)
+      ctx.strokeStyle = `rgba(${r}, ${g}, ${b}, 0.85)`;
+      ctx.lineWidth = 1.8;
+      ctx.beginPath();
+  
+      for (let i = 0; i < visibleSamples; i++) {
+        const x = (i / visibleSamples) * w;
+        const val = buffer[(startIdx + i) % BUFFER_SIZE];
+        const y = midY - val * midY * 0.8;
+  
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+  
+      // Leading dot (bright point at the write head)
+      if (visibleSamples > 1) {
+        const lastVal = buffer[(writeHead - 1) % BUFFER_SIZE];
+        const dotX = w;
+        const dotY = midY - lastVal * midY * 0.8;
+  
+        ctx.beginPath();
+        ctx.arc(dotX - 2, dotY, 3, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(${r}, ${g}, ${b}, 0.9)`;
+        ctx.fill();
+  
+        // Dot glow
+        ctx.beginPath();
+        ctx.arc(dotX - 2, dotY, 8, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(${r}, ${g}, ${b}, 0.15)`;
+        ctx.fill();
+      }
+  
+      // Fade-out on left edge
+      const fadeGrad = ctx.createLinearGradient(0, 0, 60, 0);
+      fadeGrad.addColorStop(0, "rgba(16, 23, 37, 1)");
+      fadeGrad.addColorStop(1, "rgba(16, 23, 37, 0)");
+      ctx.fillStyle = fadeGrad;
+      ctx.fillRect(0, 0, 60, h);
+  
+      animFrame = requestAnimationFrame(draw);
+    }
+  
+    // Start
+    draw();
+  
+    // Cleanup on page hide (save battery)
+    document.addEventListener("visibilitychange", () => {
+      if (document.hidden) {
+        if (animFrame) cancelAnimationFrame(animFrame);
+        animFrame = null;
+      } else {
+        if (!animFrame) draw();
+      }
+    });
+  })();

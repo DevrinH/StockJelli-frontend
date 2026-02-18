@@ -2208,29 +2208,33 @@ tbody tr:first-child {
   }
 
   /* ===========================================
-   18b. SJ FLOW GAUGE — Buy vs Sell Pressure
+   18b. MOMENTUM RIVER
    
-   Add this block to style.css right after the
-   Market Pulse section (18) styles.
+   Replaces SJ Flow Gauge. Add to style.css
+   after Market Pulse (Section 18) styles,
+   before Section 19 (Footer).
+   
+   If you previously added flow-gauge.css,
+   remove that entire block and use this instead.
    =========================================== */
 
-.flow-gauge { padding: 0 0 32px; }
+.momentum-river { padding: 0 0 32px; }
 
 /* ── Heading ── */
-.flow-heading-row {
+.river-heading-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
   margin-bottom: 14px;
 }
 
-.flow-heading-left {
+.river-heading-left {
   display: flex;
   align-items: center;
   gap: 12px;
 }
 
-.flow-title {
+.river-title {
   font-size: 0.84rem;
   font-weight: 700;
   letter-spacing: 0.06em;
@@ -2239,43 +2243,46 @@ tbody tr:first-child {
   margin: 0;
 }
 
-.flow-subtitle {
+.river-subtitle {
   font-size: 0.72rem;
   color: rgba(255, 255, 255, 0.35);
 }
 
-.flow-legend {
+.river-legend {
   display: flex;
   align-items: center;
-  gap: 16px;
-  font-size: 0.7rem;
-  color: rgba(255, 255, 255, 0.35);
+  gap: 14px;
+  font-size: 0.68rem;
+  color: rgba(255, 255, 255, 0.3);
 }
 
-.flow-legend-item {
+.river-legend-item {
   display: flex;
   align-items: center;
   gap: 5px;
 }
 
-.flow-legend-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
+.river-legend-swatch {
+  width: 18px;
+  height: 4px;
+  border-radius: 2px;
 }
 
-.flow-dot-buy {
-  background: #22c55e;
-  box-shadow: 0 0 6px rgba(34, 197, 94, 0.4);
+.river-swatch-fast {
+  background: linear-gradient(90deg, #3b82f6, #22c55e);
+  box-shadow: 0 0 6px rgba(34, 197, 94, 0.3);
 }
 
-.flow-dot-sell {
-  background: #ef4444;
-  box-shadow: 0 0 6px rgba(239, 68, 68, 0.4);
+.river-swatch-mid {
+  background: rgba(100, 200, 180, 0.5);
+}
+
+.river-swatch-slow {
+  background: rgba(239, 68, 68, 0.4);
 }
 
 /* ── Card ── */
-.flow-card {
+.river-card {
   background: rgba(16, 23, 37, 0.6);
   border-radius: 18px;
   border: 1px solid rgba(255, 255, 255, 0.06);
@@ -2287,108 +2294,85 @@ tbody tr:first-child {
   position: relative;
 }
 
-.flow-card::before {
+.river-card::before {
   content: "";
   position: absolute;
   top: 0; left: 0; right: 0;
   height: 1px;
-  background: linear-gradient(90deg, #3b82f6, #22c55e, transparent 40%, transparent 60%, #ef4444);
+  background: linear-gradient(90deg, #3b82f6, #22c55e 40%, transparent 50%);
   opacity: 0.3;
 }
 
-/* ── Rows ── */
-.flow-rows { padding: 8px 0; }
-
-.flow-row {
-  display: grid;
-  grid-template-columns: 130px 1fr 52px;
-  gap: 14px;
-  align-items: center;
-  padding: 8px 20px;
-  transition: background 0.15s ease;
+/* ── Section Labels ── */
+.river-section-label {
+  padding: 10px 20px 4px;
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.2);
 }
 
-.flow-row:hover {
-  background: rgba(255, 255, 255, 0.015);
+/* ── Canvas Wrap ── */
+.river-canvas-wrap {
+  position: relative;
+  overflow: hidden;
 }
 
-/* ── Label Cell ── */
-.flow-label {
+.river-canvas {
+  display: block;
+  width: 100%;
+}
+
+/* Labels overlay — left side */
+.river-labels {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 100px;
   display: flex;
   flex-direction: column;
+  pointer-events: none;
+  background: linear-gradient(90deg, rgba(16, 23, 37, 0.85) 0%, rgba(16, 23, 37, 0) 100%);
+  z-index: 2;
+}
+
+.river-lane-label {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 0 12px;
   gap: 1px;
 }
 
-.flow-label-name {
-  font-size: 0.82rem;
+.river-lane-sym {
+  font-size: 0.76rem;
   font-weight: 700;
-  color: rgba(255, 255, 255, 0.88);
-  letter-spacing: 0.01em;
-}
-
-.flow-label-sub {
-  font-size: 0.62rem;
-  color: rgba(255, 255, 255, 0.35);
+  color: rgba(255, 255, 255, 0.75);
   letter-spacing: 0.02em;
-}
-
-/* ── Pressure Bar ── */
-.flow-bar-wrap {
-  position: relative;
-  height: 38px;
-  border-radius: 8px;
-  overflow: hidden;
-  background: rgba(0, 0, 0, 0.35);
-  border: 1px solid rgba(255, 255, 255, 0.04);
-}
-
-.flow-bar-canvas {
-  display: block;
-  width: 100%;
-  height: 100%;
-}
-
-/* ── Net Score ── */
-.flow-net {
   font-variant-numeric: tabular-nums;
-  font-size: 0.82rem;
-  font-weight: 700;
-  text-align: right;
 }
 
-.flow-net.flow-bullish { color: #4ade80; }
-.flow-net.flow-bearish { color: #f87171; }
-.flow-net.flow-neutral { color: #3b82f6; }
-
-/* ── Summary ── */
-.flow-summary {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 14px 20px;
-  border-top: 1px solid rgba(255, 255, 255, 0.04);
-  background: rgba(0, 0, 0, 0.1);
-}
-
-.flow-summary-label {
-  font-size: 0.72rem;
-  color: rgba(255, 255, 255, 0.35);
-  font-weight: 500;
-}
-
-.flow-summary-value {
+.river-lane-pct {
+  font-size: 0.6rem;
+  font-weight: 600;
   font-variant-numeric: tabular-nums;
-  font-size: 0.85rem;
-  font-weight: 700;
 }
 
-.flow-summary-value.flow-val-bullish { color: #4ade80; }
-.flow-summary-value.flow-val-bearish { color: #f87171; }
-.flow-summary-value.flow-val-neutral { color: #3b82f6; }
+.river-lane-pct.up { color: #4ade80; }
+.river-lane-pct.down { color: #f87171; }
+
+/* ── Divider ── */
+.river-divider {
+  height: 1px;
+  margin: 0 20px;
+  background: rgba(255, 255, 255, 0.04);
+}
 
 /* ── Responsive ── */
 @media (max-width: 900px) {
-  .flow-heading-row {
+  .river-heading-row {
     flex-direction: column;
     align-items: flex-start;
     gap: 8px;
@@ -2396,27 +2380,12 @@ tbody tr:first-child {
 }
 
 @media (max-width: 640px) {
-  .flow-gauge { padding: 0 0 24px; }
-
-  .flow-row {
-    grid-template-columns: 100px 1fr 44px;
-    gap: 8px;
-    padding: 7px 12px;
-  }
-
-  .flow-label-name { font-size: 0.75rem; }
-  .flow-label-sub { font-size: 0.56rem; }
-  .flow-bar-wrap { height: 32px; }
-  .flow-net { font-size: 0.72rem; }
-  .flow-title { font-size: 0.76rem; }
-  .flow-subtitle { font-size: 0.65rem; }
-  .flow-summary { padding: 10px 12px; }
-}
-
-@media (max-width: 380px) {
-  .flow-row {
-    grid-template-columns: 80px 1fr 38px;
-    gap: 6px;
-    padding: 6px 10px;
-  }
+  .momentum-river { padding: 0 0 24px; }
+  .river-title { font-size: 0.76rem; }
+  .river-subtitle { font-size: 0.65rem; }
+  .river-legend { gap: 10px; font-size: 0.6rem; }
+  .river-labels { width: 80px; }
+  .river-lane-sym { font-size: 0.68rem; }
+  .river-lane-pct { font-size: 0.54rem; }
+  .river-section-label { padding: 8px 12px 2px; font-size: 0.58rem; }
 }

@@ -491,177 +491,142 @@
 
 
 
-  // ── 7. SJ FLOW GAUGE — Buy vs Sell Pressure Field ──────────────────────────
-// Append this to feature-additions.js (after the EKG block)
+// ── 7. MOMENTUM RIVER — Flowing lanes visualization ─────────────────────────
+// Append to feature-additions.js (replaces flow-gauge.js if present)
 
-(function initFlowGauge() {
-    const container = document.getElementById("flowRows");
-    const summaryEl = document.getElementById("flowSummaryValue");
-    if (!container) return;
+(function initMomentumRiver() {
+    const moversCanvas  = document.getElementById("riverMoversCanvas");
+    const benchCanvas   = document.getElementById("riverBenchCanvas");
+    const moversLabels  = document.getElementById("riverMoversLabels");
+    const benchLabels   = document.getElementById("riverBenchLabels");
+    const moversWrap    = document.getElementById("riverMoversWrap");
+    const benchWrap     = document.getElementById("riverBenchWrap");
+    const moversLabel   = document.getElementById("riverMoversLabel");
+    const benchLabel    = document.getElementById("riverBenchLabel");
   
-    // ── Category definitions ──
-    const CATEGORIES = {
-      crypto: [
-        { key: "largecap",  name: "Large Cap",     sub: "BTC · ETH · SOL",       filter: r => (r.marketCap || 0) >= 10e9 },
-        { key: "midcap",    name: "Mid Cap",        sub: "Top 20–80 by MCap",     filter: r => { const m = r.marketCap||0; return m >= 1e9 && m < 10e9; } },
-        { key: "smallcap",  name: "Small Cap",      sub: "Under $1B MCap",        filter: r => (r.marketCap || 0) < 1e9 && (r.marketCap || 0) > 0 },
-        { key: "altcoins",  name: "Altcoin Index",  sub: "All non-BTC movers",    filter: r => { const s = (r.coinSymbol||r.symbol||"").toUpperCase(); return s !== "BTC"; } },
-        { key: "memecoins", name: "Meme / Micro",   sub: "High vol, low MCap",    filter: r => { const m = r.marketCap||0; const v = r.volume||0; return m > 0 && m < 500e6 && v/m > 0.3; } },
-        { key: "overall",   name: "Crypto Overall", sub: "All qualifying movers",  filter: () => true },
-      ],
-      stocks: [
-        { key: "megacap",   name: "Mega Cap",       sub: "AAPL · MSFT · NVDA",    filter: r => (r.marketCap || 0) >= 200e9 },
-        { key: "largecap",  name: "Large Cap",       sub: "$10B – $200B",          filter: r => { const m = r.marketCap||0; return m >= 10e9 && m < 200e9; } },
-        { key: "midcap",    name: "Mid Cap",         sub: "$2B – $10B",            filter: r => { const m = r.marketCap||0; return m >= 2e9 && m < 10e9; } },
-        { key: "smallcap",  name: "Small Cap",       sub: "Under $2B",             filter: r => (r.marketCap || 0) < 2e9 && (r.marketCap || 0) > 0 },
-        { key: "highrvol",  name: "High RVOL",       sub: "Vol 1.5x+ average",     filter: r => r.avgVolume > 0 && (r.volume / r.avgVolume) >= 1.5 },
-        { key: "overall",   name: "Stocks Overall",  sub: "All qualifying movers",  filter: () => true },
-      ],
-    };
+    if (!moversCanvas || !benchCanvas) return;
   
-    // ── Buy-side color palettes ──
-    // Crypto: blue → green gradient
-    // Stocks: straight green
-    const BUY_COLORS = {
-      crypto: {
-        gradStops: [
-          { pos: 0,    rgba: "59, 130, 246, 0.04" },   // blue, faint
-          { pos: 0.25, rgba: "59, 130, 246, 0.15" },   // blue
-          { pos: 0.5,  rgba: "34, 197, 150, 0.30" },   // teal blend
-          { pos: 0.75, rgba: "34, 197, 94, 0.50" },    // green
-          { pos: 1,    rgba: "74, 222, 128, 0.70" },   // bright green
-        ],
-        lineGlow:   "rgba(59, 180, 200, 0.12)",
-        particleR: 50, particleG: 200, particleB: 160,  // teal-ish
-        particleGlowR: 34, particleGlowG: 197, particleGlowB: 140,
-        pctR: 100, pctG: 220, pctB: 180,                // label color
-      },
-      stocks: {
-        gradStops: [
-          { pos: 0,    rgba: "34, 197, 94, 0.04" },
-          { pos: 0.3,  rgba: "34, 197, 94, 0.12" },
-          { pos: 0.6,  rgba: "34, 197, 94, 0.28" },
-          { pos: 0.85, rgba: "74, 222, 128, 0.50" },
-          { pos: 1,    rgba: "74, 222, 128, 0.70" },
-        ],
-        lineGlow:   "rgba(74, 222, 128, 0.10)",
-        particleR: 74, particleG: 222, particleB: 128,
-        particleGlowR: 34, particleGlowG: 197, particleGlowB: 94,
-        pctR: 74, pctG: 222, pctB: 128,
-      },
-    };
+    const moversCtx = moversCanvas.getContext("2d");
+    const benchCtx  = benchCanvas.getContext("2d");
   
-    // Sell side is always red (same for both modes)
-    const SELL_COLORS = {
-      gradStops: [
-        { pos: 0,    rgba: "248, 113, 113, 0.70" },
-        { pos: 0.15, rgba: "239, 68, 68, 0.50" },
-        { pos: 0.4,  rgba: "239, 68, 68, 0.28" },
-        { pos: 0.7,  rgba: "239, 68, 68, 0.12" },
-        { pos: 1,    rgba: "239, 68, 68, 0.04" },
-      ],
-      particleR: 248, particleG: 113, particleB: 113,
-      particleGlowR: 239, particleGlowG: 68, particleGlowB: 68,
-      pctR: 248, pctG: 113, pctB: 113,
-    };
-  
-    // ── Compute pressure from a group of rows ──
-    function groupPressure(rows, mode) {
-      if (!rows.length) return 50;
-      let total = 0;
-      rows.forEach(r => {
-        const pct = r.pctChange || 0;
-        const momentum = Math.tanh(pct / 100 * 3);
-        const price = r.price || 0;
-        const hi = r.dayHigh || r.high24h || price;
-        const lo = r.dayLow  || r.low24h  || price;
-        let range = 0.5;
-        if (hi !== lo) range = Math.max(0, Math.min(1, (price - lo) / (hi - lo)));
-        const vol = r.volume || 0;
-        const mcap = r.marketCap || 1;
-        const avgVol = r.avgVolume || 0;
-        let volC = 0.5;
-        if (mode === "stocks" && avgVol > 0) volC = Math.min(1, (vol / avgVol) / 5);
-        else if (mcap > 0) volC = Math.min(1, (vol / mcap) * 3);
-        const raw = (momentum + 1) / 2;
-        total += Math.max(0, Math.min(100, (raw * 0.5 + range * 0.3 + volC * 0.2) * 100));
-      });
-      return total / rows.length;
-    }
-  
-    // ── Particle system ──
-    class Particles {
-      constructor() { this.list = []; this.max = 40; }
-  
-      emit(x, y, h, buyRatio, buyCol, sellCol) {
-        if (this.list.length >= this.max || Math.random() > 0.35) return;
-        const isBuy = Math.random() < buyRatio;
-        const col = isBuy ? buyCol : sellCol;
-        this.list.push({
-          x: x + (Math.random() - 0.5) * 8,
-          y: y + (Math.random() - 0.5) * h * 0.6,
-          vx: isBuy ? -(1 + Math.random() * 2.5) : (1 + Math.random() * 2.5),
-          vy: (Math.random() - 0.5) * 1.2,
-          life: 1, decay: 0.012 + Math.random() * 0.018,
-          size: 1.2 + Math.random() * 2,
-          r: col.r, g: col.g, b: col.b,
-          gr: col.gr, gg: col.gg, gb: col.gb,
-        });
-      }
-  
-      update() {
-        for (let i = this.list.length - 1; i >= 0; i--) {
-          const p = this.list[i];
-          p.x += p.vx;
-          p.y += p.vy;
-          p.vy += (Math.random() - 0.5) * 0.15;
-          p.life -= p.decay;
-          if (p.life <= 0) this.list.splice(i, 1);
-        }
-      }
-  
-      draw(ctx) {
-        this.list.forEach(p => {
-          const a = p.life * 0.7;
-          // Glow
-          ctx.beginPath();
-          ctx.arc(p.x, p.y, p.size + 2, 0, Math.PI * 2);
-          ctx.fillStyle = `rgba(${p.gr},${p.gg},${p.gb},${a * 0.15})`;
-          ctx.fill();
-          // Core
-          ctx.beginPath();
-          ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-          ctx.fillStyle = `rgba(${p.r},${p.g},${p.b},${a})`;
-          ctx.fill();
-        });
-      }
-    }
-  
-    // ── Bar state ──
-    const bars = [];
+    let activeMode = "crypto";
+    let moversLanes = [];
+    let benchLanes = [];
     let raf = null;
     let time = 0;
-    let activeMode = "crypto"; // syncs with app.js toggle
   
-    function makeBar(canvas, targetBuy) {
-      return {
-        canvas,
-        ctx: canvas.getContext("2d"),
-        target: targetBuy,
-        current: 50,
-        particles: new Particles(),
-        wp1: Math.random() * Math.PI * 2,
-        wp2: Math.random() * Math.PI * 2,
-      };
+    // ── Lane config ──
+    const MIN_LANE_H = 28;
+    const MAX_MOVERS = 10;  // show top 10 momentum movers
+    const LANE_GAP = 1;
+  
+    // ── Color logic ──
+    // Crypto movers: blue → teal → green based on momentum strength
+    // Stock movers: green shades
+    // Bearish: red/warm
+    function laneColor(pct, mode, alpha) {
+      if (mode === "crypto") {
+        if (pct >= 10) return `rgba(34, 255, 140, ${alpha})`;
+        if (pct >= 6)  return `rgba(50, 220, 160, ${alpha})`;
+        if (pct >= 3)  return `rgba(59, 180, 220, ${alpha})`;
+        if (pct >= 0)  return `rgba(70, 150, 230, ${alpha})`;
+        if (pct >= -3) return `rgba(200, 140, 100, ${alpha})`;
+        return `rgba(240, 90, 90, ${alpha})`;
+      } else {
+        if (pct >= 10) return `rgba(34, 255, 120, ${alpha})`;
+        if (pct >= 6)  return `rgba(74, 222, 128, ${alpha})`;
+        if (pct >= 3)  return `rgba(100, 200, 130, ${alpha})`;
+        if (pct >= 0)  return `rgba(120, 180, 150, ${alpha})`;
+        if (pct >= -3) return `rgba(200, 130, 100, ${alpha})`;
+        return `rgba(240, 90, 90, ${alpha})`;
+      }
     }
   
-    // ── Draw one bar ──
-    function drawBar(bar) {
-      const { canvas, ctx, particles } = bar;
+    // Benchmark lanes are always neutral/dim
+    function benchColor(pct, alpha) {
+      if (pct >= 0.5) return `rgba(80, 160, 130, ${alpha})`;
+      if (pct >= 0)   return `rgba(100, 140, 160, ${alpha})`;
+      if (pct >= -1)  return `rgba(160, 120, 100, ${alpha})`;
+      return `rgba(200, 100, 90, ${alpha})`;
+    }
+  
+    // ── Build lane objects ──
+    function buildLanes(data, isBench) {
+      return data.map((d, i) => ({
+        sym: d.sym,
+        pct: d.pct,
+        vol: d.vol || 0.5,    // normalized 0–1 for width weighting
+        speed: Math.max(0.3, Math.abs(d.pct) / 100 * 8 + 0.4),
+        direction: d.pct >= 0 ? 1 : -1,
+        isBench: isBench,
+        y: 0, h: 0,           // computed during layout
+        wavePhase: Math.random() * Math.PI * 2,
+        particles: [],
+      }));
+    }
+  
+    // ── Layout lanes into a canvas ──
+    function layoutLanes(lanes, canvasEl, wrapEl) {
+      if (!lanes.length) {
+        canvasEl.style.height = "0px";
+        return;
+      }
+  
+      const totalVol = lanes.reduce((s, l) => s + l.vol, 0) || 1;
+      const laneCount = lanes.length;
+      const totalGap = (laneCount - 1) * LANE_GAP;
+      const availH = laneCount * MIN_LANE_H + totalGap + 
+                     lanes.reduce((s, l) => s + (l.vol / totalVol) * 80, 0);
+  
+      let yOff = 0;
+      lanes.forEach(l => {
+        const fraction = l.vol / totalVol;
+        l.h = Math.max(MIN_LANE_H, MIN_LANE_H + fraction * 80);
+        l.y = yOff;
+        yOff += l.h + LANE_GAP;
+  
+        // Populate particles
+        if (l.particles.length === 0) {
+          const count = Math.floor(l.h * 0.7) + 8;
+          for (let i = 0; i < count; i++) {
+            l.particles.push({
+              x: Math.random() * 2000,
+              y: l.y + Math.random() * l.h,
+              size: 1 + Math.random() * 2.2,
+              alpha: 0.12 + Math.random() * 0.38,
+              speedMult: 0.5 + Math.random() * 1.0,
+            });
+          }
+        }
+      });
+  
+      const totalH = yOff - LANE_GAP;
+      canvasEl.style.height = totalH + "px";
+    }
+  
+    // ── Build side labels ──
+    function buildLabels(lanes, labelEl) {
+      labelEl.innerHTML = "";
+      lanes.forEach(l => {
+        const div = document.createElement("div");
+        div.className = "river-lane-label";
+        div.style.height = l.h + "px";
+        const sign = l.pct >= 0 ? "+" : "";
+        div.innerHTML = `
+          <span class="river-lane-sym">${l.sym}</span>
+          <span class="river-lane-pct ${l.pct >= 0 ? "up" : "down"}">${sign}${l.pct.toFixed(1)}%</span>
+        `;
+        labelEl.appendChild(div);
+      });
+    }
+  
+    // ── Draw lanes on a canvas ──
+    function drawLanes(lanes, canvas, ctxRef, mode) {
       const dpr = window.devicePixelRatio || 1;
       const wrap = canvas.parentElement;
       const w = wrap.clientWidth;
-      const h = wrap.clientHeight;
+      const h = parseInt(canvas.style.height) || 100;
+  
       if (w === 0 || h === 0) return;
   
       const cw = Math.round(w * dpr);
@@ -670,106 +635,77 @@
         canvas.width = cw;
         canvas.height = ch;
       }
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctxRef.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctxRef.clearRect(0, 0, w, h);
   
-      bar.current += (bar.target - bar.current) * 0.04;
-      const buyRatio = bar.current / 100;
-      const contactX = buyRatio * w;
-      const midY = h / 2;
+      lanes.forEach(l => {
+        const colorFn = l.isBench ? benchColor : (pct, a) => laneColor(pct, mode, a);
+        const midY = l.y + l.h / 2;
   
-      ctx.clearRect(0, 0, w, h);
+        // Lane background
+        const bgGrad = ctxRef.createLinearGradient(0, l.y, 0, l.y + l.h);
+        bgGrad.addColorStop(0, "rgba(255,255,255,0.005)");
+        bgGrad.addColorStop(0.5, colorFn(l.pct, l.isBench ? 0.03 : 0.05));
+        bgGrad.addColorStop(1, "rgba(255,255,255,0.005)");
+        ctxRef.fillStyle = bgGrad;
+        ctxRef.fillRect(0, l.y, w, l.h);
   
-      // ── Wavy boundary points ──
-      const waveAmp = 6 + Math.sin(time * 0.7 + bar.wp2) * 3;
-      const wf = 0.08;
-      const wavePts = [];
-      for (let y = -2; y <= h + 2; y += 2) {
-        const w1 = Math.sin(y * wf + time * 1.8 + bar.wp1) * waveAmp;
-        const w2 = Math.sin(y * wf * 1.7 + time * 2.4 + bar.wp2) * waveAmp * 0.5;
-        const w3 = Math.sin(y * wf * 0.5 + time * 0.9) * waveAmp * 0.3;
-        wavePts.push({ y, x: contactX + w1 + w2 + w3 });
-      }
+        // Wavy top border
+        ctxRef.beginPath();
+        for (let x = 0; x <= w; x += 4) {
+          const wave = Math.sin(x * 0.012 + time * l.speed * 0.6 + l.wavePhase) * 1.5;
+          ctxRef.lineTo(x, l.y + wave);
+        }
+        ctxRef.strokeStyle = "rgba(255,255,255,0.03)";
+        ctxRef.lineWidth = 1;
+        ctxRef.stroke();
   
-      const buyCfg = BUY_COLORS[activeMode] || BUY_COLORS.crypto;
+        // Stream particles
+        l.particles.forEach(p => {
+          p.x += l.speed * l.direction * p.speedMult;
   
-      // ── Buy side (left of wave) ──
-      ctx.beginPath();
-      ctx.moveTo(0, 0);
-      wavePts.forEach(p => ctx.lineTo(p.x, p.y));
-      ctx.lineTo(0, h);
-      ctx.closePath();
+          const wy = Math.sin(p.x * 0.006 + time + l.wavePhase) * 2.5;
   
-      const buyGrad = ctx.createLinearGradient(0, 0, contactX + 20, 0);
-      buyCfg.gradStops.forEach(s => buyGrad.addColorStop(s.pos, `rgba(${s.rgba})`));
-      ctx.fillStyle = buyGrad;
-      ctx.fill();
+          // Wrap
+          if (l.direction > 0 && p.x > w + 30) p.x = -30;
+          if (l.direction < 0 && p.x < -30) p.x = w + 30;
   
-      // ── Sell side (right of wave) ──
-      ctx.beginPath();
-      ctx.moveTo(w, 0);
-      wavePts.forEach(p => ctx.lineTo(p.x, p.y));
-      ctx.lineTo(w, h);
-      ctx.closePath();
+          const drawY = Math.max(l.y + 2, Math.min(l.y + l.h - 2, p.y + wy));
   
-      const sellGrad = ctx.createLinearGradient(contactX - 20, 0, w, 0);
-      SELL_COLORS.gradStops.forEach(s => sellGrad.addColorStop(s.pos, `rgba(${s.rgba})`));
-      ctx.fillStyle = sellGrad;
-      ctx.fill();
+          // Glow
+          ctxRef.beginPath();
+          ctxRef.arc(p.x, drawY, p.size + 1.5, 0, Math.PI * 2);
+          ctxRef.fillStyle = colorFn(l.pct, p.alpha * 0.12);
+          ctxRef.fill();
   
-      // ── Wavy contact line ──
-      ctx.beginPath();
-      wavePts.forEach((p, i) => { if (i === 0) ctx.moveTo(p.x, p.y); else ctx.lineTo(p.x, p.y); });
+          // Core
+          ctxRef.beginPath();
+          ctxRef.arc(p.x, drawY, p.size, 0, Math.PI * 2);
+          ctxRef.fillStyle = colorFn(l.pct, p.alpha);
+          ctxRef.fill();
+        });
   
-      ctx.strokeStyle = "rgba(255,255,255,0.08)";
-      ctx.lineWidth = 6;
-      ctx.lineJoin = "round";
-      ctx.stroke();
+        // Subtle direction arrows
+        const arrowSpacing = 220;
+        const arrowAlpha = Math.min(0.1, Math.abs(l.pct) / 100 * 0.4 + 0.02);
+        ctxRef.fillStyle = colorFn(l.pct, arrowAlpha);
+        ctxRef.font = `600 ${Math.max(11, l.h * 0.3)}px system-ui, sans-serif`;
+        ctxRef.textAlign = "center";
+        ctxRef.textBaseline = "middle";
   
-      ctx.strokeStyle = buyCfg.lineGlow;
-      ctx.lineWidth = 3;
-      ctx.stroke();
-  
-      ctx.strokeStyle = "rgba(255,255,255,0.30)";
-      ctx.lineWidth = 0.8;
-      ctx.stroke();
-  
-      // ── Particles ──
-      const buyParticle = { r: buyCfg.particleR, g: buyCfg.particleG, b: buyCfg.particleB, gr: buyCfg.particleGlowR, gg: buyCfg.particleGlowG, gb: buyCfg.particleGlowB };
-      const sellParticle = { r: SELL_COLORS.particleR, g: SELL_COLORS.particleG, b: SELL_COLORS.particleB, gr: SELL_COLORS.particleGlowR, gg: SELL_COLORS.particleGlowG, gb: SELL_COLORS.particleGlowB };
-  
-      const ep = wavePts[Math.floor(Math.random() * wavePts.length)];
-      if (ep) particles.emit(ep.x, ep.y, h, buyRatio, buyParticle, sellParticle);
-      if (Math.random() < 0.5) {
-        const ep2 = wavePts[Math.floor(Math.random() * wavePts.length)];
-        if (ep2) particles.emit(ep2.x, ep2.y, h, buyRatio, buyParticle, sellParticle);
-      }
-      particles.update();
-      particles.draw(ctx);
-  
-      // ── Percentage labels ──
-      const buyPct = Math.round(bar.current);
-      const sellPct = 100 - buyPct;
-  
-      ctx.font = "700 11px system-ui, -apple-system, sans-serif";
-      ctx.textBaseline = "middle";
-  
-      if (contactX > 50) {
-        ctx.textAlign = "left";
-        ctx.fillStyle = `rgba(${buyCfg.pctR},${buyCfg.pctG},${buyCfg.pctB},${Math.min(0.8, buyRatio * 1.5)})`;
-        ctx.fillText(`${buyPct}%`, 10, midY);
-      }
-  
-      if (w - contactX > 50) {
-        ctx.textAlign = "right";
-        ctx.fillStyle = `rgba(${SELL_COLORS.pctR},${SELL_COLORS.pctG},${SELL_COLORS.pctB},${Math.min(0.8, (1 - buyRatio) * 1.5)})`;
-        ctx.fillText(`${sellPct}%`, w - 10, midY);
-      }
+        const arrowChar = l.direction > 0 ? "›" : "‹";
+        const offset = (time * l.speed * l.direction * 35) % arrowSpacing;
+        for (let x = 120 + offset; x < w + arrowSpacing; x += arrowSpacing) {
+          ctxRef.fillText(arrowChar, x, midY);
+        }
+      });
     }
   
     // ── Animation loop ──
     function animate() {
       time += 0.016;
-      bars.forEach(drawBar);
+      drawLanes(moversLanes, moversCanvas, moversCtx, activeMode);
+      drawLanes(benchLanes, benchCanvas, benchCtx, activeMode);
       raf = requestAnimationFrame(animate);
     }
   
@@ -778,112 +714,119 @@
         if (raf) cancelAnimationFrame(raf);
         raf = null;
       } else {
-        if (!raf && bars.length) animate();
+        if (!raf && (moversLanes.length || benchLanes.length)) animate();
       }
     });
   
-    // ── Render ──
-    function renderCategories(categories, buyScores) {
-      container.innerHTML = "";
-      bars.length = 0;
-  
-      categories.forEach((cat, idx) => {
-        const buy = buyScores[idx] || 50;
-        const net = buy - 50;
-        const netStr = net >= 0 ? `+${Math.round(net)}` : `${Math.round(net)}`;
-        const netClass = net > 5 ? "flow-bullish" : net < -5 ? "flow-bearish" : "flow-neutral";
-  
-        const row = document.createElement("div");
-        row.className = "flow-row";
-        row.innerHTML = `
-          <div class="flow-label">
-            <span class="flow-label-name">${cat.name}</span>
-            <span class="flow-label-sub">${cat.sub}</span>
-          </div>
-          <div class="flow-bar-wrap">
-            <canvas class="flow-bar-canvas" id="flowBar${idx}"></canvas>
-          </div>
-          <span class="flow-net ${netClass}">${netStr}</span>
-        `;
-        container.appendChild(row);
-  
-        bars.push(makeBar(document.getElementById(`flowBar${idx}`), buy));
-      });
-  
-      // Summary
-      if (summaryEl) {
-        const avg = buyScores.reduce((s, v) => s + v, 0) / buyScores.length;
-        const net = avg - 50;
-        if (net > 5) {
-          summaryEl.textContent = `Buyers Dominate +${Math.round(net)}`;
-          summaryEl.className = "flow-summary-value flow-val-bullish";
-        } else if (net < -5) {
-          summaryEl.textContent = `Sellers Dominate ${Math.round(net)}`;
-          summaryEl.className = "flow-summary-value flow-val-bearish";
-        } else {
-          summaryEl.textContent = "Balanced";
-          summaryEl.className = "flow-summary-value flow-val-neutral";
-        }
-      }
-  
-      if (!raf) animate();
-    }
-  
-    // ── Fetch and compute ──
-    async function fetchFlow(mode) {
+    // ── Fetch and render ──
+    async function fetchRiver(mode) {
       activeMode = mode;
-      const cats = CATEGORIES[mode];
   
-      let buyScores;
+      // Update section labels
+      if (moversLabel) moversLabel.textContent = mode === "crypto" ? "Top Crypto Movers" : "Top Stock Movers";
+      if (benchLabel)  benchLabel.textContent  = mode === "crypto" ? "Market Context · BTC & Total Crypto" : "Market Context · S&P 500 & NASDAQ";
+  
+      let moversData = [];
+      let benchData = [];
+  
       try {
+        // Fetch movers
         const endpoint = mode === "stocks"
-          ? "https://api.stockjelli.com/api/stocks?limit=30&mcapMin=100000000"
-          : "https://api.stockjelli.com/api/crypto?limit=30&mcapMin=50000000";
+          ? "https://api.stockjelli.com/api/stocks?limit=15&mcapMin=100000000"
+          : "https://api.stockjelli.com/api/crypto?limit=15&mcapMin=50000000";
   
         const res = await fetch(endpoint, { cache: "no-store" });
         if (!res.ok) throw new Error("API error");
         const data = await res.json();
-        const rows = data.rows || [];
+        const rows = (data.rows || [])
+          .filter(r => r.pctChange > 0)
+          .sort((a, b) => b.pctChange - a.pctChange)
+          .slice(0, MAX_MOVERS);
   
-        buyScores = cats.map(cat => {
-          const filtered = rows.filter(cat.filter);
-          return groupPressure(filtered, mode);
-        });
+        // Normalize volume to 0–1 range
+        const maxVol = Math.max(...rows.map(r => r.volume || 0), 1);
+  
+        moversData = rows.map(r => ({
+          sym: mode === "crypto" ? (r.coinSymbol || r.symbol) : r.symbol,
+          pct: r.pctChange || 0,
+          vol: Math.max(0.15, (r.volume || 0) / maxVol),
+        }));
+  
+        // Benchmark data from header indices
+        if (mode === "crypto") {
+          // Try to read from the header data the main app already fetched
+          const btcPct = parseFloat(document.getElementById("idxLeftValue")?.textContent) || 0;
+          const totalPct = parseFloat(document.getElementById("idxRightValue")?.textContent) || 0;
+          benchData = [
+            { sym: "BTC", pct: btcPct, vol: 0.6 },
+            { sym: "Total Crypto", pct: totalPct, vol: 0.4 },
+          ];
+        } else {
+          const nasdaqPct = parseFloat(document.getElementById("idxLeftValue")?.textContent) || 0;
+          const spPct = parseFloat(document.getElementById("idxRightValue")?.textContent) || 0;
+          benchData = [
+            { sym: "NASDAQ", pct: nasdaqPct, vol: 0.5 },
+            { sym: "S&P 500", pct: spPct, vol: 0.5 },
+          ];
+        }
+  
       } catch (e) {
-        console.warn("[FlowGauge] API error, fallback:", e);
-        buyScores = cats.map(() => 40 + Math.random() * 30);
+        console.warn("[MomentumRiver] API error, using fallback:", e);
+        moversData = [
+          { sym: "SOL", pct: 12.4, vol: 0.85 },
+          { sym: "PEPE", pct: 24.7, vol: 0.7 },
+          { sym: "DOGE", pct: 8.1, vol: 0.65 },
+          { sym: "ADA", pct: 5.5, vol: 0.55 },
+          { sym: "NEAR", pct: 9.8, vol: 0.45 },
+          { sym: "LINK", pct: 4.2, vol: 0.5 },
+        ];
+        benchData = [
+          { sym: "BTC", pct: 1.8, vol: 0.6 },
+          { sym: "Total Crypto", pct: 0.5, vol: 0.4 },
+        ];
       }
   
-      renderCategories(cats, buyScores);
+      // Build lanes
+      moversLanes = buildLanes(moversData, false);
+      benchLanes  = buildLanes(benchData, true);
+  
+      // Layout
+      layoutLanes(moversLanes, moversCanvas, moversWrap);
+      layoutLanes(benchLanes, benchCanvas, benchWrap);
+  
+      // Labels
+      buildLabels(moversLanes, moversLabels);
+      buildLabels(benchLanes, benchLabels);
+  
+      // Start animation
+      if (!raf) animate();
     }
   
-    // ── Sync with the existing Stocks/Crypto asset toggle in app.js ──
-    // Listen for clicks on the same #assetControl segmented control
+    // ── Sync with existing Stocks/Crypto toggle ──
     const assetControl = document.getElementById("assetControl");
     if (assetControl) {
       assetControl.addEventListener("click", (e) => {
         const btn = e.target.closest(".segmented-btn");
         if (!btn) return;
-        const mode = btn.dataset.value === "crypto" ? "crypto" : "stocks";
-        fetchFlow(mode);
+        fetchRiver(btn.dataset.value === "crypto" ? "crypto" : "stocks");
       });
     }
   
-    // ── Handle resize ──
+    // ── Resize handler ──
     window.addEventListener("resize", () => {
-      bars.forEach(b => { b.current = b.target; });
+      if (moversLanes.length) layoutLanes(moversLanes, moversCanvas, moversWrap);
+      if (benchLanes.length)  layoutLanes(benchLanes, benchCanvas, benchWrap);
     });
   
-    // ── Init: match whatever mode is currently active ──
+    // ── Init ──
     const activeBtn = assetControl?.querySelector(".segmented-on");
     const initMode = activeBtn?.dataset?.value === "crypto" ? "crypto" : "stocks";
-    fetchFlow(initMode);
+    fetchRiver(initMode);
   
-    // ── Refresh every 60s alongside the main data ──
-    setInterval(() => fetchFlow(activeMode), 60_000);
+    // Refresh every 60s
+    setInterval(() => fetchRiver(activeMode), 60_000);
   
   })();
-
 
 
 

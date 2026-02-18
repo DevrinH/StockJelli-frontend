@@ -491,18 +491,25 @@
 
 
 
-// ── 7. MOMENTUM RIVER — Flowing lanes visualization ─────────────────────────
-// Append to feature-additions.js (replaces flow-gauge.js if present)
+// ── 7. MOMENTUM RIVER v3 — Targeted visual upgrades (performance-safe) ──────
+// Replaces previous river.js in feature-additions.js
+// 
+// Changes from v1:
+// - Tightened color hierarchy (strong=teal-green, moderate=desaturated, weak=amber/red)
+// - Bearish particles: slower speed + heavier glow
+// - "Current" brightness gradient across center of river
+// - Particles brighten in center, dim at edges
+// - No ctx.filter, no radial gradients per frame, no parallax layers
 
 (function initMomentumRiver() {
-    const moversCanvas  = document.getElementById("riverMoversCanvas");
-    const benchCanvas   = document.getElementById("riverBenchCanvas");
-    const moversLabels  = document.getElementById("riverMoversLabels");
-    const benchLabels   = document.getElementById("riverBenchLabels");
-    const moversWrap    = document.getElementById("riverMoversWrap");
-    const benchWrap     = document.getElementById("riverBenchWrap");
-    const moversLabel   = document.getElementById("riverMoversLabel");
-    const benchLabel    = document.getElementById("riverBenchLabel");
+    const moversCanvas = document.getElementById("riverMoversCanvas");
+    const benchCanvas  = document.getElementById("riverBenchCanvas");
+    const moversLabels = document.getElementById("riverMoversLabels");
+    const benchLabels  = document.getElementById("riverBenchLabels");
+    const moversWrap   = document.getElementById("riverMoversWrap");
+    const benchWrap    = document.getElementById("riverBenchWrap");
+    const moversLabel  = document.getElementById("riverMoversLabel");
+    const benchLabel   = document.getElementById("riverBenchLabel");
   
     if (!moversCanvas || !benchCanvas) return;
   
@@ -515,118 +522,155 @@
     let raf = null;
     let time = 0;
   
-    // ── Lane config ──
-    const MIN_LANE_H = 28;
-    const MAX_MOVERS = 10;  // show top 10 momentum movers
+    const MIN_LANE_H = 30;
+    const MAX_MOVERS = 10;
     const LANE_GAP = 1;
   
-    // ── Color logic ──
-    // Crypto movers: blue → teal → green based on momentum strength
-    // Stock movers: green shades
-    // Bearish: red/warm
-    function laneColor(pct, mode, alpha) {
+    // ═══════════════════════════════════════════════════════════════════════════
+    // COLOR HIERARCHY — strong=teal-green, moderate=desaturated, weak=amber/red
+    // ═══════════════════════════════════════════════════════════════════════════
+  
+    function moverColor(pct, mode, alpha) {
       if (mode === "crypto") {
-        if (pct >= 10) return `rgba(34, 255, 140, ${alpha})`;
-        if (pct >= 6)  return `rgba(50, 220, 160, ${alpha})`;
-        if (pct >= 3)  return `rgba(59, 180, 220, ${alpha})`;
-        if (pct >= 0)  return `rgba(70, 150, 230, ${alpha})`;
-        if (pct >= -3) return `rgba(200, 140, 100, ${alpha})`;
-        return `rgba(240, 90, 90, ${alpha})`;
+        if (pct >= 12) return `rgba(34, 255, 160, ${alpha})`;   // brilliant teal-green (earned)
+        if (pct >= 8)  return `rgba(50, 230, 170, ${alpha})`;   // strong teal
+        if (pct >= 5)  return `rgba(59, 200, 210, ${alpha})`;   // teal-blue
+        if (pct >= 3)  return `rgba(80, 180, 200, ${alpha})`;   // blue, less saturated
+        if (pct >= 0)  return `rgba(100, 160, 180, ${alpha})`;  // cool desaturated
+        if (pct >= -3) return `rgba(210, 150, 90, ${alpha})`;   // warm amber
+        return `rgba(220, 85, 70, ${alpha})`;                    // red
       } else {
-        if (pct >= 10) return `rgba(34, 255, 120, ${alpha})`;
-        if (pct >= 6)  return `rgba(74, 222, 128, ${alpha})`;
-        if (pct >= 3)  return `rgba(100, 200, 130, ${alpha})`;
-        if (pct >= 0)  return `rgba(120, 180, 150, ${alpha})`;
-        if (pct >= -3) return `rgba(200, 130, 100, ${alpha})`;
-        return `rgba(240, 90, 90, ${alpha})`;
+        if (pct >= 12) return `rgba(34, 255, 130, ${alpha})`;
+        if (pct >= 8)  return `rgba(60, 230, 120, ${alpha})`;
+        if (pct >= 5)  return `rgba(80, 210, 130, ${alpha})`;
+        if (pct >= 3)  return `rgba(110, 190, 140, ${alpha})`;
+        if (pct >= 0)  return `rgba(130, 170, 150, ${alpha})`;
+        if (pct >= -3) return `rgba(210, 140, 90, ${alpha})`;
+        return `rgba(220, 85, 70, ${alpha})`;
       }
     }
   
-    // Benchmark lanes are always neutral/dim
-    function benchColor(pct, alpha) {
-      if (pct >= 0.5) return `rgba(80, 160, 130, ${alpha})`;
-      if (pct >= 0)   return `rgba(100, 140, 160, ${alpha})`;
-      if (pct >= -1)  return `rgba(160, 120, 100, ${alpha})`;
-      return `rgba(200, 100, 90, ${alpha})`;
+    // Benchmarks: muted, intentionally "heavier" feel
+    function benchColorFn(pct, alpha) {
+      if (pct >= 0.5) return `rgba(70, 130, 120, ${alpha})`;
+      if (pct >= 0)   return `rgba(90, 120, 140, ${alpha})`;
+      if (pct >= -1)  return `rgba(170, 115, 85, ${alpha})`;
+      return `rgba(200, 85, 70, ${alpha})`;
     }
   
-    // ── Build lane objects ──
+    // ═══════════════════════════════════════════════════════════════════════════
+    // PARTICLES — simple, no blur, bearish = slower + heavier glow
+    // ═══════════════════════════════════════════════════════════════════════════
+  
+    function createParticles(lane, isBench) {
+      const particles = [];
+      const count = Math.floor(lane.h * 0.65) + 8;
+  
+      for (let i = 0; i < count; i++) {
+        const size = 0.8 + Math.random() * 2.4;
+        const alpha = 0.1 + Math.random() * 0.35;
+        // Bearish particles: slower, slightly bigger glow radius
+        const isBearish = lane.pct < 0;
+        const speedMult = isBearish
+          ? (0.25 + Math.random() * 0.45)   // slow
+          : (0.5 + Math.random() * 0.9);    // normal
+  
+        particles.push({
+          x: Math.random() * 2000,
+          y: lane.y + 3 + Math.random() * (lane.h - 6),
+          size,
+          alpha,
+          speedMult,
+          isBearish,
+          glowExtra: isBearish ? 1.5 : 0,  // heavier glow for bearish
+          wobblePhase: Math.random() * Math.PI * 2,
+        });
+      }
+  
+      return particles;
+    }
+  
+    // ═══════════════════════════════════════════════════════════════════════════
+    // LANE BUILDING
+    // ═══════════════════════════════════════════════════════════════════════════
+  
     function buildLanes(data, isBench) {
       return data.map((d, i) => ({
         sym: d.sym,
         pct: d.pct,
-        vol: d.vol || 0.5,    // normalized 0–1 for width weighting
+        vol: d.vol || 0.5,
         speed: Math.max(0.3, Math.abs(d.pct) / 100 * 8 + 0.4),
         direction: d.pct >= 0 ? 1 : -1,
-        isBench: isBench,
-        y: 0, h: 0,           // computed during layout
+        isBench,
+        y: 0, h: 0,
         wavePhase: Math.random() * Math.PI * 2,
         particles: [],
       }));
     }
   
-    // ── Layout lanes into a canvas ──
-    function layoutLanes(lanes, canvasEl, wrapEl) {
-      if (!lanes.length) {
-        canvasEl.style.height = "0px";
-        return;
-      }
+    function layoutLanes(lanes, canvasEl, isBench) {
+      if (!lanes.length) { canvasEl.style.height = "0px"; return; }
   
       const totalVol = lanes.reduce((s, l) => s + l.vol, 0) || 1;
-      const laneCount = lanes.length;
-      const totalGap = (laneCount - 1) * LANE_GAP;
-      const availH = laneCount * MIN_LANE_H + totalGap + 
-                     lanes.reduce((s, l) => s + (l.vol / totalVol) * 80, 0);
-  
       let yOff = 0;
+  
       lanes.forEach(l => {
         const fraction = l.vol / totalVol;
-        l.h = Math.max(MIN_LANE_H, MIN_LANE_H + fraction * 80);
+        l.h = Math.max(MIN_LANE_H, MIN_LANE_H + fraction * 90);
         l.y = yOff;
         yOff += l.h + LANE_GAP;
-  
-        // Populate particles
-        if (l.particles.length === 0) {
-          const count = Math.floor(l.h * 0.7) + 8;
-          for (let i = 0; i < count; i++) {
-            l.particles.push({
-              x: Math.random() * 2000,
-              y: l.y + Math.random() * l.h,
-              size: 1 + Math.random() * 2.2,
-              alpha: 0.12 + Math.random() * 0.38,
-              speedMult: 0.5 + Math.random() * 1.0,
-            });
-          }
-        }
+        l.particles = createParticles(l, isBench);
       });
   
-      const totalH = yOff - LANE_GAP;
-      canvasEl.style.height = totalH + "px";
+      canvasEl.style.height = (yOff - LANE_GAP) + "px";
     }
   
-    // ── Build side labels ──
-    function buildLabels(lanes, labelEl) {
+    // ═══════════════════════════════════════════════════════════════════════════
+    // LABELS — with count-up animation on % values
+    // ═══════════════════════════════════════════════════════════════════════════
+  
+    function buildLabelsDOM(lanes, labelEl) {
       labelEl.innerHTML = "";
       lanes.forEach(l => {
         const div = document.createElement("div");
         div.className = "river-lane-label";
         div.style.height = l.h + "px";
-        const sign = l.pct >= 0 ? "+" : "";
-        div.innerHTML = `
-          <span class="river-lane-sym">${l.sym}</span>
-          <span class="river-lane-pct ${l.pct >= 0 ? "up" : "down"}">${sign}${l.pct.toFixed(1)}%</span>
-        `;
+  
+        const pctSpan = document.createElement("span");
+        pctSpan.className = `river-lane-pct ${l.pct >= 0 ? "up" : "down"}`;
+  
+        div.innerHTML = `<span class="river-lane-sym">${l.sym}</span>`;
+        div.appendChild(pctSpan);
         labelEl.appendChild(div);
+  
+        // Count-up animation
+        const target = l.pct;
+        const sign = target >= 0 ? "+" : "";
+        const duration = 800;
+        const start = performance.now();
+  
+        function tick(now) {
+          const elapsed = now - start;
+          const progress = Math.min(1, elapsed / duration);
+          // Ease-out cubic
+          const eased = 1 - Math.pow(1 - progress, 3);
+          const current = target * eased;
+          pctSpan.textContent = `${current >= 0 ? "+" : ""}${current.toFixed(1)}%`;
+          if (progress < 1) requestAnimationFrame(tick);
+        }
+        requestAnimationFrame(tick);
       });
     }
   
-    // ── Draw lanes on a canvas ──
-    function drawLanes(lanes, canvas, ctxRef, mode) {
+    // ═══════════════════════════════════════════════════════════════════════════
+    // DRAW ENGINE — no blur, no per-frame radial gradients
+    // ═══════════════════════════════════════════════════════════════════════════
+  
+    function drawLanes(lanes, canvas, ctx, mode, isBench) {
       const dpr = window.devicePixelRatio || 1;
       const wrap = canvas.parentElement;
       const w = wrap.clientWidth;
       const h = parseInt(canvas.style.height) || 100;
-  
       if (w === 0 || h === 0) return;
   
       const cw = Math.round(w * dpr);
@@ -635,36 +679,74 @@
         canvas.width = cw;
         canvas.height = ch;
       }
-      ctxRef.setTransform(dpr, 0, 0, dpr, 0, 0);
-      ctxRef.clearRect(0, 0, w, h);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.clearRect(0, 0, w, h);
+  
+      const colorFn = isBench
+        ? (pct, a) => benchColorFn(pct, a)
+        : (pct, a) => moverColor(pct, mode, a);
+  
+      // ── Benchmark: darker wash ──
+      if (isBench) {
+        ctx.fillStyle = "rgba(0, 0, 0, 0.12)";
+        ctx.fillRect(0, 0, w, h);
+      }
+  
+      // ── "Current" gradient — brightness lift in center ──
+      if (!isBench) {
+        const currentGrad = ctx.createLinearGradient(0, 0, w, 0);
+        currentGrad.addColorStop(0, "rgba(255,255,255,0)");
+        currentGrad.addColorStop(0.3, "rgba(255,255,255,0.008)");
+        currentGrad.addColorStop(0.5, "rgba(255,255,255,0.02)");
+        currentGrad.addColorStop(0.7, "rgba(255,255,255,0.008)");
+        currentGrad.addColorStop(1, "rgba(255,255,255,0)");
+        ctx.fillStyle = currentGrad;
+        ctx.fillRect(0, 0, w, h);
+      }
   
       lanes.forEach(l => {
-        const colorFn = l.isBench ? benchColor : (pct, a) => laneColor(pct, mode, a);
         const midY = l.y + l.h / 2;
+        const absPct = Math.abs(l.pct);
   
-        // Lane background
-        const bgGrad = ctxRef.createLinearGradient(0, l.y, 0, l.y + l.h);
-        bgGrad.addColorStop(0, "rgba(255,255,255,0.005)");
-        bgGrad.addColorStop(0.5, colorFn(l.pct, l.isBench ? 0.03 : 0.05));
-        bgGrad.addColorStop(1, "rgba(255,255,255,0.005)");
-        ctxRef.fillStyle = bgGrad;
-        ctxRef.fillRect(0, l.y, w, l.h);
+        // ── Lane band — soft horizontal gradient ──
+        const bandAlpha = isBench ? 0.02 : (0.02 + Math.min(0.04, absPct / 100 * 0.25));
+        const bandGrad = ctx.createLinearGradient(0, l.y, 0, l.y + l.h);
+        bandGrad.addColorStop(0, "rgba(255,255,255,0.003)");
+        bandGrad.addColorStop(0.35, colorFn(l.pct, bandAlpha));
+        bandGrad.addColorStop(0.65, colorFn(l.pct, bandAlpha));
+        bandGrad.addColorStop(1, "rgba(255,255,255,0.003)");
+        ctx.fillStyle = bandGrad;
+        ctx.fillRect(0, l.y, w, l.h);
   
-        // Wavy top border
-        ctxRef.beginPath();
-        for (let x = 0; x <= w; x += 4) {
-          const wave = Math.sin(x * 0.012 + time * l.speed * 0.6 + l.wavePhase) * 1.5;
-          ctxRef.lineTo(x, l.y + wave);
+        // ── Straight lane border (clean line, not wavy) ──
+        ctx.strokeStyle = "rgba(255,255,255,0.025)";
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(0, l.y);
+        ctx.lineTo(w, l.y);
+        ctx.stroke();
+  
+        // ── Chevrons drifting with stream ──
+        if (!isBench && absPct >= 2) {
+          const chevronSpacing = 220;
+          const chevronAlpha = Math.min(0.07, absPct / 100 * 0.3 + 0.012);
+          ctx.fillStyle = colorFn(l.pct, chevronAlpha);
+          ctx.font = `600 ${Math.max(11, l.h * 0.28)}px system-ui, sans-serif`;
+          ctx.textAlign = "center";
+          ctx.textBaseline = "middle";
+  
+          const chevChar = l.direction > 0 ? "›  ›  ›" : "‹  ‹  ‹";
+          const offset = (time * l.speed * l.direction * 35) % chevronSpacing;
+          for (let x = 130 + offset; x < w + chevronSpacing; x += chevronSpacing) {
+            ctx.fillText(chevChar, x, midY);
+          }
         }
-        ctxRef.strokeStyle = "rgba(255,255,255,0.03)";
-        ctxRef.lineWidth = 1;
-        ctxRef.stroke();
   
-        // Stream particles
+        // ── PARTICLES ──
         l.particles.forEach(p => {
           p.x += l.speed * l.direction * p.speedMult;
   
-          const wy = Math.sin(p.x * 0.006 + time + l.wavePhase) * 2.5;
+          const wy = Math.sin(p.x * 0.005 + time * 0.8 + p.wobblePhase) * 2.5;
   
           // Wrap
           if (l.direction > 0 && p.x > w + 30) p.x = -30;
@@ -672,40 +754,39 @@
   
           const drawY = Math.max(l.y + 2, Math.min(l.y + l.h - 2, p.y + wy));
   
-          // Glow
-          ctxRef.beginPath();
-          ctxRef.arc(p.x, drawY, p.size + 1.5, 0, Math.PI * 2);
-          ctxRef.fillStyle = colorFn(l.pct, p.alpha * 0.12);
-          ctxRef.fill();
+          // ── Current brightness — brighten in center, dim at edges ──
+          let currentBoost = 0;
+          if (!isBench) {
+            const centerDist = Math.abs(p.x - w * 0.5) / (w * 0.5);
+            currentBoost = (1 - centerDist) * 0.1;
+          }
   
-          // Core
-          ctxRef.beginPath();
-          ctxRef.arc(p.x, drawY, p.size, 0, Math.PI * 2);
-          ctxRef.fillStyle = colorFn(l.pct, p.alpha);
-          ctxRef.fill();
+          const effectiveAlpha = Math.min(0.9, p.alpha + currentBoost);
+  
+          // Glow ring (heavier for bearish)
+          const glowRadius = p.size + 1.2 + p.glowExtra;
+          ctx.beginPath();
+          ctx.arc(p.x, drawY, glowRadius, 0, Math.PI * 2);
+          ctx.fillStyle = colorFn(l.pct, effectiveAlpha * (p.isBearish ? 0.15 : 0.1));
+          ctx.fill();
+  
+          // Core dot
+          ctx.beginPath();
+          ctx.arc(p.x, drawY, p.size, 0, Math.PI * 2);
+          ctx.fillStyle = colorFn(l.pct, effectiveAlpha);
+          ctx.fill();
         });
-  
-        // Subtle direction arrows
-        const arrowSpacing = 220;
-        const arrowAlpha = Math.min(0.1, Math.abs(l.pct) / 100 * 0.4 + 0.02);
-        ctxRef.fillStyle = colorFn(l.pct, arrowAlpha);
-        ctxRef.font = `600 ${Math.max(11, l.h * 0.3)}px system-ui, sans-serif`;
-        ctxRef.textAlign = "center";
-        ctxRef.textBaseline = "middle";
-  
-        const arrowChar = l.direction > 0 ? "›" : "‹";
-        const offset = (time * l.speed * l.direction * 35) % arrowSpacing;
-        for (let x = 120 + offset; x < w + arrowSpacing; x += arrowSpacing) {
-          ctxRef.fillText(arrowChar, x, midY);
-        }
       });
     }
   
-    // ── Animation loop ──
+    // ═══════════════════════════════════════════════════════════════════════════
+    // ANIMATION LOOP
+    // ═══════════════════════════════════════════════════════════════════════════
+  
     function animate() {
       time += 0.016;
-      drawLanes(moversLanes, moversCanvas, moversCtx, activeMode);
-      drawLanes(benchLanes, benchCanvas, benchCtx, activeMode);
+      drawLanes(moversLanes, moversCanvas, moversCtx, activeMode, false);
+      drawLanes(benchLanes, benchCanvas, benchCtx, activeMode, true);
       raf = requestAnimationFrame(animate);
     }
   
@@ -718,11 +799,13 @@
       }
     });
   
-    // ── Fetch and render ──
+    // ═══════════════════════════════════════════════════════════════════════════
+    // DATA FETCH
+    // ═══════════════════════════════════════════════════════════════════════════
+  
     async function fetchRiver(mode) {
       activeMode = mode;
   
-      // Update section labels
       if (moversLabel) moversLabel.textContent = mode === "crypto" ? "Top Crypto Movers" : "Top Stock Movers";
       if (benchLabel)  benchLabel.textContent  = mode === "crypto" ? "Market Context · BTC & Total Crypto" : "Market Context · S&P 500 & NASDAQ";
   
@@ -730,7 +813,6 @@
       let benchData = [];
   
       try {
-        // Fetch movers
         const endpoint = mode === "stocks"
           ? "https://api.stockjelli.com/api/stocks?limit=15&mcapMin=100000000"
           : "https://api.stockjelli.com/api/crypto?limit=15&mcapMin=50000000";
@@ -743,7 +825,6 @@
           .sort((a, b) => b.pctChange - a.pctChange)
           .slice(0, MAX_MOVERS);
   
-        // Normalize volume to 0–1 range
         const maxVol = Math.max(...rows.map(r => r.volume || 0), 1);
   
         moversData = rows.map(r => ({
@@ -752,9 +833,8 @@
           vol: Math.max(0.15, (r.volume || 0) / maxVol),
         }));
   
-        // Benchmark data from header indices
+        // Benchmarks from header
         if (mode === "crypto") {
-          // Try to read from the header data the main app already fetched
           const btcPct = parseFloat(document.getElementById("idxLeftValue")?.textContent) || 0;
           const totalPct = parseFloat(document.getElementById("idxRightValue")?.textContent) || 0;
           benchData = [
@@ -769,9 +849,8 @@
             { sym: "S&P 500", pct: spPct, vol: 0.5 },
           ];
         }
-  
       } catch (e) {
-        console.warn("[MomentumRiver] API error, using fallback:", e);
+        console.warn("[MomentumRiver] API error, fallback:", e);
         moversData = [
           { sym: "SOL", pct: 12.4, vol: 0.85 },
           { sym: "PEPE", pct: 24.7, vol: 0.7 },
@@ -786,23 +865,19 @@
         ];
       }
   
-      // Build lanes
       moversLanes = buildLanes(moversData, false);
       benchLanes  = buildLanes(benchData, true);
   
-      // Layout
-      layoutLanes(moversLanes, moversCanvas, moversWrap);
-      layoutLanes(benchLanes, benchCanvas, benchWrap);
+      layoutLanes(moversLanes, moversCanvas, false);
+      layoutLanes(benchLanes, benchCanvas, true);
   
-      // Labels
-      buildLabels(moversLanes, moversLabels);
-      buildLabels(benchLanes, benchLabels);
+      buildLabelsDOM(moversLanes, moversLabels);
+      buildLabelsDOM(benchLanes, benchLabels);
   
-      // Start animation
       if (!raf) animate();
     }
   
-    // ── Sync with existing Stocks/Crypto toggle ──
+    // ── Sync with asset toggle ──
     const assetControl = document.getElementById("assetControl");
     if (assetControl) {
       assetControl.addEventListener("click", (e) => {
@@ -812,10 +887,10 @@
       });
     }
   
-    // ── Resize handler ──
+    // ── Resize ──
     window.addEventListener("resize", () => {
-      if (moversLanes.length) layoutLanes(moversLanes, moversCanvas, moversWrap);
-      if (benchLanes.length)  layoutLanes(benchLanes, benchCanvas, benchWrap);
+      if (moversLanes.length) layoutLanes(moversLanes, moversCanvas, false);
+      if (benchLanes.length)  layoutLanes(benchLanes, benchCanvas, true);
     });
   
     // ── Init ──
@@ -823,9 +898,7 @@
     const initMode = activeBtn?.dataset?.value === "crypto" ? "crypto" : "stocks";
     fetchRiver(initMode);
   
-    // Refresh every 60s
     setInterval(() => fetchRiver(activeMode), 60_000);
-  
   })();
 
 

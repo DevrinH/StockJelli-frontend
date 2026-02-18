@@ -2207,15 +2207,12 @@ tbody tr:first-child {
     }
   }
 
-  /* ===========================================
-   18b. MOMENTUM RIVER
+ /* ===========================================
+   18b. MOMENTUM RIVER v3
    
-   Replaces SJ Flow Gauge. Add to style.css
-   after Market Pulse (Section 18) styles,
+   Replaces previous river.css in style.css.
+   Place after Section 18 (Market Pulse),
    before Section 19 (Footer).
-   
-   If you previously added flow-gauge.css,
-   remove that entire block and use this instead.
    =========================================== */
 
 .momentum-river { padding: 0 0 32px; }
@@ -2243,9 +2240,11 @@ tbody tr:first-child {
   margin: 0;
 }
 
+/* Brighter + tighter spacing */
 .river-subtitle {
   font-size: 0.72rem;
-  color: rgba(255, 255, 255, 0.35);
+  color: rgba(255, 255, 255, 0.48);
+  letter-spacing: 0.03em;
 }
 
 .river-legend {
@@ -2279,6 +2278,14 @@ tbody tr:first-child {
 
 .river-swatch-slow {
   background: rgba(239, 68, 68, 0.4);
+}
+
+/* ● volume legend dot */
+.river-legend-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.4);
 }
 
 /* ── Card ── */
@@ -2324,17 +2331,17 @@ tbody tr:first-child {
   width: 100%;
 }
 
-/* Labels overlay — left side */
+/* Labels overlay */
 .river-labels {
   position: absolute;
   top: 0;
   left: 0;
   bottom: 0;
-  width: 100px;
+  width: 105px;
   display: flex;
   flex-direction: column;
   pointer-events: none;
-  background: linear-gradient(90deg, rgba(16, 23, 37, 0.85) 0%, rgba(16, 23, 37, 0) 100%);
+  background: linear-gradient(90deg, rgba(16, 23, 37, 0.88) 0%, rgba(16, 23, 37, 0) 100%);
   z-index: 2;
 }
 
@@ -2349,25 +2356,40 @@ tbody tr:first-child {
 .river-lane-sym {
   font-size: 0.76rem;
   font-weight: 700;
-  color: rgba(255, 255, 255, 0.75);
+  color: rgba(255, 255, 255, 0.78);
   letter-spacing: 0.02em;
   font-variant-numeric: tabular-nums;
 }
 
+/* % with subtle glow */
 .river-lane-pct {
-  font-size: 0.6rem;
+  font-size: 0.62rem;
   font-weight: 600;
   font-variant-numeric: tabular-nums;
 }
 
-.river-lane-pct.up { color: #4ade80; }
-.river-lane-pct.down { color: #f87171; }
+.river-lane-pct.up {
+  color: #4ade80;
+  text-shadow: 0 0 8px rgba(74, 222, 128, 0.3);
+}
 
-/* ── Divider ── */
+.river-lane-pct.down {
+  color: #f87171;
+  text-shadow: 0 0 8px rgba(248, 113, 113, 0.25);
+}
+
+/* ── Gradient divider (not a hard line) ── */
 .river-divider {
-  height: 1px;
-  margin: 0 20px;
-  background: rgba(255, 255, 255, 0.04);
+  height: 18px;
+  margin: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.015) 35%,
+    rgba(255, 255, 255, 0.02) 50%,
+    rgba(255, 255, 255, 0.015) 65%,
+    rgba(0, 0, 0, 0.08) 100%
+  );
 }
 
 /* ── Responsive ── */
@@ -2384,8 +2406,9 @@ tbody tr:first-child {
   .river-title { font-size: 0.76rem; }
   .river-subtitle { font-size: 0.65rem; }
   .river-legend { gap: 10px; font-size: 0.6rem; }
-  .river-labels { width: 80px; }
+  .river-labels { width: 82px; }
   .river-lane-sym { font-size: 0.68rem; }
   .river-lane-pct { font-size: 0.54rem; }
   .river-section-label { padding: 8px 12px 2px; font-size: 0.58rem; }
+  .river-divider { height: 12px; }
 }

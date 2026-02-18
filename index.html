@@ -619,14 +619,11 @@
 
       
 <!-- ============================================
-     MOMENTUM RIVER — Replaces SJ Flow Gauge
+     MOMENTUM RIVER v3
      
      Place in index.html AFTER the Market Pulse
      section and BEFORE the Blog section.
-     
-     i.e. replace the entire <section class="flow-gauge">
-     block, OR if Flow Gauge was never added, place
-     after Market Pulse </section>.
+     Replaces any previous Flow Gauge or River HTML.
      ============================================ -->
 
      <section class="momentum-river" id="momentumRiver">
@@ -640,22 +637,23 @@
           <div class="river-legend">
             <div class="river-legend-item"><span class="river-legend-swatch river-swatch-fast"></span> Strong</div>
             <div class="river-legend-item"><span class="river-legend-swatch river-swatch-mid"></span> Moderate</div>
-            <div class="river-legend-item"><span class="river-legend-swatch river-swatch-slow"></span> Weak / Negative</div>
+            <div class="river-legend-item"><span class="river-legend-swatch river-swatch-slow"></span> Weak</div>
+            <div class="river-legend-item"><span class="river-legend-dot"></span> Volume</div>
           </div>
         </div>
     
         <div class="river-card">
-          <!-- Section: Movers -->
+          <!-- Movers -->
           <div class="river-section-label" id="riverMoversLabel">Top Movers</div>
           <div class="river-canvas-wrap" id="riverMoversWrap">
             <canvas id="riverMoversCanvas" class="river-canvas"></canvas>
             <div class="river-labels" id="riverMoversLabels"></div>
           </div>
     
-          <!-- Divider -->
+          <!-- Gradient divider -->
           <div class="river-divider"></div>
     
-          <!-- Section: Benchmarks -->
+          <!-- Benchmarks -->
           <div class="river-section-label" id="riverBenchLabel">Market Context</div>
           <div class="river-canvas-wrap" id="riverBenchWrap">
             <canvas id="riverBenchCanvas" class="river-canvas"></canvas>

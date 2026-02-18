@@ -488,4 +488,405 @@
       if (!animFrame) draw();
     }
   });
+
+
+
+  // ── 7. SJ FLOW GAUGE — Buy vs Sell Pressure Field ──────────────────────────
+// Append this to feature-additions.js (after the EKG block)
+
+(function initFlowGauge() {
+    const container = document.getElementById("flowRows");
+    const summaryEl = document.getElementById("flowSummaryValue");
+    if (!container) return;
+  
+    // ── Category definitions ──
+    const CATEGORIES = {
+      crypto: [
+        { key: "largecap",  name: "Large Cap",     sub: "BTC · ETH · SOL",       filter: r => (r.marketCap || 0) >= 10e9 },
+        { key: "midcap",    name: "Mid Cap",        sub: "Top 20–80 by MCap",     filter: r => { const m = r.marketCap||0; return m >= 1e9 && m < 10e9; } },
+        { key: "smallcap",  name: "Small Cap",      sub: "Under $1B MCap",        filter: r => (r.marketCap || 0) < 1e9 && (r.marketCap || 0) > 0 },
+        { key: "altcoins",  name: "Altcoin Index",  sub: "All non-BTC movers",    filter: r => { const s = (r.coinSymbol||r.symbol||"").toUpperCase(); return s !== "BTC"; } },
+        { key: "memecoins", name: "Meme / Micro",   sub: "High vol, low MCap",    filter: r => { const m = r.marketCap||0; const v = r.volume||0; return m > 0 && m < 500e6 && v/m > 0.3; } },
+        { key: "overall",   name: "Crypto Overall", sub: "All qualifying movers",  filter: () => true },
+      ],
+      stocks: [
+        { key: "megacap",   name: "Mega Cap",       sub: "AAPL · MSFT · NVDA",    filter: r => (r.marketCap || 0) >= 200e9 },
+        { key: "largecap",  name: "Large Cap",       sub: "$10B – $200B",          filter: r => { const m = r.marketCap||0; return m >= 10e9 && m < 200e9; } },
+        { key: "midcap",    name: "Mid Cap",         sub: "$2B – $10B",            filter: r => { const m = r.marketCap||0; return m >= 2e9 && m < 10e9; } },
+        { key: "smallcap",  name: "Small Cap",       sub: "Under $2B",             filter: r => (r.marketCap || 0) < 2e9 && (r.marketCap || 0) > 0 },
+        { key: "highrvol",  name: "High RVOL",       sub: "Vol 1.5x+ average",     filter: r => r.avgVolume > 0 && (r.volume / r.avgVolume) >= 1.5 },
+        { key: "overall",   name: "Stocks Overall",  sub: "All qualifying movers",  filter: () => true },
+      ],
+    };
+  
+    // ── Buy-side color palettes ──
+    // Crypto: blue → green gradient
+    // Stocks: straight green
+    const BUY_COLORS = {
+      crypto: {
+        gradStops: [
+          { pos: 0,    rgba: "59, 130, 246, 0.04" },   // blue, faint
+          { pos: 0.25, rgba: "59, 130, 246, 0.15" },   // blue
+          { pos: 0.5,  rgba: "34, 197, 150, 0.30" },   // teal blend
+          { pos: 0.75, rgba: "34, 197, 94, 0.50" },    // green
+          { pos: 1,    rgba: "74, 222, 128, 0.70" },   // bright green
+        ],
+        lineGlow:   "rgba(59, 180, 200, 0.12)",
+        particleR: 50, particleG: 200, particleB: 160,  // teal-ish
+        particleGlowR: 34, particleGlowG: 197, particleGlowB: 140,
+        pctR: 100, pctG: 220, pctB: 180,                // label color
+      },
+      stocks: {
+        gradStops: [
+          { pos: 0,    rgba: "34, 197, 94, 0.04" },
+          { pos: 0.3,  rgba: "34, 197, 94, 0.12" },
+          { pos: 0.6,  rgba: "34, 197, 94, 0.28" },
+          { pos: 0.85, rgba: "74, 222, 128, 0.50" },
+          { pos: 1,    rgba: "74, 222, 128, 0.70" },
+        ],
+        lineGlow:   "rgba(74, 222, 128, 0.10)",
+        particleR: 74, particleG: 222, particleB: 128,
+        particleGlowR: 34, particleGlowG: 197, particleGlowB: 94,
+        pctR: 74, pctG: 222, pctB: 128,
+      },
+    };
+  
+    // Sell side is always red (same for both modes)
+    const SELL_COLORS = {
+      gradStops: [
+        { pos: 0,    rgba: "248, 113, 113, 0.70" },
+        { pos: 0.15, rgba: "239, 68, 68, 0.50" },
+        { pos: 0.4,  rgba: "239, 68, 68, 0.28" },
+        { pos: 0.7,  rgba: "239, 68, 68, 0.12" },
+        { pos: 1,    rgba: "239, 68, 68, 0.04" },
+      ],
+      particleR: 248, particleG: 113, particleB: 113,
+      particleGlowR: 239, particleGlowG: 68, particleGlowB: 68,
+      pctR: 248, pctG: 113, pctB: 113,
+    };
+  
+    // ── Compute pressure from a group of rows ──
+    function groupPressure(rows, mode) {
+      if (!rows.length) return 50;
+      let total = 0;
+      rows.forEach(r => {
+        const pct = r.pctChange || 0;
+        const momentum = Math.tanh(pct / 100 * 3);
+        const price = r.price || 0;
+        const hi = r.dayHigh || r.high24h || price;
+        const lo = r.dayLow  || r.low24h  || price;
+        let range = 0.5;
+        if (hi !== lo) range = Math.max(0, Math.min(1, (price - lo) / (hi - lo)));
+        const vol = r.volume || 0;
+        const mcap = r.marketCap || 1;
+        const avgVol = r.avgVolume || 0;
+        let volC = 0.5;
+        if (mode === "stocks" && avgVol > 0) volC = Math.min(1, (vol / avgVol) / 5);
+        else if (mcap > 0) volC = Math.min(1, (vol / mcap) * 3);
+        const raw = (momentum + 1) / 2;
+        total += Math.max(0, Math.min(100, (raw * 0.5 + range * 0.3 + volC * 0.2) * 100));
+      });
+      return total / rows.length;
+    }
+  
+    // ── Particle system ──
+    class Particles {
+      constructor() { this.list = []; this.max = 40; }
+  
+      emit(x, y, h, buyRatio, buyCol, sellCol) {
+        if (this.list.length >= this.max || Math.random() > 0.35) return;
+        const isBuy = Math.random() < buyRatio;
+        const col = isBuy ? buyCol : sellCol;
+        this.list.push({
+          x: x + (Math.random() - 0.5) * 8,
+          y: y + (Math.random() - 0.5) * h * 0.6,
+          vx: isBuy ? -(1 + Math.random() * 2.5) : (1 + Math.random() * 2.5),
+          vy: (Math.random() - 0.5) * 1.2,
+          life: 1, decay: 0.012 + Math.random() * 0.018,
+          size: 1.2 + Math.random() * 2,
+          r: col.r, g: col.g, b: col.b,
+          gr: col.gr, gg: col.gg, gb: col.gb,
+        });
+      }
+  
+      update() {
+        for (let i = this.list.length - 1; i >= 0; i--) {
+          const p = this.list[i];
+          p.x += p.vx;
+          p.y += p.vy;
+          p.vy += (Math.random() - 0.5) * 0.15;
+          p.life -= p.decay;
+          if (p.life <= 0) this.list.splice(i, 1);
+        }
+      }
+  
+      draw(ctx) {
+        this.list.forEach(p => {
+          const a = p.life * 0.7;
+          // Glow
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.size + 2, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(${p.gr},${p.gg},${p.gb},${a * 0.15})`;
+          ctx.fill();
+          // Core
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(${p.r},${p.g},${p.b},${a})`;
+          ctx.fill();
+        });
+      }
+    }
+  
+    // ── Bar state ──
+    const bars = [];
+    let raf = null;
+    let time = 0;
+    let activeMode = "crypto"; // syncs with app.js toggle
+  
+    function makeBar(canvas, targetBuy) {
+      return {
+        canvas,
+        ctx: canvas.getContext("2d"),
+        target: targetBuy,
+        current: 50,
+        particles: new Particles(),
+        wp1: Math.random() * Math.PI * 2,
+        wp2: Math.random() * Math.PI * 2,
+      };
+    }
+  
+    // ── Draw one bar ──
+    function drawBar(bar) {
+      const { canvas, ctx, particles } = bar;
+      const dpr = window.devicePixelRatio || 1;
+      const wrap = canvas.parentElement;
+      const w = wrap.clientWidth;
+      const h = wrap.clientHeight;
+      if (w === 0 || h === 0) return;
+  
+      const cw = Math.round(w * dpr);
+      const ch = Math.round(h * dpr);
+      if (canvas.width !== cw || canvas.height !== ch) {
+        canvas.width = cw;
+        canvas.height = ch;
+      }
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  
+      bar.current += (bar.target - bar.current) * 0.04;
+      const buyRatio = bar.current / 100;
+      const contactX = buyRatio * w;
+      const midY = h / 2;
+  
+      ctx.clearRect(0, 0, w, h);
+  
+      // ── Wavy boundary points ──
+      const waveAmp = 6 + Math.sin(time * 0.7 + bar.wp2) * 3;
+      const wf = 0.08;
+      const wavePts = [];
+      for (let y = -2; y <= h + 2; y += 2) {
+        const w1 = Math.sin(y * wf + time * 1.8 + bar.wp1) * waveAmp;
+        const w2 = Math.sin(y * wf * 1.7 + time * 2.4 + bar.wp2) * waveAmp * 0.5;
+        const w3 = Math.sin(y * wf * 0.5 + time * 0.9) * waveAmp * 0.3;
+        wavePts.push({ y, x: contactX + w1 + w2 + w3 });
+      }
+  
+      const buyCfg = BUY_COLORS[activeMode] || BUY_COLORS.crypto;
+  
+      // ── Buy side (left of wave) ──
+      ctx.beginPath();
+      ctx.moveTo(0, 0);
+      wavePts.forEach(p => ctx.lineTo(p.x, p.y));
+      ctx.lineTo(0, h);
+      ctx.closePath();
+  
+      const buyGrad = ctx.createLinearGradient(0, 0, contactX + 20, 0);
+      buyCfg.gradStops.forEach(s => buyGrad.addColorStop(s.pos, `rgba(${s.rgba})`));
+      ctx.fillStyle = buyGrad;
+      ctx.fill();
+  
+      // ── Sell side (right of wave) ──
+      ctx.beginPath();
+      ctx.moveTo(w, 0);
+      wavePts.forEach(p => ctx.lineTo(p.x, p.y));
+      ctx.lineTo(w, h);
+      ctx.closePath();
+  
+      const sellGrad = ctx.createLinearGradient(contactX - 20, 0, w, 0);
+      SELL_COLORS.gradStops.forEach(s => sellGrad.addColorStop(s.pos, `rgba(${s.rgba})`));
+      ctx.fillStyle = sellGrad;
+      ctx.fill();
+  
+      // ── Wavy contact line ──
+      ctx.beginPath();
+      wavePts.forEach((p, i) => { if (i === 0) ctx.moveTo(p.x, p.y); else ctx.lineTo(p.x, p.y); });
+  
+      ctx.strokeStyle = "rgba(255,255,255,0.08)";
+      ctx.lineWidth = 6;
+      ctx.lineJoin = "round";
+      ctx.stroke();
+  
+      ctx.strokeStyle = buyCfg.lineGlow;
+      ctx.lineWidth = 3;
+      ctx.stroke();
+  
+      ctx.strokeStyle = "rgba(255,255,255,0.30)";
+      ctx.lineWidth = 0.8;
+      ctx.stroke();
+  
+      // ── Particles ──
+      const buyParticle = { r: buyCfg.particleR, g: buyCfg.particleG, b: buyCfg.particleB, gr: buyCfg.particleGlowR, gg: buyCfg.particleGlowG, gb: buyCfg.particleGlowB };
+      const sellParticle = { r: SELL_COLORS.particleR, g: SELL_COLORS.particleG, b: SELL_COLORS.particleB, gr: SELL_COLORS.particleGlowR, gg: SELL_COLORS.particleGlowG, gb: SELL_COLORS.particleGlowB };
+  
+      const ep = wavePts[Math.floor(Math.random() * wavePts.length)];
+      if (ep) particles.emit(ep.x, ep.y, h, buyRatio, buyParticle, sellParticle);
+      if (Math.random() < 0.5) {
+        const ep2 = wavePts[Math.floor(Math.random() * wavePts.length)];
+        if (ep2) particles.emit(ep2.x, ep2.y, h, buyRatio, buyParticle, sellParticle);
+      }
+      particles.update();
+      particles.draw(ctx);
+  
+      // ── Percentage labels ──
+      const buyPct = Math.round(bar.current);
+      const sellPct = 100 - buyPct;
+  
+      ctx.font = "700 11px system-ui, -apple-system, sans-serif";
+      ctx.textBaseline = "middle";
+  
+      if (contactX > 50) {
+        ctx.textAlign = "left";
+        ctx.fillStyle = `rgba(${buyCfg.pctR},${buyCfg.pctG},${buyCfg.pctB},${Math.min(0.8, buyRatio * 1.5)})`;
+        ctx.fillText(`${buyPct}%`, 10, midY);
+      }
+  
+      if (w - contactX > 50) {
+        ctx.textAlign = "right";
+        ctx.fillStyle = `rgba(${SELL_COLORS.pctR},${SELL_COLORS.pctG},${SELL_COLORS.pctB},${Math.min(0.8, (1 - buyRatio) * 1.5)})`;
+        ctx.fillText(`${sellPct}%`, w - 10, midY);
+      }
+    }
+  
+    // ── Animation loop ──
+    function animate() {
+      time += 0.016;
+      bars.forEach(drawBar);
+      raf = requestAnimationFrame(animate);
+    }
+  
+    document.addEventListener("visibilitychange", () => {
+      if (document.hidden) {
+        if (raf) cancelAnimationFrame(raf);
+        raf = null;
+      } else {
+        if (!raf && bars.length) animate();
+      }
+    });
+  
+    // ── Render ──
+    function renderCategories(categories, buyScores) {
+      container.innerHTML = "";
+      bars.length = 0;
+  
+      categories.forEach((cat, idx) => {
+        const buy = buyScores[idx] || 50;
+        const net = buy - 50;
+        const netStr = net >= 0 ? `+${Math.round(net)}` : `${Math.round(net)}`;
+        const netClass = net > 5 ? "flow-bullish" : net < -5 ? "flow-bearish" : "flow-neutral";
+  
+        const row = document.createElement("div");
+        row.className = "flow-row";
+        row.innerHTML = `
+          <div class="flow-label">
+            <span class="flow-label-name">${cat.name}</span>
+            <span class="flow-label-sub">${cat.sub}</span>
+          </div>
+          <div class="flow-bar-wrap">
+            <canvas class="flow-bar-canvas" id="flowBar${idx}"></canvas>
+          </div>
+          <span class="flow-net ${netClass}">${netStr}</span>
+        `;
+        container.appendChild(row);
+  
+        bars.push(makeBar(document.getElementById(`flowBar${idx}`), buy));
+      });
+  
+      // Summary
+      if (summaryEl) {
+        const avg = buyScores.reduce((s, v) => s + v, 0) / buyScores.length;
+        const net = avg - 50;
+        if (net > 5) {
+          summaryEl.textContent = `Buyers Dominate +${Math.round(net)}`;
+          summaryEl.className = "flow-summary-value flow-val-bullish";
+        } else if (net < -5) {
+          summaryEl.textContent = `Sellers Dominate ${Math.round(net)}`;
+          summaryEl.className = "flow-summary-value flow-val-bearish";
+        } else {
+          summaryEl.textContent = "Balanced";
+          summaryEl.className = "flow-summary-value flow-val-neutral";
+        }
+      }
+  
+      if (!raf) animate();
+    }
+  
+    // ── Fetch and compute ──
+    async function fetchFlow(mode) {
+      activeMode = mode;
+      const cats = CATEGORIES[mode];
+  
+      let buyScores;
+      try {
+        const endpoint = mode === "stocks"
+          ? "https://api.stockjelli.com/api/stocks?limit=30&mcapMin=100000000"
+          : "https://api.stockjelli.com/api/crypto?limit=30&mcapMin=50000000";
+  
+        const res = await fetch(endpoint, { cache: "no-store" });
+        if (!res.ok) throw new Error("API error");
+        const data = await res.json();
+        const rows = data.rows || [];
+  
+        buyScores = cats.map(cat => {
+          const filtered = rows.filter(cat.filter);
+          return groupPressure(filtered, mode);
+        });
+      } catch (e) {
+        console.warn("[FlowGauge] API error, fallback:", e);
+        buyScores = cats.map(() => 40 + Math.random() * 30);
+      }
+  
+      renderCategories(cats, buyScores);
+    }
+  
+    // ── Sync with the existing Stocks/Crypto asset toggle in app.js ──
+    // Listen for clicks on the same #assetControl segmented control
+    const assetControl = document.getElementById("assetControl");
+    if (assetControl) {
+      assetControl.addEventListener("click", (e) => {
+        const btn = e.target.closest(".segmented-btn");
+        if (!btn) return;
+        const mode = btn.dataset.value === "crypto" ? "crypto" : "stocks";
+        fetchFlow(mode);
+      });
+    }
+  
+    // ── Handle resize ──
+    window.addEventListener("resize", () => {
+      bars.forEach(b => { b.current = b.target; });
+    });
+  
+    // ── Init: match whatever mode is currently active ──
+    const activeBtn = assetControl?.querySelector(".segmented-on");
+    const initMode = activeBtn?.dataset?.value === "crypto" ? "crypto" : "stocks";
+    fetchFlow(initMode);
+  
+    // ── Refresh every 60s alongside the main data ──
+    setInterval(() => fetchFlow(activeMode), 60_000);
+  
+  })();
+
+
+
+
+
+  
 })();

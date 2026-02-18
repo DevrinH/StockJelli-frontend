@@ -619,7 +619,32 @@
 
       
 
-
+      <section class="flow-gauge" id="flowGauge">
+      <div class="container">
+    
+        <!-- Heading row -->
+        <div class="flow-heading-row">
+          <div class="flow-heading-left">
+            <h2 class="flow-title">SJ Flow Gauge</h2>
+            <span class="flow-subtitle">Buy vs Sell Pressure · Real-time</span>
+          </div>
+          <div class="flow-legend">
+            <div class="flow-legend-item"><span class="flow-legend-dot flow-dot-buy"></span> Buyers</div>
+            <div class="flow-legend-item"><span class="flow-legend-dot flow-dot-sell"></span> Sellers</div>
+          </div>
+        </div>
+    
+        <!-- Card -->
+        <div class="flow-card">
+          <div class="flow-rows" id="flowRows"></div>
+          <div class="flow-summary">
+            <span class="flow-summary-label">Overall Market Pressure</span>
+            <span class="flow-summary-value" id="flowSummaryValue">Calculating…</span>
+          </div>
+        </div>
+    
+      </div>
+    </section>
 <!-- Market Regime Indicator (replaces pricing CTA) -->
 <!-- ============================================
      MARKET PULSE (replaces Market Regime section)

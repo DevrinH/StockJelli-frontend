@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>Momentum River: See Where Money Is Moving in Real Time | StockJelli Blog</title>
+  <meta name="description" content="StockJelli's Momentum River is a real-time visualization that shows market momentum as flowing streams. Speed equals strength, width equals volume. Here's how to read it." />
+  <meta name="robots" content="index, follow" />
+  
+  <meta name="title" content="Momentum River: See Where Money Is Moving in Real Time | StockJelli Blog" />
+  <meta name="keywords" content="momentum river, StockJelli momentum river, real-time momentum visualization, stock momentum, crypto momentum, volume visualization, momentum trading tool" />
+  <link rel="canonical" href="https://stockjelli.com/blog/momentum-river.html" />
+  
+  <!-- Open Graph -->
+  <meta property="og:title" content="Momentum River: See Where Money Is Moving in Real Time" />
+  <meta property="og:description" content="Speed equals strength. Width equals volume. StockJelli's Momentum River shows market momentum as flowing streams — here's how to read it." />
+  <meta property="og:image" content="https://stockjelli.com/blog/thumbs/momentum-river.png" />
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://stockjelli.com/blog/momentum-river.html" />
+  <meta property="og:site_name" content="StockJelli" />
+  
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Momentum River: See Where Money Is Moving in Real Time" />
+  <meta name="twitter:description" content="Speed equals strength. Width equals volume. StockJelli's Momentum River shows market momentum as flowing streams — here's how to read it." />
+  <meta name="twitter:image" content="https://stockjelli.com/blog/thumbs/momentum-river.png" />
+  
+  <link rel="icon" type="image/png" sizes="32x32" href="/StockJelli-S-Logo.png" />
+  <link rel="stylesheet" href="/style.css" />
+  <link rel="stylesheet" href="/blog.css" />
+  
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-FM3HXT7ECV"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-FM3HXT7ECV', { anonymize_ip: true });
+  </script>
+  <script src="promo-toast.js" defer></script>
+  <script src="/blog-ticker.js" defer></script>
+
+</head>
+<body>
+
+  <header class="header">
+    <div class="header-inner">
+      <div class="header-left">
+        <a href="/" aria-label="StockJelli Home">
+          <img class="logo" src="/StockJelli-Logo.png" alt="StockJelli - Stock and Crypto Momentum Screener" width="150" height="32" />
+        </a>
+      </div>
+  
+      <div class="header-center market-indices">
+        <span id="idxLeft" class="idx">
+          <span id="idxLeftLabel">NASDAQ</span>
+          <span id="idxLeftValue" class="idx-value up">+1.24%</span>
+        </span>
+      
+        <span class="divider">|</span>
+      
+        <span id="idxRight" class="idx">
+          <span id="idxRightLabel">S&P 500</span>
+          <span id="idxRightValue" class="idx-value down">-0.31%</span>
+        </span>
+      </div>
+  
+      <div class="header-right">
+        <a href="/" style="color: rgba(255,255,255,0.6); text-decoration: none; font-size: 0.85rem;">← Back to Screener</a>
+      </div>
+    </div>
+  </header>
+
+
+  <div class="pulse-ticker" id="pulseTicker">
+    <div class="pulse-ticker-track" id="pulseTickerTrack">
+      <!-- JS fills this with scrolling items -->
+    </div>
+  </div>
+
+
+  <article class="blog-page">
+    <a href="/blog" class="blog-back">← All posts</a>
+
+    <img class="blog-hero-img" src="/blog/thumbs/momentum-river.png" alt="StockJelli Momentum River Visualization" onerror="this.style.display='none'" />
+
+    <span class="blog-tag">Feature</span>
+    <h1 class="blog-post-title">Momentum River: See Where Money Is Moving in Real Time</h1>
+    <div class="blog-meta">Feb 17, 2026 · 5 min read</div>
+
+    <div class="blog-body">
+      <p>
+        Most financial tools show you where money <em>is</em> — market cap heatmaps, price charts, static tables full of numbers. The Momentum River shows you where money is <em>moving</em>.
+      </p>
+      <p>
+        It's a real-time visualization that sits on the StockJelli screener page, turning raw momentum data into something you can understand in a single glance. No analysis required. No numbers to compare. Just watch the flow.
+      </p>
+
+      <h2>How It Works</h2>
+      <p>
+        Every stock or crypto that qualifies for the StockJelli screener gets its own lane in the river. Particles stream across the screen in each lane, and the behavior of those particles tells you everything you need to know about the move:
+      </p>
+      <p>
+        <strong>Speed = strength.</strong> A coin up 50% has particles racing across the screen. A coin up 4% is a slow trickle. You don't need to read a number to know which move is stronger — you can see it.
+      </p>
+      <p>
+        <strong>Width = volume.</strong> High-volume movers get thick, dense lanes packed with particles. Low-volume movers get thin, sparse lanes. This is critical because a 20% move on heavy volume is a fundamentally different signal than a 20% move on no volume. The river encodes that distinction visually — the thick, fast lanes are the ones that deserve your attention.
+      </p>
+      <p>
+        <strong>Color = direction and intensity.</strong> Strong bullish movers glow bright green. Moderate movers show a muted green-gold. Weak or bearish movers appear in red and warm tones. The color shifts with the strength of the move, so you can scan the entire river and instantly see which lanes are running hot.
+      </p>
+      <p>
+        <strong>Direction = momentum.</strong> Particles flow left-to-right for bullish momentum, right-to-left for bearish. Even the direction of flow communicates meaning.
+      </p>
+
+      <h2>The Two Sections</h2>
+      <p>
+        The river is split into two parts, and the relationship between them is where the real insight lives.
+      </p>
+      <p>
+        <strong>Top section: Individual movers.</strong> This shows the top 10 stocks or crypto assets currently on the screener, sorted by percentage change. These are the opportunities — the specific tickers showing the strongest momentum right now.
+      </p>
+      <p>
+        <strong>Bottom section: Market context.</strong> This shows broad market benchmarks flowing at their own pace. In crypto mode, you see BTC and Total Crypto Market. In stocks mode, you see NASDAQ and S&P 500. These lanes tell you what the overall market is doing.
+      </p>
+      <p>
+        The magic is in comparing the two. When the top lanes are racing with bright green particles and the bottom lanes are crawling or turning red, it means individual names are breaking out <em>ahead</em> of the broader market. That's the exact condition momentum traders look for — relative strength against the index. A stock outperforming a flat or declining market is a much stronger signal than a stock rising because everything is rising.
+      </p>
+      <p>
+        Conversely, when the bottom benchmark lanes are moving faster than the top individual lanes, it suggests the broader market is lifting everything — which typically means the momentum is macro-driven rather than stock-specific, and individual breakouts may not sustain once the tide turns.
+      </p>
+
+      <h2>What It Looks Like in Practice</h2>
+      <p>
+        Here's a scenario from this past weekend's meme coin surge. On Saturday, the crypto screener logged 248 entries — the busiest day of the week. If you had the Momentum River open, here's what you would have seen:
+      </p>
+      <p>
+        The top section would have been a wall of fast, thick, bright green lanes. Dozens of altcoins and meme tokens streaming across the screen at full speed, many with wide lanes indicating heavy volume. BERA, ME, TOSHI, VVV — all racing.
+      </p>
+      <p>
+        The bottom section — BTC and Total Crypto — would have been moving, but slower. BTC was up around 3–4%, not 50%. The total crypto market was rising, but not at the pace of the individual movers above it.
+      </p>
+      <p>
+        That gap — top section racing, bottom section walking — tells you instantly: this is a risk-on, altcoin-led rally. Capital is rotating into higher-beta names. The river communicated in two seconds what would take five minutes of scrolling through the data table to piece together.
+      </p>
+      <p>
+        Now imagine the opposite scenario: a quiet Tuesday where only 3 coins qualify for the screener, all with moderate gains. The river would show three thin, slow-moving lanes up top, and BTC crawling along at the bottom. The visual message is immediate: nothing is happening. Don't force a trade.
+      </p>
+
+      <h2>Why This Matters</h2>
+      <p>
+        Trading momentum is a speed game. The traders who do well are the ones who can quickly assess a large amount of information and focus their attention on what matters. The Momentum River is designed to compress that assessment into a glance.
+      </p>
+      <p>
+        A data table gives you precise numbers — and StockJelli's screener table still does that, sitting right above the river. But numbers require mental processing. You have to scan rows, compare percentage changes, check volume columns, and mentally piece together the picture. The river does that synthesis for you visually.
+      </p>
+      <p>
+        Think of it this way: the screener table is for <em>analysis</em>. The Momentum River is for <em>awareness</em>. Glance at the river to understand the moment — is the market active or quiet? Are individual names outperforming the index? Is volume behind the moves? — then drill into the table for the specifics on whatever caught your eye.
+      </p>
+
+      <h2>Reading the River: Quick Reference</h2>
+
+      <div class="blog-callout">
+        <div class="blog-callout-title">🌊 How to Read the Momentum River</div>
+        <p style="margin:0; color: rgba(255,255,255,0.65); font-size: 0.9rem;">
+          <strong>Fast lane</strong> → Strong price movement (high % change)<br>
+          <strong>Wide lane</strong> → High volume behind the move<br>
+          <strong>Bright green</strong> → Strong bullish momentum<br>
+          <strong>Muted / gold</strong> → Moderate momentum<br>
+          <strong>Red / warm</strong> → Weak or bearish<br>
+          <strong>Top racing, bottom slow</strong> → Individual breakouts outpacing the market (strong signal)<br>
+          <strong>Bottom racing, top slow</strong> → Rising tide lifting all boats (weaker individual signal)<br>
+          <strong>Everything slow and thin</strong> → Quiet market — don't force trades
+        </p>
+      </div>
+
+      <h2>Technical Details</h2>
+      <p>
+        For those who care about what's under the hood: the Momentum River is built on HTML5 Canvas with 60fps particle animation. Each lane's particles have subtle glow halos, and the lane boundaries undulate with layered sine waves for an organic, fluid feel — it genuinely looks like flowing water.
+      </p>
+      <p>
+        The visualization updates every 60 seconds in sync with the main StockJelli screener. It shows the top 10 movers sorted by percentage change, and automatically switches between stocks and crypto movers when you toggle modes. The benchmark data in the bottom section (BTC, Total Crypto, NASDAQ, S&P 500) is pulled from the same market data already displayed in the site header, so there's no additional latency.
+      </p>
+      <p>
+        One detail worth noting: the river automatically pauses rendering when your browser tab is hidden, so it won't drain your battery if you leave the screener open in a background tab. When you come back, it resumes instantly.
+      </p>
+
+      <h2>Where to Find It</h2>
+      <p>
+        The Momentum River appears on the main StockJelli screener page, positioned above the Market Pulse EKG section and above the blog/insights cards. It sits between the data table (precise numbers) and the Market Pulse (regime context), serving as a visual bridge — the quick-glance momentum snapshot that ties the whole page together.
+      </p>
+      <p>
+        It's available to all users — free and subscriber — with no feature gate. Open the screener and scroll down past the table, or just look for the flowing green particles. You'll know it when you see it.
+      </p>
+
+      <p>
+        <em>StockJelli is an educational tool. This article is for informational purposes only and does not constitute financial advice.</em>
+      </p>
+
+      <div class="blog-bottom-cta">
+        <p>Watch the river flow</p>
+        <a href="/">Open the Screener</a>
+      </div>
+    </div>
+  </article>
+
+  <footer class="footer">
+    <div class="container footer-inner">
+      <p>Educational tool only. Not financial advice.</p>
+      <p class="muted">© 2026 StockJelli · <a href="/privacy.html" class="footer-link">Privacy</a> · <a href="/terms.html" class="footer-link">Terms</a></p>
+    </div>
+  </footer>
+
+</body>
+</html>

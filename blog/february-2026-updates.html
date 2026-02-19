@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>February Updates: Momentum River, Market Pulse & What's Next | StockJelli Blog</title>
+  <meta name="description" content="StockJelli's latest updates — the Momentum River visualization, redesigned Market Pulse, premarket alerts via Tiingo, and the upcoming alert performance log." />
+  <meta name="robots" content="index, follow" />
+  
+  <meta name="title" content="February Updates: Momentum River, Market Pulse & What's Next | StockJelli Blog" />
+  <meta name="keywords" content="StockJelli updates, momentum river, market pulse, premarket alerts, alert log, SJ score refinement, momentum screener updates" />
+  <link rel="canonical" href="https://stockjelli.com/blog/february-2026-updates.html" />
+  
+  <!-- Open Graph -->
+  <meta property="og:title" content="February Updates: Momentum River, Market Pulse & What's Next" />
+  <meta property="og:description" content="Momentum River is live, Market Pulse is redesigned, premarket alerts are coming, and we're building an alert performance log. Here's everything new." />
+  <meta property="og:image" content="https://stockjelli.com/blog/thumbs/february-2026-updates.png" />
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://stockjelli.com/blog/february-2026-updates.html" />
+  <meta property="og:site_name" content="StockJelli" />
+  
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="February Updates: Momentum River, Market Pulse & What's Next" />
+  <meta name="twitter:description" content="Momentum River is live, Market Pulse is redesigned, premarket alerts are coming, and we're building an alert performance log. Here's everything new." />
+  <meta name="twitter:image" content="https://stockjelli.com/blog/thumbs/february-2026-updates.png" />
+  
+  <link rel="icon" type="image/png" sizes="32x32" href="/StockJelli-S-Logo.png" />
+  <link rel="stylesheet" href="/style.css" />
+  <link rel="stylesheet" href="/blog.css" />
+  
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-FM3HXT7ECV"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-FM3HXT7ECV', { anonymize_ip: true });
+  </script>
+  <script src="promo-toast.js" defer></script>
+  <script src="/blog-ticker.js" defer></script>
+
+</head>
+<body>
+
+  <header class="header">
+    <div class="header-inner">
+      <div class="header-left">
+        <a href="/" aria-label="StockJelli Home">
+          <img class="logo" src="/StockJelli-Logo.png" alt="StockJelli - Stock and Crypto Momentum Screener" width="150" height="32" />
+        </a>
+      </div>
+  
+      <div class="header-center market-indices">
+        <span id="idxLeft" class="idx">
+          <span id="idxLeftLabel">NASDAQ</span>
+          <span id="idxLeftValue" class="idx-value up">+1.24%</span>
+        </span>
+      
+        <span class="divider">|</span>
+      
+        <span id="idxRight" class="idx">
+          <span id="idxRightLabel">S&P 500</span>
+          <span id="idxRightValue" class="idx-value down">-0.31%</span>
+        </span>
+      </div>
+  
+      <div class="header-right">
+        <a href="/" style="color: rgba(255,255,255,0.6); text-decoration: none; font-size: 0.85rem;">← Back to Screener</a>
+      </div>
+    </div>
+  </header>
+
+
+  <div class="pulse-ticker" id="pulseTicker">
+    <div class="pulse-ticker-track" id="pulseTickerTrack">
+      <!-- JS fills this with scrolling items -->
+    </div>
+  </div>
+
+
+  <article class="blog-page">
+    <a href="/blog" class="blog-back">← All posts</a>
+
+    <img class="blog-hero-img" src="/blog/thumbs/february-2026-updates.png" alt="StockJelli February 2026 Updates" onerror="this.style.display='none'" />
+
+    <span class="blog-tag">Updates</span>
+    <h1 class="blog-post-title">February Updates: Momentum River, Market Pulse & What's Next</h1>
+    <div class="blog-meta">Feb 18, 2026 · 6 min read</div>
+
+    <div class="blog-body">
+      <p>
+        It's been a busy month. We've shipped two major features, started a data infrastructure migration, and are building toward what we think will be StockJelli's most important feature yet. Here's everything that's new, everything that's changing, and what's coming next.
+      </p>
+
+      <h2>🌊 Live Now: The Momentum River</h2>
+      <p>
+        The <a href="/blog/momentum-river.html" style="color: #f0b90b;">Momentum River</a> is now live on the screener page. It's a real-time particle visualization that shows market momentum as flowing streams — each lane represents a stock or crypto currently on the screener, and the behavior of each lane tells you everything at a glance.
+      </p>
+      <p>
+        Speed equals strength. Width equals volume. Color indicates direction and intensity. The top section shows individual movers, the bottom shows broad market benchmarks (BTC + Total Crypto for crypto mode, NASDAQ + S&P 500 for stocks mode). When the top lanes are racing and the bottom is crawling, individual names are outperforming the market — the exact setup momentum traders look for.
+      </p>
+      <p>
+        Built on HTML5 Canvas with 60fps animation, the river updates every 60 seconds alongside the main screener and automatically pauses when your browser tab is hidden. We wrote a full explainer on how to read it — check out the <a href="/blog/momentum-river.html" style="color: #f0b90b;">Momentum River deep dive</a> for the complete breakdown.
+      </p>
+
+      <h2>📊 Redesigned: Market Pulse (Formerly Market Regime)</h2>
+      <p>
+        What was previously called the "Market Regime Indicator" has been redesigned and renamed to <strong>Market Pulse</strong>. The underlying logic is the same — it classifies the current market into one of four states (Expansion, Rotation, Caution, Contraction) based on index trend, breadth, and top-mover spread — but the visual presentation has been overhauled.
+      </p>
+      <p>
+        The Market Pulse now sits more prominently on the page with clearer visual cues about the current state. The name change reflects what the feature actually does: it gives you the pulse of the market, not just a label. For subscribers, the pulse still directly adjusts SJ Scores with regime multipliers — a score during Expansion carries more weight than the same score during Contraction.
+      </p>
+      <p>
+        Together, the Momentum River and Market Pulse create a two-layer visual system: the Pulse tells you the market's condition, and the River shows you the individual movers within that condition. Glance at the Pulse to know if the environment is favorable, then watch the River to see who's leading.
+      </p>
+
+      <h2>📧 Coming This Weekend: Premarket Email Alerts via Tiingo</h2>
+      <p>
+        This is one we've been working toward for a while. StockJelli is migrating its stock data infrastructure to <strong>Tiingo</strong>, which gives us access to premarket data that wasn't available through our previous API provider.
+      </p>
+      <p>
+        What this means for subscribers: you'll start receiving <strong>premarket email alerts</strong> for stocks showing momentum before the 9:30 AM ET opening bell. Premarket is where many of the biggest intraday moves begin — stocks gapping up on earnings, news, or analyst activity while most traders are still asleep. Getting alerted at 7:00 or 8:00 AM gives you time to research the catalyst, plan your entry, set your levels, and be ready when the bell rings.
+      </p>
+      <p>
+        The Tiingo migration is happening this weekend. Premarket alerts will roll out to subscribers shortly after. Same $5/month subscription — just a significantly expanded alert window.
+      </p>
+
+      <h2>🔬 In Development: The Alert Performance Log</h2>
+      <p>
+        This is the feature we're most excited about on the roadmap, and it represents a fundamental shift in what StockJelli is.
+      </p>
+      <p>
+        Right now, StockJelli alerts you when a stock or crypto hits the screener. But what happens after? Did it run another 10%? Did it fade immediately? Did it hit +5% in two hours or +21% by end of day? Today, you'd have to track that yourself. Soon, StockJelli will do it for you.
+      </p>
+      <p>
+        The <strong>Alert Performance Log</strong> will sit directly on the main screener page and track every alert from the moment it fires. For each entry, it will log the alert time, the entry price, and then measure the <strong>Maximum Favorable Excursion (MFE)</strong> — the highest price the stock reached after the alert, within a defined time window.
+      </p>
+      <p>
+        In practice, it will look something like this:
+      </p>
+
+      <div style="overflow-x: auto; margin: 24px 0;">
+        <table style="width: 100%; border-collapse: collapse; font-size: 0.85rem; color: rgba(255,255,255,0.75);">
+          <thead>
+            <tr style="border-bottom: 1px solid rgba(255,255,255,0.15);">
+              <th style="text-align: left; padding: 10px 12px; color: rgba(255,255,255,0.5); font-weight: 600;">Ticker</th>
+              <th style="text-align: center; padding: 10px 12px; color: rgba(255,255,255,0.5); font-weight: 600;">Alert Price</th>
+              <th style="text-align: center; padding: 10px 12px; color: rgba(255,255,255,0.5); font-weight: 600;">Peak Price</th>
+              <th style="text-align: center; padding: 10px 12px; color: rgba(255,255,255,0.5); font-weight: 600;">Max Gain</th>
+              <th style="text-align: center; padding: 10px 12px; color: rgba(255,255,255,0.5); font-weight: 600;">Time to Peak</th>
+              <th style="text-align: center; padding: 10px 12px; color: rgba(255,255,255,0.5); font-weight: 600;">Result</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr style="border-bottom: 1px solid rgba(255,255,255,0.07);">
+              <td style="padding: 10px 12px; font-weight: 600;">NVDA</td>
+              <td style="padding: 10px 12px; text-align: center;">$142.30</td>
+              <td style="padding: 10px 12px; text-align: center;">$158.54</td>
+              <td style="padding: 10px 12px; text-align: center; color: #4ade80;">+11.4%</td>
+              <td style="padding: 10px 12px; text-align: center;">4h 20m</td>
+              <td style="padding: 10px 12px; text-align: center;">✅</td>
+            </tr>
+            <tr style="border-bottom: 1px solid rgba(255,255,255,0.07);">
+              <td style="padding: 10px 12px; font-weight: 600;">AAPL</td>
+              <td style="padding: 10px 12px; text-align: center;">$198.50</td>
+              <td style="padding: 10px 12px; text-align: center;">$206.44</td>
+              <td style="padding: 10px 12px; text-align: center; color: #4ade80;">+4.0%</td>
+              <td style="padding: 10px 12px; text-align: center;">6h 15m</td>
+              <td style="padding: 10px 12px; text-align: center;">❌</td>
+            </tr>
+            <tr>
+              <td style="padding: 10px 12px; font-weight: 600;">SMCI</td>
+              <td style="padding: 10px 12px; text-align: center;">$34.18</td>
+              <td style="padding: 10px 12px; text-align: center;">$39.00</td>
+              <td style="padding: 10px 12px; text-align: center; color: #4ade80;">+14.1%</td>
+              <td style="padding: 10px 12px; text-align: center;">2h 45m</td>
+              <td style="padding: 10px 12px; text-align: center;">✅</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p style="font-size: 0.8rem; color: rgba(255,255,255,0.35); margin-top: -12px;">
+        <em>Example data for illustration only. Actual alert log will use live screener data.</em>
+      </p>
+
+      <p>
+        Every alert gets measured against a clear success threshold — did the price reach +5% from the alert price within a defined time window? If it hit +5% in under 6 hours, that's a hit. If it faded -2% before ever reaching the target, that's a miss. No ambiguity, no cherry-picking.
+      </p>
+      <p>
+        This creates full transparency. You'll be able to see StockJelli's track record in real time, directly on the main page. Not "we picked 10 winners" selected after the fact — every single alert, measured automatically, with timestamps and peak prices visible to everyone.
+      </p>
+
+      <h2>🧪 Refining the SJ Score</h2>
+      <p>
+        The alert log isn't just a transparency feature — it's a data engine for improving the <a href="/blog/what-is-sj-score.html" style="color: #f0b90b;">SJ Score</a> itself.
+      </p>
+      <p>
+        Every alert that gets tracked generates a data point: this ticker, with this SJ Score, at this time, in this market regime, produced this outcome. Over hundreds and thousands of data points, patterns emerge. Which SJ Score thresholds have the highest hit rates? Do alerts during Expansion outperform Caution? Is there a specific volume or range position signature that appears in the 15 minutes before the best moves?
+      </p>
+      <p>
+        We're actively collecting this data now. By mid-March, we'll have enough to start backtesting formula refinements. The goal is to make the SJ Score progressively more accurate — not by adding complexity, but by weighting the factors that actually predict follow-through and de-weighting the ones that don't.
+      </p>
+      <p>
+        The Market Pulse plays a role here too. A momentum formula that works 90% of the time during bull runs might drop to 30% in choppy sideways markets. By incorporating market state into the scoring, we can effectively raise the entry bar during unfavorable conditions and lower it during strong trends. The formula adapts to the environment instead of pretending every market session is the same.
+      </p>
+
+      <h2>🔔 On the Horizon: Push Notifications</h2>
+      <p>
+        Once the alert log is validated and the SJ Score refinements are live, the next step is <strong>push notifications</strong> — real-time mobile alerts when a high-confidence setup triggers. Not every screener entry, but the filtered, high-probability entries that the refined formula identifies as having the strongest chance of hitting the +5% target within the success window.
+      </p>
+      <p>
+        Push notifications are the final piece that turns StockJelli from a tool you check into a tool that comes to you. But we're deliberately building the measurement system first. We don't want to push alerts that we haven't validated — the log comes first, the data comes second, and the push notifications come only after we can prove they're worth your attention.
+      </p>
+
+      <div class="blog-callout">
+        <div class="blog-callout-title">📋 February Recap</div>
+        <p style="margin:0; color: rgba(255,255,255,0.65); font-size: 0.9rem;">
+          <strong>Live now:</strong> Momentum River visualization with 60fps particle animation. Market Pulse (redesigned from Market Regime) with four-state classification and subscriber SJ Score adjustments.<br><br>
+          <strong>This weekend:</strong> Tiingo data migration enabling premarket email alerts for subscribers.<br><br>
+          <strong>In development:</strong> Alert Performance Log tracking every screener entry with MFE measurement. SJ Score refinement using accumulated alert data. Push notifications once the formula is validated.
+        </p>
+      </div>
+
+      <h2>Building in Public</h2>
+      <p>
+        We said in our <a href="/blog/updates-and-future-of-stockjelli.html" style="color: #f0b90b;">last update</a> that StockJelli is built in the open, and we mean it. Every feature ships because the data says it's useful, not because it looks impressive in a marketing screenshot. The alert performance log is the ultimate expression of that philosophy — it holds us accountable to every alert we send, in public, with no way to hide the misses.
+      </p>
+      <p>
+        That's the kind of tool we'd want to use ourselves. And it's the kind of tool we think you deserve.
+      </p>
+
+      <p>
+        <em>StockJelli is an educational tool. This article is for informational purposes only and does not constitute financial advice.</em>
+      </p>
+
+      <div class="blog-bottom-cta">
+        <p>See the new features in action</p>
+        <a href="/">Open the Screener</a>
+      </div>
+    </div>
+  </article>
+
+  <footer class="footer">
+    <div class="container footer-inner">
+      <p>Educational tool only. Not financial advice.</p>
+      <p class="muted">© 2026 StockJelli · <a href="/privacy.html" class="footer-link">Privacy</a> · <a href="/terms.html" class="footer-link">Terms</a></p>
+    </div>
+  </footer>
+
+</body>
+</html>

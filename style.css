@@ -115,10 +115,6 @@
     border-bottom: 1px solid rgba(255, 255, 255, 0.06);
   }
   
-  /* Desktop: match .container width so logo/burger
-     sit flush with the screener content below.
-     The page grid is 220px | 1fr | 220px when
-     side rails are visible (>1400px).              */
   .header-inner {
     position: relative;
     display: flex;
@@ -129,8 +125,7 @@
     padding: 14px 18px;
   }
   
-  /* When side rails are visible, the content area
-     is narrower. Pad the header to match.          */
+  /* When side rails are visible, pad header inward to match content */
   @media (min-width: 1401px) {
     .header-inner {
       max-width: calc(1400px + 220px + 220px);
@@ -139,10 +134,10 @@
     }
   }
   
-  /* Match .container responsive narrowing */
+  /* Rails hidden — match .container but slightly tighter */
   @media (max-width: 1400px) {
     .header-inner {
-      width: 82%;
+      width: 72%;
       max-width: 1400px;
       padding: 14px 0;
     }
@@ -150,11 +145,11 @@
   
   @media (max-width: 1200px) {
     .header-inner {
-      width: 72%;
+      width: 68%;
     }
   }
   
-  /* Tablet and below: revert to original full-width behavior */
+  /* Tablet: widen back out for usability */
   @media (max-width: 900px) {
     .header-inner {
       width: 92%;

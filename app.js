@@ -1086,6 +1086,10 @@ if (highVolOnly && rows) {
     if (stocksTable) stocksTable.style.display = mode === "stocks" ? "" : "none";
     if (cryptoTable) cryptoTable.style.display = mode === "crypto" ? "" : "none";
 
+    // CoinGecko attribution — show only on crypto tab
+    const cryptoAttr = document.getElementById("cryptoAttribution");
+    if (cryptoAttr) cryptoAttr.style.display = mode === "crypto" ? "" : "none";
+
     if (heroChartStocks) heroChartStocks.style.display = mode === "stocks" ? "" : "none";
     if (heroChartCrypto) heroChartCrypto.style.display = mode === "crypto" ? "" : "none";
 
@@ -1114,8 +1118,7 @@ if (highVolOnly && rows) {
 
   // init
 
-  const cryptoAttr = document.getElementById("cryptoAttribution");
-if (cryptoAttr) cryptoAttr.style.display = mode === "crypto" ? "" : "none";
+
   const savedMode = localStorage.getItem("sj_asset_mode");
   applyMode(savedMode === "crypto" ? "crypto" : "stocks");
 

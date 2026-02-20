@@ -8,7 +8,7 @@
   // Config
   // ----------------------------
   const API_BASE = "https://api.stockjelli.com";
-  const POLL_MS = 60_000;
+  const POLL_MS = 5_000;
 
   const MODE_DEFAULTS = {
     stocks: {

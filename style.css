@@ -100,11 +100,12 @@
 /* ===========================================
    3. HEADER (sticky, opaque)
    
-   .header-inner mirrors .container exactly:
-   82% → 72% at 1200px → 92% at 900px
-   max-width: 1400px throughout.
-   
-   Mobile (<= 640px): completely unchanged.
+   ≤1400px: Rails hidden. .header-inner mirrors
+            .container directly (same % of viewport).
+   >1400px:  Rails visible (220px each). .container
+            is 82% of the CONTENT COLUMN, not the
+            viewport. Use calc() to match.
+   ≤640px:  Mobile — completely unchanged.
    =========================================== */
 
    .header {
@@ -117,6 +118,7 @@
     border-bottom: 1px solid rgba(255, 255, 255, 0.06);
   }
   
+  /* Default: mirrors .container for ≤1400px (no rails) */
   .header-inner {
     position: relative;
     display: flex;
@@ -130,6 +132,15 @@
   
   @media (max-width: 1200px) { .header-inner { width: 72%; } }
   @media (max-width: 900px)  { .header-inner { width: 92%; } }
+  
+  /* Wide screens: rails eat 440px, so .container's 82%
+     is relative to (viewport − 440px). Match that. */
+  @media (min-width: 1401px) {
+    .header-inner {
+      width: calc((100vw - 440px) * 0.82);
+      max-width: 1400px;
+    }
+  }
   
   .header-left {
     display: flex;

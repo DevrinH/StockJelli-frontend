@@ -97,11 +97,15 @@
     .side-rail { display: none !important; }
   }
   
-  /* ===========================================
-     3. HEADER (sticky, opaque)
-     =========================================== */
-  
-  .header {
+/* ===========================================
+   3. HEADER (sticky, opaque)
+   
+   Desktop: logo & hamburger align with the
+   main content column (between side rails).
+   Mobile (<= 640px): completely unchanged.
+   =========================================== */
+
+   .header {
     position: sticky;
     top: 0;
     z-index: 1001;
@@ -111,15 +115,51 @@
     border-bottom: 1px solid rgba(255, 255, 255, 0.06);
   }
   
+  /* Desktop: match .container width so logo/burger
+     sit flush with the screener content below.
+     The page grid is 220px | 1fr | 220px when
+     side rails are visible (>1400px).              */
   .header-inner {
     position: relative;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    width: 82%;                 /* was: unset — now matches .container */
     max-width: 1400px;
     margin: 0 auto;
-    padding: 14px 0;            /* was: 14px 18px */
+    padding: 14px 18px;
+  }
+  
+  /* When side rails are visible, the content area
+     is narrower. Pad the header to match.          */
+  @media (min-width: 1401px) {
+    .header-inner {
+      max-width: calc(1400px + 220px + 220px);
+      padding-left: calc(220px + 18px);
+      padding-right: calc(220px + 18px);
+    }
+  }
+  
+  /* Match .container responsive narrowing */
+  @media (max-width: 1400px) {
+    .header-inner {
+      width: 82%;
+      max-width: 1400px;
+      padding: 14px 0;
+    }
+  }
+  
+  @media (max-width: 1200px) {
+    .header-inner {
+      width: 72%;
+    }
+  }
+  
+  /* Tablet and below: revert to original full-width behavior */
+  @media (max-width: 900px) {
+    .header-inner {
+      width: 92%;
+      padding: 14px 0;
+    }
   }
   
   .header-left {
@@ -216,7 +256,9 @@
   .menu-btn span:nth-child(2) { width: 18px; }
   .menu-btn span:nth-child(3) { width: 22px; }
   
-  /* MOBILE HEADER */
+  /* ===========================================
+     MOBILE HEADER — completely unchanged
+     =========================================== */
   @media (max-width: 640px) {
     .header-inner {
       display: grid;
@@ -225,6 +267,7 @@
       align-items: center;
       gap: 8px 10px;
       padding: 10px 12px;
+      width: auto;
     }
   
     .header-left {
@@ -260,7 +303,6 @@
       opacity: 0.95;
     }
   }
-  
   
   /* ===========================================
      4. SCROLLING PULSE TICKER

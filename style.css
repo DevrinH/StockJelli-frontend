@@ -116,9 +116,10 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
+    width: 82%;                 /* was: unset — now matches .container */
     max-width: 1400px;
     margin: 0 auto;
-    padding: 14px 18px;
+    padding: 14px 0;            /* was: 14px 18px */
   }
   
   .header-left {

@@ -100,8 +100,9 @@
 /* ===========================================
    3. HEADER (sticky, opaque)
    
-   Desktop: logo & hamburger align with the
-   main content column (between side rails).
+   Fix: .header-inner now uses the EXACT same
+   width / max-width / breakpoints as .container.
+   This guarantees alignment at every viewport.
    Mobile (<= 640px): completely unchanged.
    =========================================== */
 
@@ -115,47 +116,25 @@
     border-bottom: 1px solid rgba(255, 255, 255, 0.06);
   }
   
+  /*  .container uses:
+        width: 82%;  max-width: 1400px;
+        ≤1200px → 72%
+        ≤900px  → 92%
+      .header-inner mirrors that exactly.          */
+  
   .header-inner {
     position: relative;
     display: flex;
     align-items: center;
     justify-content: space-between;
+    width: 82%;
     max-width: 1400px;
     margin: 0 auto;
-    padding: 14px 18px;
+    padding: 14px 0;
   }
   
-  /* When side rails are visible, pad header inward to match content */
-  @media (min-width: 1401px) {
-    .header-inner {
-      max-width: calc(1400px + 220px + 220px);
-      padding-left: calc(220px + 18px);
-      padding-right: calc(220px + 18px);
-    }
-  }
-  
-  /* Rails hidden — match .container but slightly tighter */
-  @media (max-width: 1400px) {
-    .header-inner {
-      width: 72%;
-      max-width: 1400px;
-      padding: 14px 0;
-    }
-  }
-  
-  @media (max-width: 1200px) {
-    .header-inner {
-      width: 68%;
-    }
-  }
-  
-  /* Tablet: widen back out for usability */
-  @media (max-width: 900px) {
-    .header-inner {
-      width: 92%;
-      padding: 14px 0;
-    }
-  }
+  @media (max-width: 1200px) { .header-inner { width: 72%; } }
+  @media (max-width: 900px)  { .header-inner { width: 92%; } }
   
   .header-left {
     display: flex;

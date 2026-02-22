@@ -449,17 +449,17 @@ function getTradingViewUrl(symbol, type = "stock") {
 // Render ticker cell with TradingView hover tooltip (affiliate link)
 function renderTickerCell(symbol, type = "stock", imageUrl = null) {
   const tvUrl = getTradingViewUrl(symbol, type);
-  
+
   let logoHtml = "";
   if (type === "crypto" && imageUrl) {
     // Crypto: CoinGecko image URL from API response
     logoHtml = `<img class="ticker-logo" src="${imageUrl}" alt="" loading="lazy" onerror="this.dataset.failed='true'">`;
-  } else if (type === "stock" && symbol) {
-    // Stocks: FMP image CDN — free, no API key, square PNGs
+  } else if (type === "stock" && symbol && symbol !== "—") {
+    // Stocks: FMP image CDN — free, no API key needed
     const fmpLogoUrl = `https://financialmodelingprep.com/image-stock/${encodeURIComponent(symbol)}.png`;
     logoHtml = `<img class="ticker-logo" src="${fmpLogoUrl}" alt="" loading="lazy" onerror="this.dataset.failed='true'">`;
   }
-  
+
   return `
     <span class="ticker-wrap">
       ${logoHtml}<span class="ticker-symbol">${symbol}</span>
@@ -470,48 +470,48 @@ function renderTickerCell(symbol, type = "stock", imageUrl = null) {
   `;
 }
 
-  function renderStocks(rows) {
-    const tbody = document.getElementById("stocksTbody");
-    if (!tbody) return;
 
-    if (!rows || rows.length === 0) {
-      tbody.innerHTML = `<tr><td class="ticker">—</td><td>$—</td><td>—</td><td>—</td><td class="rvol">—</td><td class="news">—</td><td class="sj">—</td></tr>`;
-      return;
-    }
+function renderStocks(rows) {
+  const tbody = document.getElementById("stocksTbody");
+  if (!tbody) return;
 
-    const medals = ["🥇", "🥈", "🥉"];
-tbody.innerHTML = rows.map((x, idx) => {
-      const pct = x.pctChange;
-      const changeClass = classUpDown(pct);
-      
-      // Range indicator using day low/high
-      const rangeHtml = renderRangeIndicator(x.dayLow ?? x.rangeLow, x.dayHigh ?? x.rangeHigh, x.price);
-      
-      // News with tier styling
-      const newsHtml = renderNewsCell(x.news);
-      
-      // Ticker with TradingView link
-      const tickerHtml = renderTickerCell(x.symbol || "—", "stock");
-
-      return `
-        <tr>
-        <td class="ticker">${tickerHtml}${idx < 3 ? ' <span class="ticker-medal">' + medals[idx] + '</span>' : ''}${renderNewBadge(x.enteredAt)}</td>
-         <td>${fmtUsd(x.price)}</td>
-          <td class="${changeClass}">
-            <span class="change-wrap">
-              <span class="change-pct">${fmtPct(pct)}</span>
-              ${rangeHtml}
-            </span>
-          </td>
-          <td>${fmtVolumeCompact(x.volume)}${renderVolumeFire(x.volume, x.avgVolume, x.marketCap, "stock")}${renderLiquidityDot(x.volume, x.marketCap, "stock")}</td>
-          <td class="rvol">${renderRvol(x.volume, x.avgVolume, x.marketCap, "stock")}</td>
-          <td class="news">${newsHtml}</td>
-          <td class="sj">${renderSJScore(x.sjScore, idx)}</td>
-        </tr>
-      `;
-    }).join("");
-    trimMobileDecimals();  // ← add this
+  if (!rows || rows.length === 0) {
+    tbody.innerHTML = `<tr><td class="ticker">—</td><td>$—</td><td>—</td><td>—</td><td class="rvol">—</td><td class="news">—</td><td class="sj">—</td></tr>`;
+    return;
   }
+
+  // Snapshot old values BEFORE re-rendering (for animation)
+  const oldValues = snapshotTableValues(tbody);
+
+  const medals = ["🥇", "🥈", "🥉"];
+  tbody.innerHTML = rows.map((x, idx) => {
+    const pct = x.pctChange;
+    const changeClass = classUpDown(pct);
+    const rangeHtml = renderRangeIndicator(x.dayLow ?? x.rangeLow, x.dayHigh ?? x.rangeHigh, x.price);
+    const newsHtml = renderNewsCell(x.news);
+    const tickerHtml = renderTickerCell(x.symbol || "—", "stock");
+
+    return `
+      <tr data-symbol="${x.symbol || ''}">
+        <td class="ticker">${tickerHtml}${idx < 3 ? ' <span class="ticker-medal">' + medals[idx] + '</span>' : ''}${renderNewBadge(x.enteredAt)}</td>
+        <td class="price-cell" data-raw-price="${x.price ?? ''}">${fmtUsd(x.price)}</td>
+        <td class="${changeClass}">
+          <span class="change-wrap">
+            <span class="change-pct" data-raw-pct="${pct ?? ''}">${fmtPct(pct)}</span>
+            ${rangeHtml}
+          </span>
+        </td>
+        <td>${fmtVolumeCompact(x.volume)}${renderVolumeFire(x.volume, x.avgVolume, x.marketCap, "stock")}${renderLiquidityDot(x.volume, x.marketCap, "stock")}</td>
+        <td class="rvol">${renderRvol(x.volume, x.avgVolume, x.marketCap, "stock")}</td>
+        <td class="news">${newsHtml}</td>
+        <td class="sj">${renderSJScore(x.sjScore, idx)}</td>
+      </tr>
+    `;
+  }).join("");
+
+  trimMobileDecimals();
+  animateTableValues(tbody, oldValues);
+}
 
 // Liquidity indicator dot for crypto
 function renderLiquidityDot(volume, marketCap) {
@@ -543,8 +543,11 @@ function renderCrypto(rows) {
     return;
   }
 
+  // Snapshot old values BEFORE re-rendering (for animation)
+  const oldValues = snapshotTableValues(tbody);
+
   const medals = ["🥇", "🥈", "🥉"];
-tbody.innerHTML = rows.map((x, idx) => {
+  tbody.innerHTML = rows.map((x, idx) => {
     const pct = x.pctChange || 0;
     const changeClass = classUpDown(pct);
 
@@ -581,15 +584,16 @@ tbody.innerHTML = rows.map((x, idx) => {
       rugWarning = ' <span class="rug-warning" title="⚠️ Elevated risk: extreme move and/or unusual volume vs market cap">⚠️</span>';
     }
 
-    const tickerHtml = renderTickerCell(x.coinSymbol || "—", "crypto");
+    // ★ Pass x.image for crypto logo
+    const tickerHtml = renderTickerCell(x.coinSymbol || "—", "crypto", x.image || null);
 
     return `
-      <tr>
-<td class="ticker">${tickerHtml}${idx < 3 ? ' <span class="ticker-medal">' + medals[idx] + '</span>' : ''}${rugWarning}${renderNewBadge(x.enteredAt)}</td>
-        <td>${fmtUsd(x.price, priceDecimals)}</td>
+      <tr data-symbol="${x.coinSymbol || ''}">
+        <td class="ticker">${tickerHtml}${idx < 3 ? ' <span class="ticker-medal">' + medals[idx] + '</span>' : ''}${rugWarning}${renderNewBadge(x.enteredAt)}</td>
+        <td class="price-cell" data-raw-price="${x.price ?? ''}">${fmtUsd(x.price, priceDecimals)}</td>
         <td class="${changeClass}">
           <span class="change-wrap">
-            <span class="change-pct">${fmtPct(pct)}</span>
+            <span class="change-pct" data-raw-pct="${pct ?? ''}">${fmtPct(pct)}</span>
             ${rangeHtml}
           </span>
         </td>
@@ -601,9 +605,138 @@ tbody.innerHTML = rows.map((x, idx) => {
     `;
   }).join("");
 
-  trimMobileDecimals();  // ← add this
-
+  trimMobileDecimals();
+  animateTableValues(tbody, oldValues);
 }
+
+
+// ──────────────────────────────────────────────────────────────────────
+// 4. NEW: Animated number transitions
+//
+//    snapshotTableValues() — captures current values before re-render
+//    animateTableValues()  — compares old vs new, runs count animation
+//
+//    The system works by:
+//    - Before innerHTML replacement, we snapshot {symbol → {price, pct}}
+//    - After innerHTML replacement, we find matching rows by data-symbol
+//    - If a value changed, we animate from old → new over 400ms
+//    - We also flash green (up) or red (down) briefly
+// ──────────────────────────────────────────────────────────────────────
+
+function snapshotTableValues(tbody) {
+  const map = new Map();
+  if (!tbody) return map;
+
+  tbody.querySelectorAll("tr[data-symbol]").forEach(tr => {
+    const sym = tr.dataset.symbol;
+    if (!sym) return;
+
+    const priceCell = tr.querySelector(".price-cell");
+    const pctCell = tr.querySelector(".change-pct");
+
+    map.set(sym, {
+      price: parseFloat(priceCell?.dataset.rawPrice) || null,
+      pct: parseFloat(pctCell?.dataset.rawPct) || null,
+    });
+  });
+
+  return map;
+}
+
+function animateTableValues(tbody, oldValues) {
+  if (!tbody || !oldValues || oldValues.size === 0) return;
+
+  tbody.querySelectorAll("tr[data-symbol]").forEach(tr => {
+    const sym = tr.dataset.symbol;
+    if (!sym) return;
+
+    const old = oldValues.get(sym);
+    if (!old) return; // new row, no animation needed
+
+    const priceCell = tr.querySelector(".price-cell");
+    const pctCell = tr.querySelector(".change-pct");
+
+    // Animate price
+    const newPrice = parseFloat(priceCell?.dataset.rawPrice);
+    if (priceCell && old.price !== null && Number.isFinite(newPrice) && old.price !== newPrice) {
+      animateNumber(priceCell, old.price, newPrice, 400, formatPrice);
+      flashCell(priceCell, newPrice > old.price ? "up" : "down");
+    }
+
+    // Animate percentage
+    const newPct = parseFloat(pctCell?.dataset.rawPct);
+    if (pctCell && old.pct !== null && Number.isFinite(newPct) && Math.abs(old.pct - newPct) > 0.005) {
+      animateNumber(pctCell, old.pct, newPct, 400, formatPct);
+      flashCell(pctCell, newPct > old.pct ? "up" : "down");
+    }
+  });
+}
+
+/**
+ * Animate a number from `from` to `to` inside `el` over `duration` ms.
+ * Uses ease-out cubic for smooth deceleration.
+ * `formatter` converts the current number to display string.
+ */
+function animateNumber(el, from, to, duration, formatter) {
+  const start = performance.now();
+
+  function tick(now) {
+    const elapsed = now - start;
+    const progress = Math.min(1, elapsed / duration);
+    // Ease-out cubic
+    const eased = 1 - Math.pow(1 - progress, 3);
+    const current = from + (to - from) * eased;
+    el.textContent = formatter(current, to);
+    if (progress < 1) requestAnimationFrame(tick);
+  }
+
+  requestAnimationFrame(tick);
+}
+
+/**
+ * Flash a cell green or red briefly on change
+ */
+function flashCell(el, direction) {
+  // Remove any existing flash class
+  el.classList.remove("num-flash-up", "num-flash-down");
+  // Force reflow to restart animation
+  void el.offsetWidth;
+  el.classList.add(direction === "up" ? "num-flash-up" : "num-flash-down");
+  // Clean up after animation
+  setTimeout(() => {
+    el.classList.remove("num-flash-up", "num-flash-down");
+  }, 650);
+}
+
+/**
+ * Format price for animation display.
+ * Uses the final value's decimal precision to stay consistent.
+ */
+function formatPrice(current, finalValue) {
+  if (!Number.isFinite(current)) return "$—";
+  // Match decimals to the final value
+  let decimals = 2;
+  if (Number.isFinite(finalValue) && finalValue > 0 && finalValue < 0.01) {
+    decimals = Math.max(2, Math.ceil(-Math.log10(finalValue)) + 1);
+    decimals = Math.min(decimals, 6);
+  }
+  return `$${current.toFixed(decimals)}`;
+}
+
+/**
+ * Format percentage for animation display.
+ */
+function formatPct(current, finalValue) {
+  if (!Number.isFinite(current)) return "—";
+  // On mobile use 1 decimal, desktop use 2
+  const decimals = window.innerWidth <= 640 ? 1 : 2;
+  const sign = current > 0 ? "+" : "";
+  return `${sign}${current.toFixed(decimals)}%`;
+}
+
+
+
+
 
 // Volume fire emoji — shows when volume is elevated vs average
 function renderVolumeFire(volume, avgVolume, marketCap, mode) {

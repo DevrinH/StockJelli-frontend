@@ -990,6 +990,54 @@ tbody tr:first-child {
       border-bottom-color: #1e293b;
     }
   }
+
+  /* ===========================================
+   TICKER LOGOS — Add to style.css
+   Place after the .ticker-wrap rules (section 12)
+   =========================================== */
+
+.ticker-logo {
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+  object-fit: contain;
+  vertical-align: middle;
+  flex-shrink: 0;
+  background: rgba(255, 255, 255, 0.04);
+}
+
+/* Hide broken images cleanly — no alt text flash */
+.ticker-logo[data-failed="true"] {
+  display: none;
+}
+
+@media (min-width: 641px) {
+  .ticker-logo {
+    width: 20px;
+    height: 20px;
+    border-radius: 5px;
+  }
+}
+
+@media (max-width: 640px) {
+  .ticker-logo {
+    width: 15px;
+    height: 15px;
+    border-radius: 3px;
+  }
+}
+
+@media (max-width: 380px) {
+  .ticker-logo {
+    width: 14px;
+    height: 14px;
+  }
+}
+
+
+/* ── Also update existing .ticker-wrap gap ── */
+/* Change from: gap: 4px  →  gap: 6px         */
+/* .ticker-wrap { ... gap: 6px; }              */
   
   
   /* ===========================================

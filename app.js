@@ -447,11 +447,22 @@ function getTradingViewUrl(symbol, type = "stock") {
 }
 
 // Render ticker cell with TradingView hover tooltip (affiliate link)
-function renderTickerCell(symbol, type = "stock") {
+function renderTickerCell(symbol, type = "stock", imageUrl = null) {
   const tvUrl = getTradingViewUrl(symbol, type);
+  
+  let logoHtml = "";
+  if (type === "crypto" && imageUrl) {
+    // Crypto: CoinGecko image URL from API response
+    logoHtml = `<img class="ticker-logo" src="${imageUrl}" alt="" loading="lazy" onerror="this.dataset.failed='true'">`;
+  } else if (type === "stock" && symbol) {
+    // Stocks: FMP image CDN — free, no API key, square PNGs
+    const fmpLogoUrl = `https://financialmodelingprep.com/image-stock/${encodeURIComponent(symbol)}.png`;
+    logoHtml = `<img class="ticker-logo" src="${fmpLogoUrl}" alt="" loading="lazy" onerror="this.dataset.failed='true'">`;
+  }
+  
   return `
     <span class="ticker-wrap">
-      <span class="ticker-symbol">${symbol}</span>
+      ${logoHtml}<span class="ticker-symbol">${symbol}</span>
       <a class="ticker-tv-link" href="${tvUrl}" target="_blank" rel="noopener" title="Open ${symbol} on TradingView">
         <span class="ticker-tv-tooltip">Open in TradingView ↗</span>
       </a>

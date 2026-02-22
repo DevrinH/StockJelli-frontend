@@ -595,18 +595,20 @@
     // ═══════════════════════════════════════════════════════════════════════════
   
     function buildLanes(data, isBench) {
-      return data.map((d, i) => ({
-        sym: d.sym,
-        pct: d.pct,
-        vol: d.vol || 0.5,
-        speed: Math.max(0.3, Math.abs(d.pct) / 100 * 8 + 0.4),
-        direction: d.pct >= 0 ? 1 : -1,
-        isBench,
-        y: 0, h: 0,
-        wavePhase: Math.random() * Math.PI * 2,
-        particles: [],
-      }));
-    }
+        return data.map((d, i) => ({
+          sym: d.sym,
+          pct: d.pct,
+          vol: d.vol || 0.5,
+          image: d.image || null,
+          type: d.type || "stock",
+          speed: Math.max(0.3, Math.abs(d.pct) / 100 * 8 + 0.4),
+          direction: d.pct >= 0 ? 1 : -1,
+          isBench,
+          y: 0, h: 0,
+          wavePhase: Math.random() * Math.PI * 2,
+          particles: [],
+        }));
+      }
   
     function layoutLanes(lanes, canvasEl, isBench) {
       if (!lanes.length) { canvasEl.style.height = "0px"; return; }
@@ -630,37 +632,44 @@
     // ═══════════════════════════════════════════════════════════════════════════
   
     function buildLabelsDOM(lanes, labelEl) {
-      labelEl.innerHTML = "";
-      lanes.forEach(l => {
-        const div = document.createElement("div");
-        div.className = "river-lane-label";
-        div.style.height = l.h + "px";
+        labelEl.innerHTML = "";
+        lanes.forEach(l => {
+          const div = document.createElement("div");
+          div.className = "river-lane-label";
+          div.style.height = l.h + "px";
   
-        const pctSpan = document.createElement("span");
-        pctSpan.className = `river-lane-pct ${l.pct >= 0 ? "up" : "down"}`;
+          // Build logo HTML
+          let logoHtml = "";
+          if (l.image) {
+            logoHtml = `<img class="river-lane-logo" src="${l.image}" alt="" loading="lazy" onerror="this.style.display='none'">`;
+          } else if (l.type === "stock" && l.sym) {
+            const fmpUrl = `https://financialmodelingprep.com/image-stock/${encodeURIComponent(l.sym)}.png`;
+            logoHtml = `<img class="river-lane-logo" src="${fmpUrl}" alt="" loading="lazy" onerror="this.style.display='none'">`;
+          }
   
-        div.innerHTML = `<span class="river-lane-sym">${l.sym}</span>`;
-        div.appendChild(pctSpan);
-        labelEl.appendChild(div);
+          const pctSpan = document.createElement("span");
+          pctSpan.className = `river-lane-pct ${l.pct >= 0 ? "up" : "down"}`;
   
-        // Count-up animation
-        const target = l.pct;
-        const sign = target >= 0 ? "+" : "";
-        const duration = 800;
-        const start = performance.now();
+          div.innerHTML = `<span class="river-lane-sym">${logoHtml}${l.sym}</span>`;
+          div.appendChild(pctSpan);
+          labelEl.appendChild(div);
   
-        function tick(now) {
-          const elapsed = now - start;
-          const progress = Math.min(1, elapsed / duration);
-          // Ease-out cubic
-          const eased = 1 - Math.pow(1 - progress, 3);
-          const current = target * eased;
-          pctSpan.textContent = `${current >= 0 ? "+" : ""}${current.toFixed(1)}%`;
-          if (progress < 1) requestAnimationFrame(tick);
-        }
-        requestAnimationFrame(tick);
-      });
-    }
+          // Count-up animation
+          const target = l.pct;
+          const duration = 800;
+          const start = performance.now();
+  
+          function tick(now) {
+            const elapsed = now - start;
+            const progress = Math.min(1, elapsed / duration);
+            const eased = 1 - Math.pow(1 - progress, 3);
+            const current = target * eased;
+            pctSpan.textContent = `${current >= 0 ? "+" : ""}${current.toFixed(1)}%`;
+            if (progress < 1) requestAnimationFrame(tick);
+          }
+          requestAnimationFrame(tick);
+        });
+      }
   
     // ═══════════════════════════════════════════════════════════════════════════
     // DRAW ENGINE — no blur, no per-frame radial gradients
@@ -827,20 +836,22 @@
   
         const maxVol = Math.max(...rows.map(r => r.volume || 0), 1);
   
-        moversData = rows.map(r => ({
-          sym: mode === "crypto" ? (r.coinSymbol || r.symbol) : r.symbol,
-          pct: r.pctChange || 0,
-          vol: Math.max(0.15, (r.volume || 0) / maxVol),
-        }));
+      moversData = rows.map(r => ({
+        sym: mode === "crypto" ? (r.coinSymbol || r.symbol) : r.symbol,
+        pct: r.pctChange || 0,
+        vol: Math.max(0.15, (r.volume || 0) / maxVol),
+        image: r.image || null,
+      type: mode,
+     }));
   
         // Benchmarks from header
         if (mode === "crypto") {
           const btcPct = parseFloat(document.getElementById("idxLeftValue")?.textContent) || 0;
           const totalPct = parseFloat(document.getElementById("idxRightValue")?.textContent) || 0;
-          benchData = [
-            { sym: "BTC", pct: btcPct, vol: 0.6 },
-            { sym: "Total Crypto", pct: totalPct, vol: 0.4 },
-          ];
+      benchData = [
+        { sym: "BTC", pct: btcPct, vol: 0.6 },
+        { sym: "Total Crypto", pct: totalPct, vol: 0.4 },
+      ];
         } else {
           const nasdaqPct = parseFloat(document.getElementById("idxLeftValue")?.textContent) || 0;
           const spPct = parseFloat(document.getElementById("idxRightValue")?.textContent) || 0;
@@ -859,10 +870,10 @@
           { sym: "NEAR", pct: 9.8, vol: 0.45 },
           { sym: "LINK", pct: 4.2, vol: 0.5 },
         ];
-        benchData = [
-          { sym: "BTC", pct: 1.8, vol: 0.6 },
-          { sym: "Total Crypto", pct: 0.5, vol: 0.4 },
-        ];
+      benchData = [
+        { sym: "NASDAQ", pct: nasdaqPct, vol: 0.5, image: null, type: "stock" },
+       { sym: "S&P 500", pct: spPct, vol: 0.5, image: null, type: "stock" },
+      ];
       }
   
       moversLanes = buildLanes(moversData, false);

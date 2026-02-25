@@ -47,9 +47,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     
     <link rel="stylesheet" href="style.css" />
-    <link rel="stylesheet" href="style.css" />
-    <link rel="stylesheet" href="ads.css" />
-  
+    <link rel="stylesheet" href="sponsor.css" />
     <!-- Favicons -->
     <link rel="icon" type="image/png" sizes="16x16" href="/StockJelli-S-Logo.png">
     <link rel="icon" type="image/png" sizes="32x32" href="/StockJelli-S-Logo.png">
@@ -71,6 +69,8 @@
     <script src="app.js" defer></script>
     <script src="alerts-frontend.js" defer></script>
     <script src="feature-additions.js" defer></script>
+    <script src="sponsor.js" defer></script>
+
     
     <!-- JSON-LD Structured Data -->
     <script type="application/ld+json">
@@ -292,25 +292,20 @@
     <!-- Left ad rail -->
 <!-- Left Side Rail -->
 <aside class="side-rail side-rail-left">
-  <a href="https://www.tradingview.com/?aff_id=162729" target="_blank" rel="noopener" class="banner-b">
+  <!-- Sponsor unit — sponsor.js fills this -->
+  <div class="sj-sponsor-rail-left"></div>
+
+  <!-- TradingView partner fallback (shown if sponsor blocked or subscriber) -->
+  <a href="https://www.tradingview.com/?aff_id=162729" target="_blank" rel="noopener" class="banner-b sj-partner-fallback" style="display:none;">
     <div class="logo">
       <svg viewBox="0 0 24 24"><path d="M4 4h4v16H4V4zm6 6h4v10h-4V10zm6-3h4v13h-4V7z"/></svg>
     </div>
     <div class="brand">TradingView</div>
     <div class="tagline">Where traders chart</div>
     <div class="divider"></div>
-    <div class="benefit">
-      <strong>50M+</strong>
-      active traders
-    </div>
-    <div class="benefit">
-      <strong>100+</strong>
-      indicators
-    </div>
-    <div class="benefit">
-      <strong>Free</strong>
-      forever plan
-    </div>
+    <div class="benefit"><strong>50M+</strong> active traders</div>
+    <div class="benefit"><strong>100+</strong> indicators</div>
+    <div class="benefit"><strong>Free</strong> forever plan</div>
     <div class="spacer"></div>
     <div class="cta">Get Started</div>
   </a>
@@ -831,6 +826,7 @@
   </div>
 </section>
       
+<div id="sponsorAboveFooter"></div>
       
 <footer class="footer">
   <div class="container footer-inner">
@@ -868,25 +864,20 @@
 
 <!-- Right Side Rail -->
 <aside class="side-rail side-rail-right">
-  <a href="https://www.tradingview.com/?aff_id=162729" target="_blank" rel="noopener" class="banner-b">
+  <!-- Sponsor unit — sponsor.js fills this -->
+  <div class="sj-sponsor-rail-right"></div>
+
+  <!-- TradingView partner fallback (shown if sponsor blocked or subscriber) -->
+  <a href="https://www.tradingview.com/?aff_id=162729" target="_blank" rel="noopener" class="banner-b sj-partner-fallback" style="display:none;">
     <div class="logo">
       <svg viewBox="0 0 24 24"><path d="M4 4h4v16H4V4zm6 6h4v10h-4V10zm6-3h4v13h-4V7z"/></svg>
     </div>
     <div class="brand">TradingView</div>
     <div class="tagline">Where traders chart</div>
     <div class="divider"></div>
-    <div class="benefit">
-      <strong>50M+</strong>
-      active traders
-    </div>
-    <div class="benefit">
-      <strong>100+</strong>
-      indicators
-    </div>
-    <div class="benefit">
-      <strong>Free</strong>
-      forever plan
-    </div>
+    <div class="benefit"><strong>50M+</strong> active traders</div>
+    <div class="benefit"><strong>100+</strong> indicators</div>
+    <div class="benefit"><strong>Free</strong> forever plan</div>
     <div class="spacer"></div>
     <div class="cta">Get Started</div>
   </a>

@@ -2509,3 +2509,45 @@ tbody tr:first-child {
   .river-section-label { padding: 8px 12px 2px; font-size: 0.58rem; }
   .river-divider { height: 12px; }
 }
+
+/* ── Ad-Free Subscribe Button (hero area) ─── */
+
+.sj-noclutter-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 16px;
+  border-radius: 999px;
+  border: 1px solid rgba(77, 163, 255, 0.25);
+  background: rgba(77, 163, 255, 0.08);
+  color: rgba(77, 163, 255, 0.9);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: background 0.15s ease, border-color 0.15s ease, transform 0.1s ease;
+}
+
+.sj-noclutter-btn:hover {
+  background: rgba(77, 163, 255, 0.14);
+  border-color: rgba(77, 163, 255, 0.4);
+  transform: translateY(-1px);
+}
+
+.sj-noclutter-btn:active {
+  transform: translateY(0) scale(0.98);
+}
+
+/* Hide for subscribers */
+body.sj-subscriber .sj-noclutter-btn {
+  display: none !important;
+}
+
+@media (max-width: 640px) {
+  .sj-noclutter-btn {
+    padding: 5px 12px;
+    font-size: 0.68rem;
+  }
+}

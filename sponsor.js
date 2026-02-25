@@ -188,4 +188,20 @@
     }, 5000);
   
     console.log("[SJ] Sponsor units initialized (" + (isMobile ? "mobile" : "desktop") + ")");
+// ══════════════════════════════════════════════════════════════
+  // AD-FREE BUTTON → opens subscribe modal
+  // ══════════════════════════════════════════════════════════════
+  var noClutterBtn = document.getElementById("noClutterBtn");
+  if (noClutterBtn) {
+    if (isSubscriber()) {
+      noClutterBtn.style.display = "none";
+    }
+    noClutterBtn.addEventListener("click", function() {
+      var alertsBtn = document.getElementById("enableAlertsBtn")
+                   || document.getElementById("inlineAlertBtn");
+      if (alertsBtn) alertsBtn.click();
+    });
+  }
+
+
   })();

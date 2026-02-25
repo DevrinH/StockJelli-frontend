@@ -117,7 +117,7 @@
       label.textContent = "Sponsored";
       target.appendChild(label);
   
-      var ins = createInsElement(SLOTS.afterScreener, "auto");
+      var ins = createInsElement(SLOTS.afterScreener, "horizontal");
       target.appendChild(ins);
       pushUnit();
     })();

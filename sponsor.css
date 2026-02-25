@@ -1,141 +1,121 @@
 /* ============================================
-   StockJelli — Ad Styling
-   ads.css — v2 with Rail Ads
+   StockJelli — Sponsor Styling
+   sponsor.css — FINAL
    
-   - Rail ads replace TradingView affiliate banners
-   - In-content ads: after screener, above footer
-   - Subscriber class hides everything
-   - Responsive: rails hidden < 1400px (same as before)
-   - Mobile: fewer ads, smaller spacing
+   All classes: sj-sponsor-* / sj-partner-*
+   Zero use of the word "ad" in any selector.
    ============================================ */
 
-/* ── AD LABEL (tiny, discreet) ─────────────────────────────── */
+/* ── LABEL ─────────────────────────────────────────────────── */
 
-.sj-ad-label {
-    font-size: 0.58rem;
-    color: rgba(255, 255, 255, 0.12);
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    text-align: center;
-    margin-bottom: 4px;
-    user-select: none;
-    pointer-events: none;
-  }
-  
-  /* ── RAIL ADS (sidebars) ──────────────────────────────────── */
-  
-  .sj-ad-rail-left,
-  .sj-ad-rail-right {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding-top: 8px;
-  }
-  
-  .sj-ad-rail-left ins.adsbygoogle,
-  .sj-ad-rail-right ins.adsbygoogle {
-    display: block;
-    width: 160px;
-    height: 600px;
-  }
-  
-  /* TradingView fallback — hidden by default, shown if AdSense blocked */
-  .sj-rail-fallback {
-    display: none;
-  }
-  
-  /* Rails hidden on narrow screens (matches existing .side-rail behavior) */
-  @media (max-width: 1400px) {
-    .sj-ad-rail-left,
-    .sj-ad-rail-right,
-    .sj-rail-fallback {
-      display: none !important;
-    }
-  }
-  
-  /* ── IN-CONTENT ADS ───────────────────────────────────────── */
-  
-  .sj-ad-unit {
-    width: 100%;
-    max-width: 100%;
-    margin: 20px auto;
-    padding: 0;
-    text-align: center;
-    overflow: hidden;
-    min-height: 50px;
-  }
-  
-  .sj-ad-unit ins.adsbygoogle {
-    display: block;
-    width: 100%;
-    min-height: 50px;
-  }
-  
-  /* After screener */
-  .sj-ad-after-screener {
-    margin: 16px 0 24px;
-    padding: 12px 0;
-    border-top: 1px solid rgba(255, 255, 255, 0.03);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.03);
-  }
-  
-  /* Above footer */
-  .sj-ad-above-footer {
-    margin: 0 auto 16px;
-    padding: 12px 0;
-    border-top: 1px solid rgba(255, 255, 255, 0.03);
-    max-width: 728px;
-  }
-  
-  /* ── RESPONSIVE ───────────────────────────────────────────── */
-  
-  @media (max-width: 768px) {
-    .sj-ad-unit {
-      margin: 12px auto;
-      min-height: 50px;
-    }
-  
-    .sj-ad-label {
-      font-size: 0.52rem;
-      margin-bottom: 2px;
-    }
-  
-    .sj-ad-after-screener {
-      margin: 10px 0 14px;
-      padding: 8px 0;
-    }
-  
-    .sj-ad-above-footer {
-      margin: 0 auto 10px;
-      padding: 6px 0;
-    }
-  }
-  
-  @media (max-width: 400px) {
-    .sj-ad-unit {
-      margin: 8px auto;
-    }
-  }
-  
-  /* ── SUBSCRIBER: HIDE ALL ADS ─────────────────────────────── */
-  
-  body.sj-subscriber .sj-ad-unit,
-  body.sj-subscriber .sj-ad-rail-left,
-  body.sj-subscriber .sj-ad-rail-right,
-  body.sj-subscriber ins.adsbygoogle {
+.sj-sponsor-label {
+  font-size: 0.58rem;
+  color: rgba(255, 255, 255, 0.12);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-align: center;
+  margin-bottom: 4px;
+  user-select: none;
+  pointer-events: none;
+}
+
+/* ── RAIL UNITS (sidebars) ─────────────────────────────────── */
+
+.sj-sponsor-rail-left,
+.sj-sponsor-rail-right {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 8px;
+}
+
+/* TradingView partner fallback — hidden by default */
+.sj-partner-fallback {
+  display: none;
+}
+
+/* Rails hidden on narrow screens (matches .side-rail) */
+@media (max-width: 1400px) {
+  .sj-sponsor-rail-left,
+  .sj-sponsor-rail-right,
+  .sj-partner-fallback {
     display: none !important;
   }
-  
-  /* Show TradingView fallback for subscribers (nice partner link) */
-  body.sj-subscriber .sj-rail-fallback {
-    display: flex !important;
+}
+
+/* ── IN-CONTENT UNITS ──────────────────────────────────────── */
+
+.sj-sponsor-unit {
+  width: 100%;
+  max-width: 100%;
+  margin: 20px auto;
+  padding: 0;
+  text-align: center;
+  overflow: hidden;
+  min-height: 50px;
+}
+
+.sj-sponsor-after-screener {
+  margin: 16px 0 24px;
+  padding: 12px 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.03);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+}
+
+.sj-sponsor-above-footer {
+  margin: 0 auto 16px;
+  padding: 12px 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.03);
+  max-width: 728px;
+}
+
+/* ── RESPONSIVE ────────────────────────────────────────────── */
+
+@media (max-width: 768px) {
+  .sj-sponsor-unit {
+    margin: 12px auto;
+    min-height: 50px;
   }
-  
-  /* ── EMPTY AD CLEANUP ─────────────────────────────────────── */
-  
-  .sj-ad-unit[style*="display: none"] {
-    margin: 0 !important;
-    padding: 0 !important;
-    border: none !important;
-    min-height: 0 !important;
+
+  .sj-sponsor-label {
+    font-size: 0.52rem;
+    margin-bottom: 2px;
   }
+
+  .sj-sponsor-after-screener {
+    margin: 10px 0 14px;
+    padding: 8px 0;
+  }
+
+  .sj-sponsor-above-footer {
+    margin: 0 auto 10px;
+    padding: 6px 0;
+  }
+}
+
+@media (max-width: 400px) {
+  .sj-sponsor-unit {
+    margin: 8px auto;
+  }
+}
+
+/* ── SUBSCRIBER: HIDE UNITS ────────────────────────────────── */
+
+body.sj-subscriber .sj-sponsor-unit,
+body.sj-subscriber .sj-sponsor-rail-left,
+body.sj-subscriber .sj-sponsor-rail-right {
+  display: none !important;
+}
+
+body.sj-subscriber .sj-partner-fallback {
+  display: flex !important;
+}
+
+/* ── EMPTY CLEANUP ─────────────────────────────────────────── */
+
+.sj-sponsor-unit[style*="display: none"] {
+  margin: 0 !important;
+  padding: 0 !important;
+  border: none !important;
+  min-height: 0 !important;
+}

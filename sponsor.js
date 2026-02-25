@@ -1,43 +1,40 @@
 /* ============================================
-   StockJelli — Google AdSense Integration
-   ads.js — v2 with Rail Ads
+   StockJelli — Sponsor Integration
+   sponsor.js — FINAL
    
-   SETUP: Replace the slot IDs below with your
-   actual AdSense ad unit slot IDs from your
-   dashboard. Create 4 "Display" ad units:
-     - sj-rail-left
-     - sj-rail-right
-     - sj-after-screener
-     - sj-above-footer
+   All class names use "sponsor" / "partner".
+   No class or ID contains the word "ad".
    ============================================ */
 
-   (function initStockJelliAds() {
+   (function initSponsorUnits() {
     "use strict";
   
     // ══════════════════════════════════════════════════════════════
-    // PASTE YOUR SLOT IDS HERE (from AdSense dashboard)
+    // YOUR ADSENSE SLOT IDS
+    // Create each unit at: Ads → By ad unit → Display ads
+    // Paste the data-ad-slot number for each one below.
     // ══════════════════════════════════════════════════════════════
-    const SLOTS = {
-      railLeft:       "",  // e.g. "1234567890"
-      railRight:      "",  // e.g. "0987654321"
-      afterScreener:  "",  // e.g. "1122334455"
-      aboveFooter:    "",  // e.g. "5566778899"
+    var SLOTS = {
+      railLeft:       "1249017652",  // sj-rail-left
+      railRight:      "9823164754",  // sj-rail-right
+      afterScreener:  "8386105796",  // sj-after-screener
+      aboveFooter:    "4996690972",  // sj-above-footer
     };
   
-    const ADSENSE_PUB = "ca-pub-8792646979011381";
+    var PUB_ID = "ca-pub-8792646979011381";
   
     // ══════════════════════════════════════════════════════════════
-    // SUBSCRIBER CHECK — ad-free for paying users
+    // SUBSCRIBER CHECK — no sponsored content for paying users
     // ══════════════════════════════════════════════════════════════
     function isSubscriber() {
       return !!localStorage.getItem("sj_subscriber_email");
     }
   
     if (isSubscriber()) {
-      console.log("[SJ Ads] Subscriber — ads disabled");
+      console.log("[SJ] Subscriber detected — sponsor units skipped");
       document.body.classList.add("sj-subscriber");
-      document.querySelectorAll(".sj-ad-rail, .sj-ad-unit").forEach(function(el) {
-        el.style.display = "none";
+      document.querySelectorAll(".sj-partner-fallback").forEach(function(fb) {
+        fb.style.display = "";
       });
       return;
     }
@@ -50,7 +47,7 @@
       var ins = document.createElement("ins");
       ins.className = "adsbygoogle";
       ins.style.display = "block";
-      ins.setAttribute("data-ad-client", ADSENSE_PUB);
+      ins.setAttribute("data-ad-client", PUB_ID);
   
       if (slotId) {
         ins.setAttribute("data-ad-slot", slotId);
@@ -69,80 +66,80 @@
       return ins;
     }
   
-    function pushAd() {
+    function pushUnit() {
       try {
         (window.adsbygoogle = window.adsbygoogle || []).push({});
       } catch (e) {
-        console.log("[SJ Ads] push failed:", e.message);
+        console.log("[SJ] Sponsor push failed:", e.message);
       }
     }
   
     // ══════════════════════════════════════════════════════════════
-    // RAIL ADS (left + right sidebars)
-    // HTML containers: .sj-ad-rail-left / .sj-ad-rail-right
-    // TradingView banners are hidden; AdSense fills the space.
-    // If AdSense is blocked, TradingView fallback shows instead.
+    // RAIL UNITS (left + right sidebars)
     // ══════════════════════════════════════════════════════════════
   
-    function initRailAd(containerSelector, slotId) {
+    function initRailUnit(containerSelector, slotId) {
+      if (!slotId) return; // skip if no slot ID yet
       var container = document.querySelector(containerSelector);
       if (!container) return;
   
       var label = document.createElement("div");
-      label.className = "sj-ad-label";
-      label.textContent = "Advertisement";
+      label.className = "sj-sponsor-label";
+      label.textContent = "Sponsored";
       container.appendChild(label);
   
       var ins = createInsElement(slotId, "vertical");
       ins.style.width = "160px";
       ins.style.height = "600px";
       container.appendChild(ins);
-      pushAd();
+      pushUnit();
     }
   
-    initRailAd(".sj-ad-rail-left", SLOTS.railLeft);
-    initRailAd(".sj-ad-rail-right", SLOTS.railRight);
+    initRailUnit(".sj-sponsor-rail-left", SLOTS.railLeft);
+    initRailUnit(".sj-sponsor-rail-right", SLOTS.railRight);
   
     // ══════════════════════════════════════════════════════════════
-    // IN-CONTENT ADS
+    // IN-CONTENT UNITS
     // ══════════════════════════════════════════════════════════════
   
     var isMobile = window.innerWidth <= 768;
   
-    // After Screener table
+    // After Screener
     (function () {
-      var target = document.getElementById("adAfterScreener");
+      if (!SLOTS.afterScreener) return; // skip if no slot ID yet
+      var target = document.getElementById("sponsorAfterScreener");
       if (!target) return;
   
-      target.classList.add("sj-ad-unit", "sj-ad-after-screener");
+      target.classList.add("sj-sponsor-unit", "sj-sponsor-after-screener");
   
       var label = document.createElement("div");
-      label.className = "sj-ad-label";
-      label.textContent = "Advertisement";
+      label.className = "sj-sponsor-label";
+      label.textContent = "Sponsored";
       target.appendChild(label);
   
       var ins = createInsElement(SLOTS.afterScreener, "auto");
       target.appendChild(ins);
-      pushAd();
+      pushUnit();
     })();
   
-    // Above Footer (skip on tiny phones < 480px)
+    // Above Footer (skip on tiny phones)
     (function () {
+      if (!SLOTS.aboveFooter) return; // skip if no slot ID yet
       if (window.innerWidth < 480) return;
   
-      var target = document.getElementById("adAboveFooter");
+      var target = document.getElementById("sponsorAboveFooter");
       if (!target) return;
   
-      target.classList.add("sj-ad-unit", "sj-ad-above-footer");
+      target.classList.add("sj-sponsor-unit", "sj-sponsor-above-footer");
   
       var label = document.createElement("div");
-      label.className = "sj-ad-label";
-      label.textContent = "Advertisement";
+      label.className = "sj-sponsor-label";
+      label.textContent = "Sponsored";
       target.appendChild(label);
   
       var ins = createInsElement(SLOTS.aboveFooter, "horizontal");
       target.appendChild(ins);
-      pushAd();
+      pushUnit();
     })();
   
     // ══════════════════════════════════════════════════════════════
@@ -152,46 +149,43 @@
     localStorage.setItem = function (key, value) {
       _origSetItem(key, value);
       if (key === "sj_subscriber_email" && value) {
-        removeAllAds();
+        removeSponsorUnits();
       }
     };
   
-    function removeAllAds() {
-      document.querySelectorAll(".sj-ad-unit, .sj-ad-rail-left, .sj-ad-rail-right").forEach(function(el) {
+    function removeSponsorUnits() {
+      document.querySelectorAll(".sj-sponsor-unit, .sj-sponsor-rail-left, .sj-sponsor-rail-right").forEach(function(el) {
         el.style.transition = "opacity 0.3s ease";
         el.style.opacity = "0";
         setTimeout(function() { el.style.display = "none"; }, 350);
       });
-      // Show TradingView fallbacks in rails for subscribers
-      document.querySelectorAll(".sj-rail-fallback").forEach(function(fb) {
+      document.querySelectorAll(".sj-partner-fallback").forEach(function(fb) {
         fb.style.display = "";
       });
       document.body.classList.add("sj-subscriber");
-      console.log("[SJ Ads] Subscriber verified — ads removed");
     }
   
     // ══════════════════════════════════════════════════════════════
-    // CLEANUP: Hide empty containers after delay (ad blocker)
+    // CLEANUP: Hide empty containers after 5s (blocker handling)
     // ══════════════════════════════════════════════════════════════
     setTimeout(function() {
-      document.querySelectorAll(".sj-ad-unit").forEach(function(unit) {
+      document.querySelectorAll(".sj-sponsor-unit").forEach(function(unit) {
         var ins = unit.querySelector("ins.adsbygoogle");
         if (ins && ins.getBoundingClientRect().height === 0) {
           unit.style.display = "none";
         }
       });
-      // Check rails — if AdSense didn't fill, show TradingView fallback
-      document.querySelectorAll(".sj-ad-rail-left, .sj-ad-rail-right").forEach(function(rail) {
+      [".sj-sponsor-rail-left", ".sj-sponsor-rail-right"].forEach(function(sel) {
+        var rail = document.querySelector(sel);
+        if (!rail) return;
         var ins = rail.querySelector("ins.adsbygoogle");
         if (ins && ins.getBoundingClientRect().height === 0) {
-          var fallback = rail.parentElement.querySelector(".sj-rail-fallback");
-          if (fallback) {
-            rail.style.display = "none";
-            fallback.style.display = "";
-          }
+          rail.style.display = "none";
+          var fallback = rail.parentElement.querySelector(".sj-partner-fallback");
+          if (fallback) fallback.style.display = "";
         }
       });
     }, 5000);
   
-    console.log("[SJ Ads] Init (" + (isMobile ? "mobile" : "desktop") + ")");
+    console.log("[SJ] Sponsor units initialized (" + (isMobile ? "mobile" : "desktop") + ")");
   })();

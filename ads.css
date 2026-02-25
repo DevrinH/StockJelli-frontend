@@ -1,0 +1,130 @@
+/* ============================================
+   StockJelli — Ad Styling
+   
+   - Clean, minimal ad containers that match the dark theme
+   - Responsive sizing (desktop / tablet / mobile)
+   - Hidden for subscribers (.sj-subscriber)
+   - Graceful handling of empty/blocked ads
+   ============================================ */
+
+/* ── BASE AD UNIT ──────────────────────────────────────────────────────────── */
+
+.sj-ad-unit {
+    width: 100%;
+    max-width: 100%;
+    margin: 20px auto;
+    padding: 0;
+    text-align: center;
+    overflow: hidden;
+    min-height: 50px; /* Prevent layout shift */
+  }
+  
+  /* Tiny "Advertisement" label — discreet, matches theme */
+  .sj-ad-label {
+    font-size: 0.6rem;
+    color: rgba(255, 255, 255, 0.15);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    text-align: center;
+    margin-bottom: 4px;
+    user-select: none;
+  }
+  
+  /* Ensure AdSense ins elements fill the container properly */
+  .sj-ad-unit ins.adsbygoogle {
+    display: block;
+    width: 100%;
+    min-height: 50px;
+  }
+  
+  /* ── PLACEMENT-SPECIFIC STYLES ─────────────────────────────────────────────── */
+  
+  /* After screener table */
+  .sj-ad-after-screener {
+    margin: 16px 0 24px;
+    padding: 12px 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.04);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  }
+  
+  /* Between Momentum River and Market Pulse */
+  .sj-ad-between-sections {
+    margin: 8px 0 24px;
+    padding: 12px 0;
+  }
+  
+  /* Above footer */
+  .sj-ad-above-footer {
+    margin: 0 auto 16px;
+    padding: 12px 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.04);
+    max-width: 728px;
+  }
+  
+  /* ── RESPONSIVE ────────────────────────────────────────────────────────────── */
+  
+  /* Tablet */
+  @media (max-width: 1024px) {
+    .sj-ad-between-sections {
+      margin: 8px 0 16px;
+    }
+  }
+  
+  /* Mobile */
+  @media (max-width: 768px) {
+    .sj-ad-unit {
+      margin: 14px auto;
+      min-height: 50px;
+    }
+  
+    .sj-ad-label {
+      font-size: 0.55rem;
+      margin-bottom: 3px;
+    }
+  
+    .sj-ad-after-screener {
+      margin: 12px 0 16px;
+      padding: 8px 0;
+    }
+  
+    /* Between-sections ad is NOT injected on mobile (JS handles this),
+       but just in case — keep it compact */
+    .sj-ad-between-sections {
+      margin: 8px 0 12px;
+      padding: 8px 0;
+    }
+  
+    .sj-ad-above-footer {
+      margin: 0 auto 12px;
+      padding: 8px 0;
+    }
+  }
+  
+  /* Small phones */
+  @media (max-width: 400px) {
+    .sj-ad-unit {
+      margin: 10px auto;
+    }
+  }
+  
+  /* ── SUBSCRIBER AD-FREE ────────────────────────────────────────────────────── */
+  
+  /* When subscriber is verified, hide all ads via CSS as backup */
+  body.sj-subscriber .sj-ad-unit {
+    display: none !important;
+  }
+  
+  /* Also hide the existing Google AdSense auto-ads if they appear */
+  body.sj-subscriber ins.adsbygoogle {
+    display: none !important;
+  }
+  
+  /* ── EMPTY / BLOCKED AD CLEANUP ────────────────────────────────────────────── */
+  
+  /* If an ad unit is hidden (e.g. ad blocker detected), remove spacing */
+  .sj-ad-unit[style*="display: none"] {
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+    min-height: 0 !important;
+  }

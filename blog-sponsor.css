@@ -1,0 +1,83 @@
+/* ============================================
+   StockJelli — Blog Sponsor Styling
+   blog-sponsor.css
+   
+   Styles for auto-injected blog placements.
+   No class contains the word "ad".
+   ============================================ */
+
+   .sj-blog-sponsor {
+    width: 100%;
+    max-width: 100%;
+    margin: 28px auto;
+    padding: 16px 0;
+    text-align: center;
+    overflow: hidden;
+    border-top: 1px solid rgba(255, 255, 255, 0.04);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  }
+  
+  /* Mid-article — blend with content flow */
+  .sj-blog-sponsor-mid {
+    margin: 32px auto;
+    max-width: 680px;
+  }
+  
+  /* Before footer — horizontal banner */
+  .sj-blog-sponsor-footer {
+    margin: 24px auto 8px;
+    max-width: 728px;
+    max-height: 120px;
+    overflow: hidden;
+  }
+  
+  /* Blog index — between sections */
+  .sj-blog-sponsor-index {
+    margin: 24px auto 32px;
+    max-width: 900px;
+    max-height: 120px;
+    overflow: hidden;
+  }
+  
+  /* Reuse the label from sponsor.css */
+  .sj-blog-sponsor .sj-sponsor-label {
+    font-size: 0.55rem;
+    color: rgba(255, 255, 255, 0.10);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    text-align: center;
+    margin-bottom: 4px;
+    user-select: none;
+    pointer-events: none;
+  }
+  
+  /* ── Responsive ───────────────────────────────────────────── */
+  
+  @media (max-width: 768px) {
+    .sj-blog-sponsor {
+      margin: 20px auto;
+      padding: 12px 0;
+    }
+  
+    .sj-blog-sponsor-mid {
+      margin: 24px auto;
+    }
+  
+    .sj-blog-sponsor-footer {
+      margin: 16px auto 6px;
+    }
+  }
+  
+  /* ── Subscriber: hide all ─────────────────────────────────── */
+  
+  body.sj-subscriber .sj-blog-sponsor {
+    display: none !important;
+  }
+  
+  /* ── Empty cleanup ────────────────────────────────────────── */
+  
+  .sj-blog-sponsor[style*="display: none"] {
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+  }

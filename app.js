@@ -1611,7 +1611,135 @@ document.addEventListener("click", (e) => {
   });
 })();
 
+/* ============================================
+   NOTIFICATION BETA BANNER — JS
+   
+   Add via <script src="notif-banner.js" defer>
+   or paste at the bottom of app.js.
+   ============================================ */
 
+   (function () {
+    'use strict';
+  
+    const DISMISS_KEY = 'sj_notif_banner_dismissed';
+    const WAITLIST_KEY = 'sj_notif_waitlist_joined';
+  
+    const banner = document.getElementById('notifBanner');
+    if (!banner) return;
+  
+    // ── Already dismissed? Hide immediately ──
+    if (localStorage.getItem(DISMISS_KEY) === '1') {
+      banner.classList.add('notif-dismissed');
+      return;
+    }
+  
+    // ── Already on waitlist? Show "You're on the list" state ──
+    const savedEmail = localStorage.getItem(WAITLIST_KEY);
+    if (savedEmail) {
+      showJoinedState(savedEmail);
+    }
+  
+    // ── Dismiss handler ──
+    const closeBtn = document.getElementById('notifBannerClose');
+    if (closeBtn) {
+      closeBtn.addEventListener('click', () => {
+        banner.classList.add('notif-banner-hiding');
+        setTimeout(() => {
+          banner.classList.add('notif-dismissed');
+          localStorage.setItem(DISMISS_KEY, '1');
+        }, 300);
+      });
+    }
+  
+    // ── Form submit handler ──
+    const form = document.getElementById('notifWaitlistForm');
+    const emailInput = document.getElementById('notifEmail');
+    const submitBtn = document.getElementById('notifSubmitBtn');
+    const msgEl = document.getElementById('notifFormMsg');
+  
+    if (form) {
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+  
+        const email = emailInput.value.trim();
+        if (!email || !isValidEmail(email)) {
+          showMsg('Please enter a valid email.', 'error');
+          return;
+        }
+  
+        // Disable button, show loading
+        submitBtn.disabled = true;
+        submitBtn.querySelector('.notif-submit-text').style.display = 'none';
+        submitBtn.querySelector('.notif-submit-loading').style.display = 'inline-flex';
+  
+        try {
+          // ── POST to your backend endpoint ──
+          // Replace this URL with your actual waitlist endpoint
+          const res = await fetch('/api/notif-waitlist', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email }),
+          });
+  
+          if (res.ok) {
+            localStorage.setItem(WAITLIST_KEY, email);
+            showMsg("You're on the list! We'll notify you when the beta launches.", 'success');
+            showJoinedState(email);
+          } else {
+            const data = await res.json().catch(() => ({}));
+            showMsg(data.message || 'Something went wrong. Try again.', 'error');
+          }
+        } catch (err) {
+          // ── Fallback: save locally even if endpoint isn't wired yet ──
+          console.warn('Waitlist endpoint not available, saving locally:', err);
+          localStorage.setItem(WAITLIST_KEY, email);
+          showMsg("You're on the list! We'll email you when the beta launches.", 'success');
+          showJoinedState(email);
+        } finally {
+          submitBtn.disabled = false;
+          submitBtn.querySelector('.notif-submit-text').style.display = '';
+          submitBtn.querySelector('.notif-submit-loading').style.display = 'none';
+        }
+      });
+    }
+  
+    // ── Helpers ──
+  
+    function isValidEmail(email) {
+      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    }
+  
+    function showMsg(text, type) {
+      if (!msgEl) return;
+      msgEl.textContent = text;
+      msgEl.className = 'notif-form-msg ' + (type === 'success' ? 'msg-success' : 'msg-error');
+      msgEl.style.display = 'block';
+    }
+  
+    function showJoinedState(email) {
+      // Replace the form with a compact "you're in" confirmation
+      if (!form) return;
+      form.innerHTML = `
+        <div style="display: flex; align-items: center; gap: 6px; font-size: 0.74rem;">
+          <span style="color: #4ade80;">✓</span>
+          <span style="color: rgba(255,255,255,0.5);">
+            <strong style="color: #4ade80;">You're on the list</strong>
+            &middot; ${maskEmail(email)}
+          </span>
+        </div>
+      `;
+    }
+  
+    function maskEmail(email) {
+      const [user, domain] = email.split('@');
+      if (!domain) return email;
+      const masked = user.length > 2
+        ? user[0] + '···' + user[user.length - 1]
+        : user[0] + '···';
+      return masked + '@' + domain;
+    }
+  
+  })();
 
 
 

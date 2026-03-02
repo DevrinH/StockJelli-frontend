@@ -250,6 +250,57 @@
     </div>
   </header>
 
+  <!-- ============================================
+   NOTIFICATION BETA BANNER
+   
+   Place this in index.html AFTER the closing </header>
+   tag and BEFORE the pulse-ticker div.
+   ============================================ -->
+
+<div class="notif-banner" id="notifBanner">
+  <div class="notif-banner-inner">
+
+    <!-- Left: Icon + Copy -->
+    <div class="notif-banner-left">
+      <span class="notif-banner-icon">
+        <span class="notif-bell">🔔</span>
+      </span>
+      <div class="notif-banner-copy">
+        <span class="notif-banner-title">
+          Push Notifications Beta
+          <span class="notif-banner-tag">April 2026</span>
+        </span>
+        <span class="notif-banner-sub">Real-time momentum alerts straight to your device. Be first to try it.</span>
+      </div>
+    </div>
+
+    <!-- Right: Email waitlist -->
+    <form class="notif-banner-form" id="notifWaitlistForm" autocomplete="off">
+      <div class="notif-input-wrap">
+        <input
+          type="email"
+          id="notifEmail"
+          class="notif-input"
+          placeholder="you@email.com"
+          autocomplete="email"
+          required
+        />
+        <button type="submit" class="notif-submit-btn" id="notifSubmitBtn">
+          <span class="notif-submit-text">Join Waitlist</span>
+          <span class="notif-submit-loading" style="display:none;">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="2" stroke-dasharray="28" stroke-dashoffset="8"><animateTransform attributeName="transform" type="rotate" from="0 8 8" to="360 8 8" dur="0.8s" repeatCount="indefinite"/></circle></svg>
+          </span>
+        </button>
+      </div>
+      <p class="notif-form-msg" id="notifFormMsg" style="display:none;"></p>
+    </form>
+
+    <!-- Dismiss -->
+    <button class="notif-banner-close" id="notifBannerClose" type="button" aria-label="Dismiss banner">✕</button>
+
+  </div>
+</div>
+
   <!-- Scrolling Pulse Ticker — below header -->
 <div class="pulse-ticker" id="pulseTicker" style="display: none;">
   <div class="pulse-ticker-track" id="pulseTickerTrack">

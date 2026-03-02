@@ -1675,7 +1675,7 @@ document.addEventListener("click", (e) => {
         try {
           // ── POST to your backend endpoint ──
           // Replace this URL with your actual waitlist endpoint
-          const res = await fetch('/api/notif-waitlist', {
+          const res = await fetch('https://api.stockjelli.com/api/notif-waitlist', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email }),

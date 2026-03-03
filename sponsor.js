@@ -15,11 +15,12 @@
     // Paste the data-ad-slot number for each one below.
     // ══════════════════════════════════════════════════════════════
     var SLOTS = {
-      railLeft:       "1249017652",  // sj-rail-left
-      railRight:      "9823164754",  // sj-rail-right
-      afterScreener:  "8386105796",  // sj-after-screener
-      aboveFooter:    "4996690972",  // sj-above-footer
-    };
+      railLeft:       "1249017652",
+      railRight:      "9823164754",
+      afterScreener:  "8386105796",
+      belowScreener:  "8386105796",  // reuse same slot or create new one
+      aboveFooter:    "4996690972",
+  };
   
     var PUB_ID = "ca-pub-8792646979011381";
   
@@ -121,6 +122,24 @@
       target.appendChild(ins);
       pushUnit();
     })();
+
+    // Below Screener (before $5 CTA) — horizontal like footer
+  (function () {
+    if (!SLOTS.belowScreener) return;
+    var target = document.getElementById("sponsorBelowScreener");
+    if (!target) return;
+
+    target.classList.add("sj-sponsor-unit", "sj-sponsor-below-screener");
+
+    var label = document.createElement("div");
+    label.className = "sj-sponsor-label";
+    label.textContent = "Sponsored";
+    target.appendChild(label);
+
+    var ins = createInsElement(SLOTS.belowScreener, "horizontal");
+    target.appendChild(ins);
+    pushUnit();
+  })();
   
     // Above Footer (skip on tiny phones)
     (function () {

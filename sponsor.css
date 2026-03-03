@@ -119,3 +119,13 @@ body.sj-subscriber .sj-partner-fallback {
   border: none !important;
   min-height: 0 !important;
 }
+
+.sj-sponsor-below-screener {
+  margin: 16px 0;
+  padding: 12px 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.03);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+  max-width: 728px;
+  max-height: 120px;
+  overflow: hidden;
+}

@@ -18,7 +18,7 @@
       railLeft:       "1249017652",
       railRight:      "9823164754",
       afterScreener:  "8386105796",
-      belowScreener:  "8386105796",  // reuse same slot or create new one
+      belowScreener:  "4115231448",  // sj-below-screener  // reuse same slot or create new one
       aboveFooter:    "4996690972",
   };
   

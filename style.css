@@ -2550,10 +2550,7 @@ body.sj-subscriber #inlineAlertCta {
   display: none !important;
 }
 
-/* Subscribers get full-width layout (no rail columns) */
-body.sj-subscriber .page {
-  grid-template-columns: 1fr !important;
-}
+
 
 /* Subscribers get full-width layout (no rail columns) */
 body.sj-subscriber .page {

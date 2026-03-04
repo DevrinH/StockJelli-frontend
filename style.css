@@ -2552,11 +2552,6 @@ body.sj-subscriber #inlineAlertCta {
 
 
 
-/* Subscribers get full-width layout (no rail columns) */
-body.sj-subscriber .page {
-  grid-template-columns: 1fr !important;
-}
-
 @media (max-width: 640px) {
   .sj-noclutter-btn {
     padding: 5px 12px;

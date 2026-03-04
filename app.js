@@ -34,6 +34,12 @@ const LAST_VISIT_KEY = "stockjelli_last_visit";
 const previousVisitTime = localStorage.getItem(LAST_VISIT_KEY) || null;
 // Update last visit to NOW so next visit compares against this one
 localStorage.setItem(LAST_VISIT_KEY, new Date().toISOString());
+
+
+// Apply subscriber class to body
+if (localStorage.getItem("sj_subscriber_email")) {
+  document.body.classList.add("sj-subscriber");
+}
   // ----------------------------
   // Helpers
   // ----------------------------

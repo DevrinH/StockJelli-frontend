@@ -2541,8 +2541,23 @@ tbody tr:first-child {
 }
 
 /* Hide for subscribers */
-body.sj-subscriber .sj-noclutter-btn {
+/* Hide monetization elements for subscribers */
+body.sj-subscriber .sj-noclutter-btn,
+body.sj-subscriber .sj-partner-fallback,
+body.sj-subscriber .side-rail,
+body.sj-subscriber .inline-alert-cta,
+body.sj-subscriber #inlineAlertCta {
   display: none !important;
+}
+
+/* Subscribers get full-width layout (no rail columns) */
+body.sj-subscriber .page {
+  grid-template-columns: 1fr !important;
+}
+
+/* Subscribers get full-width layout (no rail columns) */
+body.sj-subscriber .page {
+  grid-template-columns: 1fr !important;
 }
 
 @media (max-width: 640px) {

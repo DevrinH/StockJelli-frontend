@@ -2553,6 +2553,11 @@ body.sj-subscriber .page {
   grid-template-columns: 1fr !important;
 }
 
+@media (min-width: 1401px) {
+  body.sj-subscriber .header-inner {
+    width: 82%;
+  }
+}
 
 
 @media (max-width: 640px) {

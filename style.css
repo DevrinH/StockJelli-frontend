@@ -2909,53 +2909,76 @@ body.sj-subscriber .page {
 .notif-banner.notif-dismissed {
   display: none !important;
 }
-
 /* ===========================================
-   SHARE BUTTON — Per-row Twitter/X share
+   SHARE COLUMN
    =========================================== */
 
-   .share-btn {
+   .share-header {
+    width: 32px;
+    padding: 0 8px !important;
+  }
+  
+  .share-cell {
+    width: 32px;
+    padding: 0 8px !important;
+    text-align: center;
+    position: relative;
+  }
+  
+  .share-btn {
     background: none;
     border: none;
     cursor: pointer;
-    padding: 3px 5px;
-    border-radius: 5px;
-    opacity: 0;
+    padding: 5px;
+    border-radius: 6px;
+    opacity: 0.35;
     transition: opacity 0.15s ease, background 0.15s ease;
-    vertical-align: middle;
-    line-height: 1;
-    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
   }
   
   .share-btn svg {
-    width: 13px;
-    height: 13px;
-    fill: rgba(255, 255, 255, 0.35);
+    width: 12px;
+    height: 12px;
+    fill: rgba(255, 255, 255, 0.8);
     display: block;
-    transition: fill 0.15s ease;
-  }
-  
-  /* Show on row hover */
-  tr:hover .share-btn {
-    opacity: 1;
   }
   
   .share-btn:hover {
-    background: rgba(255, 255, 255, 0.06);
+    opacity: 1;
+    background: rgba(255, 255, 255, 0.07);
   }
   
-  .share-btn:hover svg {
-    fill: rgba(255, 255, 255, 0.75);
+  /* Tooltip */
+  .share-btn::after {
+    content: "Share on X";
+    position: absolute;
+    bottom: calc(100% + 6px);
+    left: 50%;
+    transform: translateX(-50%);
+    white-space: nowrap;
+    font-size: 0.7rem;
+    font-weight: 500;
+    padding: 5px 10px;
+    border-radius: 6px;
+    background: #1e293b;
+    color: #f1f5f9;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.15s ease;
+    z-index: 50;
   }
   
-  /* Always visible on mobile (no hover) */
-  @media (max-width: 640px) {
-    .share-btn {
-      opacity: 0.4;
-      padding: 2px 4px;
-    }
-    .share-btn svg {
-      width: 11px;
-      height: 11px;
+  .share-btn:hover::after {
+    opacity: 1;
+  }
+  
+  @media (max-width: 480px) {
+    .share-btn::after {
+      display: none; /* no tooltip on mobile, no room */
     }
   }

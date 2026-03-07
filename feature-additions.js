@@ -251,8 +251,8 @@
         if (!d.available) return;
         if (dateEl) dateEl.textContent = fmtDate(d.date);
   
-        const stocks = (d.stocks || []).slice(0, 6);
-        const crypto = (d.crypto || []).slice(0, 6);
+        const stocks = (d.stocks || []).slice(0, 8);
+        const crypto = (d.crypto || []).slice(0, 8);
         hasStocks = stocks.length > 0;
         hasCrypto = crypto.length > 0;
   

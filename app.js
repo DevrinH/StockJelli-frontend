@@ -499,7 +499,7 @@ function renderStocks(rows) {
 
     return `
       <tr data-symbol="${x.symbol || ''}">
-        <td class="ticker">${tickerHtml}${idx < 3 ? ' <span class="ticker-medal">' + medals[idx] + '</span>' : ''}${renderNewBadge(x.enteredAt)}</td>
+        <td class="ticker">${tickerHtml}${idx < 3 ? ' <span class="ticker-medal">' + medals[idx] + '</span>' : ''}${renderNewBadge(x.enteredAt)}${window.sjShareBtn ? window.sjShareBtn(x.symbol, x.pctChange, fmtUsd(x.price), renderRvolRaw(x.volume, x.avgVolume, x.marketCap, 'stock'), 'stock') : ''}</td>
         <td class="price-cell" data-raw-price="${x.price ?? ''}">${fmtUsd(x.price)}</td>
         <td class="${changeClass}">
           <span class="change-wrap">
@@ -595,7 +595,7 @@ function renderCrypto(rows) {
 
     return `
       <tr data-symbol="${x.coinSymbol || ''}">
-        <td class="ticker">${tickerHtml}${idx < 3 ? ' <span class="ticker-medal">' + medals[idx] + '</span>' : ''}${rugWarning}${renderNewBadge(x.enteredAt)}</td>
+        <td class="ticker">${tickerHtml}${idx < 3 ? ' <span class="ticker-medal">' + medals[idx] + '</span>' : ''}${rugWarning}${renderNewBadge(x.enteredAt)}${window.sjShareBtn ? window.sjShareBtn(x.coinSymbol, x.pctChange, fmtUsd(x.price, priceDecimals), renderRvolRaw(x.volume, null, x.marketCap, 'crypto'), 'crypto') : ''}</td>
         <td class="price-cell" data-raw-price="${x.price ?? ''}">${fmtUsd(x.price, priceDecimals)}</td>
         <td class="${changeClass}">
           <span class="change-wrap">
@@ -790,6 +790,18 @@ function renderRvol(volume, avgVolume, marketCap, mode) {
   }
 
   return '<span class="rvol-normal">—</span>';
+}
+
+// Returns plain text RVOL for tweet (e.g. "3.2x") — no HTML
+function renderRvolRaw(volume, avgVolume, marketCap, mode) {
+  if (!volume) return null;
+  if (mode === "stock" && avgVolume && avgVolume > 0) {
+    return `${(volume / avgVolume).toFixed(1)}x`;
+  }
+  if (mode === "crypto" && marketCap && marketCap > 0) {
+    return `${(volume / marketCap).toFixed(1)}x`;
+  }
+  return null;
 }
 
 /**

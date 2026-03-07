@@ -2909,3 +2909,53 @@ body.sj-subscriber .page {
 .notif-banner.notif-dismissed {
   display: none !important;
 }
+
+/* ===========================================
+   SHARE BUTTON — Per-row Twitter/X share
+   =========================================== */
+
+   .share-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 3px 5px;
+    border-radius: 5px;
+    opacity: 0;
+    transition: opacity 0.15s ease, background 0.15s ease;
+    vertical-align: middle;
+    line-height: 1;
+    flex-shrink: 0;
+  }
+  
+  .share-btn svg {
+    width: 13px;
+    height: 13px;
+    fill: rgba(255, 255, 255, 0.35);
+    display: block;
+    transition: fill 0.15s ease;
+  }
+  
+  /* Show on row hover */
+  tr:hover .share-btn {
+    opacity: 1;
+  }
+  
+  .share-btn:hover {
+    background: rgba(255, 255, 255, 0.06);
+  }
+  
+  .share-btn:hover svg {
+    fill: rgba(255, 255, 255, 0.75);
+  }
+  
+  /* Always visible on mobile (no hover) */
+  @media (max-width: 640px) {
+    .share-btn {
+      opacity: 0.4;
+      padding: 2px 4px;
+    }
+    .share-btn svg {
+      width: 11px;
+      height: 11px;
+    }
+  }

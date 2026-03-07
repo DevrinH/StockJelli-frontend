@@ -912,7 +912,41 @@
     setInterval(() => fetchRiver(activeMode), 60_000);
   })();
 
+// ── 8. PER-ROW X/TWITTER SHARE BUTTON ───────────────────────────────────────
+(function initShareButtons() {
+  const X_ICON = `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.736-8.847L1.254 2.25H8.08l4.253 5.622L18.244 2.25zm-1.161 17.52h1.833L7.084 4.126H5.117L17.083 19.77z"/></svg>`;
 
+  function buildShareUrl(sym, pct, price, rvol, mode) {
+    const sign = pct >= 0 ? "+" : "";
+    const rvolText = rvol && rvol !== "—" ? ` · RVOL ${rvol}` : "";
+    const priceText = price ? ` @ ${price}` : "";
+    const assetText = mode === "crypto" ? "🪙" : "📈";
+
+    const tweet = `${assetText} $${sym} ${sign}${Number(pct).toFixed(1)}%${priceText}${rvolText}\n\nSpotted on StockJelli — free momentum screener\nstockjelli.com`;
+    return `https://twitter.com/intent/tweet?text=${encodeURIComponent(tweet)}`;
+  }
+
+  // Delegate click on share buttons — works across re-renders
+  document.addEventListener("click", (e) => {
+    const btn = e.target.closest(".share-btn");
+    if (!btn) return;
+
+    const url = btn.dataset.shareUrl;
+    if (!url) return;
+
+    // Brief visual feedback
+    btn.style.opacity = "1";
+    setTimeout(() => { btn.style.opacity = ""; }, 800);
+
+    window.open(url, "_blank", "noopener,width=560,height=420");
+  });
+
+  // Expose helper so renderStocks/renderCrypto can call it
+  window.sjShareBtn = function(sym, pct, price, rvol, mode) {
+    const url = buildShareUrl(sym, pct, price, rvol, mode);
+    return `<button class="share-btn" data-share-url="${url}" title="Share ${sym} on X" aria-label="Share ${sym} on X">${X_ICON}</button>`;
+  };
+})();
 
 
   

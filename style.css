@@ -342,11 +342,11 @@
     gap: 6px;
     padding: 0 14px;
     font-size: 0.72rem;
-    color: rgba(255, 255, 255, 0.4);
+    color: rgba(255, 255, 255, 0.9);
     letter-spacing: 0.01em;
   }
   
-  .ticker-item-symbol { font-weight: 600; color: rgba(255, 255, 255, 0.6); }
+  .ticker-item-symbol { font-weight: 600; color: #ffffff; }
   .ticker-item-pct { font-weight: 500; }
   .ticker-item-pct.up { color: #22c55e; }
   .ticker-item-pct.down { color: #ef4444; }
@@ -366,6 +366,7 @@
     line-height: 1;
     display: inline-flex;
     align-items: center;
+    filter: saturate(1.3) brightness(1.2);
   }
   .stocks-table .ticker-medal {
     font-size: 1.1rem;

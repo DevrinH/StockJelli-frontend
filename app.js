@@ -476,6 +476,44 @@ function renderTickerCell(symbol, type = "stock", imageUrl = null) {
   `;
 }
 
+function renderWhaleIndicator(volume, avgVolume, marketCap, pctChange, rangePosition, mode) {
+  if (!volume || !marketCap || marketCap === 0) return "";
+
+  const pct = Math.abs(pctChange || 0);
+  const rangePosVal = rangePosition ?? 0.5;
+  const volMcapRatio = volume / marketCap;
+
+  let isWhale = false;
+
+  if (mode === "stock") {
+    const rvol = (avgVolume && avgVolume > 0) ? (volume / avgVolume) : 0;
+    isWhale = (
+      rvol >= 5.0 &&
+      volMcapRatio >= 0.03 &&
+      pct >= 8 &&
+      rangePosVal >= 0.50
+    );
+  } else if (mode === "crypto") {
+    isWhale = (
+      volMcapRatio >= 0.50 &&
+      pct >= 10 &&
+      rangePosVal >= 0.50
+    );
+  }
+
+  if (!isWhale) return "";
+
+  // Build tooltip with context
+  const rvolText = (avgVolume && avgVolume > 0)
+    ? `RVOL: ${(volume / avgVolume).toFixed(1)}x`
+    : "";
+  const volMcapText = `Vol/MCap: ${(volMcapRatio * 100).toFixed(1)}%`;
+  const rangeText = `Range: ${Math.round(rangePosVal * 100)}%`;
+  const tooltipParts = [rvolText, volMcapText, rangeText].filter(Boolean).join(" · ");
+
+  return ` <span class="whale-indicator" title="Heavy flow detected — unusual institutional-level activity\n${tooltipParts}">🐋</span>`;
+}
+
 
 function renderStocks(rows) {
   const tbody = document.getElementById("stocksTbody");
@@ -507,7 +545,7 @@ function renderStocks(rows) {
             ${rangeHtml}
           </span>
         </td>
-        <td>${fmtVolumeCompact(x.volume)}${renderVolumeFire(x.volume, x.avgVolume, x.marketCap, "stock")}</td>
+        <td>${fmtVolumeCompact(x.volume)}${renderVolumeFire(x.volume, x.avgVolume, x.marketCap, "stock")}${renderWhaleIndicator(x.volume, x.avgVolume, x.marketCap, x.pctChange, x.rangePosition, "stock")}</td>
         <td class="rvol">${renderRvol(x.volume, x.avgVolume, x.marketCap, "stock")}</td>
         <td class="news">${newsHtml}</td>
         <td class="sj">${renderSJScore(x.sjScore, idx)}</td>
@@ -603,7 +641,7 @@ function renderCrypto(rows) {
             ${rangeHtml}
           </span>
         </td>
-        <td>${fmtVolumeCompact(x.volume)}${renderVolumeFire(x.volume, null, x.marketCap, "crypto")}${renderLiquidityDot(x.volume, x.marketCap)}</td>
+        <td>${fmtVolumeCompact(x.volume)}${renderVolumeFire(x.volume, null, x.marketCap, "crypto")}${renderWhaleIndicator(x.volume, null, x.marketCap, x.pctChange, x.rangePosition, "crypto")}${renderLiquidityDot(x.volume, x.marketCap)}</td>
         <td class="rvol">${renderRvol(x.volume, null, x.marketCap, "crypto")}</td>
         <td>${fmtCompactUsd(x.marketCap, 1)}</td>
         <td class="sj">${renderSJScore(x.sjScore, idx)}</td>

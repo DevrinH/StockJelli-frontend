@@ -139,14 +139,21 @@ body.sj-subscriber .sj-partner-fallback {
    =========================================== */
 
    .whale-indicator {
-    display: inline-flex;
-    align-items: center;
-    font-size: 0.9em;
-    margin-left: 4px;
     cursor: help;
     position: relative;
-    animation: whaleGlow 3s ease-in-out infinite;
+    display: inline-block;
     vertical-align: middle;
+    margin-left: 4px;
+  }
+  
+  .whale-indicator .liquidity-tooltip {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.15s ease;
+  }
+  
+  .whale-indicator:hover .liquidity-tooltip {
+    opacity: 1;
   }
   
   @keyframes whaleGlow {

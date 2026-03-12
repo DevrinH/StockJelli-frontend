@@ -511,7 +511,7 @@ function renderWhaleIndicator(volume, avgVolume, marketCap, pctChange, rangePosi
   const rangeText = `Range: ${Math.round(rangePosVal * 100)}%`;
   const tooltipParts = [rvolText, volMcapText, rangeText].filter(Boolean).join(" · ");
 
-  return ` <span class="whale-indicator liquidity-wrap"><span class="liquidity-tooltip" style="--liq-color: rgba(96, 165, 250, 0.4)">Heavy flow detected — unusual institutional-level activity<br>${tooltipParts}</span>🐋</span>`;
+  return ` <span class="whale-indicator liquidity-wrap"><span class="liquidity-tooltip" style="--liq-color: rgba(96, 165, 250, 0.4)">Heavy flow detected — unusual institutional-level activity · ${tooltipParts}</span>🐋</span>`;
 }
 
 function renderSinceEntryAttrs(currentPrice, enteredPrice, enteredAt) {

@@ -514,6 +514,43 @@ function renderWhaleIndicator(volume, avgVolume, marketCap, pctChange, rangePosi
   return ` <span class="whale-indicator" title="Heavy flow detected — unusual institutional-level activity\n${tooltipParts}">🐋</span>`;
 }
 
+function renderSinceEntryAttrs(currentPrice, enteredPrice, enteredAt) {
+  if (!enteredPrice || !currentPrice || !enteredAt) return "";
+ 
+  const current = Number(currentPrice);
+  const entry = Number(enteredPrice);
+  if (!Number.isFinite(current) || !Number.isFinite(entry) || entry <= 0) return "";
+ 
+  const sincePct = ((current - entry) / entry) * 100;
+  if (Math.abs(sincePct) < 0.3) return ""; // just entered, skip
+ 
+  const sign = sincePct >= 0 ? "+" : "";
+  const sincePctText = `${sign}${sincePct.toFixed(1)}%`;
+ 
+  // Format entry price
+  let dec = 2;
+  if (entry > 0 && entry < 0.01) {
+    dec = Math.min(6, Math.max(2, Math.ceil(-Math.log10(entry)) + 1));
+  }
+  const entryPriceText = `$${entry.toFixed(dec)}`;
+ 
+  // Time ago
+  let timeAgoText = "";
+  try {
+    const diffMs = Date.now() - new Date(enteredAt).getTime();
+    const mins = Math.floor(diffMs / 60000);
+    if (mins < 1) timeAgoText = "just now";
+    else if (mins < 60) timeAgoText = `${mins}m ago`;
+    else {
+      const h = Math.floor(mins / 60);
+      const m = mins % 60;
+      timeAgoText = m > 0 ? `${h}h ${m}m ago` : `${h}h ago`;
+    }
+  } catch (e) {}
+ 
+  const dir = sincePct >= 0 ? "up" : "down";
+  return ` data-entry-pct="${sincePctText}" data-entry-price="${entryPriceText}" data-entry-ago="${timeAgoText}" data-entry-color="${dir}"`;
+}
 
 function renderStocks(rows) {
   const tbody = document.getElementById("stocksTbody");
@@ -541,7 +578,7 @@ function renderStocks(rows) {
         <td class="price-cell" data-raw-price="${x.price ?? ''}">${fmtUsd(x.price)}</td>
         <td class="${changeClass}">
           <span class="change-wrap">
-            <span class="change-pct" data-raw-pct="${pct ?? ''}">${fmtPct(pct)}</span>
+            <span class="change-pct${x.enteredPrice ? ' has-entry-tooltip' : ''}" data-raw-pct="${pct ?? ''}"${renderSinceEntryAttrs(x.price, x.enteredPrice, x.enteredAt)}>${fmtPct(pct)}</span>
             ${rangeHtml}
           </span>
         </td>
@@ -637,7 +674,7 @@ function renderCrypto(rows) {
         <td class="price-cell" data-raw-price="${x.price ?? ''}">${fmtUsd(x.price, priceDecimals)}</td>
         <td class="${changeClass}">
           <span class="change-wrap">
-            <span class="change-pct" data-raw-pct="${pct ?? ''}">${fmtPct(pct)}</span>
+            span class="change-pct${x.enteredPrice ? ' has-entry-tooltip' : ''}" data-raw-pct="${pct ?? ''}"${renderSinceEntryAttrs(x.price, x.enteredPrice, x.enteredAt)}>${fmtPct(pct)}</span>
             ${rangeHtml}
           </span>
         </td>

@@ -2983,3 +2983,100 @@ body.sj-subscriber .page {
       display: none; /* no tooltip on mobile, no room */
     }
   }
+
+  /* ===========================================
+   SINCE-ENTRY TOOLTIP — % Change Cell
+   
+   Add to style.css after the .change-wrap rules
+   (section 10, Range Indicator area).
+   =========================================== */
+
+/* Dotted underline hint */
+.has-entry-tooltip {
+  position: relative;
+  cursor: help;
+  text-decoration-line: underline;
+  text-decoration-style: dotted;
+  text-decoration-color: rgba(255, 255, 255, 0.15);
+  text-underline-offset: 3px;
+}
+
+/* Tooltip via CSS ::before */
+.has-entry-tooltip::before {
+  content: attr(data-entry-pct) " since entering screener\A" "Entered at " attr(data-entry-price) " · " attr(data-entry-ago);
+  white-space: pre-line;
+  position: absolute;
+  bottom: calc(100% + 10px);
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: #1e293b;
+  color: #e2e8f0;
+  font-size: 0.72rem;
+  font-weight: 500;
+  line-height: 1.5;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s ease;
+  z-index: 60;
+  min-width: 200px;
+  max-width: 280px;
+  text-align: left;
+}
+
+/* Arrow */
+.has-entry-tooltip::after {
+  content: "";
+  position: absolute;
+  bottom: calc(100% + 4px);
+  left: 50%;
+  transform: translateX(-50%);
+  border: 5px solid transparent;
+  border-top-color: #1e293b;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s ease;
+  z-index: 61;
+}
+
+.has-entry-tooltip:hover::before,
+.has-entry-tooltip:hover::after {
+  opacity: 1;
+}
+
+/* Green/red left accent based on direction */
+.has-entry-tooltip[data-entry-color="up"]::before {
+  border-left: 3px solid rgba(74, 222, 128, 0.5);
+}
+.has-entry-tooltip[data-entry-color="down"]::before {
+  border-left: 3px solid rgba(239, 68, 68, 0.5);
+}
+
+/* Top rows: flip tooltip below to avoid clipping */
+tbody tr:first-child .has-entry-tooltip::before,
+tbody tr:nth-child(2) .has-entry-tooltip::before {
+  bottom: auto;
+  top: calc(100% + 10px);
+}
+tbody tr:first-child .has-entry-tooltip::after,
+tbody tr:nth-child(2) .has-entry-tooltip::after {
+  bottom: auto;
+  top: calc(100% + 4px);
+  border-top-color: transparent;
+  border-bottom-color: #1e293b;
+}
+
+/* Mobile: no hover, hide tooltip */
+@media (max-width: 640px) {
+  .has-entry-tooltip::before,
+  .has-entry-tooltip::after {
+    display: none;
+  }
+  .has-entry-tooltip {
+    text-decoration: none;
+    cursor: default;
+  }
+}

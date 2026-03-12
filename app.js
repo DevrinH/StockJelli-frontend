@@ -674,7 +674,7 @@ function renderCrypto(rows) {
         <td class="price-cell" data-raw-price="${x.price ?? ''}">${fmtUsd(x.price, priceDecimals)}</td>
         <td class="${changeClass}">
           <span class="change-wrap">
-            span class="change-pct${x.enteredPrice ? ' has-entry-tooltip' : ''}" data-raw-pct="${pct ?? ''}"${renderSinceEntryAttrs(x.price, x.enteredPrice, x.enteredAt)}>${fmtPct(pct)}</span>
+           <span class="change-pct${x.enteredPrice ? ' has-entry-tooltip' : ''}" data-raw-pct="${pct ?? ''}"${renderSinceEntryAttrs(x.price, x.enteredPrice, x.enteredAt)}>${fmtPct(pct)}</span>
             ${rangeHtml}
           </span>
         </td>

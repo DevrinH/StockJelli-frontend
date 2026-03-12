@@ -678,7 +678,7 @@ function renderCrypto(rows) {
             ${rangeHtml}
           </span>
         </td>
-        <td>${fmtVolumeCompact(x.volume)}${renderVolumeFire(x.volume, null, x.marketCap, "crypto")}${renderWhaleIndicator(x.volume, null, x.marketCap, x.pctChange, x.rangePosition, "crypto")}${renderLiquidityDot(x.volume, x.marketCap)}</td>
+        <td>${fmtVolumeCompact(x.volume)}${renderVolumeFire(x.volume, null, x.marketCap, "crypto")}${renderWhaleIndicator(x.volume, null, x.marketCap, x.pctChange, x.rangePosition, "crypto") || renderLiquidityDot(x.volume, x.marketCap)}</td>
         <td class="rvol">${renderRvol(x.volume, null, x.marketCap, "crypto")}</td>
         <td>${fmtCompactUsd(x.marketCap, 1)}</td>
         <td class="sj">${renderSJScore(x.sjScore, idx)}</td>

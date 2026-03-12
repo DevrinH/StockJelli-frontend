@@ -144,6 +144,7 @@ body.sj-subscriber .sj-partner-fallback {
     display: inline-block;
     vertical-align: middle;
     margin-left: 4px;
+    font-size: 0.85em;
   }
   
   .whale-indicator .liquidity-tooltip {
@@ -156,61 +157,12 @@ body.sj-subscriber .sj-partner-fallback {
     opacity: 1;
   }
   
-  @keyframes whaleGlow {
-    0%, 100% {
-      filter: drop-shadow(0 0 2px rgba(59, 130, 246, 0.3));
-    }
-    50% {
-      filter: drop-shadow(0 0 6px rgba(59, 130, 246, 0.6))
-             drop-shadow(0 0 12px rgba(59, 130, 246, 0.2));
-    }
-  }
-  
-  /* Tooltip — shows on hover with breakdown */
-  .whale-indicator::after {
-    content: attr(title);
-    position: absolute;
-    bottom: calc(100% + 8px);
-    left: 50%;
-    transform: translateX(-50%);
-    white-space: pre-line;
-    font-size: 0.68rem;
-    font-weight: 500;
-    padding: 8px 12px;
-    border-radius: 8px;
-    background: #1e293b;
-    color: #f1f5f9;
-    border: 1px solid rgba(59, 130, 246, 0.3);
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4),
-                0 0 12px rgba(59, 130, 246, 0.1);
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.15s ease;
-    z-index: 50;
-    max-width: 260px;
-    line-height: 1.4;
-    text-align: left;
-  }
-  
-  .whale-indicator:hover::after {
-    opacity: 1;
-  }
-  
-  /* Mobile: smaller whale, no tooltip */
   @media (max-width: 640px) {
     .whale-indicator {
       font-size: 0.75em;
       margin-left: 3px;
     }
-  
-    .whale-indicator::after {
+    .whale-indicator .liquidity-tooltip {
       display: none;
-    }
-  }
-  
-  /* Subtle animation on mobile — reduced motion */
-  @media (prefers-reduced-motion: reduce) {
-    .whale-indicator {
-      animation: none;
     }
   }

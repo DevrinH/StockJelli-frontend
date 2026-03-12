@@ -3080,13 +3080,3 @@ tbody tr:nth-child(2) .has-entry-tooltip::after {
     cursor: default;
   }
 }
-
-/* Whale tooltip — flip below on top rows to avoid clipping */
-tbody tr:first-child .vol-fire .liquidity-tooltip,
-tbody tr:nth-child(2) .vol-fire .liquidity-tooltip,
-tbody tr:first-child .liquidity-wrap .liquidity-tooltip,
-tbody tr:nth-child(2) .liquidity-wrap .liquidity-tooltip {
-  bottom: auto;
-  top: calc(100% + 8px);
-}
-

@@ -516,24 +516,24 @@ function renderWhaleIndicator(volume, avgVolume, marketCap, pctChange, rangePosi
 
 function renderSinceEntryAttrs(currentPrice, enteredPrice, enteredAt, symbol) {
   if (!enteredPrice || !currentPrice || !enteredAt) return "";
-
+ 
   const current = Number(currentPrice);
   const entry = Number(enteredPrice);
   if (!Number.isFinite(current) || !Number.isFinite(entry) || entry <= 0) return "";
-
+ 
   const sincePct = ((current - entry) / entry) * 100;
   if (Math.abs(sincePct) < 0.3) return "";
-
+ 
   const sign = sincePct >= 0 ? "+" : "";
   const sincePctText = `${sign}${sincePct.toFixed(1)}%`;
-
+ 
   // Format entry price
   let dec = 2;
   if (entry > 0 && entry < 0.01) {
     dec = Math.min(6, Math.max(2, Math.ceil(-Math.log10(entry)) + 1));
   }
   const entryPriceText = `$${entry.toFixed(dec)}`;
-
+ 
   // Time ago
   let timeAgoText = "";
   try {
@@ -547,18 +547,26 @@ function renderSinceEntryAttrs(currentPrice, enteredPrice, enteredAt, symbol) {
       timeAgoText = m > 0 ? `${h}h ${m}m ago` : `${h}h ago`;
     }
   } catch (e) {}
-
-  // Peak info — \n at end so it creates a line break only when present
-  let peakLine = "";
+ 
+  // Build tooltip lines
+  const line1 = `${sincePctText} since entering screener`;
+ 
+  let line2 = "";
   if (symbol) {
     const peakPct = getPeakPct(symbol, entry);
     if (peakPct !== null && peakPct > sincePct + 0.5) {
-      peakLine = `+${peakPct.toFixed(1)}% peak since entering\n`;
+      line2 = `Peak: +${peakPct.toFixed(1)}% since entry`;
     }
   }
-
+ 
+  const line3 = `Entered at ${entryPriceText} · ${timeAgoText}`;
+ 
   const dir = sincePct >= 0 ? "up" : "down";
-  return ` data-entry-pct="${sincePctText} since entering screener" data-entry-peak="${peakLine}" data-entry-price="Entered at ${entryPriceText} · ${timeAgoText}" data-entry-color="${dir}"`;
+ 
+  // Single data attribute with all lines — CSS uses \A for line breaks
+  // We separate lines with a pipe character, then CSS replaces in content
+  // Actually simpler: just use data-entry-line1, data-entry-line2, data-entry-line3
+  return ` data-entry-line1="${line1}" data-entry-line2="${line2}" data-entry-line3="${line3}" data-entry-color="${dir}"`;
 }
 
 // Track peak prices since page load (per symbol)

@@ -618,15 +618,15 @@ function renderSinceEntryMobile(currentPrice, enteredPrice, enteredAt, symbol) {
 function renderStocks(rows) {
   const tbody = document.getElementById("stocksTbody");
   if (!tbody) return;
-
+ 
   if (!rows || rows.length === 0) {
     tbody.innerHTML = `<tr><td class="ticker">—</td><td>$—</td><td>—</td><td>—</td><td class="rvol">—</td><td class="news">—</td><td class="sj">—</td></tr>`;
     return;
   }
-
+ 
   const oldValues = snapshotTableValues(tbody);
   const medals = ["🥇", "🥈", "🥉"];
-
+ 
   tbody.innerHTML = rows.map((x, idx) => {
     const pct = x.pctChange;
     const changeClass = classUpDown(pct);
@@ -634,14 +634,15 @@ function renderStocks(rows) {
     const newsHtml = renderNewsCell(x.news);
     const tickerHtml = renderTickerCell(x.symbol || "—", "stock");
     if (x.enteredPrice) updatePeakPrice(x.symbol, x.price, x.enteredPrice);
-
+    const entryAttrs = renderSinceEntryAttrs(x.price, x.enteredPrice, x.enteredAt, x.symbol);
+ 
     return `
       <tr data-symbol="${x.symbol || ''}">
         <td class="ticker">${tickerHtml}${idx < 3 ? ' <span class="ticker-medal">' + medals[idx] + '</span>' : ''}${renderNewBadge(x.enteredAt)}${window.sjShareBtn ? window.sjShareBtn(x.symbol, x.pctChange, fmtUsd(x.price), renderRvolRaw(x.volume, x.avgVolume, x.marketCap, 'stock'), 'stock') : ''}</td>
         <td class="price-cell" data-raw-price="${x.price ?? ''}">${fmtUsd(x.price)}</td>
         <td class="${changeClass}">
           <span class="change-wrap">
-            <span class="change-pct${x.enteredPrice ? ' has-entry-tooltip' : ''}" data-raw-pct="${pct ?? ''}"${renderSinceEntryAttrs(x.price, x.enteredPrice, x.enteredAt, x.symbol)}>${fmtPct(pct)}</span>
+            <span class="change-pct${entryAttrs ? ' has-entry-tooltip' : ''}" data-raw-pct="${pct ?? ''}"${entryAttrs}>${fmtPct(pct)}</span>
             ${rangeHtml}
           </span>${renderSinceEntryMobile(x.price, x.enteredPrice, x.enteredAt, x.symbol)}
         </td>
@@ -652,7 +653,7 @@ function renderStocks(rows) {
       </tr>
     `;
   }).join("");
-
+ 
   trimMobileDecimals();
   animateTableValues(tbody, oldValues);
 }
@@ -682,19 +683,19 @@ function renderLiquidityDot(volume, marketCap) {
 function renderCrypto(rows) {
   const tbody = document.getElementById("cryptoTbody");
   if (!tbody) return;
-
+ 
   if (!rows || rows.length === 0) {
     tbody.innerHTML = `<tr><td class="ticker">—</td><td>$—</td><td>—</td><td>—</td><td class="rvol">—</td><td>—</td><td class="sj">—</td></tr>`;
     return;
   }
-
+ 
   const oldValues = snapshotTableValues(tbody);
   const medals = ["🥇", "🥈", "🥉"];
-
+ 
   tbody.innerHTML = rows.map((x, idx) => {
     const pct = x.pctChange || 0;
     const changeClass = classUpDown(pct);
-
+ 
     let priceDecimals = 2;
     if (x.price !== null && x.price !== undefined) {
       const p = Number(x.price);
@@ -703,9 +704,9 @@ function renderCrypto(rows) {
         priceDecimals = Math.min(priceDecimals, 6);
       }
     }
-
+ 
     const rangeHtml = renderRangeIndicator(x.low24h ?? x.rangeLow, x.high24h ?? x.rangeHigh, x.price);
-
+ 
     let rugWarning = "";
     const mcap = x.marketCap || 0;
     const vol = x.volume || 0;
@@ -719,17 +720,18 @@ function renderCrypto(rows) {
     if (showWarning) {
       rugWarning = ' <span class="rug-warning" title="⚠️ Elevated risk: extreme move and/or unusual volume vs market cap">⚠️</span>';
     }
-
+ 
     const tickerHtml = renderTickerCell(x.coinSymbol || "—", "crypto", x.image || null);
     if (x.enteredPrice) updatePeakPrice(x.coinSymbol, x.price, x.enteredPrice);
-
+    const entryAttrs = renderSinceEntryAttrs(x.price, x.enteredPrice, x.enteredAt, x.coinSymbol);
+ 
     return `
       <tr data-symbol="${x.coinSymbol || ''}">
         <td class="ticker">${tickerHtml}${idx < 3 ? ' <span class="ticker-medal">' + medals[idx] + '</span>' : ''}${rugWarning}${renderNewBadge(x.enteredAt)}${window.sjShareBtn ? window.sjShareBtn(x.coinSymbol, x.pctChange, fmtUsd(x.price, priceDecimals), renderRvolRaw(x.volume, null, x.marketCap, 'crypto'), 'crypto') : ''}</td>
         <td class="price-cell" data-raw-price="${x.price ?? ''}">${fmtUsd(x.price, priceDecimals)}</td>
         <td class="${changeClass}">
           <span class="change-wrap">
-            <span class="change-pct${x.enteredPrice ? ' has-entry-tooltip' : ''}" data-raw-pct="${pct ?? ''}"${renderSinceEntryAttrs(x.price, x.enteredPrice, x.enteredAt, x.coinSymbol)}>${fmtPct(pct)}</span>
+            <span class="change-pct${entryAttrs ? ' has-entry-tooltip' : ''}" data-raw-pct="${pct ?? ''}"${entryAttrs}>${fmtPct(pct)}</span>
             ${rangeHtml}
           </span>${renderSinceEntryMobile(x.price, x.enteredPrice, x.enteredAt, x.coinSymbol)}
         </td>
@@ -740,7 +742,7 @@ function renderCrypto(rows) {
       </tr>
     `;
   }).join("");
-
+ 
   trimMobileDecimals();
   animateTableValues(tbody, oldValues);
 }

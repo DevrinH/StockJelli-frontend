@@ -514,26 +514,26 @@ function renderWhaleIndicator(volume, avgVolume, marketCap, pctChange, rangePosi
   return ` <span class="whale-indicator"><span class="liquidity-tooltip" style="--liq-color: rgba(96, 165, 250, 0.4)">Heavy flow detected — unusual institutional-level activity · ${tooltipParts}</span>🐋</span>`;
 }
 
-function renderSinceEntryAttrs(currentPrice, enteredPrice, enteredAt) {
+function renderSinceEntryAttrs(currentPrice, enteredPrice, enteredAt, symbol) {
   if (!enteredPrice || !currentPrice || !enteredAt) return "";
- 
+
   const current = Number(currentPrice);
   const entry = Number(enteredPrice);
   if (!Number.isFinite(current) || !Number.isFinite(entry) || entry <= 0) return "";
- 
+
   const sincePct = ((current - entry) / entry) * 100;
-  if (Math.abs(sincePct) < 0.3) return ""; // just entered, skip
- 
+  if (Math.abs(sincePct) < 0.3) return "";
+
   const sign = sincePct >= 0 ? "+" : "";
   const sincePctText = `${sign}${sincePct.toFixed(1)}%`;
- 
+
   // Format entry price
   let dec = 2;
   if (entry > 0 && entry < 0.01) {
     dec = Math.min(6, Math.max(2, Math.ceil(-Math.log10(entry)) + 1));
   }
   const entryPriceText = `$${entry.toFixed(dec)}`;
- 
+
   // Time ago
   let timeAgoText = "";
   try {
@@ -547,10 +547,65 @@ function renderSinceEntryAttrs(currentPrice, enteredPrice, enteredAt) {
       timeAgoText = m > 0 ? `${h}h ${m}m ago` : `${h}h ago`;
     }
   } catch (e) {}
- 
+
+  // Peak info
+  let peakLine = "";
+  if (symbol) {
+    const peakPct = getPeakPct(symbol, entry);
+    if (peakPct !== null && peakPct > sincePct + 0.5) {
+      peakLine = `+${peakPct.toFixed(1)}% peak since entering`;
+    }
+  }
+
   const dir = sincePct >= 0 ? "up" : "down";
-  return ` data-entry-pct="${sincePctText}" data-entry-price="${entryPriceText}" data-entry-ago="${timeAgoText}" data-entry-color="${dir}"`;
+  return ` data-entry-pct="${sincePctText} since entering screener" data-entry-peak="${peakLine}" data-entry-price="Entered at ${entryPriceText} · ${timeAgoText}" data-entry-color="${dir}"`;
 }
+
+// Track peak prices since page load (per symbol)
+const peakSinceEntry = new Map();
+
+function updatePeakPrice(symbol, price, enteredPrice) {
+  if (!symbol || !price || !enteredPrice) return;
+  const prev = peakSinceEntry.get(symbol);
+  if (!prev || price > prev) {
+    peakSinceEntry.set(symbol, price);
+  }
+}
+
+function getPeakPct(symbol, enteredPrice) {
+  if (!symbol || !enteredPrice) return null;
+  const peak = peakSinceEntry.get(symbol);
+  if (!peak || !Number.isFinite(peak) || enteredPrice <= 0) return null;
+  const pct = ((peak - enteredPrice) / enteredPrice) * 100;
+  return Math.abs(pct) >= 0.3 ? pct : null;
+}
+
+function renderSinceEntryMobile(currentPrice, enteredPrice, enteredAt, symbol) {
+  if (!enteredPrice || !currentPrice || !enteredAt) return "";
+  const current = Number(currentPrice);
+  const entry = Number(enteredPrice);
+  if (!Number.isFinite(current) || !Number.isFinite(entry) || entry <= 0) return "";
+  const sincePct = ((current - entry) / entry) * 100;
+  if (Math.abs(sincePct) < 0.3) return "";
+  const sign = sincePct >= 0 ? "+" : "";
+  const dir = sincePct >= 0 ? "up" : "down";
+
+  let peakStr = "";
+  if (symbol) {
+    const peakPct = getPeakPct(symbol, entry);
+    if (peakPct !== null && peakPct > sincePct + 0.5) {
+      peakStr = ` · pk +${peakPct.toFixed(1)}%`;
+    }
+  }
+
+  let dec = 2;
+  if (entry > 0 && entry < 0.01) {
+    dec = Math.min(6, Math.max(2, Math.ceil(-Math.log10(entry)) + 1));
+  }
+
+  return `<span class="since-entry-mobile ${dir}">${sign}${sincePct.toFixed(1)}%${peakStr} · $${entry.toFixed(dec)}</span>`;
+}
+
 
 function renderStocks(rows) {
   const tbody = document.getElementById("stocksTbody");
@@ -561,16 +616,16 @@ function renderStocks(rows) {
     return;
   }
 
-  // Snapshot old values BEFORE re-rendering (for animation)
   const oldValues = snapshotTableValues(tbody);
-
   const medals = ["🥇", "🥈", "🥉"];
+
   tbody.innerHTML = rows.map((x, idx) => {
     const pct = x.pctChange;
     const changeClass = classUpDown(pct);
     const rangeHtml = renderRangeIndicator(x.dayLow ?? x.rangeLow, x.dayHigh ?? x.rangeHigh, x.price);
     const newsHtml = renderNewsCell(x.news);
     const tickerHtml = renderTickerCell(x.symbol || "—", "stock");
+    if (x.enteredPrice) updatePeakPrice(x.symbol, x.price, x.enteredPrice);
 
     return `
       <tr data-symbol="${x.symbol || ''}">
@@ -578,9 +633,9 @@ function renderStocks(rows) {
         <td class="price-cell" data-raw-price="${x.price ?? ''}">${fmtUsd(x.price)}</td>
         <td class="${changeClass}">
           <span class="change-wrap">
-  <span class="change-pct${x.enteredPrice ? ' has-entry-tooltip' : ''}" data-raw-pct="${pct ?? ''}"${renderSinceEntryAttrs(x.price, x.enteredPrice, x.enteredAt)}>${fmtPct(pct)}</span>
+            <span class="change-pct${x.enteredPrice ? ' has-entry-tooltip' : ''}" data-raw-pct="${pct ?? ''}"${renderSinceEntryAttrs(x.price, x.enteredPrice, x.enteredAt, x.symbol)}>${fmtPct(pct)}</span>
             ${rangeHtml}
-          </span>
+          </span>${renderSinceEntryMobile(x.price, x.enteredPrice, x.enteredAt, x.symbol)}
         </td>
         <td>${fmtVolumeCompact(x.volume)}${renderVolumeFire(x.volume, x.avgVolume, x.marketCap, "stock")}${renderWhaleIndicator(x.volume, x.avgVolume, x.marketCap, x.pctChange, x.rangePosition, "stock")}</td>
         <td class="rvol">${renderRvol(x.volume, x.avgVolume, x.marketCap, "stock")}</td>
@@ -593,6 +648,7 @@ function renderStocks(rows) {
   trimMobileDecimals();
   animateTableValues(tbody, oldValues);
 }
+
 
 // Liquidity indicator dot for crypto
 function renderLiquidityDot(volume, marketCap) {
@@ -624,10 +680,9 @@ function renderCrypto(rows) {
     return;
   }
 
-  // Snapshot old values BEFORE re-rendering (for animation)
   const oldValues = snapshotTableValues(tbody);
-
   const medals = ["🥇", "🥈", "🥉"];
+
   tbody.innerHTML = rows.map((x, idx) => {
     const pct = x.pctChange || 0;
     const changeClass = classUpDown(pct);
@@ -647,26 +702,18 @@ function renderCrypto(rows) {
     const mcap = x.marketCap || 0;
     const vol = x.volume || 0;
     const rangePos = x.rangePosition ?? 0.5;
-
     const isExtremeGain = pct > 500;
     const isMassiveGain = pct > 1000;
     const isCrashedRange = rangePos < 0.20;
     const isHighVolRatio = mcap > 0 && (vol / mcap) > 1.0;
     const isMediumVolRatio = mcap > 0 && (vol / mcap) > 0.5;
-
-    const showWarning =
-      isMassiveGain ||
-      (isExtremeGain && isCrashedRange) ||
-      (isExtremeGain && isHighVolRatio) ||
-      (isCrashedRange && isMediumVolRatio) ||
-      (pct > 200 && isCrashedRange && isMediumVolRatio);
-
+    const showWarning = isMassiveGain || (isExtremeGain && isCrashedRange) || (isExtremeGain && isHighVolRatio) || (isCrashedRange && isMediumVolRatio) || (pct > 200 && isCrashedRange && isMediumVolRatio);
     if (showWarning) {
       rugWarning = ' <span class="rug-warning" title="⚠️ Elevated risk: extreme move and/or unusual volume vs market cap">⚠️</span>';
     }
 
-    // ★ Pass x.image for crypto logo
     const tickerHtml = renderTickerCell(x.coinSymbol || "—", "crypto", x.image || null);
+    if (x.enteredPrice) updatePeakPrice(x.coinSymbol, x.price, x.enteredPrice);
 
     return `
       <tr data-symbol="${x.coinSymbol || ''}">
@@ -674,9 +721,9 @@ function renderCrypto(rows) {
         <td class="price-cell" data-raw-price="${x.price ?? ''}">${fmtUsd(x.price, priceDecimals)}</td>
         <td class="${changeClass}">
           <span class="change-wrap">
-           <span class="change-pct${x.enteredPrice ? ' has-entry-tooltip' : ''}" data-raw-pct="${pct ?? ''}"${renderSinceEntryAttrs(x.price, x.enteredPrice, x.enteredAt)}>${fmtPct(pct)}</span>
+            <span class="change-pct${x.enteredPrice ? ' has-entry-tooltip' : ''}" data-raw-pct="${pct ?? ''}"${renderSinceEntryAttrs(x.price, x.enteredPrice, x.enteredAt, x.coinSymbol)}>${fmtPct(pct)}</span>
             ${rangeHtml}
-          </span>
+          </span>${renderSinceEntryMobile(x.price, x.enteredPrice, x.enteredAt, x.coinSymbol)}
         </td>
         <td>${fmtVolumeCompact(x.volume)}${renderVolumeFire(x.volume, null, x.marketCap, "crypto")}${renderWhaleIndicator(x.volume, null, x.marketCap, x.pctChange, x.rangePosition, "crypto") || renderLiquidityDot(x.volume, x.marketCap)}</td>
         <td class="rvol">${renderRvol(x.volume, null, x.marketCap, "crypto")}</td>

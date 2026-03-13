@@ -3003,7 +3003,7 @@ body.sj-subscriber .page {
 
 /* Tooltip via CSS ::before */
 .has-entry-tooltip::before {
-  content: attr(data-entry-pct) " since entering screener\A" "Entered at " attr(data-entry-price) " · " attr(data-entry-ago);
+  content: attr(data-entry-pct) "\A" attr(data-entry-peak) "\A" attr(data-entry-price);
   white-space: pre-line;
   position: absolute;
   bottom: calc(100% + 10px);
@@ -3015,15 +3015,15 @@ body.sj-subscriber .page {
   color: #e2e8f0;
   font-size: 0.72rem;
   font-weight: 500;
-  line-height: 1.5;
+  line-height: 1.6;
   border: 1px solid rgba(255, 255, 255, 0.1);
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.15s ease;
   z-index: 60;
-  min-width: 200px;
-  max-width: 280px;
+  min-width: 220px;
+  max-width: 300px;
   text-align: left;
 }
 
@@ -3091,4 +3091,25 @@ tbody tr:nth-child(2) .whale-indicator {
 .whale-indicator {
   cursor: help;
   position: relative;
+}
+
+/* Since-entry inline — mobile only */
+.since-entry-mobile {
+  display: none;
+}
+
+@media (max-width: 640px) {
+  .since-entry-mobile {
+    display: block;
+    font-size: 0.58rem;
+    font-weight: 500;
+    margin-top: 2px;
+    opacity: 0.7;
+  }
+  .since-entry-mobile.up {
+    color: #4ade80;
+  }
+  .since-entry-mobile.down {
+    color: rgba(255, 90, 90, 0.85);
+  }
 }

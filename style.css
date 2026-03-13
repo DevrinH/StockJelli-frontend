@@ -3003,7 +3003,7 @@ body.sj-subscriber .page {
 
 /* Tooltip via CSS ::before */
 .has-entry-tooltip::before {
-  content: attr(data-entry-pct) "\A" attr(data-entry-peak) "\A" attr(data-entry-price);
+  content: attr(data-entry-pct) "\A" attr(data-entry-peak) attr(data-entry-price);
   white-space: pre-line;
   position: absolute;
   bottom: calc(100% + 10px);

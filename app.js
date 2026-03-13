@@ -548,12 +548,12 @@ function renderSinceEntryAttrs(currentPrice, enteredPrice, enteredAt, symbol) {
     }
   } catch (e) {}
 
-  // Peak info
+  // Peak info — \n at end so it creates a line break only when present
   let peakLine = "";
   if (symbol) {
     const peakPct = getPeakPct(symbol, entry);
     if (peakPct !== null && peakPct > sincePct + 0.5) {
-      peakLine = `+${peakPct.toFixed(1)}% peak since entering`;
+      peakLine = `+${peakPct.toFixed(1)}% peak since entering\n`;
     }
   }
 

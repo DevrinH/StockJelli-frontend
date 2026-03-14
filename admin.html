@@ -7,100 +7,134 @@
 <link rel="icon" type="image/png" href="/StockJelli-S-Logo.png">
 <style>
   @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap');
-
   * { box-sizing: border-box; margin: 0; padding: 0; }
-
   :root {
-    --bg: #0a0d14;
-    --surface: #111622;
-    --surface2: #171e2e;
-    --border: rgba(255,255,255,0.06);
-    --text: #e2e8f0;
-    --muted: #64748b;
-    --accent: #3b82f6;
-    --green: #22c55e;
-    --red: #ef4444;
-    --amber: #f59e0b;
-    --mono: 'JetBrains Mono', monospace;
-    --sans: 'DM Sans', system-ui, sans-serif;
+    --bg: #0a0d14; --surface: #111622; --surface2: #171e2e;
+    --border: rgba(255,255,255,0.06); --text: #e2e8f0; --muted: #64748b;
+    --accent: #3b82f6; --green: #22c55e; --red: #ef4444; --amber: #f59e0b;
+    --mono: 'JetBrains Mono', monospace; --sans: 'DM Sans', system-ui, sans-serif;
   }
+  body { background: var(--bg); color: var(--text); font-family: var(--sans); min-height: 100vh; }
 
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: var(--sans);
-    min-height: 100vh;
-  }
-
+  /* Auth */
   .auth-gate { display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 20px; }
   .auth-box { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 40px; max-width: 400px; width: 100%; text-align: center; }
   .auth-box h1 { font-size: 1.4rem; font-weight: 700; margin-bottom: 8px; background: linear-gradient(135deg, #e2e8f0, #3b82f6); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
   .auth-box p { color: var(--muted); font-size: 0.85rem; margin-bottom: 20px; }
-  .auth-input { width: 100%; padding: 12px 16px; background: var(--bg); border: 1px solid var(--border); border-radius: 10px; color: var(--text); font-family: var(--mono); font-size: 0.9rem; outline: none; transition: border-color 0.2s; }
+  .auth-input { width: 100%; padding: 12px 16px; background: var(--bg); border: 1px solid var(--border); border-radius: 10px; color: var(--text); font-family: var(--mono); font-size: 0.9rem; outline: none; }
   .auth-input:focus { border-color: var(--accent); }
   .auth-input::placeholder { color: #334155; }
-  .auth-btn { width: 100%; padding: 12px; margin-top: 12px; background: var(--accent); color: #fff; border: none; border-radius: 10px; font-weight: 600; font-size: 0.9rem; cursor: pointer; transition: opacity 0.15s; }
-  .auth-btn:hover { opacity: 0.85; }
+  .auth-btn { width: 100%; padding: 12px; margin-top: 12px; background: var(--accent); color: #fff; border: none; border-radius: 10px; font-weight: 600; cursor: pointer; }
   .auth-error { color: var(--red); font-size: 0.8rem; margin-top: 10px; display: none; }
 
+  /* Dashboard */
   .dashboard { display: none; }
   .dashboard.visible { display: block; }
 
-  .dash-header { position: sticky; top: 0; z-index: 100; background: rgba(10, 13, 20, 0.92); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); padding: 14px 24px; display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
-  .dash-title { font-size: 1rem; font-weight: 700; color: var(--accent); letter-spacing: 0.02em; font-family: var(--mono); }
-  .dash-controls { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-  .ctrl-select { padding: 7px 12px; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-size: 0.8rem; font-family: var(--mono); outline: none; cursor: pointer; }
-  .ctrl-btn { padding: 7px 14px; background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-size: 0.78rem; font-weight: 600; cursor: pointer; transition: all 0.15s; white-space: nowrap; }
+  /* Header */
+  .dash-header { position: sticky; top: 0; z-index: 100; background: rgba(10, 13, 20, 0.92); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); padding: 12px 20px; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+  .dash-brand { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+  .dash-brand img { border-radius: 6px; }
+  .dash-title { font-size: 1rem; font-weight: 700; color: var(--accent); font-family: var(--mono); }
+  .dash-controls { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .ctrl-select { padding: 6px 10px; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-size: 0.78rem; font-family: var(--mono); outline: none; cursor: pointer; }
+  .ctrl-btn { padding: 6px 12px; background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-size: 0.75rem; font-weight: 600; cursor: pointer; transition: all 0.15s; white-space: nowrap; }
   .ctrl-btn:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
   .ctrl-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
   .ctrl-btn-copy { background: rgba(34, 197, 94, 0.1); border-color: rgba(34, 197, 94, 0.2); color: var(--green); }
   .ctrl-btn-copy:hover { background: var(--green); color: #0a0d14; }
   .ctrl-btn-copy.copied { background: var(--green); color: #0a0d14; }
+  .ctrl-btn-today { background: rgba(245, 158, 11, 0.1); border-color: rgba(245, 158, 11, 0.2); color: var(--amber); }
+  .ctrl-btn-today.active { background: var(--amber); color: #0a0d14; border-color: var(--amber); }
+  .refresh-info { font-size: 0.62rem; color: var(--muted); font-family: var(--mono); display: flex; align-items: center; gap: 4px; }
+  .refresh-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); animation: pulse 2s ease-in-out infinite; }
+  @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.4; } }
 
-  .stats-bar { display: flex; gap: 16px; padding: 12px 24px; border-bottom: 1px solid var(--border); background: var(--surface); flex-wrap: wrap; }
-  .stat { display: flex; flex-direction: column; gap: 2px; }
-  .stat-label { font-size: 0.65rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; font-weight: 600; }
-  .stat-value { font-size: 1rem; font-weight: 700; font-family: var(--mono); }
+  /* Filter Panel */
+  .filter-panel { padding: 10px 20px; border-bottom: 1px solid var(--border); background: var(--surface); display: flex; gap: 12px; flex-wrap: wrap; align-items: flex-end; }
+  .filter-group { display: flex; flex-direction: column; gap: 4px; }
+  .filter-label { font-size: 0.6rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; font-weight: 600; }
+  .filter-input { padding: 5px 10px; background: var(--bg); border: 1px solid var(--border); border-radius: 6px; color: var(--text); font-family: var(--mono); font-size: 0.75rem; width: 100px; outline: none; }
+  .filter-input:focus { border-color: var(--accent); }
+  .filter-input::placeholder { color: #334155; }
+  .filter-input-wide { width: 140px; }
+  .filter-select { padding: 5px 8px; background: var(--bg); border: 1px solid var(--border); border-radius: 6px; color: var(--text); font-family: var(--mono); font-size: 0.75rem; outline: none; cursor: pointer; }
+  .filter-reset { padding: 5px 10px; background: none; border: 1px solid var(--border); border-radius: 6px; color: var(--muted); font-size: 0.7rem; cursor: pointer; align-self: flex-end; transition: all 0.15s; }
+  .filter-reset:hover { color: var(--red); border-color: var(--red); }
+  .filter-count { font-size: 0.65rem; color: var(--muted); font-family: var(--mono); align-self: flex-end; padding-bottom: 4px; }
+
+  /* Stats */
+  .stats-bar { display: flex; gap: 14px; padding: 10px 20px; border-bottom: 1px solid var(--border); background: var(--surface); flex-wrap: wrap; }
+  .stat { display: flex; flex-direction: column; gap: 1px; }
+  .stat-label { font-size: 0.6rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; font-weight: 600; }
+  .stat-value { font-size: 0.95rem; font-weight: 700; font-family: var(--mono); }
   .stat-value.green { color: var(--green); }
-  .stat-value.red { color: var(--red); }
   .stat-value.amber { color: var(--amber); }
 
-  .table-container { overflow-x: auto; padding: 0 24px 24px; }
-  table { width: 100%; border-collapse: collapse; font-size: 0.78rem; margin-top: 12px; }
-  th { position: sticky; top: 56px; background: var(--surface); padding: 10px 12px; text-align: left; font-weight: 600; color: var(--muted); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.04em; border-bottom: 1px solid var(--border); cursor: pointer; user-select: none; white-space: nowrap; transition: color 0.15s; }
+  /* Table */
+  .table-container { overflow-x: auto; padding: 0 20px 20px; -webkit-overflow-scrolling: touch; }
+  table { width: 100%; border-collapse: collapse; font-size: 0.75rem; margin-top: 10px; }
+  th { position: sticky; top: 0; background: var(--surface); padding: 8px 10px; text-align: left; font-weight: 600; color: var(--muted); font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.04em; border-bottom: 1px solid var(--border); cursor: pointer; user-select: none; white-space: nowrap; }
   th:hover { color: var(--accent); }
   th.sorted { color: var(--accent); }
-  th .sort-arrow { margin-left: 4px; font-size: 0.65rem; }
-  td { padding: 8px 12px; border-bottom: 1px solid var(--border); font-family: var(--mono); font-size: 0.75rem; white-space: nowrap; }
+  th .sort-arrow { margin-left: 3px; font-size: 0.6rem; }
+  td { padding: 7px 10px; border-bottom: 1px solid var(--border); font-family: var(--mono); font-size: 0.72rem; white-space: nowrap; }
   tr:hover td { background: rgba(59, 130, 246, 0.04); }
-  tr.near-miss td { opacity: 0.5; }
-
+  tr.near-miss td { opacity: 0.45; }
   .sym { font-weight: 700; color: #fff; }
   .pct-up { color: var(--green); font-weight: 600; }
   .pct-down { color: var(--red); font-weight: 600; }
   .pct-flat { color: var(--muted); }
-  .sj-badge { display: inline-block; padding: 2px 6px; border-radius: 4px; font-weight: 700; font-size: 0.72rem; }
+  .sj-badge { display: inline-block; padding: 2px 5px; border-radius: 4px; font-weight: 700; font-size: 0.68rem; }
   .sj-high { background: rgba(34, 197, 94, 0.12); color: var(--green); }
   .sj-mid { background: rgba(255,255,255,0.06); color: var(--text); }
   .sj-low { background: rgba(100, 116, 139, 0.1); color: var(--muted); }
-  .source-tag { font-size: 0.65rem; padding: 2px 6px; border-radius: 4px; background: rgba(59, 130, 246, 0.1); color: var(--accent); font-weight: 600; }
-  .qualified-no { font-size: 0.65rem; padding: 2px 6px; border-radius: 4px; background: rgba(239, 68, 68, 0.1); color: var(--red); font-weight: 600; }
+  .qualified-no { font-size: 0.62rem; padding: 2px 5px; border-radius: 4px; background: rgba(239, 68, 68, 0.1); color: var(--red); font-weight: 600; }
   .outcome-pos { color: var(--green); font-weight: 600; }
   .outcome-neg { color: var(--red); font-weight: 600; }
-  .outcome-na { color: var(--muted); font-size: 0.65rem; }
+  .outcome-na { color: var(--muted); font-size: 0.62rem; }
+  .source-tag { font-size: 0.62rem; padding: 2px 5px; border-radius: 4px; background: rgba(59, 130, 246, 0.1); color: var(--accent); font-weight: 600; }
+  .session-tag { font-size: 0.62rem; padding: 2px 5px; border-radius: 4px; font-weight: 600; }
+  .session-open { background: rgba(34,197,94,0.1); color: var(--green); }
+  .session-premarket { background: rgba(245,158,11,0.1); color: var(--amber); }
+  .session-afterhours { background: rgba(139,92,246,0.1); color: #8b5cf6; }
 
   .empty-state { text-align: center; padding: 60px 20px; color: var(--muted); }
   .empty-state h3 { font-size: 1.1rem; margin-bottom: 8px; color: var(--text); }
   .loading { text-align: center; padding: 40px; color: var(--muted); font-family: var(--mono); }
-
-  .toast { position: fixed; bottom: 24px; right: 24px; padding: 12px 20px; background: var(--green); color: #0a0d14; font-weight: 600; font-size: 0.85rem; border-radius: 10px; box-shadow: 0 8px 24px rgba(0,0,0,0.4); transform: translateY(80px); opacity: 0; transition: all 0.3s ease; z-index: 1000; }
+  .toast { position: fixed; bottom: 20px; right: 20px; padding: 10px 18px; background: var(--green); color: #0a0d14; font-weight: 600; font-size: 0.82rem; border-radius: 10px; box-shadow: 0 8px 24px rgba(0,0,0,0.4); transform: translateY(80px); opacity: 0; transition: all 0.3s ease; z-index: 1000; }
   .toast.visible { transform: translateY(0); opacity: 1; }
 
-  @media (max-width: 768px) {
-    .dash-header { padding: 10px 12px; }
-    .stats-bar { padding: 10px 12px; gap: 12px; }
-    .table-container { padding: 0 8px 16px; }
-    td, th { padding: 6px 8px; font-size: 0.7rem; }
+  /* Responsive */
+  @media (max-width: 900px) {
+    .dash-header { padding: 10px 12px; gap: 8px; }
+    .filter-panel { padding: 8px 12px; gap: 8px; }
+    .stats-bar { padding: 8px 12px; gap: 10px; }
+    .table-container { padding: 0 6px 12px; }
+    .filter-input { width: 80px; }
+    .filter-input-wide { width: 110px; }
+  }
+  @media (max-width: 640px) {
+    .dash-header { flex-direction: column; align-items: stretch; }
+    .dash-controls { justify-content: flex-start; }
+    .ctrl-btn { padding: 5px 10px; font-size: 0.7rem; }
+    .ctrl-select { font-size: 0.72rem; }
+    .filter-panel { flex-direction: column; gap: 6px; }
+    .filter-group { flex-direction: row; align-items: center; gap: 6px; width: 100%; }
+    .filter-label { min-width: 55px; }
+    .filter-input, .filter-input-wide { flex: 1; width: auto; }
+    .filter-select { flex: 1; }
+    .stats-bar { gap: 8px; }
+    .stat-value { font-size: 0.82rem; }
+    .stat-label { font-size: 0.55rem; }
+    td, th { padding: 5px 6px; font-size: 0.65rem; }
+    .sj-badge { font-size: 0.6rem; padding: 1px 4px; }
+    /* Hide less important columns on mobile */
+    .col-name, .col-rvol, .col-volmcap, .col-peakmin, .col-session { display: none; }
+  }
+  @media (max-width: 380px) {
+    td, th { padding: 4px 4px; font-size: 0.6rem; }
+    .ctrl-btn { padding: 4px 8px; font-size: 0.65rem; }
   }
 </style>
 </head>
@@ -109,7 +143,7 @@
 <div class="auth-gate" id="authGate">
   <div class="auth-box">
     <h1>SJ Admin</h1>
-    <p>Logger Dashboard — Enter admin key to continue</p>
+    <p>Logger Dashboard — Enter admin key</p>
     <input type="password" class="auth-input" id="authKey" placeholder="Admin key" autocomplete="off" />
     <button class="auth-btn" id="authBtn">Enter</button>
     <div class="auth-error" id="authError">Invalid key</div>
@@ -117,33 +151,114 @@
 </div>
 
 <div class="dashboard" id="dashboard">
-    <header class="dash-header">
-        <a href="/" aria-label="StockJelli Home" style="text-decoration:none;display:flex;align-items:center;gap:10px;">
-          <img src="/StockJelli-S-Logo.png" alt="StockJelli" width="28" height="28" style="border-radius:6px;" />
-          <span class="dash-title">SJ Logger</span>
-        </a>
+  <header class="dash-header">
+    <a href="/" class="dash-brand" aria-label="StockJelli Home">
+      <img src="/StockJelli-S-Logo.png" alt="" width="26" height="26" />
+      <span class="dash-title">SJ Logger</span>
+    </a>
     <div class="dash-controls">
       <button class="ctrl-btn active" id="modeStocks" data-mode="stocks">Stocks</button>
       <button class="ctrl-btn" id="modeCrypto" data-mode="crypto">Crypto</button>
       <select class="ctrl-select" id="weekSelect"></select>
-      <button class="ctrl-btn" id="todayBtn">Today</button>
-      <label style="display:flex;align-items:center;gap:6px;font-size:0.75rem;color:var(--muted);cursor:pointer;">
-        <input type="checkbox" id="showNearMisses" style="accent-color:var(--accent);" /> Near-misses
+      <button class="ctrl-btn ctrl-btn-today" id="todayBtn">Today</button>
+      <label style="display:flex;align-items:center;gap:5px;font-size:0.7rem;color:var(--muted);cursor:pointer;">
+        <input type="checkbox" id="showNearMisses" style="accent-color:var(--accent);" /> Misses
       </label>
-      <span id="autoRefreshIndicator" style="font-size:0.65rem;color:var(--muted);font-family:var(--mono);display:none;">⟳ <span id="refreshCountdown"></span></span>
-      <button class="ctrl-btn ctrl-btn-copy" id="copyJsonBtn">📋 Copy JSON</button>
-      <button class="ctrl-btn ctrl-btn-copy" id="copyCsvBtn">📋 Copy CSV</button>
+      <span class="refresh-info" id="refreshInfo" style="display:none;">
+        <span class="refresh-dot"></span>
+        <span id="refreshCountdown"></span>
+      </span>
+      <button class="ctrl-btn ctrl-btn-copy" id="copyJsonBtn">📋 JSON</button>
+      <button class="ctrl-btn ctrl-btn-copy" id="copyCsvBtn">📋 CSV</button>
     </div>
   </header>
 
+  <!-- Filter Panel -->
+  <div class="filter-panel" id="filterPanel">
+    <div class="filter-group">
+      <span class="filter-label">Symbol</span>
+      <input type="text" class="filter-input" id="filterSymbol" placeholder="e.g. NVDA" />
+    </div>
+    <div class="filter-group">
+      <span class="filter-label">MCap Min</span>
+      <select class="filter-select" id="filterMcapMin">
+        <option value="0">Any</option>
+        <option value="100000000">$100M+</option>
+        <option value="500000000">$500M+</option>
+        <option value="1000000000">$1B+</option>
+        <option value="5000000000">$5B+</option>
+        <option value="10000000000">$10B+</option>
+        <option value="50000000000">$50B+</option>
+      </select>
+    </div>
+    <div class="filter-group">
+      <span class="filter-label">MCap Max</span>
+      <select class="filter-select" id="filterMcapMax">
+        <option value="0">Any</option>
+        <option value="500000000">≤$500M</option>
+        <option value="1000000000">≤$1B</option>
+        <option value="5000000000">≤$5B</option>
+        <option value="10000000000">≤$10B</option>
+        <option value="50000000000">≤$50B</option>
+        <option value="500000000000">≤$500B</option>
+      </select>
+    </div>
+    <div class="filter-group">
+      <span class="filter-label">Vol Min</span>
+      <select class="filter-select" id="filterVolMin">
+        <option value="0">Any</option>
+        <option value="500000">500K+</option>
+        <option value="1000000">1M+</option>
+        <option value="5000000">5M+</option>
+        <option value="10000000">10M+</option>
+        <option value="50000000">50M+</option>
+      </select>
+    </div>
+    <div class="filter-group">
+      <span class="filter-label">SJ Min</span>
+      <select class="filter-select" id="filterSjMin">
+        <option value="0">Any</option>
+        <option value="40">40+</option>
+        <option value="50">50+</option>
+        <option value="60">60+</option>
+        <option value="70">70+</option>
+      </select>
+    </div>
+    <div class="filter-group">
+      <span class="filter-label">% Chg Min</span>
+      <input type="number" class="filter-input" id="filterPctMin" placeholder="e.g. 5" step="0.5" />
+    </div>
+    <div class="filter-group">
+      <span class="filter-label">Range Min</span>
+      <select class="filter-select" id="filterRangeMin">
+        <option value="0">Any</option>
+        <option value="0.5">50%+</option>
+        <option value="0.6">60%+</option>
+        <option value="0.7">70%+</option>
+        <option value="0.8">80%+</option>
+      </select>
+    </div>
+    <div class="filter-group">
+      <span class="filter-label">Session</span>
+      <select class="filter-select" id="filterSession">
+        <option value="">Any</option>
+        <option value="open">Open</option>
+        <option value="premarket">Premarket</option>
+        <option value="afterhours">After-Hours</option>
+      </select>
+    </div>
+    <button class="filter-reset" id="filterResetBtn">✕ Reset</button>
+    <span class="filter-count" id="filterCount"></span>
+  </div>
+
   <div class="stats-bar" id="statsBar">
-    <div class="stat"><span class="stat-label">Entries</span><span class="stat-value" id="statEntries">—</span></div>
+    <div class="stat"><span class="stat-label">Showing</span><span class="stat-value" id="statEntries">—</span></div>
     <div class="stat"><span class="stat-label">Qualified</span><span class="stat-value green" id="statQualified">—</span></div>
     <div class="stat"><span class="stat-label">Near-Miss</span><span class="stat-value amber" id="statNearMiss">—</span></div>
     <div class="stat"><span class="stat-label">Avg SJ</span><span class="stat-value" id="statAvgSJ">—</span></div>
-    <div class="stat"><span class="stat-label">Avg Pct</span><span class="stat-value" id="statAvgPct">—</span></div>
-    <div class="stat"><span class="stat-label">Avg VolMcap</span><span class="stat-value" id="statAvgVolMcap">—</span></div>
-    <div class="stat"><span class="stat-label">Midcap Src</span><span class="stat-value" id="statMidcap">—</span></div>
+    <div class="stat"><span class="stat-label">Avg %</span><span class="stat-value" id="statAvgPct">—</span></div>
+    <div class="stat"><span class="stat-label">Avg V/MC</span><span class="stat-value" id="statAvgVolMcap">—</span></div>
+    <div class="stat"><span class="stat-label">Midcap</span><span class="stat-value" id="statMidcap">—</span></div>
   </div>
 
   <div class="table-container" id="tableContainer">
@@ -172,12 +287,7 @@
   let countdownTimer = null;
   let nextRefreshAt = null;
 
-  const authGate = document.getElementById('authGate');
-  const dashboard = document.getElementById('dashboard');
-  const authKey = document.getElementById('authKey');
-  const authBtn = document.getElementById('authBtn');
-  const authError = document.getElementById('authError');
-
+  // Auth
   const urlKey = new URLSearchParams(window.location.search).get('key');
   const savedKey = localStorage.getItem('sj_admin_key');
   if (urlKey === ADMIN_KEY || savedKey === ADMIN_KEY) {
@@ -185,25 +295,24 @@
     showDashboard();
   }
 
-  authBtn.addEventListener('click', tryAuth);
-  authKey.addEventListener('keydown', e => { if (e.key === 'Enter') tryAuth(); });
+  document.getElementById('authBtn').addEventListener('click', tryAuth);
+  document.getElementById('authKey').addEventListener('keydown', e => { if (e.key === 'Enter') tryAuth(); });
 
   function tryAuth() {
-    if (authKey.value.trim() === ADMIN_KEY) {
-      localStorage.setItem('sj_admin_key', ADMIN_KEY);
-      showDashboard();
-    } else { authError.style.display = 'block'; }
+    const k = document.getElementById('authKey').value.trim();
+    if (k === ADMIN_KEY) { localStorage.setItem('sj_admin_key', ADMIN_KEY); showDashboard(); }
+    else document.getElementById('authError').style.display = 'block';
   }
 
   function showDashboard() {
-    authGate.style.display = 'none';
-    dashboard.classList.add('visible');
+    document.getElementById('authGate').style.display = 'none';
+    document.getElementById('dashboard').classList.add('visible');
     loadWeeks();
   }
 
+  // Mode
   document.getElementById('modeStocks').addEventListener('click', () => setMode('stocks'));
   document.getElementById('modeCrypto').addEventListener('click', () => setMode('crypto'));
-
   function setMode(mode) {
     currentMode = mode;
     document.querySelectorAll('[data-mode]').forEach(b => b.classList.toggle('active', b.dataset.mode === mode));
@@ -211,45 +320,75 @@
     else loadReport();
   }
 
+  // Week
   const weekSelect = document.getElementById('weekSelect');
   weekSelect.addEventListener('change', () => { currentWeek = weekSelect.value; loadReport(); });
 
+  // Near-misses
+  document.getElementById('showNearMisses').addEventListener('change', e => { showNearMisses = e.target.checked; renderTable(); });
+
+  // Today + auto-refresh
   document.getElementById('todayBtn').addEventListener('click', () => {
     todayOnly = !todayOnly;
     document.getElementById('todayBtn').classList.toggle('active', todayOnly);
-    if (todayOnly) startAutoRefresh();
-    else stopAutoRefresh();
+    if (todayOnly) startAutoRefresh(); else stopAutoRefresh();
     renderTable();
   });
 
   function startAutoRefresh() {
     stopAutoRefresh();
-    const INTERVAL = 30 * 60 * 1000; // 30 minutes
-    nextRefreshAt = Date.now() + INTERVAL;
-    document.getElementById('autoRefreshIndicator').style.display = '';
+    const MS = 30 * 60 * 1000;
+    nextRefreshAt = Date.now() + MS;
+    document.getElementById('refreshInfo').style.display = 'flex';
     updateCountdown();
-    countdownTimer = setInterval(updateCountdown, 10_000);
-    autoRefreshTimer = setInterval(() => {
-      loadReport();
-      nextRefreshAt = Date.now() + INTERVAL;
-    }, INTERVAL);
+    countdownTimer = setInterval(updateCountdown, 10000);
+    autoRefreshTimer = setInterval(() => { loadReport(); nextRefreshAt = Date.now() + MS; }, MS);
   }
 
   function stopAutoRefresh() {
-    if (autoRefreshTimer) { clearInterval(autoRefreshTimer); autoRefreshTimer = null; }
-    if (countdownTimer) { clearInterval(countdownTimer); countdownTimer = null; }
-    nextRefreshAt = null;
-    document.getElementById('autoRefreshIndicator').style.display = 'none';
+    if (autoRefreshTimer) clearInterval(autoRefreshTimer);
+    if (countdownTimer) clearInterval(countdownTimer);
+    autoRefreshTimer = countdownTimer = null; nextRefreshAt = null;
+    document.getElementById('refreshInfo').style.display = 'none';
   }
 
   function updateCountdown() {
     if (!nextRefreshAt) return;
-    const remaining = Math.max(0, nextRefreshAt - Date.now());
-    const mins = Math.floor(remaining / 60000);
-    const secs = Math.floor((remaining % 60000) / 1000);
-    document.getElementById('refreshCountdown').textContent = `${mins}m ${secs < 10 ? '0' : ''}${secs}s`;
+    const r = Math.max(0, nextRefreshAt - Date.now());
+    const m = Math.floor(r / 60000);
+    document.getElementById('refreshCountdown').textContent = `${m}m`;
   }
 
+  // Filters — all use change/input events
+  const fEls = {
+    symbol: document.getElementById('filterSymbol'),
+    mcapMin: document.getElementById('filterMcapMin'),
+    mcapMax: document.getElementById('filterMcapMax'),
+    volMin: document.getElementById('filterVolMin'),
+    sjMin: document.getElementById('filterSjMin'),
+    pctMin: document.getElementById('filterPctMin'),
+    rangeMin: document.getElementById('filterRangeMin'),
+    session: document.getElementById('filterSession'),
+  };
+
+  Object.values(fEls).forEach(el => {
+    if (!el) return;
+    el.addEventListener(el.tagName === 'INPUT' ? 'input' : 'change', () => renderTable());
+  });
+
+  document.getElementById('filterResetBtn').addEventListener('click', () => {
+    fEls.symbol.value = '';
+    fEls.mcapMin.value = '0';
+    fEls.mcapMax.value = '0';
+    fEls.volMin.value = '0';
+    fEls.sjMin.value = '0';
+    fEls.pctMin.value = '';
+    fEls.rangeMin.value = '0';
+    fEls.session.value = '';
+    renderTable();
+  });
+
+  // Data loading
   async function loadWeeks() {
     try {
       const res = await fetch(`${API}/api/weekly-report/weeks`);
@@ -259,45 +398,75 @@
       if (weeks.length === 0) { weekSelect.innerHTML = '<option>No data</option>'; return; }
       weeks.forEach((w, i) => {
         const opt = document.createElement('option');
-        opt.value = w;
-        opt.textContent = w + (i === 0 ? ' (latest)' : '');
+        opt.value = w; opt.textContent = w + (i === 0 ? ' (latest)' : '');
         weekSelect.appendChild(opt);
       });
       currentWeek = weeks[0];
       loadReport();
     } catch (e) {
-      console.error('Failed to load weeks:', e);
-      document.getElementById('tableContainer').innerHTML = '<div class="empty-state"><h3>Failed to load weeks</h3><p>' + e.message + '</p></div>';
+      document.getElementById('tableContainer').innerHTML = '<div class="empty-state"><h3>Failed to load</h3><p>' + e.message + '</p></div>';
     }
   }
 
   async function loadReport() {
-    const container = document.getElementById('tableContainer');
-    container.innerHTML = '<div class="loading">Loading data...</div>';
+    document.getElementById('tableContainer').innerHTML = '<div class="loading">Loading data...</div>';
     try {
       const res = await fetch(`${API}/api/weekly-report?week=${currentWeek || ''}`);
       reportData = await res.json();
       extractEntries();
       renderTable();
     } catch (e) {
-      container.innerHTML = '<div class="empty-state"><h3>Failed to load</h3><p>' + e.message + '</p></div>';
+      document.getElementById('tableContainer').innerHTML = '<div class="empty-state"><h3>Failed</h3><p>' + e.message + '</p></div>';
     }
   }
 
   function extractEntries() {
     if (!reportData) { allEntries = []; return; }
-    // Shape: { week, stocks: { allEntries, entriesByDate, outcomeStats }, crypto: { ... } }
-    const modeData = reportData[currentMode];
-    allEntries = modeData?.allEntries || [];
+    allEntries = reportData[currentMode]?.allEntries || [];
   }
 
   function getFilteredEntries() {
     let entries = allEntries;
     if (!showNearMisses) entries = entries.filter(e => e.qualifiedAtEntry !== false);
+
+    // Today filter
     if (todayOnly) {
-      const today = new Date().toLocaleDateString('en-CA', { timeZone: 'America/New_York' }); // YYYY-MM-DD
+      const today = new Date().toLocaleDateString('en-CA', { timeZone: 'America/New_York' });
       entries = entries.filter(e => e.date === today);
     }
+
+    // Symbol search
+    const sym = (fEls.symbol.value || '').trim().toUpperCase();
+    if (sym) entries = entries.filter(e => (e.symbol || '').includes(sym));
+
+    // MCap min
+    const mcMin = Number(fEls.mcapMin.value) || 0;
+    if (mcMin > 0) entries = entries.filter(e => (e.marketCapAtEntry || 0) >= mcMin);
+
+    // MCap max
+    const mcMax = Number(fEls.mcapMax.value) || 0;
+    if (mcMax > 0) entries = entries.filter(e => (e.marketCapAtEntry || Infinity) <= mcMax);
+
+    // Volume min
+    const vMin = Number(fEls.volMin.value) || 0;
+    if (vMin > 0) entries = entries.filter(e => (e.volumeAtEntry || 0) >= vMin);
+
+    // SJ min
+    const sjMin = Number(fEls.sjMin.value) || 0;
+    if (sjMin > 0) entries = entries.filter(e => (e.sjScoreAtEntry || 0) >= sjMin);
+
+    // Pct min
+    const pctMin = parseFloat(fEls.pctMin.value);
+    if (pctMin > 0) entries = entries.filter(e => (e.pctChangeAtEntry || 0) >= pctMin);
+
+    // Range min
+    const rMin = parseFloat(fEls.rangeMin.value) || 0;
+    if (rMin > 0) entries = entries.filter(e => (e.rangePositionAtEntry || 0) >= rMin);
+
+    // Session
+    const sess = fEls.session.value;
+    if (sess) entries = entries.filter(e => (e.marketSessionAtEntry || '') === sess);
+
     return entries;
   }
 
@@ -305,26 +474,28 @@
     const container = document.getElementById('tableContainer');
     const entries = getFilteredEntries();
 
+    // Stats
     const qualified = entries.filter(e => e.qualifiedAtEntry !== false);
     const nearMiss = allEntries.filter(e => e.qualifiedAtEntry === false);
-    const sjScores = qualified.map(e => e.sjScoreAtEntry).filter(s => s != null);
-    const pcts = qualified.map(e => e.pctChangeAtEntry).filter(p => p != null);
-    const vmrs = qualified.map(e => e.volMcapRatioAtEntry).filter(v => v != null);
-    const midcapCount = qualified.filter(e => e.source === 'midcap').length;
+    const sjArr = qualified.map(e => e.sjScoreAtEntry).filter(s => s != null);
+    const pctArr = qualified.map(e => e.pctChangeAtEntry).filter(p => p != null);
+    const vmrArr = qualified.map(e => e.volMcapRatioAtEntry).filter(v => v != null);
 
     document.getElementById('statEntries').textContent = entries.length;
     document.getElementById('statQualified').textContent = qualified.length;
     document.getElementById('statNearMiss').textContent = nearMiss.length;
-    document.getElementById('statAvgSJ').textContent = sjScores.length ? (sjScores.reduce((a, b) => a + b, 0) / sjScores.length).toFixed(1) : '—';
-    document.getElementById('statAvgPct').textContent = pcts.length ? (pcts.reduce((a, b) => a + b, 0) / pcts.length).toFixed(1) + '%' : '—';
-    document.getElementById('statAvgVolMcap').textContent = vmrs.length ? (vmrs.reduce((a, b) => a + b, 0) / vmrs.length * 100).toFixed(2) + '%' : '—';
-    document.getElementById('statMidcap').textContent = midcapCount;
+    document.getElementById('statAvgSJ').textContent = sjArr.length ? (sjArr.reduce((a, b) => a + b, 0) / sjArr.length).toFixed(1) : '—';
+    document.getElementById('statAvgPct').textContent = pctArr.length ? (pctArr.reduce((a, b) => a + b, 0) / pctArr.length).toFixed(1) + '%' : '—';
+    document.getElementById('statAvgVolMcap').textContent = vmrArr.length ? (vmrArr.reduce((a, b) => a + b, 0) / vmrArr.length * 100).toFixed(2) + '%' : '—';
+    document.getElementById('statMidcap').textContent = qualified.filter(e => e.source === 'midcap').length;
+    document.getElementById('filterCount').textContent = entries.length !== allEntries.length ? `${entries.length}/${allEntries.length}` : '';
 
     if (entries.length === 0) {
-      container.innerHTML = '<div class="empty-state"><h3>No entries</h3><p>No data for this week/mode.' + (allEntries.length > 0 && !showNearMisses ? ' Try enabling Near-misses.' : '') + '</p></div>';
+      container.innerHTML = '<div class="empty-state"><h3>No entries</h3><p>No data matches filters.</p></div>';
       return;
     }
 
+    // Sort
     const sorted = [...entries].sort((a, b) => {
       let va = a[sortCol], vb = b[sortCol];
       if (va == null) va = sortDir === 'asc' ? Infinity : -Infinity;
@@ -340,20 +511,21 @@
       'peakPctChange','peakMinutesAfterEntry',
       'marketSessionAtEntry','enteredAt','qualifiedAtEntry'
     ];
-
     const outcomeKeys = ['outcome_5m','outcome_15m','outcome_30m','outcome_1h','outcome_2h','outcome_4h','outcome_6h'];
     const hasOutcomes = entries.some(e => e.outcomes && Object.keys(e.outcomes).length > 0);
     const cols = hasOutcomes ? [...baseCols, ...outcomeKeys] : baseCols;
 
+    // Mobile-responsive class mapping for hiding columns
+    const colClass = {
+      name: 'col-name', rvolAtEntry: 'col-rvol', volMcapRatioAtEntry: 'col-volmcap',
+      peakMinutesAfterEntry: 'col-peakmin', marketSessionAtEntry: 'col-session',
+    };
+
     const colLabels = {
-      symbol:'Symbol', name:'Name', date:'Date',
-      priceAtEntry:'Price', pctChangeAtEntry:'% Chg',
-      volumeAtEntry:'Volume', marketCapAtEntry:'MCap',
-      sjScoreAtEntry:'SJ', rangePositionAtEntry:'Range',
-      rvolAtEntry:'RVOL', volMcapRatioAtEntry:'Vol/MCap',
-      peakPctChange:'Peak%', peakMinutesAfterEntry:'PeakMin',
-      marketSessionAtEntry:'Session', enteredAt:'Time',
-      qualifiedAtEntry:'Qual',
+      symbol:'Sym', name:'Name', date:'Date', priceAtEntry:'Price', pctChangeAtEntry:'%Chg',
+      volumeAtEntry:'Vol', marketCapAtEntry:'MCap', sjScoreAtEntry:'SJ', rangePositionAtEntry:'Rng',
+      rvolAtEntry:'RVOL', volMcapRatioAtEntry:'V/MC', peakPctChange:'Pk%', peakMinutesAfterEntry:'PkM',
+      marketSessionAtEntry:'Sess', enteredAt:'Time', qualifiedAtEntry:'Q',
       outcome_5m:'5m', outcome_15m:'15m', outcome_30m:'30m',
       outcome_1h:'1h', outcome_2h:'2h', outcome_4h:'4h', outcome_6h:'6h',
     };
@@ -361,18 +533,20 @@
     let html = '<table><thead><tr>';
     for (const col of cols) {
       const arrow = sortCol === col ? (sortDir === 'asc' ? '↑' : '↓') : '';
-      const cls = sortCol === col ? ' class="sorted"' : '';
-      html += `<th${cls} data-col="${col}">${colLabels[col] || col}<span class="sort-arrow">${arrow}</span></th>`;
+      const cls = [sortCol === col ? 'sorted' : '', colClass[col] || ''].filter(Boolean).join(' ');
+      html += `<th class="${cls}" data-col="${col}">${colLabels[col] || col}<span class="sort-arrow">${arrow}</span></th>`;
     }
     html += '</tr></thead><tbody>';
 
     for (const e of sorted) {
       const rowCls = e.qualifiedAtEntry === false ? 'near-miss' : '';
       html += `<tr class="${rowCls}">`;
-      for (const col of cols) html += '<td>' + formatCell(col, e, e[col]) + '</td>';
+      for (const col of cols) {
+        const cc = colClass[col] || '';
+        html += `<td class="${cc}">` + formatCell(col, e, e[col]) + '</td>';
+      }
       html += '</tr>';
     }
-
     html += '</tbody></table>';
     container.innerHTML = html;
 
@@ -388,37 +562,33 @@
 
   function formatCell(col, entry, val) {
     if (col.startsWith('outcome_')) {
-      const outcome = entry.outcomes?.[col];
-      if (!outcome || outcome.pctFromEntry == null) return '<span class="outcome-na">—</span>';
-      const p = outcome.pctFromEntry;
-      const cls = p > 0 ? 'outcome-pos' : p < 0 ? 'outcome-neg' : 'outcome-na';
-      return `<span class="${cls}">${p > 0 ? '+' : ''}${p.toFixed(2)}%</span>`;
+      const o = entry.outcomes?.[col];
+      if (!o || o.pctFromEntry == null) return '<span class="outcome-na">—</span>';
+      const p = o.pctFromEntry;
+      return `<span class="${p > 0 ? 'outcome-pos' : p < 0 ? 'outcome-neg' : 'outcome-na'}">${p > 0 ? '+' : ''}${p.toFixed(2)}%</span>`;
     }
     if (val === null || val === undefined) return '<span style="color:var(--muted)">—</span>';
     switch (col) {
       case 'symbol': return `<span class="sym">${val}</span>`;
-      case 'name': return String(val).length > 18 ? String(val).slice(0, 16) + '…' : String(val);
-      case 'date': return String(val);
+      case 'name': return String(val).length > 16 ? String(val).slice(0, 14) + '…' : String(val);
+      case 'date': return String(val).slice(5); // MM-DD
       case 'priceAtEntry': return '$' + Number(val).toFixed(val < 1 ? 4 : 2);
-      case 'pctChangeAtEntry':
-      case 'peakPctChange': {
-        const pct = Number(val);
-        const cls = pct > 0 ? 'pct-up' : pct < 0 ? 'pct-down' : 'pct-flat';
-        return `<span class="${cls}">${pct > 0 ? '+' : ''}${pct.toFixed(2)}%</span>`;
+      case 'pctChangeAtEntry': case 'peakPctChange': {
+        const p = Number(val);
+        return `<span class="${p > 0 ? 'pct-up' : p < 0 ? 'pct-down' : 'pct-flat'}">${p > 0 ? '+' : ''}${p.toFixed(1)}%</span>`;
       }
-      case 'volumeAtEntry':
-      case 'marketCapAtEntry': return fmtCompact(val);
-      case 'sjScoreAtEntry': {
-        const s = Number(val);
-        const tier = s >= 75 ? 'sj-high' : s >= 60 ? 'sj-mid' : 'sj-low';
-        return `<span class="sj-badge ${tier}">${s}</span>`;
-      }
+      case 'volumeAtEntry': case 'marketCapAtEntry': return fmtC(val);
+      case 'sjScoreAtEntry': { const s = Number(val); return `<span class="sj-badge ${s >= 75 ? 'sj-high' : s >= 60 ? 'sj-mid' : 'sj-low'}">${s}</span>`; }
       case 'rangePositionAtEntry': return Math.round(Number(val) * 100) + '%';
       case 'rvolAtEntry': return val ? Number(val).toFixed(1) + 'x' : '<span style="color:var(--muted)">—</span>';
-      case 'volMcapRatioAtEntry': return (Number(val) * 100).toFixed(2) + '%';
+      case 'volMcapRatioAtEntry': return (Number(val) * 100).toFixed(1) + '%';
       case 'peakMinutesAfterEntry': return val + 'm';
-      case 'marketSessionAtEntry': return String(val);
-      case 'qualifiedAtEntry': return val === false ? '<span class="qualified-no">miss</span>' : '✓';
+      case 'marketSessionAtEntry': {
+        const s = String(val);
+        const cls = s === 'open' ? 'session-open' : s === 'premarket' ? 'session-premarket' : s === 'afterhours' ? 'session-afterhours' : '';
+        return `<span class="session-tag ${cls}">${s}</span>`;
+      }
+      case 'qualifiedAtEntry': return val === false ? '<span class="qualified-no">✕</span>' : '✓';
       case 'enteredAt':
         try { return new Date(val).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true }); }
         catch { return val; }
@@ -426,56 +596,51 @@
     }
   }
 
-  function fmtCompact(n) {
-    const v = Number(n);
-    if (!isFinite(v)) return '—';
-    if (v >= 1e12) return '$' + (v / 1e12).toFixed(1) + 'T';
-    if (v >= 1e9) return '$' + (v / 1e9).toFixed(1) + 'B';
-    if (v >= 1e6) return '$' + (v / 1e6).toFixed(0) + 'M';
-    if (v >= 1e3) return '$' + (v / 1e3).toFixed(0) + 'K';
+  function fmtC(n) {
+    const v = Number(n); if (!isFinite(v)) return '—';
+    if (v >= 1e12) return '$' + (v/1e12).toFixed(1) + 'T';
+    if (v >= 1e9) return '$' + (v/1e9).toFixed(1) + 'B';
+    if (v >= 1e6) return '$' + (v/1e6).toFixed(0) + 'M';
+    if (v >= 1e3) return '$' + (v/1e3).toFixed(0) + 'K';
     return '$' + v.toFixed(0);
   }
 
+  // Copy
   document.getElementById('copyJsonBtn').addEventListener('click', () => {
-    copyToClipboard(JSON.stringify(getFilteredEntries(), null, 2), 'copyJsonBtn');
+    copyClip(JSON.stringify(getFilteredEntries(), null, 2), 'copyJsonBtn', '📋 JSON');
   });
-
   document.getElementById('copyCsvBtn').addEventListener('click', () => {
     const entries = getFilteredEntries();
-    if (entries.length === 0) return;
-    const outcomeKeys = ['outcome_5m','outcome_15m','outcome_30m','outcome_1h','outcome_2h','outcome_4h','outcome_6h'];
-    const baseKeys = Object.keys(entries[0]).filter(k => k !== 'outcomes');
-    const allKeys = [...baseKeys, ...outcomeKeys];
-    const header = allKeys.join(',');
-    const rows = entries.map(e => allKeys.map(k => {
+    if (!entries.length) return;
+    const oKeys = ['outcome_5m','outcome_15m','outcome_30m','outcome_1h','outcome_2h','outcome_4h','outcome_6h'];
+    const bKeys = Object.keys(entries[0]).filter(k => k !== 'outcomes');
+    const aKeys = [...bKeys, ...oKeys];
+    const rows = entries.map(e => aKeys.map(k => {
       if (k.startsWith('outcome_')) { const o = e.outcomes?.[k]; return o?.pctFromEntry != null ? o.pctFromEntry : ''; }
-      const v = e[k];
-      if (v === null || v === undefined) return '';
+      const v = e[k]; if (v == null) return '';
       if (typeof v === 'object') return JSON.stringify(v).replace(/,/g, ';');
-      if (typeof v === 'string' && (v.includes(',') || v.includes('"'))) return '"' + v.replace(/"/g, '""') + '"';
+      if (typeof v === 'string' && v.includes(',')) return '"' + v.replace(/"/g, '""') + '"';
       return String(v);
     }).join(','));
-    copyToClipboard([header, ...rows].join('\n'), 'copyCsvBtn');
+    copyClip([aKeys.join(','), ...rows].join('\n'), 'copyCsvBtn', '📋 CSV');
   });
 
-  function copyToClipboard(text, btnId) {
+  function copyClip(text, btnId, label) {
     navigator.clipboard.writeText(text).then(() => {
       const btn = document.getElementById(btnId);
-      btn.classList.add('copied');
-      btn.textContent = '✓ Copied!';
-      showToast(`Copied ${text.length > 1000 ? (text.length / 1024).toFixed(0) + 'KB' : text.length + ' chars'}`);
-      setTimeout(() => { btn.classList.remove('copied'); btn.textContent = btnId === 'copyJsonBtn' ? '📋 Copy JSON' : '📋 Copy CSV'; }, 2000);
+      btn.classList.add('copied'); btn.textContent = '✓ Done';
+      showToast(`Copied ${text.length > 1024 ? (text.length/1024).toFixed(0) + 'KB' : text.length + ' chars'}`);
+      setTimeout(() => { btn.classList.remove('copied'); btn.textContent = label; }, 2000);
     }).catch(() => {
-      const ta = document.createElement('textarea');
-      ta.value = text; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
-      showToast('Copied (fallback)');
+      const ta = document.createElement('textarea'); ta.value = text;
+      document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
+      showToast('Copied');
     });
   }
 
   function showToast(msg) {
-    const toast = document.getElementById('toast');
-    toast.textContent = msg; toast.classList.add('visible');
-    setTimeout(() => toast.classList.remove('visible'), 2000);
+    const t = document.getElementById('toast'); t.textContent = msg; t.classList.add('visible');
+    setTimeout(() => t.classList.remove('visible'), 2000);
   }
 })();
 </script>

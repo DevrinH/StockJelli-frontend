@@ -1437,6 +1437,74 @@ if (highVolOnly && rows) {
     refreshOnce();
   });
 
+// --- Filter Presets ---
+(function initFilterPresets() {
+  const presetsRow = document.getElementById("filterPresets");
+  const presetDefault = document.getElementById("presetDefault");
+  const presetMidCap = document.getElementById("presetMidCap");
+  const presetLargeCap = document.getElementById("presetLargeCap");
+  if (!presetsRow) return;
+
+  function updateVisibility() {
+    presetsRow.style.display = currentMode === "stocks" ? "flex" : "none";
+  }
+  const stocksTableEl = document.getElementById("stocksTable");
+  if (stocksTableEl) {
+    new MutationObserver(updateVisibility).observe(stocksTableEl, { attributes: true, attributeFilter: ["style"] });
+  }
+  updateVisibility();
+
+  function setActive(btn) {
+    [presetDefault, presetMidCap, presetLargeCap].forEach(b => b?.classList.remove("preset-active"));
+    btn?.classList.add("preset-active");
+  }
+
+  presetDefault?.addEventListener("click", () => {
+    setActive(presetDefault);
+    const state = filterState.stocks;
+    const d = MODE_DEFAULTS.stocks;
+    state.mcapTouched = false;
+    state.mcapValue = d.mcapDial;
+    state.priceTouched = false;
+    state.priceValue = d.priceMax;
+    state.volTouched = false;
+    state.volValue = d.volMin;
+    state.pctMinOverride = null;
+    setUiDefaultsForMode("stocks");
+    refreshOnce();
+  });
+
+  presetMidCap?.addEventListener("click", () => {
+    setActive(presetMidCap);
+    filterState.stocks.mcapTouched = true;
+    filterState.stocks.mcapValue = 270;
+    filterState.stocks.priceTouched = true;
+    filterState.stocks.priceValue = 5000;
+    filterState.stocks.volTouched = true;
+    filterState.stocks.volValue = 500_000;
+    filterState.stocks.pctMinOverride = 3;
+    setMcapUiForMode("stocks");
+    setPriceUiForMode("stocks");
+    setVolumeUiForMode("stocks");
+    refreshOnce();
+  });
+
+  presetLargeCap?.addEventListener("click", () => {
+    setActive(presetLargeCap);
+    filterState.stocks.mcapTouched = true;
+    filterState.stocks.mcapValue = 541;
+    filterState.stocks.priceTouched = true;
+    filterState.stocks.priceValue = 5000;
+    filterState.stocks.volTouched = true;
+    filterState.stocks.volValue = 500_000;
+    filterState.stocks.pctMinOverride = 3;
+    setMcapUiForMode("stocks");
+    setPriceUiForMode("stocks");
+    setVolumeUiForMode("stocks");
+    refreshOnce();
+  });
+})();
+
   // ----------------------------
   // Legal modals (Privacy / Terms)
   // ----------------------------

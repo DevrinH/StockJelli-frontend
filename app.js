@@ -1047,11 +1047,12 @@ if (marketSessionText) {
   const filterState = {
     stocks: {
       mcapTouched: false,
-      mcapValue: MODE_DEFAULTS.stocks.mcapDial,  // Now uses dial
+      mcapValue: MODE_DEFAULTS.stocks.mcapDial,
       priceTouched: false,
       priceValue: MODE_DEFAULTS.stocks.priceMax,
       volTouched: false,
       volValue: MODE_DEFAULTS.stocks.volMin,
+      pctMinOverride: null,
     },
     crypto: {
       mcapTouched: false,
@@ -1060,6 +1061,7 @@ if (marketSessionText) {
       priceValue: MODE_DEFAULTS.crypto.priceMax,
       volTouched: false,
       volValue: MODE_DEFAULTS.crypto.volMin,
+      pctMinOverride: null,
     },
   };
 
@@ -1211,7 +1213,7 @@ if (marketSessionText) {
     const highVolumeOnly = filterEls.highVolChk ? !!filterEls.highVolChk.checked : false;
   
     const limit = d.limit;
-    const pctMin = d.pctMin;
+    const pctMin = filterState[mode].pctMinOverride ?? d.pctMin;
   
     const volMin = filterEls.volRange ? Number(filterEls.volRange.value) : d.volMin;
     const priceMax = filterEls.priceRange ? Number(filterEls.priceRange.value) : d.priceMax;
@@ -1420,7 +1422,6 @@ if (highVolOnly && rows) {
   filterEls.applyBtn?.addEventListener("click", () => refreshOnce());
 
   filterEls.resetBtn?.addEventListener("click", () => {
-    // Reset state for current mode
     const state = filterState[currentMode];
     const d = MODE_DEFAULTS[currentMode];
     
@@ -1430,6 +1431,7 @@ if (highVolOnly && rows) {
     state.priceValue = d.priceMax;
     state.volTouched = false;
     state.volValue = d.volMin;
+    state.pctMinOverride = null;
     
     setUiDefaultsForMode(currentMode);
     refreshOnce();

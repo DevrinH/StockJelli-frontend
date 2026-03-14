@@ -3113,3 +3113,49 @@ tbody tr:nth-child(2) .whale-indicator {
     color: rgba(255, 90, 90, 0.85);
   }
 }
+
+.filter-presets {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+  margin-bottom: 4px;
+  flex-wrap: wrap;
+}
+
+.filter-presets-label {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.35);
+  font-weight: 500;
+}
+
+.filter-preset-btn {
+  padding: 4px 12px;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.03);
+  color: rgba(255, 255, 255, 0.55);
+  font-size: 0.72rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.filter-preset-btn:hover {
+  background: rgba(77, 163, 255, 0.08);
+  border-color: rgba(77, 163, 255, 0.2);
+  color: rgba(77, 163, 255, 0.9);
+}
+
+.filter-preset-btn.preset-active {
+  background: rgba(77, 163, 255, 0.12);
+  border-color: rgba(77, 163, 255, 0.3);
+  color: rgba(77, 163, 255, 0.95);
+}
+
+@media (max-width: 640px) {
+  .filter-presets { gap: 6px; }
+  .filter-presets-label { font-size: 0.68rem; }
+  .filter-preset-btn { padding: 3px 10px; font-size: 0.65rem; }
+}

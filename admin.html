@@ -31,296 +31,70 @@
     min-height: 100vh;
   }
 
-  /* ── Auth Gate ── */
-  .auth-gate {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 100vh;
-    padding: 20px;
-  }
-
-  .auth-box {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 40px;
-    max-width: 400px;
-    width: 100%;
-    text-align: center;
-  }
-
-  .auth-box h1 {
-    font-size: 1.4rem;
-    font-weight: 700;
-    margin-bottom: 8px;
-    background: linear-gradient(135deg, #e2e8f0, #3b82f6);
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-  }
-
+  .auth-gate { display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 20px; }
+  .auth-box { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 40px; max-width: 400px; width: 100%; text-align: center; }
+  .auth-box h1 { font-size: 1.4rem; font-weight: 700; margin-bottom: 8px; background: linear-gradient(135deg, #e2e8f0, #3b82f6); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
   .auth-box p { color: var(--muted); font-size: 0.85rem; margin-bottom: 20px; }
-
-  .auth-input {
-    width: 100%;
-    padding: 12px 16px;
-    background: var(--bg);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    color: var(--text);
-    font-family: var(--mono);
-    font-size: 0.9rem;
-    outline: none;
-    transition: border-color 0.2s;
-  }
-
+  .auth-input { width: 100%; padding: 12px 16px; background: var(--bg); border: 1px solid var(--border); border-radius: 10px; color: var(--text); font-family: var(--mono); font-size: 0.9rem; outline: none; transition: border-color 0.2s; }
   .auth-input:focus { border-color: var(--accent); }
   .auth-input::placeholder { color: #334155; }
-
-  .auth-btn {
-    width: 100%;
-    padding: 12px;
-    margin-top: 12px;
-    background: var(--accent);
-    color: #fff;
-    border: none;
-    border-radius: 10px;
-    font-weight: 600;
-    font-size: 0.9rem;
-    cursor: pointer;
-    transition: opacity 0.15s;
-  }
-
+  .auth-btn { width: 100%; padding: 12px; margin-top: 12px; background: var(--accent); color: #fff; border: none; border-radius: 10px; font-weight: 600; font-size: 0.9rem; cursor: pointer; transition: opacity 0.15s; }
   .auth-btn:hover { opacity: 0.85; }
   .auth-error { color: var(--red); font-size: 0.8rem; margin-top: 10px; display: none; }
 
-  /* ── Dashboard ── */
   .dashboard { display: none; }
   .dashboard.visible { display: block; }
 
-  .dash-header {
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    background: rgba(10, 13, 20, 0.92);
-    backdrop-filter: blur(12px);
-    border-bottom: 1px solid var(--border);
-    padding: 14px 24px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 16px;
-    flex-wrap: wrap;
-  }
-
-  .dash-title {
-    font-size: 1rem;
-    font-weight: 700;
-    color: var(--accent);
-    letter-spacing: 0.02em;
-    font-family: var(--mono);
-  }
-
-  .dash-controls {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    flex-wrap: wrap;
-  }
-
-  .ctrl-select {
-    padding: 7px 12px;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    color: var(--text);
-    font-size: 0.8rem;
-    font-family: var(--mono);
-    outline: none;
-    cursor: pointer;
-  }
-
-  .ctrl-btn {
-    padding: 7px 14px;
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    color: var(--text);
-    font-size: 0.78rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.15s;
-    white-space: nowrap;
-  }
-
+  .dash-header { position: sticky; top: 0; z-index: 100; background: rgba(10, 13, 20, 0.92); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); padding: 14px 24px; display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+  .dash-title { font-size: 1rem; font-weight: 700; color: var(--accent); letter-spacing: 0.02em; font-family: var(--mono); }
+  .dash-controls { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .ctrl-select { padding: 7px 12px; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-size: 0.8rem; font-family: var(--mono); outline: none; cursor: pointer; }
+  .ctrl-btn { padding: 7px 14px; background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-size: 0.78rem; font-weight: 600; cursor: pointer; transition: all 0.15s; white-space: nowrap; }
   .ctrl-btn:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
   .ctrl-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
-
-  .ctrl-btn-copy {
-    background: rgba(34, 197, 94, 0.1);
-    border-color: rgba(34, 197, 94, 0.2);
-    color: var(--green);
-  }
+  .ctrl-btn-copy { background: rgba(34, 197, 94, 0.1); border-color: rgba(34, 197, 94, 0.2); color: var(--green); }
   .ctrl-btn-copy:hover { background: var(--green); color: #0a0d14; }
   .ctrl-btn-copy.copied { background: var(--green); color: #0a0d14; }
 
-  /* ── Stats Bar ── */
-  .stats-bar {
-    display: flex;
-    gap: 16px;
-    padding: 12px 24px;
-    border-bottom: 1px solid var(--border);
-    background: var(--surface);
-    flex-wrap: wrap;
-  }
-
-  .stat {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-  }
-
+  .stats-bar { display: flex; gap: 16px; padding: 12px 24px; border-bottom: 1px solid var(--border); background: var(--surface); flex-wrap: wrap; }
+  .stat { display: flex; flex-direction: column; gap: 2px; }
   .stat-label { font-size: 0.65rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; font-weight: 600; }
   .stat-value { font-size: 1rem; font-weight: 700; font-family: var(--mono); }
   .stat-value.green { color: var(--green); }
   .stat-value.red { color: var(--red); }
   .stat-value.amber { color: var(--amber); }
 
-  /* ── Table ── */
-  .table-container {
-    overflow-x: auto;
-    padding: 0 24px 24px;
-  }
-
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 0.78rem;
-    margin-top: 12px;
-  }
-
-  th {
-    position: sticky;
-    top: 56px;
-    background: var(--surface);
-    padding: 10px 12px;
-    text-align: left;
-    font-weight: 600;
-    color: var(--muted);
-    font-size: 0.7rem;
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-    border-bottom: 1px solid var(--border);
-    cursor: pointer;
-    user-select: none;
-    white-space: nowrap;
-    transition: color 0.15s;
-  }
-
+  .table-container { overflow-x: auto; padding: 0 24px 24px; }
+  table { width: 100%; border-collapse: collapse; font-size: 0.78rem; margin-top: 12px; }
+  th { position: sticky; top: 56px; background: var(--surface); padding: 10px 12px; text-align: left; font-weight: 600; color: var(--muted); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.04em; border-bottom: 1px solid var(--border); cursor: pointer; user-select: none; white-space: nowrap; transition: color 0.15s; }
   th:hover { color: var(--accent); }
   th.sorted { color: var(--accent); }
   th .sort-arrow { margin-left: 4px; font-size: 0.65rem; }
-
-  td {
-    padding: 8px 12px;
-    border-bottom: 1px solid var(--border);
-    font-family: var(--mono);
-    font-size: 0.75rem;
-    white-space: nowrap;
-  }
-
+  td { padding: 8px 12px; border-bottom: 1px solid var(--border); font-family: var(--mono); font-size: 0.75rem; white-space: nowrap; }
   tr:hover td { background: rgba(59, 130, 246, 0.04); }
-
-  /* Row coloring based on outcome */
-  tr.outcome-win td { border-left: 3px solid var(--green); }
-  tr.outcome-loss td { border-left: 3px solid var(--red); }
-  tr.outcome-pending td { border-left: 3px solid var(--muted); }
   tr.near-miss td { opacity: 0.5; }
 
   .sym { font-weight: 700; color: #fff; }
   .pct-up { color: var(--green); font-weight: 600; }
   .pct-down { color: var(--red); font-weight: 600; }
   .pct-flat { color: var(--muted); }
-
-  .sj-badge {
-    display: inline-block;
-    padding: 2px 6px;
-    border-radius: 4px;
-    font-weight: 700;
-    font-size: 0.72rem;
-  }
+  .sj-badge { display: inline-block; padding: 2px 6px; border-radius: 4px; font-weight: 700; font-size: 0.72rem; }
   .sj-high { background: rgba(34, 197, 94, 0.12); color: var(--green); }
   .sj-mid { background: rgba(255,255,255,0.06); color: var(--text); }
   .sj-low { background: rgba(100, 116, 139, 0.1); color: var(--muted); }
+  .source-tag { font-size: 0.65rem; padding: 2px 6px; border-radius: 4px; background: rgba(59, 130, 246, 0.1); color: var(--accent); font-weight: 600; }
+  .qualified-no { font-size: 0.65rem; padding: 2px 6px; border-radius: 4px; background: rgba(239, 68, 68, 0.1); color: var(--red); font-weight: 600; }
+  .outcome-pos { color: var(--green); font-weight: 600; }
+  .outcome-neg { color: var(--red); font-weight: 600; }
+  .outcome-na { color: var(--muted); font-size: 0.65rem; }
 
-  .source-tag {
-    font-size: 0.65rem;
-    padding: 2px 6px;
-    border-radius: 4px;
-    background: rgba(59, 130, 246, 0.1);
-    color: var(--accent);
-    font-weight: 600;
-  }
-
-  .qualified-no {
-    font-size: 0.65rem;
-    padding: 2px 6px;
-    border-radius: 4px;
-    background: rgba(239, 68, 68, 0.1);
-    color: var(--red);
-    font-weight: 600;
-  }
-
-  /* ── Empty State ── */
-  .empty-state {
-    text-align: center;
-    padding: 60px 20px;
-    color: var(--muted);
-  }
-
+  .empty-state { text-align: center; padding: 60px 20px; color: var(--muted); }
   .empty-state h3 { font-size: 1.1rem; margin-bottom: 8px; color: var(--text); }
+  .loading { text-align: center; padding: 40px; color: var(--muted); font-family: var(--mono); }
 
-  /* ── Loading ── */
-  .loading {
-    text-align: center;
-    padding: 40px;
-    color: var(--muted);
-    font-family: var(--mono);
-  }
-
-  .loading::after {
-    content: '';
-    animation: dots 1.5s infinite;
-  }
-
-  @keyframes dots {
-    0%, 20% { content: '.'; }
-    40% { content: '..'; }
-    60%, 100% { content: '...'; }
-  }
-
-  /* ── Toast ── */
-  .toast {
-    position: fixed;
-    bottom: 24px;
-    right: 24px;
-    padding: 12px 20px;
-    background: var(--green);
-    color: #0a0d14;
-    font-weight: 600;
-    font-size: 0.85rem;
-    border-radius: 10px;
-    box-shadow: 0 8px 24px rgba(0,0,0,0.4);
-    transform: translateY(80px);
-    opacity: 0;
-    transition: all 0.3s ease;
-    z-index: 1000;
-  }
-
+  .toast { position: fixed; bottom: 24px; right: 24px; padding: 12px 20px; background: var(--green); color: #0a0d14; font-weight: 600; font-size: 0.85rem; border-radius: 10px; box-shadow: 0 8px 24px rgba(0,0,0,0.4); transform: translateY(80px); opacity: 0; transition: all 0.3s ease; z-index: 1000; }
   .toast.visible { transform: translateY(0); opacity: 1; }
 
-  /* ── Responsive ── */
   @media (max-width: 768px) {
     .dash-header { padding: 10px 12px; }
     .stats-bar { padding: 10px 12px; gap: 12px; }
@@ -331,7 +105,6 @@
 </head>
 <body>
 
-<!-- Auth Gate -->
 <div class="auth-gate" id="authGate">
   <div class="auth-box">
     <h1>SJ Admin</h1>
@@ -342,9 +115,7 @@
   </div>
 </div>
 
-<!-- Dashboard -->
 <div class="dashboard" id="dashboard">
-
   <header class="dash-header">
     <span class="dash-title">📊 SJ Logger</span>
     <div class="dash-controls">
@@ -370,9 +141,8 @@
   </div>
 
   <div class="table-container" id="tableContainer">
-    <div class="loading" id="loadingMsg">Loading data</div>
+    <div class="loading">Loading data...</div>
   </div>
-
 </div>
 
 <div class="toast" id="toast">Copied!</div>
@@ -382,28 +152,24 @@
   'use strict';
 
   const API = 'https://api.stockjelli.com';
-  // Simple admin key — change this to your own secret
   const ADMIN_KEY = 'sjadmin2026';
 
-  // State
   let currentMode = 'stocks';
   let currentWeek = null;
+  let reportData = null;
   let allEntries = [];
   let sortCol = 'enteredAt';
   let sortDir = 'desc';
   let showNearMisses = false;
 
-  // Auth
   const authGate = document.getElementById('authGate');
   const dashboard = document.getElementById('dashboard');
   const authKey = document.getElementById('authKey');
   const authBtn = document.getElementById('authBtn');
   const authError = document.getElementById('authError');
 
-  // Check URL param or localStorage
   const urlKey = new URLSearchParams(window.location.search).get('key');
   const savedKey = localStorage.getItem('sj_admin_key');
-
   if (urlKey === ADMIN_KEY || savedKey === ADMIN_KEY) {
     localStorage.setItem('sj_admin_key', ADMIN_KEY);
     showDashboard();
@@ -416,11 +182,7 @@
     if (authKey.value.trim() === ADMIN_KEY) {
       localStorage.setItem('sj_admin_key', ADMIN_KEY);
       showDashboard();
-    } else {
-      authError.style.display = 'block';
-      authKey.classList.add('shake');
-      setTimeout(() => authKey.classList.remove('shake'), 500);
-    }
+    } else { authError.style.display = 'block'; }
   }
 
   function showDashboard() {
@@ -429,26 +191,19 @@
     loadWeeks();
   }
 
-  // Mode toggle
   document.getElementById('modeStocks').addEventListener('click', () => setMode('stocks'));
   document.getElementById('modeCrypto').addEventListener('click', () => setMode('crypto'));
 
   function setMode(mode) {
     currentMode = mode;
-    document.querySelectorAll('[data-mode]').forEach(b => {
-      b.classList.toggle('active', b.dataset.mode === mode);
-    });
-    loadWeeks();
+    document.querySelectorAll('[data-mode]').forEach(b => b.classList.toggle('active', b.dataset.mode === mode));
+    if (reportData) { extractEntries(); renderTable(); }
+    else loadReport();
   }
 
-  // Week selector
   const weekSelect = document.getElementById('weekSelect');
-  weekSelect.addEventListener('change', () => {
-    currentWeek = weekSelect.value;
-    loadReport();
-  });
+  weekSelect.addEventListener('change', () => { currentWeek = weekSelect.value; loadReport(); });
 
-  // Near-misses toggle
   document.getElementById('showNearMisses').addEventListener('change', (e) => {
     showNearMisses = e.target.checked;
     renderTable();
@@ -458,49 +213,46 @@
     try {
       const res = await fetch(`${API}/api/weekly-report/weeks`);
       const data = await res.json();
-      const weeks = (data.weeks || []).filter(w => w.mode === currentMode).map(w => w.weekKey).sort().reverse();
-
+      const weeks = (data.weeks || []).sort().reverse();
       weekSelect.innerHTML = '';
-      if (weeks.length === 0) {
-        weekSelect.innerHTML = '<option>No data</option>';
-        return;
-      }
-
+      if (weeks.length === 0) { weekSelect.innerHTML = '<option>No data</option>'; return; }
       weeks.forEach((w, i) => {
         const opt = document.createElement('option');
         opt.value = w;
         opt.textContent = w + (i === 0 ? ' (latest)' : '');
         weekSelect.appendChild(opt);
       });
-
       currentWeek = weeks[0];
       loadReport();
     } catch (e) {
       console.error('Failed to load weeks:', e);
+      document.getElementById('tableContainer').innerHTML = '<div class="empty-state"><h3>Failed to load weeks</h3><p>' + e.message + '</p></div>';
     }
   }
 
   async function loadReport() {
     const container = document.getElementById('tableContainer');
-    container.innerHTML = '<div class="loading" id="loadingMsg">Loading data</div>';
-
+    container.innerHTML = '<div class="loading">Loading data...</div>';
     try {
-      const res = await fetch(`${API}/api/weekly-report?mode=${currentMode}&week=${currentWeek || ''}`);
-      const data = await res.json();
-      allEntries = data.entries || [];
-      sortCol = 'enteredAt';
-      sortDir = 'desc';
+      const res = await fetch(`${API}/api/weekly-report?week=${currentWeek || ''}`);
+      reportData = await res.json();
+      extractEntries();
       renderTable();
     } catch (e) {
       container.innerHTML = '<div class="empty-state"><h3>Failed to load</h3><p>' + e.message + '</p></div>';
     }
   }
 
+  function extractEntries() {
+    if (!reportData) { allEntries = []; return; }
+    // Shape: { week, stocks: { allEntries, entriesByDate, outcomeStats }, crypto: { ... } }
+    const modeData = reportData[currentMode];
+    allEntries = modeData?.allEntries || [];
+  }
+
   function getFilteredEntries() {
     let entries = allEntries;
-    if (!showNearMisses) {
-      entries = entries.filter(e => e.qualified !== false);
-    }
+    if (!showNearMisses) entries = entries.filter(e => e.qualifiedAtEntry !== false);
     return entries;
   }
 
@@ -508,12 +260,11 @@
     const container = document.getElementById('tableContainer');
     const entries = getFilteredEntries();
 
-    // Update stats
-    const qualified = entries.filter(e => e.qualified !== false);
-    const nearMiss = entries.filter(e => e.qualified === false);
-    const sjScores = qualified.map(e => e.sjScore).filter(s => s != null);
-    const pcts = qualified.map(e => e.pctChange).filter(p => p != null);
-    const vmrs = qualified.map(e => e.volMcapRatio).filter(v => v != null);
+    const qualified = entries.filter(e => e.qualifiedAtEntry !== false);
+    const nearMiss = allEntries.filter(e => e.qualifiedAtEntry === false);
+    const sjScores = qualified.map(e => e.sjScoreAtEntry).filter(s => s != null);
+    const pcts = qualified.map(e => e.pctChangeAtEntry).filter(p => p != null);
+    const vmrs = qualified.map(e => e.volMcapRatioAtEntry).filter(v => v != null);
     const midcapCount = qualified.filter(e => e.source === 'midcap').length;
 
     document.getElementById('statEntries').textContent = entries.length;
@@ -525,32 +276,41 @@
     document.getElementById('statMidcap').textContent = midcapCount;
 
     if (entries.length === 0) {
-      container.innerHTML = '<div class="empty-state"><h3>No entries</h3><p>No data for this week/mode combination.</p></div>';
+      container.innerHTML = '<div class="empty-state"><h3>No entries</h3><p>No data for this week/mode.' + (allEntries.length > 0 && !showNearMisses ? ' Try enabling Near-misses.' : '') + '</p></div>';
       return;
     }
 
-    // Sort
     const sorted = [...entries].sort((a, b) => {
       let va = a[sortCol], vb = b[sortCol];
       if (va == null) va = sortDir === 'asc' ? Infinity : -Infinity;
       if (vb == null) vb = sortDir === 'asc' ? Infinity : -Infinity;
-      if (typeof va === 'string') {
-        return sortDir === 'asc' ? va.localeCompare(vb) : vb.localeCompare(va);
-      }
+      if (typeof va === 'string') return sortDir === 'asc' ? va.localeCompare(vb) : vb.localeCompare(va);
       return sortDir === 'asc' ? va - vb : vb - va;
     });
 
-    const isStock = currentMode === 'stocks';
-    const cols = isStock
-      ? ['symbol','name','price','pctChange','volume','marketCap','sjScore','rangePosition','volMcapRatio','avgVolume','source','marketSession','enteredAt','qualified']
-      : ['symbol','name','price','pctChange','volume','marketCap','sjScore','rangePosition','volMcapRatio','btcPct','totalCryptoPct','enteredAt','qualified'];
+    const baseCols = [
+      'symbol','name','date','priceAtEntry','pctChangeAtEntry',
+      'volumeAtEntry','marketCapAtEntry','sjScoreAtEntry',
+      'rangePositionAtEntry','rvolAtEntry','volMcapRatioAtEntry',
+      'peakPctChange','peakMinutesAfterEntry',
+      'marketSessionAtEntry','enteredAt','qualifiedAtEntry'
+    ];
+
+    const outcomeKeys = ['outcome_5m','outcome_15m','outcome_30m','outcome_1h','outcome_2h','outcome_4h','outcome_6h'];
+    const hasOutcomes = entries.some(e => e.outcomes && Object.keys(e.outcomes).length > 0);
+    const cols = hasOutcomes ? [...baseCols, ...outcomeKeys] : baseCols;
 
     const colLabels = {
-      symbol: 'Symbol', name: 'Name', price: 'Price', pctChange: '% Chg',
-      volume: 'Volume', marketCap: 'MCap', sjScore: 'SJ', rangePosition: 'Range',
-      volMcapRatio: 'Vol/MCap', avgVolume: 'AvgVol', source: 'Source',
-      marketSession: 'Session', enteredAt: 'Entered', qualified: 'Qual',
-      btcPct: 'BTC%', totalCryptoPct: 'Mkt%',
+      symbol:'Symbol', name:'Name', date:'Date',
+      priceAtEntry:'Price', pctChangeAtEntry:'% Chg',
+      volumeAtEntry:'Volume', marketCapAtEntry:'MCap',
+      sjScoreAtEntry:'SJ', rangePositionAtEntry:'Range',
+      rvolAtEntry:'RVOL', volMcapRatioAtEntry:'Vol/MCap',
+      peakPctChange:'Peak%', peakMinutesAfterEntry:'PeakMin',
+      marketSessionAtEntry:'Session', enteredAt:'Time',
+      qualifiedAtEntry:'Qual',
+      outcome_5m:'5m', outcome_15m:'15m', outcome_30m:'30m',
+      outcome_1h:'1h', outcome_2h:'2h', outcome_4h:'4h', outcome_6h:'6h',
     };
 
     let html = '<table><thead><tr>';
@@ -562,90 +322,62 @@
     html += '</tr></thead><tbody>';
 
     for (const e of sorted) {
-      const rowCls = e.qualified === false ? 'near-miss' : '';
+      const rowCls = e.qualifiedAtEntry === false ? 'near-miss' : '';
       html += `<tr class="${rowCls}">`;
-      for (const col of cols) {
-        html += '<td>' + formatCell(col, e[col], e) + '</td>';
-      }
+      for (const col of cols) html += '<td>' + formatCell(col, e, e[col]) + '</td>';
       html += '</tr>';
     }
 
     html += '</tbody></table>';
     container.innerHTML = html;
 
-    // Wire sort headers
     container.querySelectorAll('th[data-col]').forEach(th => {
       th.addEventListener('click', () => {
         const col = th.dataset.col;
-        if (sortCol === col) {
-          sortDir = sortDir === 'asc' ? 'desc' : 'asc';
-        } else {
-          sortCol = col;
-          sortDir = 'desc';
-        }
+        if (sortCol === col) sortDir = sortDir === 'asc' ? 'desc' : 'asc';
+        else { sortCol = col; sortDir = 'desc'; }
         renderTable();
       });
     });
   }
 
-  function formatCell(col, val, entry) {
+  function formatCell(col, entry, val) {
+    if (col.startsWith('outcome_')) {
+      const outcome = entry.outcomes?.[col];
+      if (!outcome || outcome.pctFromEntry == null) return '<span class="outcome-na">—</span>';
+      const p = outcome.pctFromEntry;
+      const cls = p > 0 ? 'outcome-pos' : p < 0 ? 'outcome-neg' : 'outcome-na';
+      return `<span class="${cls}">${p > 0 ? '+' : ''}${p.toFixed(2)}%</span>`;
+    }
     if (val === null || val === undefined) return '<span style="color:var(--muted)">—</span>';
-
     switch (col) {
-      case 'symbol':
-        return `<span class="sym">${val}</span>`;
-
-      case 'name':
-        return String(val).length > 20 ? String(val).slice(0, 18) + '…' : String(val);
-
-      case 'price':
-        return '$' + Number(val).toFixed(val < 1 ? 4 : 2);
-
-      case 'pctChange':
+      case 'symbol': return `<span class="sym">${val}</span>`;
+      case 'name': return String(val).length > 18 ? String(val).slice(0, 16) + '…' : String(val);
+      case 'date': return String(val);
+      case 'priceAtEntry': return '$' + Number(val).toFixed(val < 1 ? 4 : 2);
+      case 'pctChangeAtEntry':
+      case 'peakPctChange': {
         const pct = Number(val);
         const cls = pct > 0 ? 'pct-up' : pct < 0 ? 'pct-down' : 'pct-flat';
         return `<span class="${cls}">${pct > 0 ? '+' : ''}${pct.toFixed(2)}%</span>`;
-
-      case 'volume':
-        return fmtCompact(val);
-
-      case 'marketCap':
-        return fmtCompact(val);
-
-      case 'sjScore':
+      }
+      case 'volumeAtEntry':
+      case 'marketCapAtEntry': return fmtCompact(val);
+      case 'sjScoreAtEntry': {
         const s = Number(val);
         const tier = s >= 75 ? 'sj-high' : s >= 60 ? 'sj-mid' : 'sj-low';
         return `<span class="sj-badge ${tier}">${s}</span>`;
-
-      case 'rangePosition':
-        const rp = Math.round(Number(val) * 100);
-        return `${rp}%`;
-
-      case 'volMcapRatio':
-        return (Number(val) * 100).toFixed(2) + '%';
-
-      case 'avgVolume':
-        return val ? fmtCompact(val) : '<span style="color:var(--muted)">—</span>';
-
-      case 'source':
-        return val === 'midcap' ? '<span class="source-tag">midcap</span>' : (val || 'fmp');
-
-      case 'qualified':
-        return val === false ? '<span class="qualified-no">miss</span>' : '✓';
-
+      }
+      case 'rangePositionAtEntry': return Math.round(Number(val) * 100) + '%';
+      case 'rvolAtEntry': return val ? Number(val).toFixed(1) + 'x' : '<span style="color:var(--muted)">—</span>';
+      case 'volMcapRatioAtEntry': return (Number(val) * 100).toFixed(2) + '%';
+      case 'peakMinutesAfterEntry': return val + 'm';
+      case 'marketSessionAtEntry': return String(val);
+      case 'qualifiedAtEntry': return val === false ? '<span class="qualified-no">miss</span>' : '✓';
       case 'enteredAt':
-        try {
-          const d = new Date(val);
-          return d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
-        } catch { return val; }
-
-      case 'btcPct':
-      case 'totalCryptoPct':
-        const p = Number(val);
-        return `<span class="${p >= 0 ? 'pct-up' : 'pct-down'}">${p >= 0 ? '+' : ''}${p.toFixed(1)}%</span>`;
-
-      default:
-        return String(val);
+        try { return new Date(val).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true }); }
+        catch { return val; }
+      default: return String(val);
     }
   }
 
@@ -659,29 +391,26 @@
     return '$' + v.toFixed(0);
   }
 
-  // Copy JSON
   document.getElementById('copyJsonBtn').addEventListener('click', () => {
-    const entries = getFilteredEntries();
-    const json = JSON.stringify(entries, null, 2);
-    copyToClipboard(json, 'copyJsonBtn');
+    copyToClipboard(JSON.stringify(getFilteredEntries(), null, 2), 'copyJsonBtn');
   });
 
-  // Copy CSV
   document.getElementById('copyCsvBtn').addEventListener('click', () => {
     const entries = getFilteredEntries();
     if (entries.length === 0) return;
-
-    const keys = Object.keys(entries[0]);
-    const header = keys.join(',');
-    const rows = entries.map(e => keys.map(k => {
+    const outcomeKeys = ['outcome_5m','outcome_15m','outcome_30m','outcome_1h','outcome_2h','outcome_4h','outcome_6h'];
+    const baseKeys = Object.keys(entries[0]).filter(k => k !== 'outcomes');
+    const allKeys = [...baseKeys, ...outcomeKeys];
+    const header = allKeys.join(',');
+    const rows = entries.map(e => allKeys.map(k => {
+      if (k.startsWith('outcome_')) { const o = e.outcomes?.[k]; return o?.pctFromEntry != null ? o.pctFromEntry : ''; }
       const v = e[k];
       if (v === null || v === undefined) return '';
+      if (typeof v === 'object') return JSON.stringify(v).replace(/,/g, ';');
       if (typeof v === 'string' && (v.includes(',') || v.includes('"'))) return '"' + v.replace(/"/g, '""') + '"';
       return String(v);
     }).join(','));
-
-    const csv = [header, ...rows].join('\n');
-    copyToClipboard(csv, 'copyCsvBtn');
+    copyToClipboard([header, ...rows].join('\n'), 'copyCsvBtn');
   });
 
   function copyToClipboard(text, btnId) {
@@ -690,30 +419,19 @@
       btn.classList.add('copied');
       btn.textContent = '✓ Copied!';
       showToast(`Copied ${text.length > 1000 ? (text.length / 1024).toFixed(0) + 'KB' : text.length + ' chars'}`);
-      setTimeout(() => {
-        btn.classList.remove('copied');
-        btn.textContent = btnId === 'copyJsonBtn' ? '📋 Copy JSON' : '📋 Copy CSV';
-      }, 2000);
-    }).catch(err => {
-      console.error('Copy failed:', err);
-      // Fallback
+      setTimeout(() => { btn.classList.remove('copied'); btn.textContent = btnId === 'copyJsonBtn' ? '📋 Copy JSON' : '📋 Copy CSV'; }, 2000);
+    }).catch(() => {
       const ta = document.createElement('textarea');
-      ta.value = text;
-      document.body.appendChild(ta);
-      ta.select();
-      document.execCommand('copy');
-      document.body.removeChild(ta);
+      ta.value = text; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
       showToast('Copied (fallback)');
     });
   }
 
   function showToast(msg) {
     const toast = document.getElementById('toast');
-    toast.textContent = msg;
-    toast.classList.add('visible');
+    toast.textContent = msg; toast.classList.add('visible');
     setTimeout(() => toast.classList.remove('visible'), 2000);
   }
-
 })();
 </script>
 </body>

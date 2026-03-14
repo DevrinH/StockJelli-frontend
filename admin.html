@@ -126,9 +126,11 @@
       <button class="ctrl-btn active" id="modeStocks" data-mode="stocks">Stocks</button>
       <button class="ctrl-btn" id="modeCrypto" data-mode="crypto">Crypto</button>
       <select class="ctrl-select" id="weekSelect"></select>
+      <button class="ctrl-btn" id="todayBtn">Today</button>
       <label style="display:flex;align-items:center;gap:6px;font-size:0.75rem;color:var(--muted);cursor:pointer;">
         <input type="checkbox" id="showNearMisses" style="accent-color:var(--accent);" /> Near-misses
       </label>
+      <span id="autoRefreshIndicator" style="font-size:0.65rem;color:var(--muted);font-family:var(--mono);display:none;">⟳ <span id="refreshCountdown"></span></span>
       <button class="ctrl-btn ctrl-btn-copy" id="copyJsonBtn">📋 Copy JSON</button>
       <button class="ctrl-btn ctrl-btn-copy" id="copyCsvBtn">📋 Copy CSV</button>
     </div>
@@ -165,6 +167,10 @@
   let sortCol = 'enteredAt';
   let sortDir = 'desc';
   let showNearMisses = false;
+  let todayOnly = false;
+  let autoRefreshTimer = null;
+  let countdownTimer = null;
+  let nextRefreshAt = null;
 
   const authGate = document.getElementById('authGate');
   const dashboard = document.getElementById('dashboard');
@@ -208,10 +214,41 @@
   const weekSelect = document.getElementById('weekSelect');
   weekSelect.addEventListener('change', () => { currentWeek = weekSelect.value; loadReport(); });
 
-  document.getElementById('showNearMisses').addEventListener('change', (e) => {
-    showNearMisses = e.target.checked;
+  document.getElementById('todayBtn').addEventListener('click', () => {
+    todayOnly = !todayOnly;
+    document.getElementById('todayBtn').classList.toggle('active', todayOnly);
+    if (todayOnly) startAutoRefresh();
+    else stopAutoRefresh();
     renderTable();
   });
+
+  function startAutoRefresh() {
+    stopAutoRefresh();
+    const INTERVAL = 30 * 60 * 1000; // 30 minutes
+    nextRefreshAt = Date.now() + INTERVAL;
+    document.getElementById('autoRefreshIndicator').style.display = '';
+    updateCountdown();
+    countdownTimer = setInterval(updateCountdown, 10_000);
+    autoRefreshTimer = setInterval(() => {
+      loadReport();
+      nextRefreshAt = Date.now() + INTERVAL;
+    }, INTERVAL);
+  }
+
+  function stopAutoRefresh() {
+    if (autoRefreshTimer) { clearInterval(autoRefreshTimer); autoRefreshTimer = null; }
+    if (countdownTimer) { clearInterval(countdownTimer); countdownTimer = null; }
+    nextRefreshAt = null;
+    document.getElementById('autoRefreshIndicator').style.display = 'none';
+  }
+
+  function updateCountdown() {
+    if (!nextRefreshAt) return;
+    const remaining = Math.max(0, nextRefreshAt - Date.now());
+    const mins = Math.floor(remaining / 60000);
+    const secs = Math.floor((remaining % 60000) / 1000);
+    document.getElementById('refreshCountdown').textContent = `${mins}m ${secs < 10 ? '0' : ''}${secs}s`;
+  }
 
   async function loadWeeks() {
     try {
@@ -257,6 +294,10 @@
   function getFilteredEntries() {
     let entries = allEntries;
     if (!showNearMisses) entries = entries.filter(e => e.qualifiedAtEntry !== false);
+    if (todayOnly) {
+      const today = new Date().toLocaleDateString('en-CA', { timeZone: 'America/New_York' }); // YYYY-MM-DD
+      entries = entries.filter(e => e.date === today);
+    }
     return entries;
   }
 

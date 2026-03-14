@@ -711,14 +711,77 @@ function renderCrypto(rows) {
     const mcap = x.marketCap || 0;
     const vol = x.volume || 0;
     const rangePos = x.rangePosition ?? 0.5;
-    const isExtremeGain = pct > 500;
-    const isMassiveGain = pct > 1000;
-    const isCrashedRange = rangePos < 0.20;
-    const isHighVolRatio = mcap > 0 && (vol / mcap) > 1.0;
-    const isMediumVolRatio = mcap > 0 && (vol / mcap) > 0.5;
-    const showWarning = isMassiveGain || (isExtremeGain && isCrashedRange) || (isExtremeGain && isHighVolRatio) || (isCrashedRange && isMediumVolRatio) || (pct > 200 && isCrashedRange && isMediumVolRatio);
-    if (showWarning) {
-      rugWarning = ' <span class="rug-warning" title="⚠️ Elevated risk: extreme move and/or unusual volume vs market cap">⚠️</span>';
+    const volMcapRatio = mcap > 0 ? vol / mcap : 0;
+ 
+    // ── Pump & Dump Warning Signals ──────────────────────────────
+    // Tiered system: red ⚠️ for high confidence, yellow ⚠️ for caution
+    //
+    // KEY INSIGHT from W09-W11 data:
+    //   Most real pump-and-dumps are +50-200%, not +1000%.
+    //   The strongest signal is: big move + crashed range + high vol churn.
+    //   That means it spiked, people dumped, and exit liquidity is drying up.
+ 
+    let warningLevel = 0; // 0 = none, 1 = caution (yellow), 2 = danger (red)
+    let warningReasons = [];
+ 
+    // ── DANGER (red) — high confidence pump-and-dump ──
+    
+    // Massive gain, already crashed from highs
+    if (pct > 200 && rangePos < 0.25) {
+      warningLevel = 2;
+      warningReasons.push("extreme gain + crashed from highs");
+    }
+    // Insane volume churn — vol > 150% of entire market cap
+    if (volMcapRatio > 1.5) {
+      warningLevel = 2;
+      warningReasons.push("volume exceeds 150% of market cap");
+    }
+    // Classic dump pattern: big spike + heavy volume + price fading
+    if (pct > 100 && volMcapRatio > 0.8 && rangePos < 0.30) {
+      warningLevel = 2;
+      warningReasons.push("spike + heavy churn + fading");
+    }
+    // Micro cap + extreme gain = almost always manipulation
+    if (mcap > 0 && mcap < 50e6 && pct > 100) {
+      warningLevel = Math.max(warningLevel, 2);
+      warningReasons.push("micro cap + extreme gain");
+    }
+    // +500% on anything
+    if (pct > 500) {
+      warningLevel = 2;
+      warningReasons.push("gain exceeds 500%");
+    }
+ 
+    // ── CAUTION (yellow) — elevated risk ──
+ 
+    // Moderate spike that's already fading
+    if (warningLevel === 0 && pct > 50 && rangePos < 0.25) {
+      warningLevel = 1;
+      warningReasons.push("significant gain but fading from highs");
+    }
+    // High volume churn on a moderate move
+    if (warningLevel === 0 && pct > 30 && volMcapRatio > 0.8 && rangePos < 0.40) {
+      warningLevel = 1;
+      warningReasons.push("heavy volume churn + weakening");
+    }
+    // Small cap with big move and volume exceeding mcap
+    if (warningLevel === 0 && mcap > 0 && mcap < 200e6 && pct > 60 && volMcapRatio > 0.5) {
+      warningLevel = 1;
+      warningReasons.push("small cap + large move + high volume ratio");
+    }
+    // Any coin where vol > mcap (regardless of % change)
+    if (warningLevel === 0 && volMcapRatio > 1.0) {
+      warningLevel = 1;
+      warningReasons.push("24h volume exceeds market cap");
+    }
+ 
+    // Build the warning HTML
+    if (warningLevel >= 2) {
+      const reasonText = warningReasons.join("; ");
+      rugWarning = ` <span class="rug-warning rug-danger" title="⚠️ High risk: ${reasonText}">⚠️</span>`;
+    } else if (warningLevel >= 1) {
+      const reasonText = warningReasons.join("; ");
+      rugWarning = ` <span class="rug-warning rug-caution" title="⚠️ Elevated risk: ${reasonText}">⚠️</span>`;
     }
  
     const tickerHtml = renderTickerCell(x.coinSymbol || "—", "crypto", x.image || null);

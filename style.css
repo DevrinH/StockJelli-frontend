@@ -3159,3 +3159,19 @@ tbody tr:nth-child(2) .whale-indicator {
   .filter-presets-label { font-size: 0.68rem; }
   .filter-preset-btn { padding: 3px 10px; font-size: 0.65rem; }
 }
+
+/* Tiered warning styling */
+.rug-danger {
+  animation: pulse-warning-fast 1.2s ease-in-out infinite;
+  filter: saturate(1.5);
+}
+
+.rug-caution {
+  animation: pulse-warning 2.5s ease-in-out infinite;
+  opacity: 0.8;
+}
+
+@keyframes pulse-warning-fast {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(1.1); }
+}

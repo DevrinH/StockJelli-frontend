@@ -72,7 +72,7 @@
   .stat-value.amber { color: var(--amber); }
 
   /* Table */
-  .table-container { overflow-x: auto; padding: 0 20px 20px; -webkit-overflow-scrolling: touch; }
+  .table-container { overflow-x: auto; padding: 0 20px 20px; -webkit-overflow-scrolling: touch; max-height: calc(100vh - 180px); overflow-y: auto; }
   table { width: 100%; border-collapse: collapse; font-size: 0.75rem; margin-top: 10px; }
   th { position: sticky; top: 0; background: var(--surface); padding: 8px 10px; text-align: left; font-weight: 600; color: var(--muted); font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.04em; border-bottom: 1px solid var(--border); cursor: pointer; user-select: none; white-space: nowrap; }
   th:hover { color: var(--accent); }

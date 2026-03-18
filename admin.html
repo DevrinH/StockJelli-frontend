@@ -511,7 +511,8 @@
       'volumeAtEntry','marketCapAtEntry','sjScoreAtEntry',
       'rangePositionAtEntry','rvolAtEntry','volMcapRatioAtEntry',
       'peakPctChange','peakMinutesAfterEntry',
-      'marketSessionAtEntry','enteredAt','qualifiedAtEntry'
+      'marketSessionAtEntry','enteredAt','qualifiedAtEntry',
+      'sectorAtEntry','industryAtEntry'
     ];
     const outcomeKeys = ['outcome_5m','outcome_15m','outcome_30m','outcome_1h','outcome_2h','outcome_4h','outcome_6h'];
     const hasOutcomes = entries.some(e => e.outcomes && Object.keys(e.outcomes).length > 0);
@@ -528,6 +529,7 @@
       volumeAtEntry:'Vol', marketCapAtEntry:'MCap', sjScoreAtEntry:'SJ', rangePositionAtEntry:'Rng',
       rvolAtEntry:'RVOL', volMcapRatioAtEntry:'V/MC', peakPctChange:'Pk%', peakMinutesAfterEntry:'PkM',
       marketSessionAtEntry:'Sess', enteredAt:'Time', qualifiedAtEntry:'Q',
+      sectorAtEntry:'Sector', industryAtEntry:'Industry',
       outcome_5m:'5m', outcome_15m:'15m', outcome_30m:'30m',
       outcome_1h:'1h', outcome_2h:'2h', outcome_4h:'4h', outcome_6h:'6h',
     };

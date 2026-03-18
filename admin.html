@@ -597,16 +597,14 @@
         try { return new Date(val).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true }); }
         catch { return val; }
         case 'peakAfter15m': {
-        if (val === null) return '<span style="color:var(--muted)">—</span>';
-        const p = Number(val);
-        return `<span class="${p > 0 ? 'pct-up' : 'pct-down'}">${p > 0 ? '+' : ''}${p.toFixed(1)}%</span>`;
+        const peakPrice = entry.peakAfter15mPrice;
+        const o15 = entry.outcomes?.outcome_15m?.price;
+        if (!peakPrice || !o15 || o15 <= 0) return '<span style="color:var(--muted)">—</span>';
+        const gain = ((peakPrice / o15) - 1) * 100;
+        return `<span class="${gain > 0 ? 'pct-up' : gain < 0 ? 'pct-down' : 'pct-flat'}">${gain > 0 ? '+' : ''}${gain.toFixed(1)}%</span>`;
       }
       default: return String(val);
-      case 'peakAfter15m': {
-        if (val === null) return '<span style="color:var(--muted)">—</span>';
-        const p = Number(val);
-        return `<span class="${p > 0 ? 'pct-up' : 'pct-down'}">${p > 0 ? '+' : ''}${p.toFixed(1)}%</span>`;
-      }
+
     }
     
   }

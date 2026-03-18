@@ -170,6 +170,8 @@
       </span>
       <button class="ctrl-btn ctrl-btn-copy" id="copyJsonBtn">📋 JSON</button>
       <button class="ctrl-btn ctrl-btn-copy" id="copyCsvBtn">📋 CSV</button>
+      <button class="ctrl-btn" id="dlJsonBtn" style="background:rgba(59,130,246,0.1);border-color:rgba(59,130,246,0.2);color:var(--accent);">⬇ JSON</button>
+      <button class="ctrl-btn" id="dlCsvBtn" style="background:rgba(59,130,246,0.1);border-color:rgba(59,130,246,0.2);color:var(--accent);">⬇ CSV</button>
     </div>
   </header>
 
@@ -637,6 +639,42 @@
       showToast('Copied');
     });
   }
+
+  function downloadFile(content, filename, type) {
+    const blob = new Blob([content], { type });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = filename;
+    document.body.appendChild(a); a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    showToast('Downloaded ' + filename);
+  }
+
+  document.getElementById('dlJsonBtn').addEventListener('click', () => {
+    const entries = getFilteredEntries();
+    const week = currentWeek || 'data';
+    const filename = `sj-${currentMode}-${week}-${todayOnly ? 'today' : 'full'}.json`;
+    downloadFile(JSON.stringify(entries, null, 2), filename, 'application/json');
+  });
+
+  document.getElementById('dlCsvBtn').addEventListener('click', () => {
+    const entries = getFilteredEntries();
+    if (!entries.length) return;
+    const oKeys = ['outcome_5m','outcome_15m','outcome_30m','outcome_1h','outcome_2h','outcome_4h','outcome_6h'];
+    const bKeys = Object.keys(entries[0]).filter(k => k !== 'outcomes');
+    const aKeys = [...bKeys, ...oKeys];
+    const rows = entries.map(e => aKeys.map(k => {
+      if (k.startsWith('outcome_')) { const o = e.outcomes?.[k]; return o?.pctFromEntry != null ? o.pctFromEntry : ''; }
+      const v = e[k]; if (v == null) return '';
+      if (typeof v === 'object') return JSON.stringify(v).replace(/,/g, ';');
+      if (typeof v === 'string' && v.includes(',')) return '"' + v.replace(/"/g, '""') + '"';
+      return String(v);
+    }).join(','));
+    const week = currentWeek || 'data';
+    const filename = `sj-${currentMode}-${week}-${todayOnly ? 'today' : 'full'}.csv`;
+    downloadFile([aKeys.join(','), ...rows].join('\n'), filename, 'text/csv');
+  });
 
   function showToast(msg) {
     const t = document.getElementById('toast'); t.textContent = msg; t.classList.add('visible');

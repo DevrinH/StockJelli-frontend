@@ -625,7 +625,7 @@
   document.getElementById('copyCsvBtn').addEventListener('click', () => {
     const entries = getFilteredEntries();
     if (!entries.length) return;
-    const oKeys = ['outcome_5m','outcome_15m','outcome_30m','outcome_1h','outcome_2h','outcome_4h','outcome_6h'];
+    const oKeys = ['outcome_5m','outcome_10m','outcome_15m','outcome_30m','outcome_1h','outcome_2h','outcome_4h','outcome_6h'];
     const bKeys = Object.keys(entries[0]).filter(k => k !== 'outcomes');
     const aKeys = [...bKeys, ...oKeys];
     const rows = entries.map(e => aKeys.map(k => {
@@ -672,7 +672,7 @@
   document.getElementById('dlCsvBtn').addEventListener('click', () => {
     const entries = getFilteredEntries();
     if (!entries.length) return;
-    const oKeys = ['outcome_5m','outcome_15m','outcome_30m','outcome_1h','outcome_2h','outcome_4h','outcome_6h'];
+    const oKeys = ['outcome_5m','outcome_10m','outcome_15m','outcome_30m','outcome_1h','outcome_2h','outcome_4h','outcome_6h'];
     const bKeys = Object.keys(entries[0]).filter(k => k !== 'outcomes');
     const aKeys = [...bKeys, ...oKeys];
     const rows = entries.map(e => aKeys.map(k => {

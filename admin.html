@@ -514,7 +514,7 @@
       'marketSessionAtEntry','enteredAt','qualifiedAtEntry',
       'sectorAtEntry','industryAtEntry','peakAfter15m'
     ];
-    const outcomeKeys = ['outcome_5m','outcome_10m','outcome_15m','outcome_30m','outcome_1h','outcome_2h','outcome_4h','outcome_6h'];
+    const outcomeKeys = ['outcome_5m','outcome_10m','outcome_15m','outcome_30m','outcome_45m','outcome_1h','outcome_1h15m','outcome_1h30m','outcome_1h45m','outcome_2h','outcome_2h15m','outcome_2h30m','outcome_2h45m','outcome_3h','outcome_3h15m','outcome_3h30m','outcome_3h45m','outcome_4h','outcome_6h'];
     const hasOutcomes = entries.some(e => e.outcomes && Object.keys(e.outcomes).length > 0);
     const cols = hasOutcomes ? [...baseCols, ...outcomeKeys] : baseCols;
 
@@ -531,7 +531,9 @@
       marketSessionAtEntry:'Sess', enteredAt:'Time', qualifiedAtEntry:'Q',
       sectorAtEntry:'Sector', industryAtEntry:'Industry',peakAfter15m:'Pk15m+',
       outcome_5m:'5m', outcome_10m:'10m', outcome_15m:'15m', outcome_30m:'30m',
-      outcome_1h:'1h', outcome_2h:'2h', outcome_4h:'4h', outcome_6h:'6h',
+      outcome_1h:'1h', outcome_2h:'2h', outcome_4h:'4h', outcome_6h:'6h',outcome_45m:'45m', outcome_1h15m:'1:15', outcome_1h30m:'1:30', outcome_1h45m:'1:45',
+      outcome_2h15m:'2:15', outcome_2h30m:'2:30', outcome_2h45m:'2:45',
+      outcome_3h:'3h', outcome_3h15m:'3:15', outcome_3h30m:'3:30', outcome_3h45m:'3:45',
     };
 
     let html = '<table><thead><tr>';
@@ -625,7 +627,7 @@
   document.getElementById('copyCsvBtn').addEventListener('click', () => {
     const entries = getFilteredEntries();
     if (!entries.length) return;
-    const oKeys = ['outcome_5m','outcome_10m','outcome_15m','outcome_30m','outcome_1h','outcome_2h','outcome_4h','outcome_6h'];
+    const oKeys = ['outcome_5m','outcome_10m','outcome_15m','outcome_30m','outcome_45m','outcome_1h','outcome_1h15m','outcome_1h30m','outcome_1h45m','outcome_2h','outcome_2h15m','outcome_2h30m','outcome_2h45m','outcome_3h','outcome_3h15m','outcome_3h30m','outcome_3h45m','outcome_4h','outcome_6h'];
     const bKeys = Object.keys(entries[0]).filter(k => k !== 'outcomes');
     const aKeys = [...bKeys, ...oKeys];
     const rows = entries.map(e => aKeys.map(k => {
@@ -672,7 +674,7 @@
   document.getElementById('dlCsvBtn').addEventListener('click', () => {
     const entries = getFilteredEntries();
     if (!entries.length) return;
-    const oKeys = ['outcome_5m','outcome_10m','outcome_15m','outcome_30m','outcome_1h','outcome_2h','outcome_4h','outcome_6h'];
+    const oKeys = ['outcome_5m','outcome_10m','outcome_15m','outcome_30m','outcome_45m','outcome_1h','outcome_1h15m','outcome_1h30m','outcome_1h45m','outcome_2h','outcome_2h15m','outcome_2h30m','outcome_2h45m','outcome_3h','outcome_3h15m','outcome_3h30m','outcome_3h45m','outcome_4h','outcome_6h'];
     const bKeys = Object.keys(entries[0]).filter(k => k !== 'outcomes');
     const aKeys = [...bKeys, ...oKeys];
     const rows = entries.map(e => aKeys.map(k => {

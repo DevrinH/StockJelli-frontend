@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>April 20 Launch: Push Notifications, Webhook API & the Momentum Intelligence Era | StockJelli Blog</title>
+  <meta name="description" content="StockJelli launches push notifications and a webhook API for bot traders on April 20. Here's what we built, why it took 12 weeks of data, and what it means." />
+  <meta name="robots" content="index, follow" />
+  
+  <meta name="title" content="April 20 Launch: Push Notifications, Webhook API & the Momentum Intelligence Era | StockJelli Blog" />
+  <meta name="keywords" content="StockJelli push notifications, stock alerts, crypto alerts, momentum alerts, webhook API, bot trading, momentum intelligence, stock screener alerts" />
+  <link rel="canonical" href="https://stockjelli.com/blog/april-2026-launch.html" />
+  
+  <!-- Open Graph -->
+  <meta property="og:title" content="April 20 Launch: Push Notifications, Webhook API & the Momentum Intelligence Era" />
+  <meta property="og:description" content="StockJelli launches push notifications and a webhook API on April 20. Data-validated momentum alerts for stocks and crypto — not just another alert bot." />
+  <meta property="og:image" content="https://stockjelli.com/blog/thumbs/april-2026-launch.png" />
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://stockjelli.com/blog/april-2026-launch.html" />
+  <meta property="og:site_name" content="StockJelli" />
+  
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="April 20 Launch: Push Notifications, Webhook API & the Momentum Intelligence Era" />
+  <meta name="twitter:description" content="StockJelli launches push notifications and a webhook API on April 20. Data-validated momentum alerts for stocks and crypto — not just another alert bot." />
+  <meta name="twitter:image" content="https://stockjelli.com/blog/thumbs/april-2026-launch.png" />
+  
+  <link rel="icon" type="image/png" sizes="32x32" href="/StockJelli-S-Logo.png" />
+  <link rel="stylesheet" href="/style.css" />
+  <link rel="stylesheet" href="/blog.css" />
+  <link rel="stylesheet" href="/blog-sponsor.css" />
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8792646979011381"
+     crossorigin="anonymous"></script>
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-FM3HXT7ECV"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-FM3HXT7ECV', { anonymize_ip: true });
+  </script>
+  <script src="promo-toast.js" defer></script>
+  <script src="/blog-ticker.js" defer></script>
+  <script src="/blog-sponsor.js" defer></script>
+
+</head>
+<body>
+
+  <header class="header">
+    <div class="header-inner">
+      <div class="header-left">
+        <a href="/" aria-label="StockJelli Home">
+          <img class="logo" src="/StockJelli-Logo.png" alt="StockJelli - Stock and Crypto Momentum Screener" width="150" height="32" />
+        </a>
+      </div>
+  
+      <div class="header-center market-indices">
+        <span id="idxLeft" class="idx">
+          <span id="idxLeftLabel">NASDAQ</span>
+          <span id="idxLeftValue" class="idx-value up">+1.24%</span>
+        </span>
+      
+        <span class="divider">|</span>
+      
+        <span id="idxRight" class="idx">
+          <span id="idxRightLabel">S&P 500</span>
+          <span id="idxRightValue" class="idx-value down">-0.31%</span>
+        </span>
+      </div>
+  
+      <div class="header-right">
+        <a href="/" style="color: rgba(255,255,255,0.6); text-decoration: none; font-size: 0.85rem;">← Back to Screener</a>
+      </div>
+    </div>
+  </header>
+
+
+  <div class="pulse-ticker" id="pulseTicker">
+    <div class="pulse-ticker-track" id="pulseTickerTrack">
+      <!-- JS fills this with scrolling items -->
+    </div>
+  </div>
+
+
+  <article class="blog-page">
+    <a href="/blog" class="blog-back">← All posts</a>
+
+    <img class="blog-hero-img" src="/blog/thumbs/april-2026-launch.png" alt="StockJelli April 2026 Launch — Push Notifications and Webhook API" onerror="this.style.display='none'" />
+
+    <span class="blog-tag">Launch</span>
+    <h1 class="blog-post-title">April 20 Launch: Push Notifications, Webhook API & the Momentum Intelligence Era</h1>
+    <div class="blog-meta">Mar 22, 2026 · 7 min read</div>
+
+    <div class="blog-body">
+      <p>
+        On April 20, StockJelli is launching two features that fundamentally change what this platform is. Push notifications bring data-validated momentum alerts directly to your phone. A webhook API opens the same signal pipeline to bot builders and automated trading systems. Here's everything — what's launching, how the signal works, what it costs, and why we spent 12 weeks collecting data before sending a single alert.
+      </p>
+
+      <h2>🔔 Push Notifications: Alerts That Earn Your Attention</h2>
+      <p>
+        There's no shortage of stock alert services. Most of them work the same way: a ticker hits some basic threshold — volume spike, price move, RSI level — and your phone buzzes. You get 40 notifications a day. You start ignoring them by day three. The signal drowns in its own noise.
+      </p>
+      <p>
+        StockJelli's push notifications work differently. Every alert passes through a two-stage qualification system before it ever reaches your phone.
+      </p>
+      <p>
+        <strong>Stage 1: Screener Entry.</strong> A stock or crypto hits the live screener based on momentum strength, volume, relative volume, and SJ Score. This is the same screening logic that powers the main page today — but screener entry alone does not trigger a notification.
+      </p>
+      <p>
+        <strong>Stage 2: Confirmation Gate.</strong> After screener entry, StockJelli watches the ticker for 15 minutes. If the price rises at least +2% from the entry point within that window, the confirmation gate opens and the push notification fires. If the price stalls, fades, or doesn't reach the threshold, no notification is sent. You never hear about it.
+      </p>
+      <p>
+        This is the difference between alerting you when something <em>is</em> moving and alerting you when something <em>has proven</em> it's moving. The 15-minute confirmation gate eliminates the fakeouts, the dead-cat bounces, the volume spikes that go nowhere. By the time your phone buzzes, the move has already shown real follow-through.
+      </p>
+
+      <h2>📊 12 Weeks of Data Behind Every Alert</h2>
+      <p>
+        We didn't build this system in a week and ship it. We've been collecting signal data since late January — logging every screener entry, tracking 15-minute confirmation strength, measuring peak prices after entry, and recording outcomes across different market conditions.
+      </p>
+      <p>
+        Twelve weeks of data (W09 through W12 and counting) have taught us several things that directly shaped the notification formula:
+      </p>
+      <p>
+        <strong>Confirmation strength matters more than entry strength.</strong> The single strongest predictor of a successful move isn't the initial momentum score — it's how much the price rises in the first 15 minutes after screener entry. Barely-green prints (+0.2% to +0.4%) are nearly as unreliable as red ones. The +2% gate isn't arbitrary. It's the threshold where hit rates meaningfully separate from noise.
+      </p>
+      <p>
+        <strong>Early peaks are traps.</strong> Entries that peak within the first 0–5 minutes after hitting the screener — then immediately fade — are systematically excluded. If the best price a ticker will see all day happens in the first few minutes of momentum, that's not a signal. That's a trap. StockJelli's suppression rule catches it.
+      </p>
+      <p>
+        <strong>Market conditions change the math.</strong> On red days (broad market down), an upside target of roughly +3% from entry is realistic. On green days (broad market up), that target expands to roughly +6%. A static formula that ignores market context will either over-alert during downtrends or miss the bigger moves during uptrends. StockJelli's targets adapt to the environment using the same <a href="/blog/february-2026-updates.html" style="color: #f0b90b;">Market Pulse</a> system that already adjusts SJ Scores.
+      </p>
+      <p>
+        <strong>Mid-cap stocks are the sweet spot.</strong> Companies with market caps between $100M and $2B produce the most reliable momentum signals. Below $100M, you get too much noise from low-float manipulation. Above $2B, the moves are real but smaller. The notification system weights mid-cap entries accordingly.
+      </p>
+      <p>
+        This data collection is ongoing. The long-term goal is a logistic regression probability model — once we cross 500+ tracked entries, we'll have enough data to assign each alert a probability score rather than a binary pass/fail. That's the next evolution, but the April 20 launch doesn't wait for it. The threshold-based system is already validated and ready.
+      </p>
+
+      <h2>🤖 Webhook API: Your Signal Pipeline</h2>
+      <p>
+        Push notifications are for traders who want to act on alerts manually. The webhook API is for everyone else — bot builders, algorithmic traders, developers who want StockJelli's signal data flowing directly into their own systems.
+      </p>
+      <p>
+        When a push notification fires, the same signal is simultaneously sent as a JSON payload to your registered webhook URL. The payload includes the ticker, entry price, confirmation price, confirmation percentage, SJ Score, market pulse state, and timestamp. Everything you need to programmatically act on the signal.
+      </p>
+      <p>
+        Use cases we expect to see: automated buy orders triggered by StockJelli signals, custom filtering layers on top of our data, Slack or Discord bot integrations for trading communities, portfolio management systems that factor in momentum signals, and backtesting pipelines using real-time signal data.
+      </p>
+      <p>
+        The API is simple by design. One endpoint, one event type, clean JSON. No SDK required — anything that can receive an HTTP POST can consume StockJelli signals. Documentation will be live on launch day.
+      </p>
+
+      <h2>💰 Pricing</h2>
+      <p>
+        Two new tiers join the existing free screener:
+      </p>
+
+      <div style="overflow-x: auto; margin: 24px 0;">
+        <table style="width: 100%; border-collapse: collapse; font-size: 0.85rem; color: rgba(255,255,255,0.75);">
+          <thead>
+            <tr style="border-bottom: 1px solid rgba(255,255,255,0.15);">
+              <th style="text-align: left; padding: 10px 12px; color: rgba(255,255,255,0.5); font-weight: 600;">Tier</th>
+              <th style="text-align: center; padding: 10px 12px; color: rgba(255,255,255,0.5); font-weight: 600;">Price</th>
+              <th style="text-align: left; padding: 10px 12px; color: rgba(255,255,255,0.5); font-weight: 600;">What You Get</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr style="border-bottom: 1px solid rgba(255,255,255,0.07);">
+              <td style="padding: 10px 12px; font-weight: 600;">Free</td>
+              <td style="padding: 10px 12px; text-align: center;">$0</td>
+              <td style="padding: 10px 12px;">Live momentum screener, Momentum River, Market Pulse</td>
+            </tr>
+            <tr style="border-bottom: 1px solid rgba(255,255,255,0.07);">
+              <td style="padding: 10px 12px; font-weight: 600;">Push Alerts</td>
+              <td style="padding: 10px 12px; text-align: center;">$5/mo</td>
+              <td style="padding: 10px 12px;">Everything free + data-validated push notifications for stocks &amp; crypto, premarket email alerts, ad-free experience, SJ Score regime multipliers</td>
+            </tr>
+            <tr>
+              <td style="padding: 10px 12px; font-weight: 600;">API</td>
+              <td style="padding: 10px 12px; text-align: center;">$30/mo</td>
+              <td style="padding: 10px 12px;">Everything in Push Alerts + webhook API delivering real-time signal payloads to your endpoint</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p>
+        The free screener stays free. If you're already a $5 subscriber, push notifications are included automatically — no action needed. The $30 API tier is additive: you get push notifications plus the webhook pipeline.
+      </p>
+
+      <h2>🧠 From Screener to Momentum Intelligence Platform</h2>
+      <p>
+        When StockJelli launched, it was a real-time momentum screener. It showed you what was moving. That's useful, but it puts the entire burden of decision-making on you — you had to watch the screen, evaluate the setup, and decide whether to act.
+      </p>
+      <p>
+        With push notifications and the webhook API, StockJelli becomes something different. It screens, it confirms, it scores, and it delivers. The screener surfaces candidates. The confirmation gate validates them. The Market Pulse contextualizes the environment. And the notification system brings the result to you — or to your bot — only when all three layers agree.
+      </p>
+      <p>
+        We've started calling this <strong>momentum intelligence</strong> internally, and we think the term fits. It's not just data. It's not just alerts. It's a pipeline that turns raw market activity into scored, validated, context-aware signals delivered in real time.
+      </p>
+      <p>
+        The <a href="/blog/february-2026-updates.html" style="color: #f0b90b;">Alert Performance Log</a> we announced in February is the accountability layer. Every notification that fires gets tracked — entry price, peak price, max gain, time to peak, pass or fail. The log sits on the main screener page for everyone to see. No cherry-picking, no "our best picks" highlight reels. Every alert, measured automatically, in public.
+      </p>
+
+      <h2>🗓️ Timeline</h2>
+      <p>
+        <strong>Now through April 19:</strong> Final beta testing with waitlist users. If you're on the waitlist, you'll receive test notifications this week. Report anything that feels off — timing, relevance, frequency. Your feedback directly shapes the launch build.
+      </p>
+      <p>
+        <strong>April 20:</strong> Push notifications and webhook API go live. Stripe billing activates for both new tiers. API documentation publishes.
+      </p>
+      <p>
+        <strong>Post-launch:</strong> Continued data collection toward the logistic regression probability model. Once we cross 500+ tracked entries, alerts will carry a probability score — not just pass/fail, but a percentage confidence that the move will hit its target. That's the next milestone, and we'll share progress publicly as the data accumulates.
+      </p>
+
+      <div class="blog-callout">
+        <div class="blog-callout-title">📋 Launch Summary</div>
+        <p style="margin:0; color: rgba(255,255,255,0.65); font-size: 0.9rem;">
+          <strong>April 20 launch:</strong> Push notifications ($5/mo) and webhook API ($30/mo) go live alongside the existing free screener.<br><br>
+          <strong>How it works:</strong> Two-stage system — screener entry qualification → 15-minute price confirmation gate (≥+2%) → push notification fires. Market-condition-aware upside targets adjust dynamically.<br><br>
+          <strong>What's validated:</strong> 12+ weeks of signal data collection. Confirmation strength, early-peak suppression, mid-cap weighting, and market regime context all built into the formula.<br><br>
+          <strong>What's next:</strong> Logistic regression probability model once 500+ entries are tracked. Every alert measured publicly in the Alert Performance Log.
+        </p>
+      </div>
+
+      <h2>Join the Waitlist</h2>
+      <p>
+        If you want to be among the first to receive StockJelli push notifications when they go live on April 20, join the waitlist now. Waitlist users get early access during the final beta window and priority onboarding at launch.
+      </p>
+
+      <p>
+        <em>StockJelli is an educational tool. This article is for informational purposes only and does not constitute financial advice.</em>
+      </p>
+
+      <div class="blog-bottom-cta">
+        <p>Join the push notification waitlist</p>
+        <a href="/">Open the Screener</a>
+      </div>
+    </div>
+  </article>
+
+  <footer class="footer">
+    <div class="container footer-inner">
+      <p>Educational tool only. Not financial advice.</p>
+      <p class="muted">© 2026 StockJelli · <a href="/privacy.html" class="footer-link">Privacy</a> · <a href="/terms.html" class="footer-link">Terms</a></p>
+    </div>
+  </footer>
+
+</body>
+</html>

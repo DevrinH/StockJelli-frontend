@@ -12,6 +12,7 @@
     --bg: #0a0d14; --surface: #111622; --surface2: #171e2e;
     --border: rgba(255,255,255,0.06); --text: #e2e8f0; --muted: #64748b;
     --accent: #3b82f6; --green: #22c55e; --red: #ef4444; --amber: #f59e0b;
+    --purple: #a78bfa;
     --mono: 'JetBrains Mono', monospace; --sans: 'DM Sans', system-ui, sans-serif;
   }
   body { background: var(--bg); color: var(--text); font-family: var(--sans); min-height: 100vh; }
@@ -46,9 +47,16 @@
   .ctrl-btn-copy.copied { background: var(--green); color: #0a0d14; }
   .ctrl-btn-today { background: rgba(245, 158, 11, 0.1); border-color: rgba(245, 158, 11, 0.2); color: var(--amber); }
   .ctrl-btn-today.active { background: var(--amber); color: #0a0d14; border-color: var(--amber); }
+  .ctrl-btn-swing { background: rgba(167, 139, 250, 0.1); border-color: rgba(167, 139, 250, 0.2); color: var(--purple); }
+  .ctrl-btn-swing.active { background: var(--purple); color: #0a0d14; border-color: var(--purple); }
   .refresh-info { font-size: 0.62rem; color: var(--muted); font-family: var(--mono); display: flex; align-items: center; gap: 4px; }
   .refresh-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); animation: pulse 2s ease-in-out infinite; }
   @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.4; } }
+
+  /* View label */
+  .view-label { font-size: 0.6rem; color: var(--muted); font-family: var(--mono); text-transform: uppercase; letter-spacing: 0.08em; padding: 4px 8px; border-radius: 4px; }
+  .view-label-momentum { background: rgba(59,130,246,0.08); color: var(--accent); }
+  .view-label-swing { background: rgba(167,139,250,0.08); color: var(--purple); }
 
   /* Filter Panel */
   .filter-panel { padding: 10px 20px; border-bottom: 1px solid var(--border); background: var(--surface); display: flex; gap: 12px; flex-wrap: wrap; align-items: flex-end; }
@@ -70,6 +78,7 @@
   .stat-value { font-size: 0.95rem; font-weight: 700; font-family: var(--mono); }
   .stat-value.green { color: var(--green); }
   .stat-value.amber { color: var(--amber); }
+  .stat-value.purple { color: var(--purple); }
 
   /* Table */
   .table-container { overflow-x: auto; padding: 0 20px 20px; -webkit-overflow-scrolling: touch; max-height: calc(100vh - 180px); overflow-y: auto; }
@@ -98,6 +107,12 @@
   .session-open { background: rgba(34,197,94,0.1); color: var(--green); }
   .session-premarket { background: rgba(245,158,11,0.1); color: var(--amber); }
   .session-afterhours { background: rgba(139,92,246,0.1); color: #8b5cf6; }
+
+  /* Swing-specific */
+  .swing-high { color: var(--green); font-weight: 700; }
+  .swing-low { color: var(--red); font-weight: 700; }
+  .swing-day-tag { font-size: 0.58rem; color: var(--muted); margin-left: 2px; }
+  th.swing-col { color: var(--purple); }
 
   .empty-state { text-align: center; padding: 60px 20px; color: var(--muted); }
   .empty-state h3 { font-size: 1.1rem; margin-bottom: 8px; color: var(--text); }
@@ -129,7 +144,6 @@
     .stat-label { font-size: 0.55rem; }
     td, th { padding: 5px 6px; font-size: 0.65rem; }
     .sj-badge { font-size: 0.6rem; padding: 1px 4px; }
-    /* Hide less important columns on mobile */
     .col-name, .col-rvol, .col-volmcap, .col-peakmin, .col-session { display: none; }
   }
   @media (max-width: 380px) {
@@ -159,6 +173,8 @@
     <div class="dash-controls">
       <button class="ctrl-btn active" id="modeStocks" data-mode="stocks">Stocks</button>
       <button class="ctrl-btn" id="modeCrypto" data-mode="crypto">Crypto</button>
+      <span style="width:1px;height:18px;background:var(--border);margin:0 2px;"></span>
+      <button class="ctrl-btn ctrl-btn-swing" id="viewSwingBtn">📈 Swing</button>
       <select class="ctrl-select" id="weekSelect"></select>
       <button class="ctrl-btn ctrl-btn-today" id="todayBtn">Today</button>
       <label style="display:flex;align-items:center;gap:5px;font-size:0.7rem;color:var(--muted);cursor:pointer;">
@@ -249,6 +265,12 @@
         <option value="afterhours">After-Hours</option>
       </select>
     </div>
+    <div class="filter-group" id="filterSectorGroup">
+      <span class="filter-label">Sector</span>
+      <select class="filter-select" id="filterSector">
+        <option value="">Any</option>
+      </select>
+    </div>
     <button class="filter-reset" id="filterResetBtn">✕ Reset</button>
     <span class="filter-count" id="filterCount"></span>
   </div>
@@ -261,6 +283,10 @@
     <div class="stat"><span class="stat-label">Avg %</span><span class="stat-value" id="statAvgPct">—</span></div>
     <div class="stat"><span class="stat-label">Avg V/MC</span><span class="stat-value" id="statAvgVolMcap">—</span></div>
     <div class="stat"><span class="stat-label">Midcap</span><span class="stat-value" id="statMidcap">—</span></div>
+    <!-- Swing-only stats -->
+    <div class="stat" id="statSwingHighWrap" style="display:none;"><span class="stat-label">Avg Swing Hi</span><span class="stat-value green" id="statSwingHigh">—</span></div>
+    <div class="stat" id="statSwingLowWrap" style="display:none;"><span class="stat-label">Avg Swing Lo</span><span class="stat-value" style="color:var(--red)" id="statSwingLow">—</span></div>
+    <div class="stat" id="statSwingDataWrap" style="display:none;"><span class="stat-label">Has D1+</span><span class="stat-value purple" id="statSwingData">—</span></div>
   </div>
 
   <div class="table-container" id="tableContainer">
@@ -278,6 +304,7 @@
   const ADMIN_KEY = 'sjadmin2026';
 
   let currentMode = 'stocks';
+  let currentView = 'momentum'; // 'momentum' or 'swing'
   let currentWeek = null;
   let reportData = null;
   let allEntries = [];
@@ -322,6 +349,22 @@
     else loadReport();
   }
 
+  // Swing toggle
+  document.getElementById('viewSwingBtn').addEventListener('click', () => {
+    currentView = currentView === 'momentum' ? 'swing' : 'momentum';
+    const btn = document.getElementById('viewSwingBtn');
+    btn.classList.toggle('active', currentView === 'swing');
+    // Reset sort for swing view
+    if (currentView === 'swing') {
+      sortCol = 'date';
+      sortDir = 'desc';
+    } else {
+      sortCol = 'enteredAt';
+      sortDir = 'desc';
+    }
+    renderTable();
+  });
+
   // Week
   const weekSelect = document.getElementById('weekSelect');
   weekSelect.addEventListener('change', () => { currentWeek = weekSelect.value; loadReport(); });
@@ -361,7 +404,7 @@
     document.getElementById('refreshCountdown').textContent = `${m}m`;
   }
 
-  // Filters — all use change/input events
+  // Filters
   const fEls = {
     symbol: document.getElementById('filterSymbol'),
     mcapMin: document.getElementById('filterMcapMin'),
@@ -371,6 +414,7 @@
     pctMin: document.getElementById('filterPctMin'),
     rangeMin: document.getElementById('filterRangeMin'),
     session: document.getElementById('filterSession'),
+    sector: document.getElementById('filterSector'),
   };
 
   Object.values(fEls).forEach(el => {
@@ -387,6 +431,7 @@
     fEls.pctMin.value = '';
     fEls.rangeMin.value = '0';
     fEls.session.value = '';
+    fEls.sector.value = '';
     renderTable();
   });
 
@@ -416,6 +461,7 @@
       const res = await fetch(`${API}/api/weekly-report?week=${currentWeek || ''}`);
       reportData = await res.json();
       extractEntries();
+      populateSectorFilter();
       renderTable();
     } catch (e) {
       document.getElementById('tableContainer').innerHTML = '<div class="empty-state"><h3>Failed</h3><p>' + e.message + '</p></div>';
@@ -427,54 +473,112 @@
     allEntries = reportData[currentMode]?.allEntries || [];
   }
 
+  function populateSectorFilter() {
+    const sectors = new Set();
+    for (const e of allEntries) {
+      if (e.sectorAtEntry) sectors.add(e.sectorAtEntry);
+    }
+    const sel = fEls.sector;
+    const cur = sel.value;
+    sel.innerHTML = '<option value="">Any</option>';
+    [...sectors].sort().forEach(s => {
+      const opt = document.createElement('option');
+      opt.value = s; opt.textContent = s;
+      sel.appendChild(opt);
+    });
+    sel.value = cur;
+  }
+
   function getFilteredEntries() {
     let entries = allEntries;
     if (!showNearMisses) entries = entries.filter(e => e.qualifiedAtEntry !== false);
 
-    // Today filter
     if (todayOnly) {
       const today = new Date().toLocaleDateString('en-CA', { timeZone: 'America/New_York' });
       entries = entries.filter(e => e.date === today);
     }
 
-    // Symbol search
     const sym = (fEls.symbol.value || '').trim().toUpperCase();
     if (sym) entries = entries.filter(e => (e.symbol || '').includes(sym));
 
-    // MCap min
     const mcMin = Number(fEls.mcapMin.value) || 0;
     if (mcMin > 0) entries = entries.filter(e => (e.marketCapAtEntry || 0) >= mcMin);
 
-    // MCap max
     const mcMax = Number(fEls.mcapMax.value) || 0;
     if (mcMax > 0) entries = entries.filter(e => (e.marketCapAtEntry || Infinity) <= mcMax);
 
-    // Volume min
     const vMin = Number(fEls.volMin.value) || 0;
     if (vMin > 0) entries = entries.filter(e => (e.volumeAtEntry || 0) >= vMin);
 
-    // SJ min
     const sjMin = Number(fEls.sjMin.value) || 0;
     if (sjMin > 0) entries = entries.filter(e => (e.sjScoreAtEntry || 0) >= sjMin);
 
-    // Pct min
     const pctMin = parseFloat(fEls.pctMin.value);
     if (pctMin > 0) entries = entries.filter(e => (e.pctChangeAtEntry || 0) >= pctMin);
 
-    // Range min
     const rMin = parseFloat(fEls.rangeMin.value) || 0;
     if (rMin > 0) entries = entries.filter(e => (e.rangePositionAtEntry || 0) >= rMin);
 
-    // Session
     const sess = fEls.session.value;
     if (sess) entries = entries.filter(e => (e.marketSessionAtEntry || '') === sess);
+
+    const sector = fEls.sector.value;
+    if (sector) entries = entries.filter(e => (e.sectorAtEntry || '') === sector);
 
     return entries;
   }
 
+  // ── Column definitions per view ──
+  const DAILY_OUTCOME_KEYS = ['outcome_d1','outcome_d2','outcome_d3','outcome_d4','outcome_d5','outcome_d6','outcome_d7','outcome_d8','outcome_d9','outcome_d10'];
+
+  const MOMENTUM_COLS = [
+    'symbol','name','date','priceAtEntry','pctChangeAtEntry',
+    'volumeAtEntry','marketCapAtEntry','sjScoreAtEntry',
+    'rangePositionAtEntry','rvolAtEntry','volMcapRatioAtEntry',
+    'peakPctChange','peakMinutesAfterEntry',
+    'marketSessionAtEntry','enteredAt','qualifiedAtEntry',
+    'sectorAtEntry','industryAtEntry','hasNews','peakAfter15m','peakAfter2h'
+  ];
+  const MOMENTUM_OUTCOME_KEYS = ['outcome_5m','outcome_10m','outcome_15m','outcome_30m','outcome_45m','outcome_1h','outcome_1h15m','outcome_1h30m','outcome_1h45m','outcome_2h','outcome_2h15m','outcome_2h30m','outcome_2h45m','outcome_3h','outcome_3h15m','outcome_3h30m','outcome_3h45m','outcome_4h','outcome_6h'];
+
+  const SWING_BASE_COLS = [
+    'symbol','name','date','priceAtEntry','pctChangeAtEntry',
+    'marketCapAtEntry','sjScoreAtEntry','sectorAtEntry','industryAtEntry',
+    'rvolAtEntry','volMcapRatioAtEntry','outcome_eod'
+  ];
+  const SWING_SUMMARY_COLS = ['swingHighPct','swingLowPct'];
+
+  const COL_LABELS = {
+    symbol:'Sym', name:'Name', date:'Date', priceAtEntry:'Entry $', pctChangeAtEntry:'Entry %',
+    volumeAtEntry:'Vol', marketCapAtEntry:'MCap', sjScoreAtEntry:'SJ', rangePositionAtEntry:'Rng',
+    rvolAtEntry:'RVOL', volMcapRatioAtEntry:'V/MC', peakPctChange:'Pk%', peakMinutesAfterEntry:'PkM',
+    marketSessionAtEntry:'Sess', enteredAt:'Time', qualifiedAtEntry:'Q',
+    sectorAtEntry:'Sector', industryAtEntry:'Industry', peakAfter15m:'Pk15m+',
+    outcome_5m:'5m', outcome_10m:'10m', outcome_15m:'15m', outcome_30m:'30m',
+    outcome_1h:'1h', outcome_2h:'2h', outcome_4h:'4h', outcome_6h:'6h', outcome_45m:'45m',
+    outcome_1h15m:'1:15', outcome_1h30m:'1:30', outcome_1h45m:'1:45',
+    outcome_2h15m:'2:15', outcome_2h30m:'2:30', outcome_2h45m:'2:45',
+    outcome_3h:'3h', outcome_3h15m:'3:15', outcome_3h30m:'3:30', outcome_3h45m:'3:45',
+    peakAfter2h:'Pk2h+', hasNews:'News', outcome_eod:'EOD',
+    outcome_d1:'D1', outcome_d2:'D2', outcome_d3:'D3', outcome_d4:'D4', outcome_d5:'D5',
+    outcome_d6:'D6', outcome_d7:'D7', outcome_d8:'D8', outcome_d9:'D9', outcome_d10:'D10',
+    swingHighPct:'SwHi', swingLowPct:'SwLo',
+  };
+
+  const COL_CLASS = {
+    name: 'col-name', rvolAtEntry: 'col-rvol', volMcapRatioAtEntry: 'col-volmcap',
+    peakMinutesAfterEntry: 'col-peakmin', marketSessionAtEntry: 'col-session',
+  };
+
   function renderTable() {
     const container = document.getElementById('tableContainer');
     const entries = getFilteredEntries();
+    const isSwing = currentView === 'swing';
+
+    // Toggle swing stats visibility
+    document.getElementById('statSwingHighWrap').style.display = isSwing ? '' : 'none';
+    document.getElementById('statSwingLowWrap').style.display = isSwing ? '' : 'none';
+    document.getElementById('statSwingDataWrap').style.display = isSwing ? '' : 'none';
 
     // Stats
     const qualified = entries.filter(e => e.qualifiedAtEntry !== false);
@@ -492,6 +596,16 @@
     document.getElementById('statMidcap').textContent = qualified.filter(e => e.source === 'midcap').length;
     document.getElementById('filterCount').textContent = entries.length !== allEntries.length ? `${entries.length}/${allEntries.length}` : '';
 
+    // Swing stats
+    if (isSwing) {
+      const swHiArr = entries.map(e => e.swingHighPct).filter(v => v != null);
+      const swLoArr = entries.map(e => e.swingLowPct).filter(v => v != null);
+      const hasDaily = entries.filter(e => e.outcomes && (e.outcomes.outcome_d1 || e.outcomes.outcome_d2));
+      document.getElementById('statSwingHigh').textContent = swHiArr.length ? '+' + (swHiArr.reduce((a,b)=>a+b,0)/swHiArr.length).toFixed(1) + '%' : '—';
+      document.getElementById('statSwingLow').textContent = swLoArr.length ? (swLoArr.reduce((a,b)=>a+b,0)/swLoArr.length).toFixed(1) + '%' : '—';
+      document.getElementById('statSwingData').textContent = hasDaily.length;
+    }
+
     if (entries.length === 0) {
       container.innerHTML = '<div class="empty-state"><h3>No entries</h3><p>No data matches filters.</p></div>';
       return;
@@ -499,48 +613,33 @@
 
     // Sort
     const sorted = [...entries].sort((a, b) => {
-      let va = a[sortCol], vb = b[sortCol];
+      let va = resolveSort(a, sortCol), vb = resolveSort(b, sortCol);
       if (va == null) va = sortDir === 'asc' ? Infinity : -Infinity;
       if (vb == null) vb = sortDir === 'asc' ? Infinity : -Infinity;
       if (typeof va === 'string') return sortDir === 'asc' ? va.localeCompare(vb) : vb.localeCompare(va);
       return sortDir === 'asc' ? va - vb : vb - va;
     });
 
-    const baseCols = [
-      'symbol','name','date','priceAtEntry','pctChangeAtEntry',
-      'volumeAtEntry','marketCapAtEntry','sjScoreAtEntry',
-      'rangePositionAtEntry','rvolAtEntry','volMcapRatioAtEntry',
-      'peakPctChange','peakMinutesAfterEntry',
-      'marketSessionAtEntry','enteredAt','qualifiedAtEntry',
-      'sectorAtEntry','industryAtEntry','hasNews','peakAfter15m','peakAfter2h'
-    ];
-    const outcomeKeys = ['outcome_5m','outcome_10m','outcome_15m','outcome_30m','outcome_45m','outcome_1h','outcome_1h15m','outcome_1h30m','outcome_1h45m','outcome_2h','outcome_2h15m','outcome_2h30m','outcome_2h45m','outcome_3h','outcome_3h15m','outcome_3h30m','outcome_3h45m','outcome_4h','outcome_6h'];
-    const hasOutcomes = entries.some(e => e.outcomes && Object.keys(e.outcomes).length > 0);
-    const cols = hasOutcomes ? [...baseCols, ...outcomeKeys] : baseCols;
-
-    // Mobile-responsive class mapping for hiding columns
-    const colClass = {
-      name: 'col-name', rvolAtEntry: 'col-rvol', volMcapRatioAtEntry: 'col-volmcap',
-      peakMinutesAfterEntry: 'col-peakmin', marketSessionAtEntry: 'col-session',
-    };
-
-    const colLabels = {
-      symbol:'Sym', name:'Name', date:'Date', priceAtEntry:'Price', pctChangeAtEntry:'%Chg',
-      volumeAtEntry:'Vol', marketCapAtEntry:'MCap', sjScoreAtEntry:'SJ', rangePositionAtEntry:'Rng',
-      rvolAtEntry:'RVOL', volMcapRatioAtEntry:'V/MC', peakPctChange:'Pk%', peakMinutesAfterEntry:'PkM',
-      marketSessionAtEntry:'Sess', enteredAt:'Time', qualifiedAtEntry:'Q',
-      sectorAtEntry:'Sector', industryAtEntry:'Industry',peakAfter15m:'Pk15m+',
-      outcome_5m:'5m', outcome_10m:'10m', outcome_15m:'15m', outcome_30m:'30m',
-      outcome_1h:'1h', outcome_2h:'2h', outcome_4h:'4h', outcome_6h:'6h',outcome_45m:'45m', outcome_1h15m:'1:15', outcome_1h30m:'1:30', outcome_1h45m:'1:45',
-      outcome_2h15m:'2:15', outcome_2h30m:'2:30', outcome_2h45m:'2:45',
-      outcome_3h:'3h', outcome_3h15m:'3:15', outcome_3h30m:'3:30', outcome_3h45m:'3:45',peakAfter2h:'Pk2h+',hasNews:'News',
-    };
+    // Build column list
+    let cols;
+    if (isSwing) {
+      const hasDailyOutcomes = entries.some(e => e.outcomes && DAILY_OUTCOME_KEYS.some(k => e.outcomes[k]));
+      cols = [...SWING_BASE_COLS, ...DAILY_OUTCOME_KEYS, ...SWING_SUMMARY_COLS];
+    } else {
+      const hasOutcomes = entries.some(e => e.outcomes && Object.keys(e.outcomes).length > 0);
+      cols = hasOutcomes ? [...MOMENTUM_COLS, ...MOMENTUM_OUTCOME_KEYS] : MOMENTUM_COLS;
+    }
 
     let html = '<table><thead><tr>';
     for (const col of cols) {
       const arrow = sortCol === col ? (sortDir === 'asc' ? '↑' : '↓') : '';
-      const cls = [sortCol === col ? 'sorted' : '', colClass[col] || ''].filter(Boolean).join(' ');
-      html += `<th class="${cls}" data-col="${col}">${colLabels[col] || col}<span class="sort-arrow">${arrow}</span></th>`;
+      const isSwingCol = col.startsWith('outcome_d') || col.startsWith('swing');
+      const cls = [
+        sortCol === col ? 'sorted' : '',
+        COL_CLASS[col] || '',
+        isSwingCol ? 'swing-col' : '',
+      ].filter(Boolean).join(' ');
+      html += `<th class="${cls}" data-col="${col}">${COL_LABELS[col] || col}<span class="sort-arrow">${arrow}</span></th>`;
     }
     html += '</tr></thead><tbody>';
 
@@ -548,7 +647,7 @@
       const rowCls = e.qualifiedAtEntry === false ? 'near-miss' : '';
       html += `<tr class="${rowCls}">`;
       for (const col of cols) {
-        const cc = colClass[col] || '';
+        const cc = COL_CLASS[col] || '';
         html += `<td class="${cc}">` + formatCell(col, e, e[col]) + '</td>';
       }
       html += '</tr>';
@@ -566,18 +665,42 @@
     });
   }
 
+  function resolveSort(entry, col) {
+    // Handle outcome columns for sorting
+    if (col.startsWith('outcome_')) {
+      const o = entry.outcomes?.[col];
+      return o?.pctFromEntry ?? null;
+    }
+    if (col === 'swingHighPct') return entry.swingHighPct ?? null;
+    if (col === 'swingLowPct') return entry.swingLowPct ?? null;
+    return entry[col];
+  }
+
   function formatCell(col, entry, val) {
+    // All outcome columns (intraday + daily)
     if (col.startsWith('outcome_')) {
       const o = entry.outcomes?.[col];
       if (!o || o.pctFromEntry == null) return '<span class="outcome-na">—</span>';
       const p = o.pctFromEntry;
       return `<span class="${p > 0 ? 'outcome-pos' : p < 0 ? 'outcome-neg' : 'outcome-na'}">${p > 0 ? '+' : ''}${p.toFixed(2)}%</span>`;
     }
+    // Swing summary columns
+    if (col === 'swingHighPct') {
+      if (val == null) return '<span class="outcome-na">—</span>';
+      const day = entry.swingHighDay;
+      return `<span class="swing-high">${val > 0 ? '+' : ''}${val.toFixed(1)}%</span><span class="swing-day-tag">D${day || '?'}</span>`;
+    }
+    if (col === 'swingLowPct') {
+      if (val == null) return '<span class="outcome-na">—</span>';
+      const day = entry.swingLowDay;
+      return `<span class="swing-low">${val > 0 ? '+' : ''}${val.toFixed(1)}%</span><span class="swing-day-tag">D${day || '?'}</span>`;
+    }
+
     if (val === null || val === undefined) return '<span style="color:var(--muted)">—</span>';
     switch (col) {
       case 'symbol': return `<span class="sym">${val}</span>`;
       case 'name': return String(val).length > 16 ? String(val).slice(0, 14) + '…' : String(val);
-      case 'date': return String(val).slice(5); // MM-DD
+      case 'date': return String(val).slice(5);
       case 'priceAtEntry': return '$' + Number(val).toFixed(val < 1 ? 4 : 2);
       case 'pctChangeAtEntry': case 'peakPctChange': {
         const p = Number(val);
@@ -598,14 +721,13 @@
       case 'enteredAt':
         try { return new Date(val).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true }); }
         catch { return val; }
-        case 'peakAfter15m': {
+      case 'peakAfter15m': {
         const peakPrice = entry.peakAfter15mPrice;
         const o15 = entry.outcomes?.outcome_15m?.price;
         if (!peakPrice || !o15 || o15 <= 0) return '<span style="color:var(--muted)">—</span>';
         const gain = ((peakPrice / o15) - 1) * 100;
         return `<span class="${gain > 0 ? 'pct-up' : gain < 0 ? 'pct-down' : 'pct-flat'}">${gain > 0 ? '+' : ''}${gain.toFixed(1)}%</span>`;
       }
-
       case 'peakAfter2h': {
         const peakPrice2h = entry.peakAfter2hPrice;
         const o2h = entry.outcomes?.outcome_2h?.price;
@@ -615,9 +737,7 @@
       }
       case 'hasNews': return val ? '📰' : '';
       default: return String(val);
-
     }
-    
   }
 
   function fmtC(n) {
@@ -629,16 +749,50 @@
     return '$' + v.toFixed(0);
   }
 
-  // Copy
+  // Copy / Download — uses current view's columns
+  function getCurrentCols(entries) {
+    if (currentView === 'swing') {
+      return [...SWING_BASE_COLS, ...DAILY_OUTCOME_KEYS, ...SWING_SUMMARY_COLS];
+    }
+    const oKeys = MOMENTUM_OUTCOME_KEYS;
+    const hasOutcomes = entries.some(e => e.outcomes && Object.keys(e.outcomes).length > 0);
+    return hasOutcomes ? [...MOMENTUM_COLS, ...oKeys] : MOMENTUM_COLS;
+  }
+
   document.getElementById('copyJsonBtn').addEventListener('click', () => {
     copyClip(JSON.stringify(getFilteredEntries(), null, 2), 'copyJsonBtn', '📋 JSON');
   });
+
   document.getElementById('copyCsvBtn').addEventListener('click', () => {
     const entries = getFilteredEntries();
     if (!entries.length) return;
-    const oKeys = ['outcome_5m','outcome_10m','outcome_15m','outcome_30m','outcome_45m','outcome_1h','outcome_1h15m','outcome_1h30m','outcome_1h45m','outcome_2h','outcome_2h15m','outcome_2h30m','outcome_2h45m','outcome_3h','outcome_3h15m','outcome_3h30m','outcome_3h45m','outcome_4h','outcome_6h'];
+    const csv = buildCsv(entries);
+    copyClip(csv, 'copyCsvBtn', '📋 CSV');
+  });
+
+  document.getElementById('dlJsonBtn').addEventListener('click', () => {
+    const entries = getFilteredEntries();
+    const week = currentWeek || 'data';
+    const viewTag = currentView === 'swing' ? 'swing' : 'momentum';
+    const filename = `sj-${currentMode}-${week}-${viewTag}${todayOnly ? '-today' : ''}.json`;
+    downloadFile(JSON.stringify(entries, null, 2), filename, 'application/json');
+  });
+
+  document.getElementById('dlCsvBtn').addEventListener('click', () => {
+    const entries = getFilteredEntries();
+    if (!entries.length) return;
+    const csv = buildCsv(entries);
+    const week = currentWeek || 'data';
+    const viewTag = currentView === 'swing' ? 'swing' : 'momentum';
+    const filename = `sj-${currentMode}-${week}-${viewTag}${todayOnly ? '-today' : ''}.csv`;
+    downloadFile(csv, filename, 'text/csv');
+  });
+
+  function buildCsv(entries) {
+    const allOutcomeKeys = currentView === 'swing' ? DAILY_OUTCOME_KEYS : MOMENTUM_OUTCOME_KEYS;
+    const swingFields = currentView === 'swing' ? ['swingHighPct','swingHighDay','swingLowPct','swingLowDay'] : [];
     const bKeys = Object.keys(entries[0]).filter(k => k !== 'outcomes');
-    const aKeys = [...bKeys, ...oKeys];
+    const aKeys = [...bKeys, ...allOutcomeKeys, ...swingFields];
     const rows = entries.map(e => aKeys.map(k => {
       if (k.startsWith('outcome_')) { const o = e.outcomes?.[k]; return o?.pctFromEntry != null ? o.pctFromEntry : ''; }
       const v = e[k]; if (v == null) return '';
@@ -646,8 +800,8 @@
       if (typeof v === 'string' && v.includes(',')) return '"' + v.replace(/"/g, '""') + '"';
       return String(v);
     }).join(','));
-    copyClip([aKeys.join(','), ...rows].join('\n'), 'copyCsvBtn', '📋 CSV');
-  });
+    return [aKeys.join(','), ...rows].join('\n');
+  }
 
   function copyClip(text, btnId, label) {
     navigator.clipboard.writeText(text).then(() => {
@@ -672,31 +826,6 @@
     URL.revokeObjectURL(url);
     showToast('Downloaded ' + filename);
   }
-
-  document.getElementById('dlJsonBtn').addEventListener('click', () => {
-    const entries = getFilteredEntries();
-    const week = currentWeek || 'data';
-    const filename = `sj-${currentMode}-${week}-${todayOnly ? 'today' : 'full'}.json`;
-    downloadFile(JSON.stringify(entries, null, 2), filename, 'application/json');
-  });
-
-  document.getElementById('dlCsvBtn').addEventListener('click', () => {
-    const entries = getFilteredEntries();
-    if (!entries.length) return;
-    const oKeys = ['outcome_5m','outcome_10m','outcome_15m','outcome_30m','outcome_45m','outcome_1h','outcome_1h15m','outcome_1h30m','outcome_1h45m','outcome_2h','outcome_2h15m','outcome_2h30m','outcome_2h45m','outcome_3h','outcome_3h15m','outcome_3h30m','outcome_3h45m','outcome_4h','outcome_6h'];
-    const bKeys = Object.keys(entries[0]).filter(k => k !== 'outcomes');
-    const aKeys = [...bKeys, ...oKeys];
-    const rows = entries.map(e => aKeys.map(k => {
-      if (k.startsWith('outcome_')) { const o = e.outcomes?.[k]; return o?.pctFromEntry != null ? o.pctFromEntry : ''; }
-      const v = e[k]; if (v == null) return '';
-      if (typeof v === 'object') return JSON.stringify(v).replace(/,/g, ';');
-      if (typeof v === 'string' && v.includes(',')) return '"' + v.replace(/"/g, '""') + '"';
-      return String(v);
-    }).join(','));
-    const week = currentWeek || 'data';
-    const filename = `sj-${currentMode}-${week}-${todayOnly ? 'today' : 'full'}.csv`;
-    downloadFile([aKeys.join(','), ...rows].join('\n'), filename, 'text/csv');
-  });
 
   function showToast(msg) {
     const t = document.getElementById('toast'); t.textContent = msg; t.classList.add('visible');

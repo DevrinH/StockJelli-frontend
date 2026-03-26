@@ -16,8 +16,6 @@
     --mono: 'JetBrains Mono', monospace; --sans: 'DM Sans', system-ui, sans-serif;
   }
   body { background: var(--bg); color: var(--text); font-family: var(--sans); min-height: 100vh; }
-
-  /* Auth */
   .auth-gate { display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 20px; }
   .auth-box { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 40px; max-width: 400px; width: 100%; text-align: center; }
   .auth-box h1 { font-size: 1.4rem; font-weight: 700; margin-bottom: 8px; background: linear-gradient(135deg, #e2e8f0, #3b82f6); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
@@ -27,12 +25,8 @@
   .auth-input::placeholder { color: #334155; }
   .auth-btn { width: 100%; padding: 12px; margin-top: 12px; background: var(--accent); color: #fff; border: none; border-radius: 10px; font-weight: 600; cursor: pointer; }
   .auth-error { color: var(--red); font-size: 0.8rem; margin-top: 10px; display: none; }
-
-  /* Dashboard */
   .dashboard { display: none; }
   .dashboard.visible { display: block; }
-
-  /* Header */
   .dash-header { position: sticky; top: 0; z-index: 100; background: rgba(10, 13, 20, 0.92); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); padding: 12px 20px; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
   .dash-brand { display: flex; align-items: center; gap: 10px; text-decoration: none; }
   .dash-brand img { border-radius: 6px; }
@@ -52,26 +46,16 @@
   .refresh-info { font-size: 0.62rem; color: var(--muted); font-family: var(--mono); display: flex; align-items: center; gap: 4px; }
   .refresh-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); animation: pulse 2s ease-in-out infinite; }
   @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.4; } }
-
-  /* View label */
-  .view-label { font-size: 0.6rem; color: var(--muted); font-family: var(--mono); text-transform: uppercase; letter-spacing: 0.08em; padding: 4px 8px; border-radius: 4px; }
-  .view-label-momentum { background: rgba(59,130,246,0.08); color: var(--accent); }
-  .view-label-swing { background: rgba(167,139,250,0.08); color: var(--purple); }
-
-  /* Filter Panel */
   .filter-panel { padding: 10px 20px; border-bottom: 1px solid var(--border); background: var(--surface); display: flex; gap: 12px; flex-wrap: wrap; align-items: flex-end; }
   .filter-group { display: flex; flex-direction: column; gap: 4px; }
   .filter-label { font-size: 0.6rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; font-weight: 600; }
   .filter-input { padding: 5px 10px; background: var(--bg); border: 1px solid var(--border); border-radius: 6px; color: var(--text); font-family: var(--mono); font-size: 0.75rem; width: 100px; outline: none; }
   .filter-input:focus { border-color: var(--accent); }
   .filter-input::placeholder { color: #334155; }
-  .filter-input-wide { width: 140px; }
   .filter-select { padding: 5px 8px; background: var(--bg); border: 1px solid var(--border); border-radius: 6px; color: var(--text); font-family: var(--mono); font-size: 0.75rem; outline: none; cursor: pointer; }
   .filter-reset { padding: 5px 10px; background: none; border: 1px solid var(--border); border-radius: 6px; color: var(--muted); font-size: 0.7rem; cursor: pointer; align-self: flex-end; transition: all 0.15s; }
   .filter-reset:hover { color: var(--red); border-color: var(--red); }
   .filter-count { font-size: 0.65rem; color: var(--muted); font-family: var(--mono); align-self: flex-end; padding-bottom: 4px; }
-
-  /* Stats */
   .stats-bar { display: flex; gap: 14px; padding: 10px 20px; border-bottom: 1px solid var(--border); background: var(--surface); flex-wrap: wrap; }
   .stat { display: flex; flex-direction: column; gap: 1px; }
   .stat-label { font-size: 0.6rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; font-weight: 600; }
@@ -79,14 +63,17 @@
   .stat-value.green { color: var(--green); }
   .stat-value.amber { color: var(--amber); }
   .stat-value.purple { color: var(--purple); }
-
-  /* Table */
   .table-container { overflow-x: auto; padding: 0 20px 20px; -webkit-overflow-scrolling: touch; max-height: calc(100vh - 180px); overflow-y: auto; }
   table { width: 100%; border-collapse: collapse; font-size: 0.75rem; margin-top: 10px; }
-  th { position: sticky; top: 0; background: var(--surface); padding: 8px 10px; text-align: left; font-weight: 600; color: var(--muted); font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.04em; border-bottom: 1px solid var(--border); cursor: pointer; user-select: none; white-space: nowrap; }
+  th { position: sticky; top: 0; background: var(--surface); padding: 8px 10px; text-align: left; font-weight: 600; color: var(--muted); font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.04em; border-bottom: 1px solid var(--border); cursor: pointer; user-select: none; white-space: nowrap; z-index: 2; }
   th:hover { color: var(--accent); }
   th.sorted { color: var(--accent); }
   th .sort-arrow { margin-left: 3px; font-size: 0.6rem; }
+  /* Swing day group headers */
+  th.swing-group { background: var(--surface2); color: var(--purple); text-align: center; cursor: default; font-size: 0.6rem; letter-spacing: 0.08em; border-left: 1px solid rgba(167,139,250,0.15); }
+  th.swing-sub { color: var(--purple); font-size: 0.55rem; opacity: 0.7; border-left: 1px solid rgba(167,139,250,0.06); }
+  td.swing-cell { border-left: 1px solid rgba(167,139,250,0.04); }
+  td.swing-day-start { border-left: 1px solid rgba(167,139,250,0.15); }
   td { padding: 7px 10px; border-bottom: 1px solid var(--border); font-family: var(--mono); font-size: 0.72rem; white-space: nowrap; }
   tr:hover td { background: rgba(59, 130, 246, 0.04); }
   tr.near-miss td { opacity: 0.45; }
@@ -102,53 +89,39 @@
   .outcome-pos { color: var(--green); font-weight: 600; }
   .outcome-neg { color: var(--red); font-weight: 600; }
   .outcome-na { color: var(--muted); font-size: 0.62rem; }
-  .source-tag { font-size: 0.62rem; padding: 2px 5px; border-radius: 4px; background: rgba(59, 130, 246, 0.1); color: var(--accent); font-weight: 600; }
   .session-tag { font-size: 0.62rem; padding: 2px 5px; border-radius: 4px; font-weight: 600; }
   .session-open { background: rgba(34,197,94,0.1); color: var(--green); }
   .session-premarket { background: rgba(245,158,11,0.1); color: var(--amber); }
   .session-afterhours { background: rgba(139,92,246,0.1); color: #8b5cf6; }
-
-  /* Swing-specific */
   .swing-high { color: var(--green); font-weight: 700; }
   .swing-low { color: var(--red); font-weight: 700; }
-  .swing-day-tag { font-size: 0.58rem; color: var(--muted); margin-left: 2px; }
-  th.swing-col { color: var(--purple); }
-
+  .swing-day-tag { font-size: 0.55rem; color: var(--muted); margin-left: 2px; }
   .empty-state { text-align: center; padding: 60px 20px; color: var(--muted); }
   .empty-state h3 { font-size: 1.1rem; margin-bottom: 8px; color: var(--text); }
   .loading { text-align: center; padding: 40px; color: var(--muted); font-family: var(--mono); }
   .toast { position: fixed; bottom: 20px; right: 20px; padding: 10px 18px; background: var(--green); color: #0a0d14; font-weight: 600; font-size: 0.82rem; border-radius: 10px; box-shadow: 0 8px 24px rgba(0,0,0,0.4); transform: translateY(80px); opacity: 0; transition: all 0.3s ease; z-index: 1000; }
   .toast.visible { transform: translateY(0); opacity: 1; }
-
-  /* Responsive */
+  /* Swing detail toggle */
+  .swing-detail-toggle { display: flex; align-items: center; gap: 6px; font-size: 0.7rem; color: var(--muted); cursor: pointer; }
+  .swing-detail-toggle input { accent-color: var(--purple); }
   @media (max-width: 900px) {
     .dash-header { padding: 10px 12px; gap: 8px; }
     .filter-panel { padding: 8px 12px; gap: 8px; }
     .stats-bar { padding: 8px 12px; gap: 10px; }
     .table-container { padding: 0 6px 12px; }
-    .filter-input { width: 80px; }
-    .filter-input-wide { width: 110px; }
   }
   @media (max-width: 640px) {
     .dash-header { flex-direction: column; align-items: stretch; }
     .dash-controls { justify-content: flex-start; }
     .ctrl-btn { padding: 5px 10px; font-size: 0.7rem; }
-    .ctrl-select { font-size: 0.72rem; }
     .filter-panel { flex-direction: column; gap: 6px; }
     .filter-group { flex-direction: row; align-items: center; gap: 6px; width: 100%; }
     .filter-label { min-width: 55px; }
-    .filter-input, .filter-input-wide { flex: 1; width: auto; }
-    .filter-select { flex: 1; }
+    .filter-input, .filter-select { flex: 1; }
     .stats-bar { gap: 8px; }
     .stat-value { font-size: 0.82rem; }
-    .stat-label { font-size: 0.55rem; }
     td, th { padding: 5px 6px; font-size: 0.65rem; }
-    .sj-badge { font-size: 0.6rem; padding: 1px 4px; }
     .col-name, .col-rvol, .col-volmcap, .col-peakmin, .col-session { display: none; }
-  }
-  @media (max-width: 380px) {
-    td, th { padding: 4px 4px; font-size: 0.6rem; }
-    .ctrl-btn { padding: 4px 8px; font-size: 0.65rem; }
   }
 </style>
 </head>
@@ -175,6 +148,9 @@
       <button class="ctrl-btn" id="modeCrypto" data-mode="crypto">Crypto</button>
       <span style="width:1px;height:18px;background:var(--border);margin:0 2px;"></span>
       <button class="ctrl-btn ctrl-btn-swing" id="viewSwingBtn">📈 Swing</button>
+      <label class="swing-detail-toggle" id="swingDetailWrap" style="display:none;">
+        <input type="checkbox" id="swingShowAll" /> All 2h
+      </label>
       <select class="ctrl-select" id="weekSelect"></select>
       <button class="ctrl-btn ctrl-btn-today" id="todayBtn">Today</button>
       <label style="display:flex;align-items:center;gap:5px;font-size:0.7rem;color:var(--muted);cursor:pointer;">
@@ -191,86 +167,16 @@
     </div>
   </header>
 
-  <!-- Filter Panel -->
   <div class="filter-panel" id="filterPanel">
-    <div class="filter-group">
-      <span class="filter-label">Symbol</span>
-      <input type="text" class="filter-input" id="filterSymbol" placeholder="e.g. NVDA" />
-    </div>
-    <div class="filter-group">
-      <span class="filter-label">MCap Min</span>
-      <select class="filter-select" id="filterMcapMin">
-        <option value="0">Any</option>
-        <option value="100000000">$100M+</option>
-        <option value="500000000">$500M+</option>
-        <option value="1000000000">$1B+</option>
-        <option value="5000000000">$5B+</option>
-        <option value="10000000000">$10B+</option>
-        <option value="50000000000">$50B+</option>
-      </select>
-    </div>
-    <div class="filter-group">
-      <span class="filter-label">MCap Max</span>
-      <select class="filter-select" id="filterMcapMax">
-        <option value="0">Any</option>
-        <option value="500000000">≤$500M</option>
-        <option value="1000000000">≤$1B</option>
-        <option value="5000000000">≤$5B</option>
-        <option value="10000000000">≤$10B</option>
-        <option value="50000000000">≤$50B</option>
-        <option value="500000000000">≤$500B</option>
-      </select>
-    </div>
-    <div class="filter-group">
-      <span class="filter-label">Vol Min</span>
-      <select class="filter-select" id="filterVolMin">
-        <option value="0">Any</option>
-        <option value="500000">500K+</option>
-        <option value="1000000">1M+</option>
-        <option value="5000000">5M+</option>
-        <option value="10000000">10M+</option>
-        <option value="50000000">50M+</option>
-      </select>
-    </div>
-    <div class="filter-group">
-      <span class="filter-label">SJ Min</span>
-      <select class="filter-select" id="filterSjMin">
-        <option value="0">Any</option>
-        <option value="40">40+</option>
-        <option value="50">50+</option>
-        <option value="60">60+</option>
-        <option value="70">70+</option>
-      </select>
-    </div>
-    <div class="filter-group">
-      <span class="filter-label">% Chg Min</span>
-      <input type="number" class="filter-input" id="filterPctMin" placeholder="e.g. 5" step="0.5" />
-    </div>
-    <div class="filter-group">
-      <span class="filter-label">Range Min</span>
-      <select class="filter-select" id="filterRangeMin">
-        <option value="0">Any</option>
-        <option value="0.5">50%+</option>
-        <option value="0.6">60%+</option>
-        <option value="0.7">70%+</option>
-        <option value="0.8">80%+</option>
-      </select>
-    </div>
-    <div class="filter-group">
-      <span class="filter-label">Session</span>
-      <select class="filter-select" id="filterSession">
-        <option value="">Any</option>
-        <option value="open">Open</option>
-        <option value="premarket">Premarket</option>
-        <option value="afterhours">After-Hours</option>
-      </select>
-    </div>
-    <div class="filter-group" id="filterSectorGroup">
-      <span class="filter-label">Sector</span>
-      <select class="filter-select" id="filterSector">
-        <option value="">Any</option>
-      </select>
-    </div>
+    <div class="filter-group"><span class="filter-label">Symbol</span><input type="text" class="filter-input" id="filterSymbol" placeholder="e.g. NVDA" /></div>
+    <div class="filter-group"><span class="filter-label">MCap Min</span><select class="filter-select" id="filterMcapMin"><option value="0">Any</option><option value="100000000">$100M+</option><option value="500000000">$500M+</option><option value="1000000000">$1B+</option><option value="5000000000">$5B+</option><option value="10000000000">$10B+</option><option value="50000000000">$50B+</option></select></div>
+    <div class="filter-group"><span class="filter-label">MCap Max</span><select class="filter-select" id="filterMcapMax"><option value="0">Any</option><option value="500000000">≤$500M</option><option value="1000000000">≤$1B</option><option value="5000000000">≤$5B</option><option value="10000000000">≤$10B</option><option value="50000000000">≤$50B</option><option value="500000000000">≤$500B</option></select></div>
+    <div class="filter-group"><span class="filter-label">Vol Min</span><select class="filter-select" id="filterVolMin"><option value="0">Any</option><option value="500000">500K+</option><option value="1000000">1M+</option><option value="5000000">5M+</option><option value="10000000">10M+</option><option value="50000000">50M+</option></select></div>
+    <div class="filter-group"><span class="filter-label">SJ Min</span><select class="filter-select" id="filterSjMin"><option value="0">Any</option><option value="40">40+</option><option value="50">50+</option><option value="60">60+</option><option value="70">70+</option></select></div>
+    <div class="filter-group"><span class="filter-label">% Chg Min</span><input type="number" class="filter-input" id="filterPctMin" placeholder="e.g. 5" step="0.5" /></div>
+    <div class="filter-group"><span class="filter-label">Range Min</span><select class="filter-select" id="filterRangeMin"><option value="0">Any</option><option value="0.5">50%+</option><option value="0.6">60%+</option><option value="0.7">70%+</option><option value="0.8">80%+</option></select></div>
+    <div class="filter-group"><span class="filter-label">Session</span><select class="filter-select" id="filterSession"><option value="">Any</option><option value="open">Open</option><option value="premarket">Premarket</option><option value="afterhours">After-Hours</option></select></div>
+    <div class="filter-group"><span class="filter-label">Sector</span><select class="filter-select" id="filterSector"><option value="">Any</option></select></div>
     <button class="filter-reset" id="filterResetBtn">✕ Reset</button>
     <span class="filter-count" id="filterCount"></span>
   </div>
@@ -283,10 +189,9 @@
     <div class="stat"><span class="stat-label">Avg %</span><span class="stat-value" id="statAvgPct">—</span></div>
     <div class="stat"><span class="stat-label">Avg V/MC</span><span class="stat-value" id="statAvgVolMcap">—</span></div>
     <div class="stat"><span class="stat-label">Midcap</span><span class="stat-value" id="statMidcap">—</span></div>
-    <!-- Swing-only stats -->
     <div class="stat" id="statSwingHighWrap" style="display:none;"><span class="stat-label">Avg Swing Hi</span><span class="stat-value green" id="statSwingHigh">—</span></div>
     <div class="stat" id="statSwingLowWrap" style="display:none;"><span class="stat-label">Avg Swing Lo</span><span class="stat-value" style="color:var(--red)" id="statSwingLow">—</span></div>
-    <div class="stat" id="statSwingDataWrap" style="display:none;"><span class="stat-label">Has D1+</span><span class="stat-value purple" id="statSwingData">—</span></div>
+    <div class="stat" id="statSwingDataWrap" style="display:none;"><span class="stat-label">Has Swing</span><span class="stat-value purple" id="statSwingData">—</span></div>
   </div>
 
   <div class="table-container" id="tableContainer">
@@ -304,7 +209,7 @@
   const ADMIN_KEY = 'sjadmin2026';
 
   let currentMode = 'stocks';
-  let currentView = 'momentum'; // 'momentum' or 'swing'
+  let currentView = 'momentum';
   let currentWeek = null;
   let reportData = null;
   let allEntries = [];
@@ -312,9 +217,23 @@
   let sortDir = 'desc';
   let showNearMisses = false;
   let todayOnly = false;
+  let swingShowAll = false; // show all 4 checks per day vs just close
   let autoRefreshTimer = null;
   let countdownTimer = null;
   let nextRefreshAt = null;
+
+  // ── Swing outcome key generation ──
+  const SWING_DAYS = [2,3,4,5,6,7,8,9,10];
+  const SWING_CHECKS = ['open','mid1','mid2','close'];
+  function swingKey(day, check) { return `outcome_d${day}_${check}`; }
+  function allSwingKeys() {
+    const keys = [];
+    for (const d of SWING_DAYS) for (const c of SWING_CHECKS) keys.push(swingKey(d, c));
+    return keys;
+  }
+  function closeOnlySwingKeys() {
+    return SWING_DAYS.map(d => swingKey(d, 'close'));
+  }
 
   // Auth
   const urlKey = new URLSearchParams(window.location.search).get('key');
@@ -323,16 +242,13 @@
     localStorage.setItem('sj_admin_key', ADMIN_KEY);
     showDashboard();
   }
-
   document.getElementById('authBtn').addEventListener('click', tryAuth);
   document.getElementById('authKey').addEventListener('keydown', e => { if (e.key === 'Enter') tryAuth(); });
-
   function tryAuth() {
     const k = document.getElementById('authKey').value.trim();
     if (k === ADMIN_KEY) { localStorage.setItem('sj_admin_key', ADMIN_KEY); showDashboard(); }
     else document.getElementById('authError').style.display = 'block';
   }
-
   function showDashboard() {
     document.getElementById('authGate').style.display = 'none';
     document.getElementById('dashboard').classList.add('visible');
@@ -345,34 +261,28 @@
   function setMode(mode) {
     currentMode = mode;
     document.querySelectorAll('[data-mode]').forEach(b => b.classList.toggle('active', b.dataset.mode === mode));
-    if (reportData) { extractEntries(); renderTable(); }
-    else loadReport();
+    if (reportData) { extractEntries(); renderTable(); } else loadReport();
   }
 
   // Swing toggle
   document.getElementById('viewSwingBtn').addEventListener('click', () => {
     currentView = currentView === 'momentum' ? 'swing' : 'momentum';
-    const btn = document.getElementById('viewSwingBtn');
-    btn.classList.toggle('active', currentView === 'swing');
-    // Reset sort for swing view
-    if (currentView === 'swing') {
-      sortCol = 'date';
-      sortDir = 'desc';
-    } else {
-      sortCol = 'enteredAt';
-      sortDir = 'desc';
-    }
+    document.getElementById('viewSwingBtn').classList.toggle('active', currentView === 'swing');
+    document.getElementById('swingDetailWrap').style.display = currentView === 'swing' ? '' : 'none';
+    if (currentView === 'swing') { sortCol = 'date'; sortDir = 'desc'; }
+    else { sortCol = 'enteredAt'; sortDir = 'desc'; }
     renderTable();
   });
 
-  // Week
+  // Swing detail toggle (close-only vs all 2h checks)
+  document.getElementById('swingShowAll').addEventListener('change', e => {
+    swingShowAll = e.target.checked;
+    renderTable();
+  });
+
   const weekSelect = document.getElementById('weekSelect');
   weekSelect.addEventListener('change', () => { currentWeek = weekSelect.value; loadReport(); });
-
-  // Near-misses
   document.getElementById('showNearMisses').addEventListener('change', e => { showNearMisses = e.target.checked; renderTable(); });
-
-  // Today + auto-refresh
   document.getElementById('todayBtn').addEventListener('click', () => {
     todayOnly = !todayOnly;
     document.getElementById('todayBtn').classList.toggle('active', todayOnly);
@@ -382,200 +292,108 @@
 
   function startAutoRefresh() {
     stopAutoRefresh();
-    const MS = 30 * 60 * 1000;
-    nextRefreshAt = Date.now() + MS;
-    document.getElementById('refreshInfo').style.display = 'flex';
-    updateCountdown();
+    const MS = 30*60*1000; nextRefreshAt = Date.now()+MS;
+    document.getElementById('refreshInfo').style.display = 'flex'; updateCountdown();
     countdownTimer = setInterval(updateCountdown, 10000);
-    autoRefreshTimer = setInterval(() => { loadReport(); nextRefreshAt = Date.now() + MS; }, MS);
+    autoRefreshTimer = setInterval(() => { loadReport(); nextRefreshAt = Date.now()+MS; }, MS);
   }
-
   function stopAutoRefresh() {
     if (autoRefreshTimer) clearInterval(autoRefreshTimer);
     if (countdownTimer) clearInterval(countdownTimer);
     autoRefreshTimer = countdownTimer = null; nextRefreshAt = null;
     document.getElementById('refreshInfo').style.display = 'none';
   }
-
   function updateCountdown() {
     if (!nextRefreshAt) return;
-    const r = Math.max(0, nextRefreshAt - Date.now());
-    const m = Math.floor(r / 60000);
-    document.getElementById('refreshCountdown').textContent = `${m}m`;
+    document.getElementById('refreshCountdown').textContent = Math.floor(Math.max(0, nextRefreshAt-Date.now())/60000) + 'm';
   }
 
   // Filters
   const fEls = {
     symbol: document.getElementById('filterSymbol'),
-    mcapMin: document.getElementById('filterMcapMin'),
-    mcapMax: document.getElementById('filterMcapMax'),
-    volMin: document.getElementById('filterVolMin'),
-    sjMin: document.getElementById('filterSjMin'),
-    pctMin: document.getElementById('filterPctMin'),
-    rangeMin: document.getElementById('filterRangeMin'),
-    session: document.getElementById('filterSession'),
-    sector: document.getElementById('filterSector'),
+    mcapMin: document.getElementById('filterMcapMin'), mcapMax: document.getElementById('filterMcapMax'),
+    volMin: document.getElementById('filterVolMin'), sjMin: document.getElementById('filterSjMin'),
+    pctMin: document.getElementById('filterPctMin'), rangeMin: document.getElementById('filterRangeMin'),
+    session: document.getElementById('filterSession'), sector: document.getElementById('filterSector'),
   };
-
-  Object.values(fEls).forEach(el => {
-    if (!el) return;
-    el.addEventListener(el.tagName === 'INPUT' ? 'input' : 'change', () => renderTable());
-  });
-
+  Object.values(fEls).forEach(el => { if (!el) return; el.addEventListener(el.tagName==='INPUT'?'input':'change', ()=>renderTable()); });
   document.getElementById('filterResetBtn').addEventListener('click', () => {
-    fEls.symbol.value = '';
-    fEls.mcapMin.value = '0';
-    fEls.mcapMax.value = '0';
-    fEls.volMin.value = '0';
-    fEls.sjMin.value = '0';
-    fEls.pctMin.value = '';
-    fEls.rangeMin.value = '0';
-    fEls.session.value = '';
-    fEls.sector.value = '';
+    fEls.symbol.value=''; fEls.mcapMin.value='0'; fEls.mcapMax.value='0'; fEls.volMin.value='0';
+    fEls.sjMin.value='0'; fEls.pctMin.value=''; fEls.rangeMin.value='0'; fEls.session.value=''; fEls.sector.value='';
     renderTable();
   });
 
-  // Data loading
+  // Data
   async function loadWeeks() {
     try {
       const res = await fetch(`${API}/api/weekly-report/weeks`);
       const data = await res.json();
-      const weeks = (data.weeks || []).sort().reverse();
+      const weeks = (data.weeks||[]).sort().reverse();
       weekSelect.innerHTML = '';
-      if (weeks.length === 0) { weekSelect.innerHTML = '<option>No data</option>'; return; }
-      weeks.forEach((w, i) => {
-        const opt = document.createElement('option');
-        opt.value = w; opt.textContent = w + (i === 0 ? ' (latest)' : '');
-        weekSelect.appendChild(opt);
-      });
-      currentWeek = weeks[0];
-      loadReport();
-    } catch (e) {
-      document.getElementById('tableContainer').innerHTML = '<div class="empty-state"><h3>Failed to load</h3><p>' + e.message + '</p></div>';
-    }
+      if (!weeks.length) { weekSelect.innerHTML = '<option>No data</option>'; return; }
+      weeks.forEach((w,i) => { const o=document.createElement('option'); o.value=w; o.textContent=w+(i===0?' (latest)':''); weekSelect.appendChild(o); });
+      currentWeek = weeks[0]; loadReport();
+    } catch (e) { document.getElementById('tableContainer').innerHTML = '<div class="empty-state"><h3>Failed to load</h3><p>'+e.message+'</p></div>'; }
   }
-
   async function loadReport() {
     document.getElementById('tableContainer').innerHTML = '<div class="loading">Loading data...</div>';
     try {
-      const res = await fetch(`${API}/api/weekly-report?week=${currentWeek || ''}`);
-      reportData = await res.json();
-      extractEntries();
-      populateSectorFilter();
-      renderTable();
-    } catch (e) {
-      document.getElementById('tableContainer').innerHTML = '<div class="empty-state"><h3>Failed</h3><p>' + e.message + '</p></div>';
-    }
+      const res = await fetch(`${API}/api/weekly-report?week=${currentWeek||''}`);
+      reportData = await res.json(); extractEntries(); populateSectorFilter(); renderTable();
+    } catch (e) { document.getElementById('tableContainer').innerHTML = '<div class="empty-state"><h3>Failed</h3><p>'+e.message+'</p></div>'; }
   }
-
-  function extractEntries() {
-    if (!reportData) { allEntries = []; return; }
-    allEntries = reportData[currentMode]?.allEntries || [];
-  }
-
+  function extractEntries() { allEntries = reportData?.[currentMode]?.allEntries || []; }
   function populateSectorFilter() {
-    const sectors = new Set();
-    for (const e of allEntries) {
-      if (e.sectorAtEntry) sectors.add(e.sectorAtEntry);
-    }
-    const sel = fEls.sector;
-    const cur = sel.value;
+    const sectors = new Set(); for (const e of allEntries) if (e.sectorAtEntry) sectors.add(e.sectorAtEntry);
+    const sel = fEls.sector; const cur = sel.value;
     sel.innerHTML = '<option value="">Any</option>';
-    [...sectors].sort().forEach(s => {
-      const opt = document.createElement('option');
-      opt.value = s; opt.textContent = s;
-      sel.appendChild(opt);
-    });
+    [...sectors].sort().forEach(s => { const o=document.createElement('option'); o.value=s; o.textContent=s; sel.appendChild(o); });
     sel.value = cur;
   }
-
   function getFilteredEntries() {
     let entries = allEntries;
     if (!showNearMisses) entries = entries.filter(e => e.qualifiedAtEntry !== false);
-
-    if (todayOnly) {
-      const today = new Date().toLocaleDateString('en-CA', { timeZone: 'America/New_York' });
-      entries = entries.filter(e => e.date === today);
-    }
-
-    const sym = (fEls.symbol.value || '').trim().toUpperCase();
-    if (sym) entries = entries.filter(e => (e.symbol || '').includes(sym));
-
-    const mcMin = Number(fEls.mcapMin.value) || 0;
-    if (mcMin > 0) entries = entries.filter(e => (e.marketCapAtEntry || 0) >= mcMin);
-
-    const mcMax = Number(fEls.mcapMax.value) || 0;
-    if (mcMax > 0) entries = entries.filter(e => (e.marketCapAtEntry || Infinity) <= mcMax);
-
-    const vMin = Number(fEls.volMin.value) || 0;
-    if (vMin > 0) entries = entries.filter(e => (e.volumeAtEntry || 0) >= vMin);
-
-    const sjMin = Number(fEls.sjMin.value) || 0;
-    if (sjMin > 0) entries = entries.filter(e => (e.sjScoreAtEntry || 0) >= sjMin);
-
-    const pctMin = parseFloat(fEls.pctMin.value);
-    if (pctMin > 0) entries = entries.filter(e => (e.pctChangeAtEntry || 0) >= pctMin);
-
-    const rMin = parseFloat(fEls.rangeMin.value) || 0;
-    if (rMin > 0) entries = entries.filter(e => (e.rangePositionAtEntry || 0) >= rMin);
-
-    const sess = fEls.session.value;
-    if (sess) entries = entries.filter(e => (e.marketSessionAtEntry || '') === sess);
-
-    const sector = fEls.sector.value;
-    if (sector) entries = entries.filter(e => (e.sectorAtEntry || '') === sector);
-
+    if (todayOnly) { const today = new Date().toLocaleDateString('en-CA',{timeZone:'America/New_York'}); entries = entries.filter(e => e.date === today); }
+    const sym = (fEls.symbol.value||'').trim().toUpperCase(); if (sym) entries = entries.filter(e => (e.symbol||'').includes(sym));
+    const mcMin = Number(fEls.mcapMin.value)||0; if (mcMin>0) entries = entries.filter(e => (e.marketCapAtEntry||0) >= mcMin);
+    const mcMax = Number(fEls.mcapMax.value)||0; if (mcMax>0) entries = entries.filter(e => (e.marketCapAtEntry||Infinity) <= mcMax);
+    const vMin = Number(fEls.volMin.value)||0; if (vMin>0) entries = entries.filter(e => (e.volumeAtEntry||0) >= vMin);
+    const sjMin = Number(fEls.sjMin.value)||0; if (sjMin>0) entries = entries.filter(e => (e.sjScoreAtEntry||0) >= sjMin);
+    const pctMin = parseFloat(fEls.pctMin.value); if (pctMin>0) entries = entries.filter(e => (e.pctChangeAtEntry||0) >= pctMin);
+    const rMin = parseFloat(fEls.rangeMin.value)||0; if (rMin>0) entries = entries.filter(e => (e.rangePositionAtEntry||0) >= rMin);
+    const sess = fEls.session.value; if (sess) entries = entries.filter(e => (e.marketSessionAtEntry||'') === sess);
+    const sector = fEls.sector.value; if (sector) entries = entries.filter(e => (e.sectorAtEntry||'') === sector);
     return entries;
   }
 
-  // ── Column definitions per view ──
-  const DAILY_OUTCOME_KEYS = ['outcome_d1','outcome_d2','outcome_d3','outcome_d4','outcome_d5','outcome_d6','outcome_d7','outcome_d8','outcome_d9','outcome_d10'];
-
-  const MOMENTUM_COLS = [
-    'symbol','name','date','priceAtEntry','pctChangeAtEntry',
-    'volumeAtEntry','marketCapAtEntry','sjScoreAtEntry',
-    'rangePositionAtEntry','rvolAtEntry','volMcapRatioAtEntry',
-    'peakPctChange','peakMinutesAfterEntry',
-    'marketSessionAtEntry','enteredAt','qualifiedAtEntry',
-    'sectorAtEntry','industryAtEntry','hasNews','peakAfter15m','peakAfter2h'
-  ];
+  // ── Column definitions ──
+  const MOMENTUM_COLS = ['symbol','name','date','priceAtEntry','pctChangeAtEntry','volumeAtEntry','marketCapAtEntry','sjScoreAtEntry','rangePositionAtEntry','rvolAtEntry','volMcapRatioAtEntry','peakPctChange','peakMinutesAfterEntry','marketSessionAtEntry','enteredAt','qualifiedAtEntry','sectorAtEntry','industryAtEntry','hasNews','peakAfter15m','peakAfter2h'];
   const MOMENTUM_OUTCOME_KEYS = ['outcome_5m','outcome_10m','outcome_15m','outcome_30m','outcome_45m','outcome_1h','outcome_1h15m','outcome_1h30m','outcome_1h45m','outcome_2h','outcome_2h15m','outcome_2h30m','outcome_2h45m','outcome_3h','outcome_3h15m','outcome_3h30m','outcome_3h45m','outcome_4h','outcome_6h'];
-
-  const SWING_BASE_COLS = [
-    'symbol','name','date','priceAtEntry','pctChangeAtEntry',
-    'marketCapAtEntry','sjScoreAtEntry','sectorAtEntry','industryAtEntry',
-    'rvolAtEntry','volMcapRatioAtEntry','outcome_eod'
-  ];
-  const SWING_SUMMARY_COLS = ['swingHighPct','swingLowPct'];
+  const SWING_BASE_COLS = ['symbol','name','date','priceAtEntry','pctChangeAtEntry','marketCapAtEntry','sjScoreAtEntry','sectorAtEntry','industryAtEntry','rvolAtEntry','volMcapRatioAtEntry','outcome_eod'];
 
   const COL_LABELS = {
-    symbol:'Sym', name:'Name', date:'Date', priceAtEntry:'Entry $', pctChangeAtEntry:'Entry %',
-    volumeAtEntry:'Vol', marketCapAtEntry:'MCap', sjScoreAtEntry:'SJ', rangePositionAtEntry:'Rng',
-    rvolAtEntry:'RVOL', volMcapRatioAtEntry:'V/MC', peakPctChange:'Pk%', peakMinutesAfterEntry:'PkM',
-    marketSessionAtEntry:'Sess', enteredAt:'Time', qualifiedAtEntry:'Q',
-    sectorAtEntry:'Sector', industryAtEntry:'Industry', peakAfter15m:'Pk15m+',
-    outcome_5m:'5m', outcome_10m:'10m', outcome_15m:'15m', outcome_30m:'30m',
-    outcome_1h:'1h', outcome_2h:'2h', outcome_4h:'4h', outcome_6h:'6h', outcome_45m:'45m',
-    outcome_1h15m:'1:15', outcome_1h30m:'1:30', outcome_1h45m:'1:45',
-    outcome_2h15m:'2:15', outcome_2h30m:'2:30', outcome_2h45m:'2:45',
-    outcome_3h:'3h', outcome_3h15m:'3:15', outcome_3h30m:'3:30', outcome_3h45m:'3:45',
-    peakAfter2h:'Pk2h+', hasNews:'News', outcome_eod:'EOD',
-    outcome_d1:'D1', outcome_d2:'D2', outcome_d3:'D3', outcome_d4:'D4', outcome_d5:'D5',
-    outcome_d6:'D6', outcome_d7:'D7', outcome_d8:'D8', outcome_d9:'D9', outcome_d10:'D10',
-    swingHighPct:'SwHi', swingLowPct:'SwLo',
+    symbol:'Sym',name:'Name',date:'Date',priceAtEntry:'Entry $',pctChangeAtEntry:'Entry %',
+    volumeAtEntry:'Vol',marketCapAtEntry:'MCap',sjScoreAtEntry:'SJ',rangePositionAtEntry:'Rng',
+    rvolAtEntry:'RVOL',volMcapRatioAtEntry:'V/MC',peakPctChange:'Pk%',peakMinutesAfterEntry:'PkM',
+    marketSessionAtEntry:'Sess',enteredAt:'Time',qualifiedAtEntry:'Q',
+    sectorAtEntry:'Sector',industryAtEntry:'Industry',peakAfter15m:'Pk15m+',
+    outcome_5m:'5m',outcome_10m:'10m',outcome_15m:'15m',outcome_30m:'30m',
+    outcome_1h:'1h',outcome_2h:'2h',outcome_4h:'4h',outcome_6h:'6h',outcome_45m:'45m',
+    outcome_1h15m:'1:15',outcome_1h30m:'1:30',outcome_1h45m:'1:45',
+    outcome_2h15m:'2:15',outcome_2h30m:'2:30',outcome_2h45m:'2:45',
+    outcome_3h:'3h',outcome_3h15m:'3:15',outcome_3h30m:'3:30',outcome_3h45m:'3:45',
+    peakAfter2h:'Pk2h+',hasNews:'News',outcome_eod:'EOD',
+    swingHighPct:'Sw Hi',swingLowPct:'Sw Lo',
   };
-
-  const COL_CLASS = {
-    name: 'col-name', rvolAtEntry: 'col-rvol', volMcapRatioAtEntry: 'col-volmcap',
-    peakMinutesAfterEntry: 'col-peakmin', marketSessionAtEntry: 'col-session',
-  };
+  const SWING_CHECK_LABELS = { open:'O', mid1:'M1', mid2:'M2', close:'C' };
+  const COL_CLASS = { name:'col-name',rvolAtEntry:'col-rvol',volMcapRatioAtEntry:'col-volmcap',peakMinutesAfterEntry:'col-peakmin',marketSessionAtEntry:'col-session' };
 
   function renderTable() {
     const container = document.getElementById('tableContainer');
     const entries = getFilteredEntries();
     const isSwing = currentView === 'swing';
 
-    // Toggle swing stats visibility
+    // Toggle swing stats
     document.getElementById('statSwingHighWrap').style.display = isSwing ? '' : 'none';
     document.getElementById('statSwingLowWrap').style.display = isSwing ? '' : 'none';
     document.getElementById('statSwingDataWrap').style.display = isSwing ? '' : 'none';
@@ -583,221 +401,219 @@
     // Stats
     const qualified = entries.filter(e => e.qualifiedAtEntry !== false);
     const nearMiss = allEntries.filter(e => e.qualifiedAtEntry === false);
-    const sjArr = qualified.map(e => e.sjScoreAtEntry).filter(s => s != null);
-    const pctArr = qualified.map(e => e.pctChangeAtEntry).filter(p => p != null);
-    const vmrArr = qualified.map(e => e.volMcapRatioAtEntry).filter(v => v != null);
-
+    const sjArr = qualified.map(e => e.sjScoreAtEntry).filter(s => s!=null);
+    const pctArr = qualified.map(e => e.pctChangeAtEntry).filter(p => p!=null);
+    const vmrArr = qualified.map(e => e.volMcapRatioAtEntry).filter(v => v!=null);
     document.getElementById('statEntries').textContent = entries.length;
     document.getElementById('statQualified').textContent = qualified.length;
     document.getElementById('statNearMiss').textContent = nearMiss.length;
-    document.getElementById('statAvgSJ').textContent = sjArr.length ? (sjArr.reduce((a, b) => a + b, 0) / sjArr.length).toFixed(1) : '—';
-    document.getElementById('statAvgPct').textContent = pctArr.length ? (pctArr.reduce((a, b) => a + b, 0) / pctArr.length).toFixed(1) + '%' : '—';
-    document.getElementById('statAvgVolMcap').textContent = vmrArr.length ? (vmrArr.reduce((a, b) => a + b, 0) / vmrArr.length * 100).toFixed(2) + '%' : '—';
-    document.getElementById('statMidcap').textContent = qualified.filter(e => e.source === 'midcap').length;
+    document.getElementById('statAvgSJ').textContent = sjArr.length ? (sjArr.reduce((a,b)=>a+b,0)/sjArr.length).toFixed(1) : '—';
+    document.getElementById('statAvgPct').textContent = pctArr.length ? (pctArr.reduce((a,b)=>a+b,0)/pctArr.length).toFixed(1)+'%' : '—';
+    document.getElementById('statAvgVolMcap').textContent = vmrArr.length ? (vmrArr.reduce((a,b)=>a+b,0)/vmrArr.length*100).toFixed(2)+'%' : '—';
+    document.getElementById('statMidcap').textContent = qualified.filter(e => e.source==='midcap').length;
     document.getElementById('filterCount').textContent = entries.length !== allEntries.length ? `${entries.length}/${allEntries.length}` : '';
 
-    // Swing stats
     if (isSwing) {
-      const swHiArr = entries.map(e => e.swingHighPct).filter(v => v != null);
-      const swLoArr = entries.map(e => e.swingLowPct).filter(v => v != null);
-      const hasDaily = entries.filter(e => e.outcomes && (e.outcomes.outcome_d1 || e.outcomes.outcome_d2));
-      document.getElementById('statSwingHigh').textContent = swHiArr.length ? '+' + (swHiArr.reduce((a,b)=>a+b,0)/swHiArr.length).toFixed(1) + '%' : '—';
-      document.getElementById('statSwingLow').textContent = swLoArr.length ? (swLoArr.reduce((a,b)=>a+b,0)/swLoArr.length).toFixed(1) + '%' : '—';
-      document.getElementById('statSwingData').textContent = hasDaily.length;
+      const swHi = entries.map(e=>e.swingHighPct).filter(v=>v!=null);
+      const swLo = entries.map(e=>e.swingLowPct).filter(v=>v!=null);
+      const hasSwing = entries.filter(e=>e.outcomes && Object.keys(e.outcomes).some(k=>k.startsWith('outcome_d')));
+      document.getElementById('statSwingHigh').textContent = swHi.length ? '+'+(swHi.reduce((a,b)=>a+b,0)/swHi.length).toFixed(1)+'%' : '—';
+      document.getElementById('statSwingLow').textContent = swLo.length ? (swLo.reduce((a,b)=>a+b,0)/swLo.length).toFixed(1)+'%' : '—';
+      document.getElementById('statSwingData').textContent = hasSwing.length;
     }
 
-    if (entries.length === 0) {
-      container.innerHTML = '<div class="empty-state"><h3>No entries</h3><p>No data matches filters.</p></div>';
-      return;
-    }
+    if (!entries.length) { container.innerHTML = '<div class="empty-state"><h3>No entries</h3><p>No data matches filters.</p></div>'; return; }
 
     // Sort
-    const sorted = [...entries].sort((a, b) => {
-      let va = resolveSort(a, sortCol), vb = resolveSort(b, sortCol);
-      if (va == null) va = sortDir === 'asc' ? Infinity : -Infinity;
-      if (vb == null) vb = sortDir === 'asc' ? Infinity : -Infinity;
-      if (typeof va === 'string') return sortDir === 'asc' ? va.localeCompare(vb) : vb.localeCompare(va);
-      return sortDir === 'asc' ? va - vb : vb - va;
+    const sorted = [...entries].sort((a,b) => {
+      let va = resolveSort(a,sortCol), vb = resolveSort(b,sortCol);
+      if (va==null) va = sortDir==='asc'?Infinity:-Infinity;
+      if (vb==null) vb = sortDir==='asc'?Infinity:-Infinity;
+      if (typeof va==='string') return sortDir==='asc'?va.localeCompare(vb):vb.localeCompare(va);
+      return sortDir==='asc'?va-vb:vb-va;
     });
 
-    // Build column list
-    let cols;
+    let html;
     if (isSwing) {
-      const hasDailyOutcomes = entries.some(e => e.outcomes && DAILY_OUTCOME_KEYS.some(k => e.outcomes[k]));
-      cols = [...SWING_BASE_COLS, ...DAILY_OUTCOME_KEYS, ...SWING_SUMMARY_COLS];
+      html = buildSwingTable(sorted);
     } else {
-      const hasOutcomes = entries.some(e => e.outcomes && Object.keys(e.outcomes).length > 0);
-      cols = hasOutcomes ? [...MOMENTUM_COLS, ...MOMENTUM_OUTCOME_KEYS] : MOMENTUM_COLS;
+      html = buildMomentumTable(sorted, entries);
     }
-
-    let html = '<table><thead><tr>';
-    for (const col of cols) {
-      const arrow = sortCol === col ? (sortDir === 'asc' ? '↑' : '↓') : '';
-      const isSwingCol = col.startsWith('outcome_d') || col.startsWith('swing');
-      const cls = [
-        sortCol === col ? 'sorted' : '',
-        COL_CLASS[col] || '',
-        isSwingCol ? 'swing-col' : '',
-      ].filter(Boolean).join(' ');
-      html += `<th class="${cls}" data-col="${col}">${COL_LABELS[col] || col}<span class="sort-arrow">${arrow}</span></th>`;
-    }
-    html += '</tr></thead><tbody>';
-
-    for (const e of sorted) {
-      const rowCls = e.qualifiedAtEntry === false ? 'near-miss' : '';
-      html += `<tr class="${rowCls}">`;
-      for (const col of cols) {
-        const cc = COL_CLASS[col] || '';
-        html += `<td class="${cc}">` + formatCell(col, e, e[col]) + '</td>';
-      }
-      html += '</tr>';
-    }
-    html += '</tbody></table>';
     container.innerHTML = html;
 
     container.querySelectorAll('th[data-col]').forEach(th => {
       th.addEventListener('click', () => {
         const col = th.dataset.col;
-        if (sortCol === col) sortDir = sortDir === 'asc' ? 'desc' : 'asc';
+        if (sortCol === col) sortDir = sortDir==='asc'?'desc':'asc';
         else { sortCol = col; sortDir = 'desc'; }
         renderTable();
       });
     });
   }
 
-  function resolveSort(entry, col) {
-    // Handle outcome columns for sorting
-    if (col.startsWith('outcome_')) {
-      const o = entry.outcomes?.[col];
-      return o?.pctFromEntry ?? null;
+  function buildMomentumTable(sorted, entries) {
+    const hasOutcomes = entries.some(e => e.outcomes && Object.keys(e.outcomes).length > 0);
+    const cols = hasOutcomes ? [...MOMENTUM_COLS, ...MOMENTUM_OUTCOME_KEYS] : MOMENTUM_COLS;
+    let html = '<table><thead><tr>';
+    for (const col of cols) {
+      const arrow = sortCol===col?(sortDir==='asc'?'↑':'↓'):'';
+      const cls = [sortCol===col?'sorted':'', COL_CLASS[col]||''].filter(Boolean).join(' ');
+      html += `<th class="${cls}" data-col="${col}">${COL_LABELS[col]||col}<span class="sort-arrow">${arrow}</span></th>`;
     }
+    html += '</tr></thead><tbody>';
+    for (const e of sorted) {
+      const rowCls = e.qualifiedAtEntry===false?'near-miss':'';
+      html += `<tr class="${rowCls}">`;
+      for (const col of cols) html += `<td class="${COL_CLASS[col]||''}">`+formatCell(col,e,e[col])+'</td>';
+      html += '</tr>';
+    }
+    return html + '</tbody></table>';
+  }
+
+  function buildSwingTable(sorted) {
+    const swingKeys = swingShowAll ? allSwingKeys() : closeOnlySwingKeys();
+    const baseCols = SWING_BASE_COLS;
+    const summaryCols = ['swingHighPct','swingLowPct'];
+
+    // Two-row header for swing: group header (D2, D3...) + sub-headers (O, M1, M2, C)
+    let html = '<table><thead>';
+
+    // Row 1: base col placeholders + day group headers + summary placeholders
+    html += '<tr>';
+    for (const col of baseCols) {
+      const rowspan = swingShowAll ? ' rowspan="2"' : '';
+      const arrow = sortCol===col?(sortDir==='asc'?'↑':'↓'):'';
+      const cls = [sortCol===col?'sorted':'', COL_CLASS[col]||''].filter(Boolean).join(' ');
+      html += `<th class="${cls}" data-col="${col}"${rowspan}>${COL_LABELS[col]||col}<span class="sort-arrow">${arrow}</span></th>`;
+    }
+    if (swingShowAll) {
+      for (const day of SWING_DAYS) {
+        html += `<th class="swing-group" colspan="4">D${day}</th>`;
+      }
+    } else {
+      for (const day of SWING_DAYS) {
+        const key = swingKey(day,'close');
+        const arrow = sortCol===key?(sortDir==='asc'?'↑':'↓'):'';
+        html += `<th class="swing-sub" data-col="${key}">D${day}<span class="sort-arrow">${arrow}</span></th>`;
+      }
+    }
+    for (const col of summaryCols) {
+      const rowspan = swingShowAll ? ' rowspan="2"' : '';
+      const arrow = sortCol===col?(sortDir==='asc'?'↑':'↓'):'';
+      html += `<th class="sorted" data-col="${col}"${rowspan} style="color:var(--purple)">${COL_LABELS[col]}<span class="sort-arrow">${arrow}</span></th>`;
+    }
+    html += '</tr>';
+
+    // Row 2: sub-headers for each check (only if showing all)
+    if (swingShowAll) {
+      html += '<tr>';
+      for (const day of SWING_DAYS) {
+        for (const check of SWING_CHECKS) {
+          const key = swingKey(day, check);
+          const arrow = sortCol===key?(sortDir==='asc'?'↑':'↓'):'';
+          html += `<th class="swing-sub" data-col="${key}">${SWING_CHECK_LABELS[check]}<span class="sort-arrow">${arrow}</span></th>`;
+        }
+      }
+      html += '</tr>';
+    }
+
+    html += '</thead><tbody>';
+
+    for (const e of sorted) {
+      const rowCls = e.qualifiedAtEntry===false?'near-miss':'';
+      html += `<tr class="${rowCls}">`;
+      for (const col of baseCols) html += `<td class="${COL_CLASS[col]||''}">`+formatCell(col,e,e[col])+'</td>';
+      for (let i = 0; i < swingKeys.length; i++) {
+        const key = swingKeys[i];
+        const isDayStart = swingShowAll ? (i % 4 === 0) : true;
+        const cellCls = isDayStart ? 'swing-cell swing-day-start' : 'swing-cell';
+        html += `<td class="${cellCls}">`+formatCell(key,e,null)+'</td>';
+      }
+      // Summary
+      html += '<td>'+formatSwingSummary(e.swingHighPct, e.swingHighDay, 'high')+'</td>';
+      html += '<td>'+formatSwingSummary(e.swingLowPct, e.swingLowDay, 'low')+'</td>';
+      html += '</tr>';
+    }
+
+    return html + '</tbody></table>';
+  }
+
+  function formatSwingSummary(pct, day, type) {
+    if (pct == null) return '<span class="outcome-na">—</span>';
+    const cls = type === 'high' ? 'swing-high' : 'swing-low';
+    return `<span class="${cls}">${pct > 0 ? '+' : ''}${pct.toFixed(1)}%</span><span class="swing-day-tag">D${day||'?'}</span>`;
+  }
+
+  function resolveSort(entry, col) {
+    if (col.startsWith('outcome_')) return entry.outcomes?.[col]?.pctFromEntry ?? null;
     if (col === 'swingHighPct') return entry.swingHighPct ?? null;
     if (col === 'swingLowPct') return entry.swingLowPct ?? null;
     return entry[col];
   }
 
   function formatCell(col, entry, val) {
-    // All outcome columns (intraday + daily)
     if (col.startsWith('outcome_')) {
       const o = entry.outcomes?.[col];
-      if (!o || o.pctFromEntry == null) return '<span class="outcome-na">—</span>';
+      if (!o || o.pctFromEntry==null) return '<span class="outcome-na">—</span>';
       const p = o.pctFromEntry;
-      return `<span class="${p > 0 ? 'outcome-pos' : p < 0 ? 'outcome-neg' : 'outcome-na'}">${p > 0 ? '+' : ''}${p.toFixed(2)}%</span>`;
+      return `<span class="${p>0?'outcome-pos':p<0?'outcome-neg':'outcome-na'}">${p>0?'+':''}${p.toFixed(2)}%</span>`;
     }
-    // Swing summary columns
-    if (col === 'swingHighPct') {
-      if (val == null) return '<span class="outcome-na">—</span>';
-      const day = entry.swingHighDay;
-      return `<span class="swing-high">${val > 0 ? '+' : ''}${val.toFixed(1)}%</span><span class="swing-day-tag">D${day || '?'}</span>`;
-    }
-    if (col === 'swingLowPct') {
-      if (val == null) return '<span class="outcome-na">—</span>';
-      const day = entry.swingLowDay;
-      return `<span class="swing-low">${val > 0 ? '+' : ''}${val.toFixed(1)}%</span><span class="swing-day-tag">D${day || '?'}</span>`;
-    }
-
-    if (val === null || val === undefined) return '<span style="color:var(--muted)">—</span>';
+    if (val===null||val===undefined) return '<span style="color:var(--muted)">—</span>';
     switch (col) {
       case 'symbol': return `<span class="sym">${val}</span>`;
-      case 'name': return String(val).length > 16 ? String(val).slice(0, 14) + '…' : String(val);
+      case 'name': return String(val).length>16?String(val).slice(0,14)+'…':String(val);
       case 'date': return String(val).slice(5);
-      case 'priceAtEntry': return '$' + Number(val).toFixed(val < 1 ? 4 : 2);
-      case 'pctChangeAtEntry': case 'peakPctChange': {
-        const p = Number(val);
-        return `<span class="${p > 0 ? 'pct-up' : p < 0 ? 'pct-down' : 'pct-flat'}">${p > 0 ? '+' : ''}${p.toFixed(1)}%</span>`;
-      }
+      case 'priceAtEntry': return '$'+Number(val).toFixed(val<1?4:2);
+      case 'pctChangeAtEntry': case 'peakPctChange': { const p=Number(val); return `<span class="${p>0?'pct-up':p<0?'pct-down':'pct-flat'}">${p>0?'+':''}${p.toFixed(1)}%</span>`; }
       case 'volumeAtEntry': case 'marketCapAtEntry': return fmtC(val);
-      case 'sjScoreAtEntry': { const s = Number(val); return `<span class="sj-badge ${s >= 75 ? 'sj-high' : s >= 60 ? 'sj-mid' : 'sj-low'}">${s}</span>`; }
-      case 'rangePositionAtEntry': return Math.round(Number(val) * 100) + '%';
-      case 'rvolAtEntry': return val ? Number(val).toFixed(1) + 'x' : '<span style="color:var(--muted)">—</span>';
-      case 'volMcapRatioAtEntry': return (Number(val) * 100).toFixed(1) + '%';
-      case 'peakMinutesAfterEntry': return val + 'm';
-      case 'marketSessionAtEntry': {
-        const s = String(val);
-        const cls = s === 'open' ? 'session-open' : s === 'premarket' ? 'session-premarket' : s === 'afterhours' ? 'session-afterhours' : '';
-        return `<span class="session-tag ${cls}">${s}</span>`;
-      }
-      case 'qualifiedAtEntry': return val === false ? '<span class="qualified-no">✕</span>' : '✓';
-      case 'enteredAt':
-        try { return new Date(val).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true }); }
-        catch { return val; }
-      case 'peakAfter15m': {
-        const peakPrice = entry.peakAfter15mPrice;
-        const o15 = entry.outcomes?.outcome_15m?.price;
-        if (!peakPrice || !o15 || o15 <= 0) return '<span style="color:var(--muted)">—</span>';
-        const gain = ((peakPrice / o15) - 1) * 100;
-        return `<span class="${gain > 0 ? 'pct-up' : gain < 0 ? 'pct-down' : 'pct-flat'}">${gain > 0 ? '+' : ''}${gain.toFixed(1)}%</span>`;
-      }
-      case 'peakAfter2h': {
-        const peakPrice2h = entry.peakAfter2hPrice;
-        const o2h = entry.outcomes?.outcome_2h?.price;
-        if (!peakPrice2h || !o2h || o2h <= 0) return '<span style="color:var(--muted)">—</span>';
-        const gain2h = ((peakPrice2h / o2h) - 1) * 100;
-        return `<span class="${gain2h > 0 ? 'pct-up' : gain2h < 0 ? 'pct-down' : 'pct-flat'}">${gain2h > 0 ? '+' : ''}${gain2h.toFixed(1)}%</span>`;
-      }
-      case 'hasNews': return val ? '📰' : '';
+      case 'sjScoreAtEntry': { const s=Number(val); return `<span class="sj-badge ${s>=75?'sj-high':s>=60?'sj-mid':'sj-low'}">${s}</span>`; }
+      case 'rangePositionAtEntry': return Math.round(Number(val)*100)+'%';
+      case 'rvolAtEntry': return val?Number(val).toFixed(1)+'x':'<span style="color:var(--muted)">—</span>';
+      case 'volMcapRatioAtEntry': return (Number(val)*100).toFixed(1)+'%';
+      case 'peakMinutesAfterEntry': return val+'m';
+      case 'marketSessionAtEntry': { const s=String(val); return `<span class="session-tag ${s==='open'?'session-open':s==='premarket'?'session-premarket':s==='afterhours'?'session-afterhours':''}">${s}</span>`; }
+      case 'qualifiedAtEntry': return val===false?'<span class="qualified-no">✕</span>':'✓';
+      case 'enteredAt': try { return new Date(val).toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',hour12:true}); } catch { return val; }
+      case 'peakAfter15m': { const pp=entry.peakAfter15mPrice; const o15=entry.outcomes?.outcome_15m?.price; if(!pp||!o15||o15<=0) return '<span style="color:var(--muted)">—</span>'; const g=((pp/o15)-1)*100; return `<span class="${g>0?'pct-up':g<0?'pct-down':'pct-flat'}">${g>0?'+':''}${g.toFixed(1)}%</span>`; }
+      case 'peakAfter2h': { const pp2=entry.peakAfter2hPrice; const o2=entry.outcomes?.outcome_2h?.price; if(!pp2||!o2||o2<=0) return '<span style="color:var(--muted)">—</span>'; const g2=((pp2/o2)-1)*100; return `<span class="${g2>0?'pct-up':g2<0?'pct-down':'pct-flat'}">${g2>0?'+':''}${g2.toFixed(1)}%</span>`; }
+      case 'hasNews': return val?'📰':'';
       default: return String(val);
     }
   }
 
   function fmtC(n) {
-    const v = Number(n); if (!isFinite(v)) return '—';
-    if (v >= 1e12) return '$' + (v/1e12).toFixed(1) + 'T';
-    if (v >= 1e9) return '$' + (v/1e9).toFixed(1) + 'B';
-    if (v >= 1e6) return '$' + (v/1e6).toFixed(0) + 'M';
-    if (v >= 1e3) return '$' + (v/1e3).toFixed(0) + 'K';
-    return '$' + v.toFixed(0);
+    const v=Number(n); if(!isFinite(v)) return '—';
+    if(v>=1e12) return '$'+(v/1e12).toFixed(1)+'T';
+    if(v>=1e9) return '$'+(v/1e9).toFixed(1)+'B';
+    if(v>=1e6) return '$'+(v/1e6).toFixed(0)+'M';
+    if(v>=1e3) return '$'+(v/1e3).toFixed(0)+'K';
+    return '$'+v.toFixed(0);
   }
 
-  // Copy / Download — uses current view's columns
-  function getCurrentCols(entries) {
-    if (currentView === 'swing') {
-      return [...SWING_BASE_COLS, ...DAILY_OUTCOME_KEYS, ...SWING_SUMMARY_COLS];
-    }
-    const oKeys = MOMENTUM_OUTCOME_KEYS;
-    const hasOutcomes = entries.some(e => e.outcomes && Object.keys(e.outcomes).length > 0);
-    return hasOutcomes ? [...MOMENTUM_COLS, ...oKeys] : MOMENTUM_COLS;
-  }
-
-  document.getElementById('copyJsonBtn').addEventListener('click', () => {
-    copyClip(JSON.stringify(getFilteredEntries(), null, 2), 'copyJsonBtn', '📋 JSON');
-  });
-
-  document.getElementById('copyCsvBtn').addEventListener('click', () => {
-    const entries = getFilteredEntries();
-    if (!entries.length) return;
-    const csv = buildCsv(entries);
-    copyClip(csv, 'copyCsvBtn', '📋 CSV');
-  });
-
+  // Copy/Download
+  document.getElementById('copyJsonBtn').addEventListener('click', () => copyClip(JSON.stringify(getFilteredEntries(),null,2),'copyJsonBtn','📋 JSON'));
+  document.getElementById('copyCsvBtn').addEventListener('click', () => { const e=getFilteredEntries(); if(!e.length) return; copyClip(buildCsv(e),'copyCsvBtn','📋 CSV'); });
   document.getElementById('dlJsonBtn').addEventListener('click', () => {
-    const entries = getFilteredEntries();
-    const week = currentWeek || 'data';
-    const viewTag = currentView === 'swing' ? 'swing' : 'momentum';
-    const filename = `sj-${currentMode}-${week}-${viewTag}${todayOnly ? '-today' : ''}.json`;
-    downloadFile(JSON.stringify(entries, null, 2), filename, 'application/json');
+    const e=getFilteredEntries(); const vt=currentView==='swing'?'swing':'momentum';
+    downloadFile(JSON.stringify(e,null,2), `sj-${currentMode}-${currentWeek||'data'}-${vt}${todayOnly?'-today':''}.json`, 'application/json');
   });
-
   document.getElementById('dlCsvBtn').addEventListener('click', () => {
-    const entries = getFilteredEntries();
-    if (!entries.length) return;
-    const csv = buildCsv(entries);
-    const week = currentWeek || 'data';
-    const viewTag = currentView === 'swing' ? 'swing' : 'momentum';
-    const filename = `sj-${currentMode}-${week}-${viewTag}${todayOnly ? '-today' : ''}.csv`;
-    downloadFile(csv, filename, 'text/csv');
+    const e=getFilteredEntries(); if(!e.length) return; const vt=currentView==='swing'?'swing':'momentum';
+    downloadFile(buildCsv(e), `sj-${currentMode}-${currentWeek||'data'}-${vt}${todayOnly?'-today':''}.csv`, 'text/csv');
   });
 
   function buildCsv(entries) {
-    const allOutcomeKeys = currentView === 'swing' ? DAILY_OUTCOME_KEYS : MOMENTUM_OUTCOME_KEYS;
-    const swingFields = currentView === 'swing' ? ['swingHighPct','swingHighDay','swingLowPct','swingLowDay'] : [];
-    const bKeys = Object.keys(entries[0]).filter(k => k !== 'outcomes');
-    const aKeys = [...bKeys, ...allOutcomeKeys, ...swingFields];
+    const swKeys = allSwingKeys(); // always export all 2h checks in CSV
+    const momentumOK = MOMENTUM_OUTCOME_KEYS;
+    const outcomeKeys = currentView==='swing' ? ['outcome_eod',...swKeys] : momentumOK;
+    const swingFields = currentView==='swing' ? ['swingHighPct','swingHighDay','swingLowPct','swingLowDay'] : [];
+    const bKeys = Object.keys(entries[0]).filter(k => k!=='outcomes');
+    const aKeys = [...bKeys, ...outcomeKeys, ...swingFields];
     const rows = entries.map(e => aKeys.map(k => {
-      if (k.startsWith('outcome_')) { const o = e.outcomes?.[k]; return o?.pctFromEntry != null ? o.pctFromEntry : ''; }
-      const v = e[k]; if (v == null) return '';
-      if (typeof v === 'object') return JSON.stringify(v).replace(/,/g, ';');
-      if (typeof v === 'string' && v.includes(',')) return '"' + v.replace(/"/g, '""') + '"';
+      if (k.startsWith('outcome_')) { const o=e.outcomes?.[k]; return o?.pctFromEntry!=null?o.pctFromEntry:''; }
+      const v=e[k]; if(v==null) return '';
+      if(typeof v==='object') return JSON.stringify(v).replace(/,/g,';');
+      if(typeof v==='string'&&v.includes(',')) return '"'+v.replace(/"/g,'""')+'"';
       return String(v);
     }).join(','));
     return [aKeys.join(','), ...rows].join('\n');
@@ -805,32 +621,18 @@
 
   function copyClip(text, btnId, label) {
     navigator.clipboard.writeText(text).then(() => {
-      const btn = document.getElementById(btnId);
-      btn.classList.add('copied'); btn.textContent = '✓ Done';
-      showToast(`Copied ${text.length > 1024 ? (text.length/1024).toFixed(0) + 'KB' : text.length + ' chars'}`);
-      setTimeout(() => { btn.classList.remove('copied'); btn.textContent = label; }, 2000);
-    }).catch(() => {
-      const ta = document.createElement('textarea'); ta.value = text;
-      document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
-      showToast('Copied');
-    });
+      const btn=document.getElementById(btnId); btn.classList.add('copied'); btn.textContent='✓ Done';
+      showToast(`Copied ${text.length>1024?(text.length/1024).toFixed(0)+'KB':text.length+' chars'}`);
+      setTimeout(()=>{btn.classList.remove('copied');btn.textContent=label;},2000);
+    }).catch(() => { const ta=document.createElement('textarea'); ta.value=text; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta); showToast('Copied'); });
   }
-
   function downloadFile(content, filename, type) {
-    const blob = new Blob([content], { type });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url; a.download = filename;
-    document.body.appendChild(a); a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-    showToast('Downloaded ' + filename);
+    const blob=new Blob([content],{type}); const url=URL.createObjectURL(blob);
+    const a=document.createElement('a'); a.href=url; a.download=filename;
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    URL.revokeObjectURL(url); showToast('Downloaded '+filename);
   }
-
-  function showToast(msg) {
-    const t = document.getElementById('toast'); t.textContent = msg; t.classList.add('visible');
-    setTimeout(() => t.classList.remove('visible'), 2000);
-  }
+  function showToast(msg) { const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('visible'); setTimeout(()=>t.classList.remove('visible'),2000); }
 })();
 </script>
 </body>

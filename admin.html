@@ -368,7 +368,7 @@
 
   // ── Column definitions ──
   const MOMENTUM_COLS = ['symbol','name','date','priceAtEntry','pctChangeAtEntry','volumeAtEntry','marketCapAtEntry','sjScoreAtEntry','rangePositionAtEntry','rvolAtEntry','volMcapRatioAtEntry','peakPctChange','peakMinutesAfterEntry','marketSessionAtEntry','enteredAt','qualifiedAtEntry','sectorAtEntry','industryAtEntry','hasNews','peakAfter15m','peakAfter2h'];
-  const MOMENTUM_OUTCOME_KEYS = ['outcome_5m','outcome_10m','outcome_15m','outcome_30m','outcome_45m','outcome_1h','outcome_1h15m','outcome_1h30m','outcome_1h45m','outcome_2h','outcome_2h15m','outcome_2h30m','outcome_2h45m','outcome_3h','outcome_3h15m','outcome_3h30m','outcome_3h45m','outcome_4h','outcome_6h'];
+  const MOMENTUM_OUTCOME_KEYS = ['outcome_5m','outcome_10m','outcome_15m','outcome_30m','outcome_45m','outcome_1h','outcome_1h15m','outcome_1h30m','outcome_1h45m','outcome_2h','outcome_2h15m','outcome_2h30m','outcome_2h45m','outcome_3h','outcome_3h15m','outcome_3h30m','outcome_3h45m','outcome_4h','outcome_6h','outcome_8h','outcome_10h','outcome_12h','outcome_14h','outcome_16h','outcome_18h'];
   const SWING_BASE_COLS = ['symbol','name','date','priceAtEntry','pctChangeAtEntry','marketCapAtEntry','sjScoreAtEntry','sectorAtEntry','industryAtEntry','rvolAtEntry','volMcapRatioAtEntry','outcome_eod'];
 
   const COL_LABELS = {
@@ -378,10 +378,11 @@
     marketSessionAtEntry:'Sess',enteredAt:'Time',qualifiedAtEntry:'Q',
     sectorAtEntry:'Sector',industryAtEntry:'Industry',peakAfter15m:'Pk15m+',
     outcome_5m:'5m',outcome_10m:'10m',outcome_15m:'15m',outcome_30m:'30m',
-    outcome_1h:'1h',outcome_2h:'2h',outcome_4h:'4h',outcome_6h:'6h',outcome_45m:'45m',
+    outcome_1h:'1h',outcome_2h:'2h',outcome_4h:'4h',outcome_6h:'6h',outcome_8h:'8h',outcome_45m:'45m',
     outcome_1h15m:'1:15',outcome_1h30m:'1:30',outcome_1h45m:'1:45',
     outcome_2h15m:'2:15',outcome_2h30m:'2:30',outcome_2h45m:'2:45',
     outcome_3h:'3h',outcome_3h15m:'3:15',outcome_3h30m:'3:30',outcome_3h45m:'3:45',
+    outcome_10h:'10h',outcome_12h:'12h',outcome_14h:'14h',outcome_16h:'16h',outcome_18h:'18h',
     peakAfter2h:'Pk2h+',hasNews:'News',outcome_eod:'EOD',
     swingHighPct:'Sw Hi',swingLowPct:'Sw Lo',
   };

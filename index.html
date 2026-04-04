@@ -954,149 +954,362 @@
   </main>
 
   <!-- Alerts Modal -->
-<div id="alertsModal" class="modal-overlay" aria-hidden="true">
-  <div class="modal">
-    <button class="modal-close" id="closeModalBtn">✕</button>
+<!-- ============================================
+     STOCKJELLI CHECKOUT MODAL — April 2026 Launch
+     
+     Replaces the existing <div id="alertsModal"> block.
+     
+     Plans:
+       • Push Notifications — $5/mo
+       • Webhook API — $30/mo
+       • Push + API Bundle — $32/mo
+     
+     Steps:
+       1. Choose Plan
+       2. Configure (assets, frequency, webhook consent)
+       3. Review & Checkout
+     ============================================ -->
 
-    <div class="modal-header">
-      <div class="modal-kicker">MOMENTUM ALERTS</div>
-      <h2 class="modal-title">Get Notified When It Matters</h2>
-      <p class="modal-subtitle muted">
-        Receive email alerts when stocks &amp; crypto hit strict momentum criteria.
-      </p>
-    </div>
-
-    <!-- Step dots -->
-    <div class="steps">
-      <span class="step-dot step-active" data-step="1">1</span>
-      <span class="step-line"></span>
-      <span class="step-dot" data-step="2">2</span>
-    </div>
-
-    <!-- STEP 1: Email + Region + Frequency -->
-    <div class="modal-step" data-step="1">
-      <div class="card">
-        <h3 class="card-title">Set Up Your Alerts</h3>
-        <p class="card-sub muted">Choose your region and how often you want alerts.</p>
-
-        <div class="form-grid">
-          <!-- Email -->
-          <div>
-            <label class="form-label">Email Address</label>
-            <input
-              type="email"
-              id="alertEmail"
-              class="form-input"
-              placeholder="you@email.com"
-              autocomplete="email"
-              required
-            />
-            <p id="emailError" class="hint muted" style="display: none; color: #ef4444;">
-              Please enter a valid email address.
-            </p>
+     <div id="alertsModal" class="modal-overlay" aria-hidden="true">
+      <div class="modal modal-checkout">
+        <button class="modal-close" id="closeModalBtn" type="button" aria-label="Close">✕</button>
+    
+        <div class="modal-header">
+          <div class="modal-kicker">
+            <span class="kicker-dot"></span>
+            LAUNCHING APRIL 20
           </div>
-
-          <!-- Region Selector -->
-          <div>
-            <label class="form-label">Your Region</label>
-            <div class="segmented" id="regionControl">
-              <button type="button" class="segmented-btn segmented-on" data-value="americas">
-                🌎 Americas
-              </button>
-              <button type="button" class="segmented-btn" data-value="global">
-                🌍 Global
-              </button>
+          <h2 class="modal-title" id="checkoutTitle">Choose Your Plan</h2>
+          <p class="modal-subtitle muted" id="checkoutSubtitle">Momentum intelligence, delivered how you want it.</p>
+        </div>
+    
+        <!-- Step dots -->
+        <div class="steps" id="checkoutSteps">
+          <span class="step-dot step-active" data-step="1">1</span>
+          <span class="step-line"></span>
+          <span class="step-dot" data-step="2">2</span>
+          <span class="step-line"></span>
+          <span class="step-dot" data-step="3">3</span>
+        </div>
+    
+        <!-- ═══════════════════════════════════════════
+             STEP 1: Choose Plan
+             ═══════════════════════════════════════════ -->
+        <div class="modal-step" data-step="1">
+    
+          <!-- Push Notifications -->
+          <div class="plan-card" data-plan="push" id="planPush">
+            <div class="plan-card-top">
+              <div class="plan-card-info">
+                <span class="plan-icon">🔔</span>
+                <div>
+                  <div class="plan-name">Push Notifications</div>
+                  <div class="plan-tagline muted">Real-time momentum alerts to your device</div>
+                </div>
+              </div>
+              <div class="plan-price-block">
+                <span class="plan-price">$5</span><span class="plan-period">/mo</span>
+                <span class="plan-badge plan-badge-accent">POPULAR</span>
+              </div>
             </div>
-            <p class="hint muted" id="regionHint" style="margin-top: 8px;">
-              Stocks + Crypto alerts timed for US market hours (ET)
-            </p>
+            <ul class="plan-features muted">
+              <li>Alerts when stocks & crypto hit strict criteria</li>
+              <li>Only plays near the day's high (70%+ range)</li>
+              <li>TradingView links + news sources</li>
+              <li>Weekly reports + full SJ Score access</li>
+            </ul>
+            <div class="plan-select-indicator"></div>
           </div>
-
-          <!-- Frequency -->
-          <div>
-            <label class="form-label">Alert Frequency</label>
-            <div class="segmented" id="frequencyControl">
-              <button type="button" class="segmented-btn segmented-on" data-value="1">1/day</button>
-              <button type="button" class="segmented-btn" data-value="2">2/day</button>
-              <button type="button" class="segmented-btn" data-value="3">3/day</button>
-              <button type="button" class="segmented-btn" data-value="4">4/day</button>
+    
+          <!-- Webhook API -->
+          <div class="plan-card" data-plan="webhook" id="planWebhook">
+            <div class="plan-card-top">
+              <div class="plan-card-info">
+                <span class="plan-icon">⚡</span>
+                <div>
+                  <div class="plan-name">Webhook API</div>
+                  <div class="plan-tagline muted">Programmatic JSON data to your endpoint</div>
+                </div>
+              </div>
+              <div class="plan-price-block">
+                <span class="plan-price">$30</span><span class="plan-period">/mo</span>
+                <span class="plan-badge plan-badge-warn">DEVELOPER</span>
+              </div>
             </div>
-            <p class="hint muted" id="frequencyHint" style="margin-top: 8px;">
-              First hour momentum alert (10:00 AM ET)
+            <ul class="plan-features muted">
+              <li>JSON payloads on every momentum signal</li>
+              <li>Whale detection & pump warning flags</li>
+              <li>RVOL, cap tier, regime context</li>
+              <li>Full SJ Score access + weekly reports</li>
+            </ul>
+            <div class="plan-select-indicator"></div>
+          </div>
+    
+          <!-- Bundle -->
+          <div class="plan-card" data-plan="bundle" id="planBundle">
+            <div class="plan-card-top">
+              <div class="plan-card-info">
+                <span class="plan-icon">🚀</span>
+                <div>
+                  <div class="plan-name">Push + API Bundle</div>
+                  <div class="plan-tagline muted">Alerts on your phone, data on your server</div>
+                </div>
+              </div>
+              <div class="plan-price-block">
+                <span class="plan-price">$32</span><span class="plan-period">/mo</span>
+                <span class="plan-badge plan-badge-green">BEST VALUE</span>
+              </div>
+            </div>
+            <ul class="plan-features muted">
+              <li>All Push Notification features</li>
+              <li>All Webhook API features</li>
+              <li>Save $3/mo vs. buying separately</li>
+            </ul>
+            <div class="plan-select-indicator"></div>
+          </div>
+    
+          <button class="btn btn-primary btn-wide" id="step1NextBtn" disabled>
+            Continue →
+          </button>
+          <p class="btn-hint muted" id="step1Hint">Select a plan to continue</p>
+        </div>
+    
+        <!-- ═══════════════════════════════════════════
+             STEP 2: Configure
+             ═══════════════════════════════════════════ -->
+        <div class="modal-step" data-step="2" hidden>
+          <div class="card">
+            <h3 class="card-title" id="configTitle">Configure Your Plan</h3>
+            <p class="card-sub muted">Customize how you receive momentum data.</p>
+    
+            <div class="form-grid">
+              <!-- Email -->
+              <div>
+                <label class="form-label">Email Address</label>
+                <input
+                  type="email"
+                  id="alertEmail"
+                  class="form-input"
+                  placeholder="you@email.com"
+                  autocomplete="email"
+                  required
+                />
+                <p id="emailError" class="hint muted" style="display: none; color: #ef4444;">
+                  Please enter a valid email address.
+                </p>
+              </div>
+    
+              <!-- Asset Types -->
+              <div>
+                <label class="form-label">Asset Types</label>
+                <div class="segmented" id="assetTypeControl">
+                  <button type="button" class="segmented-btn" data-value="stocks">📈 Stocks</button>
+                  <button type="button" class="segmented-btn segmented-on" data-value="both">⚡ Both</button>
+                  <button type="button" class="segmented-btn" data-value="crypto">🪙 Crypto</button>
+                </div>
+                <p class="hint muted" id="assetTypeHint" style="margin-top: 6px;">
+                  Stocks during market hours + crypto 24/7
+                </p>
+              </div>
+    
+              <!-- Region -->
+              <div>
+                <label class="form-label">Your Region</label>
+                <div class="segmented" id="regionControl">
+                  <button type="button" class="segmented-btn segmented-on" data-value="americas">🌎 Americas</button>
+                  <button type="button" class="segmented-btn" data-value="global">🌍 Global</button>
+                </div>
+                <p class="hint muted" id="regionHint" style="margin-top: 6px;">
+                  Stocks + Crypto alerts timed for US market hours (ET)
+                </p>
+              </div>
+    
+              <!-- Frequency (push / bundle only) -->
+              <div id="frequencySection">
+                <label class="form-label">Alert Frequency</label>
+                <div class="segmented" id="frequencyControl">
+                  <button type="button" class="segmented-btn segmented-on" data-value="1">1/day</button>
+                  <button type="button" class="segmented-btn" data-value="2">2/day</button>
+                  <button type="button" class="segmented-btn" data-value="3">3/day</button>
+                  <button type="button" class="segmented-btn" data-value="4">4/day</button>
+                </div>
+                <p class="hint muted" id="frequencyHint" style="margin-top: 6px;">
+                  First hour momentum alert (10:00 AM ET)
+                </p>
+              </div>
+    
+              <!-- Webhook URL (webhook / bundle only) -->
+              <div id="webhookUrlSection" style="display: none;">
+                <label class="form-label">Webhook Endpoint URL</label>
+                <input
+                  type="url"
+                  id="webhookUrlInput"
+                  class="form-input form-input-mono"
+                  placeholder="https://your-server.com/webhook"
+                />
+                <p class="hint muted" style="margin-top: 4px;">
+                  Optional — you can configure this later in your dashboard.
+                </p>
+              </div>
+            </div>
+          </div>
+    
+          <!-- Webhook API Consent (webhook / bundle only) -->
+          <div class="card card-warn" id="webhookConsentCard" style="display: none; margin-top: 12px;">
+            <div class="section-label">API Acknowledgments</div>
+    
+            <div class="consent-item" data-ack="ack1">
+              <div class="check-box"><svg viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#080b10" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+              <div class="consent-text"><strong>Not investment advice.</strong> StockJelli provides informational momentum data only and is not an investment adviser, broker-dealer, or fiduciary.</div>
+            </div>
+    
+            <div class="consent-item" data-ack="ack2">
+              <div class="check-box"><svg viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#080b10" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+              <div class="consent-text"><strong>My responsibility.</strong> I will not rely on StockJelli data as the sole basis for trading decisions. I am solely responsible for any trades or automated systems I build.</div>
+            </div>
+    
+            <div class="consent-item" data-ack="ack3">
+              <div class="check-box"><svg viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#080b10" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+              <div class="consent-text"><strong>Compliance obligation.</strong> I am responsible for complying with all applicable securities laws. I will not use this API to provide advisory services unless appropriately licensed.</div>
+            </div>
+    
+            <div class="consent-item" data-ack="ack4">
+              <div class="check-box"><svg viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#080b10" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+              <div class="consent-text"><strong>No guarantees.</strong> Data is delivered on a best-effort basis. I accept that latency, downtime, and data errors may occur.</div>
+            </div>
+    
+            <div class="consent-item" data-ack="ack5">
+              <div class="check-box"><svg viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#080b10" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+              <div class="consent-text"><strong>Terms of Service.</strong> I have read and agree to the <a href="/terms.html" target="_blank" style="color:var(--accent)">Terms of Service</a>, including the webhook API terms, indemnification, and limitation of liability.</div>
+            </div>
+    
+            <!-- Auto-execution disclosure -->
+            <div class="execution-question">
+              <div class="q-label">
+                <svg viewBox="0 0 16 16" fill="none"><path d="M8 1.33l6.67 11.34H1.33L8 1.33z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/><path d="M8 6v3M8 11h.007" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+                Will you use this data to automatically execute trades?
+              </div>
+              <div class="radio-group" id="autoExecGroup">
+                <div class="radio-option">
+                  <input type="radio" name="auto_exec" id="exec_no" value="no" />
+                  <label for="exec_no">No</label>
+                </div>
+                <div class="radio-option">
+                  <input type="radio" name="auto_exec" id="exec_yes" value="yes" />
+                  <label for="exec_yes">Yes</label>
+                </div>
+                <div class="radio-option">
+                  <input type="radio" name="auto_exec" id="exec_exploring" value="exploring" />
+                  <label for="exec_exploring">Exploring</label>
+                </div>
+              </div>
+              <div class="auto-trade-notice" id="autoTradeNotice">
+                <strong>Note:</strong> StockJelli data is not designed or warranted for automated trade execution. You assume all risk for any automated systems you operate.
+              </div>
+            </div>
+          </div>
+    
+          <div class="modal-actions" style="margin-top: 16px;">
+            <button class="btn btn-ghost" id="step2BackBtn" type="button">← Back</button>
+            <button class="btn btn-primary" id="step2NextBtn" type="button">Review Order →</button>
+          </div>
+          <p class="btn-hint muted" id="step2Hint" style="display: none;"></p>
+        </div>
+    
+        <!-- ═══════════════════════════════════════════
+             STEP 3: Review & Checkout
+             ═══════════════════════════════════════════ -->
+        <div class="modal-step" data-step="3" hidden>
+          <div class="card">
+            <h3 class="card-title">Confirm Your Subscription</h3>
+            <p class="card-sub muted">Review your settings before checkout.</p>
+    
+            <!-- Plan summary -->
+            <div class="checkout-plan-header" id="reviewPlanHeader">
+              <div class="checkout-plan-left">
+                <span class="plan-icon" id="reviewPlanIcon">🔔</span>
+                <div>
+                  <div class="plan-name" id="reviewPlanName">Push Notifications</div>
+                  <span class="plan-badge plan-badge-accent" id="reviewPlanBadge">POPULAR</span>
+                </div>
+              </div>
+              <div class="checkout-plan-price">
+                <span class="plan-price" id="reviewPlanPrice">$5</span><span class="plan-period">/mo</span>
+              </div>
+            </div>
+    
+            <div class="checkout-box">
+              <div class="checkout-row">
+                <span class="muted">Email</span>
+                <span id="summaryEmail" class="strong">—</span>
+              </div>
+              <div class="checkout-row">
+                <span class="muted">Assets</span>
+                <span id="summaryAssets" class="strong">—</span>
+              </div>
+              <div class="checkout-row">
+                <span class="muted">Region</span>
+                <span id="summaryRegion" class="strong">—</span>
+              </div>
+              <div class="checkout-row" id="summaryFreqRow">
+                <span class="muted">Frequency</span>
+                <span id="summaryFrequency" class="strong">—</span>
+              </div>
+              <div class="checkout-row" id="summaryWebhookRow" style="display: none;">
+                <span class="muted">Webhook URL</span>
+                <span id="summaryWebhook" class="strong" style="font-family: 'JetBrains Mono', monospace; font-size: 12px; max-width: 60%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">—</span>
+              </div>
+              <div class="checkout-row" id="summaryAutoExecRow" style="display: none;">
+                <span class="muted">Auto-execution</span>
+                <span id="summaryAutoExec" class="strong">—</span>
+              </div>
+            </div>
+    
+            <div class="disclaimer-block" style="margin-top: 16px;">
+              StockJelli is not registered with the SEC, FINRA, or any state securities authority. All data is non-personalized momentum data for informational purposes only. No advisory relationship is created. Billed monthly. Cancel anytime.
+            </div>
+          </div>
+    
+          <div class="modal-actions" style="margin-top: 16px;">
+            <button class="btn btn-ghost" id="step3BackBtn" type="button">← Back</button>
+            <button class="btn btn-primary" id="stripeCheckoutBtn" type="button">Subscribe with Stripe →</button>
+          </div>
+        </div>
+    
+        <!-- ═══════════════════════════════════════════
+             SUCCESS STATE
+             ═══════════════════════════════════════════ -->
+        <div class="modal-step" data-step="success" hidden>
+          <div class="card" style="text-align: center; padding: 32px 24px;">
+            <div style="font-size: 48px; margin-bottom: 16px;">🎉</div>
+            <h3 class="card-title" id="successTitle">You're Subscribed!</h3>
+            <p class="card-sub muted" id="successSubtitle">
+              Check your inbox for a welcome email. Your first alert will arrive at the next scheduled time.
             </p>
+    
+            <!-- API Key display (webhook/bundle only) -->
+            <div id="successApiKeyBlock" style="display: none; margin-top: 20px;">
+              <div class="section-label" style="text-align: left;">Your API Key</div>
+              <div class="api-key-display" id="successApiKey">sj_wh_xxxxxxxxxxxxxxxxxxxx</div>
+              <p class="hint muted" style="text-align: left; margin-top: 6px;">
+                Save this key — it won't be shown again. You can regenerate from your dashboard.
+              </p>
+            </div>
+    
+            <!-- Consent log (webhook/bundle only) -->
+            <div id="successConsentLog" style="display: none; margin-top: 20px; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 16px; text-align: left;">
+              <div class="section-label">Consent Log</div>
+              <div class="log-entry" id="consentLogContent"></div>
+            </div>
+    
+            <button class="btn btn-primary btn-wide" id="closeSuccessBtn" style="margin-top: 20px;">
+              Done
+            </button>
           </div>
         </div>
-
-        <!-- Alert Features -->
-        <div class="alert-features" style="margin-top: 16px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,0.08);">
-          <p class="muted" style="font-size: 0.85rem; margin: 0;">
-            ✓ Only plays near day's high (70%+ range)<br>
-            ✓ Liquidity-checked crypto (no rug pulls)<br>
-            ✓ TradingView links + news sources<br>
-            ✓ Access to the weekly stock and crypto reports<br>
-            ✓ Access to the SJ column<br>
-            ✓ Cancel anytime
-          </p>
-        </div>
-
-        <button class="btn btn-primary btn-wide" id="toStep2Btn" style="margin-top: 16px;">
-          Continue →
-        </button>
+    
       </div>
     </div>
-
-    <!-- STEP 2: Confirm + Checkout -->
-    <div class="modal-step" data-step="2" hidden>
-      <div class="card">
-        <h3 class="card-title">Confirm Your Subscription</h3>
-        <p class="card-sub muted">Review your settings before checkout.</p>
-
-        <div class="checkout-box">
-          <div class="checkout-row">
-            <span class="muted">Email</span>
-            <span id="summaryEmail" class="strong">—</span>
-          </div>
-          <div class="checkout-row">
-            <span class="muted">Region</span>
-            <span id="summaryRegion" class="strong">—</span>
-          </div>
-          <div class="checkout-row">
-            <span class="muted">Frequency</span>
-            <span id="summaryFrequency" class="strong">—</span>
-          </div>
-          <div class="checkout-row">
-            <span class="muted">Price</span>
-            <span class="strong">$5/month</span>
-          </div>
-        </div>
-
-        <p class="fineprint muted">
-          Billed monthly. Cancel anytime from your Stripe dashboard.
-        </p>
-
-        <div class="modal-actions">
-          <button class="btn btn-ghost" id="backToStep1Btn">← Back</button>
-          <button class="btn btn-primary" id="stripeCheckoutBtn">Subscribe with Stripe →</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- SUCCESS STATE -->
-    <div class="modal-step" data-step="success" hidden>
-      <div class="card" style="text-align: center; padding: 32px 24px;">
-        <div style="font-size: 48px; margin-bottom: 16px;">🎉</div>
-        <h3 class="card-title">You're Subscribed!</h3>
-        <p class="card-sub muted">
-          Check your inbox for a welcome email. Your first alert will arrive at the next scheduled time.
-        </p>
-        <button class="btn btn-primary btn-wide" id="closeSuccessBtn" style="margin-top: 16px;">
-          Done
-        </button>
-      </div>
-    </div>
-
-  </div>
-</div>
   
 <!-- Privacy Policy Modal -->
 <div class="modal-overlay" id="privacyModal" aria-hidden="true">

@@ -526,6 +526,13 @@
   // ═══════════════════════════════════════════════════════════════════════════
 
   stripeCheckoutBtn?.addEventListener("click", async () => {
+    // Gate: block checkout until April 20, 2026 midnight ET
+    const launchDate = new Date("2026-04-20T00:00:00-04:00");
+    if (Date.now() < launchDate.getTime()) {
+      alert("Subscriptions go live April 20th! Join the push notification waitlist to be first in line.");
+      return;
+    }
+
     if (!userEmail || !selectedPlan) {
       showStep(1);
       return;
@@ -573,7 +580,6 @@
       stripeCheckoutBtn.textContent = "Subscribe with Stripe →";
     }
   });
-
   // ═══════════════════════════════════════════════════════════════════════════
   // MODAL TRIGGERS
   // ═══════════════════════════════════════════════════════════════════════════

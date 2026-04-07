@@ -3647,3 +3647,47 @@ tbody tr:nth-child(2) .whale-indicator {
     gap: 8px;
   }
 }
+
+/* ============================================
+   ACCOUNT MODAL — CSS
+   Append to checkout.css or style.css
+   ============================================ */
+
+   .modal-account {
+    max-width: 520px;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+  
+  /* Plan status bar at top of prefs */
+  .account-plan-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 18px;
+    border-radius: 10px;
+    background: rgba(255,255,255,0.02);
+    border: 1px solid rgba(255,255,255,0.06);
+  }
+  
+  .account-plan-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  
+  .account-plan-icon {
+    font-size: 22px;
+    line-height: 1;
+  }
+  
+  .account-plan-name {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text-primary, #e6edf3);
+  }
+  
+  .account-plan-email {
+    font-size: 12px;
+    margin-top: 1px;
+  }

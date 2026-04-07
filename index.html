@@ -69,6 +69,7 @@
   <script src="promo-toast.js" defer></script>
     <script src="app.js" defer></script>
     <script src="alerts-frontend.js" defer></script>
+    <script src="account.js" defer></script>
     <script src="feature-additions.js" defer></script>
     <script src="sponsor.js" defer></script>
 
@@ -327,6 +328,7 @@
     <nav class="drawer-nav" aria-label="Main navigation">
       <a href="/privacy.html" class="drawer-link">Privacy Policy</a>
       <a href="/terms.html" class="drawer-link">Terms of Service</a>
+      <button class="drawer-link" id="drawerAccountBtn" type="button">Account</button>
       <a href="https://billing.stripe.com/p/login/cNi28jaCC6iW7JMfLJ3sI00" class="drawer-link" target="_blank" rel="noopener">Manage Subscription</a>
       <button class="drawer-link" id="drawerAboutBtn" type="button">About</button>
       <a href="/blog" class="drawer-link">Blog</a>
@@ -1607,6 +1609,178 @@
     </div>
   </div>
 </div>
+
+<!-- ============================================
+     STOCKJELLI ACCOUNT / PREFERENCES MODAL
+     
+     Add this block to index.html BEFORE the closing </body> tag,
+     alongside the other modals.
+     
+     Also add the Account button to the drawer nav (see below).
+     ============================================ -->
+
+<!-- ── Add this button to the drawer nav in <aside class="drawer"> ──
+     Place it ABOVE the "Manage Subscription" link:
+
+     <button class="drawer-link" id="drawerAccountBtn" type="button">Account</button>
+
+     ════════════════════════════════════════════════════════════════ -->
+
+     <div class="modal-overlay" id="accountModal" aria-hidden="true">
+      <div class="modal modal-account" role="dialog" aria-modal="true" aria-labelledby="accountTitle">
+        <button class="modal-close" type="button" id="closeAccountBtn" aria-label="Close">✕</button>
+    
+        <div class="modal-header">
+          <div class="modal-kicker">YOUR ACCOUNT</div>
+          <h2 class="modal-title" id="accountTitle">Notification Preferences</h2>
+          <p class="modal-subtitle muted" id="accountSubtitle">Manage how you receive momentum alerts.</p>
+        </div>
+    
+        <!-- ── Login step (verify email) ────────────────────────────────── -->
+        <div id="accountLoginStep">
+          <div class="card">
+            <h3 class="card-title">Verify Your Email</h3>
+            <p class="card-sub muted">Enter your subscriber email to access your preferences.</p>
+    
+            <div style="margin-top: 12px;">
+              <label class="form-label">Subscriber Email</label>
+              <input
+                type="email"
+                id="accountEmailInput"
+                class="form-input"
+                placeholder="you@email.com"
+                autocomplete="email"
+              />
+              <p id="accountEmailError" class="hint" style="display: none; color: #ef4444; margin-top: 6px;"></p>
+            </div>
+    
+            <button class="btn btn-primary btn-wide" id="accountVerifyBtn" style="margin-top: 16px;">
+              Access Account →
+            </button>
+    
+            <div style="margin-top: 16px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,0.06); text-align: center;">
+              <p class="muted" style="font-size: 0.82rem; margin: 0;">
+                Not a subscriber? <a href="#" id="accountSubscribeLink" style="color: var(--accent, #60a5fa); text-decoration: underline;">Get started →</a>
+              </p>
+            </div>
+          </div>
+        </div>
+    
+        <!-- ── Preferences step (shown after verification) ──────────────── -->
+        <div id="accountPrefsStep" style="display: none;">
+    
+          <!-- Current plan badge -->
+          <div class="account-plan-bar" id="accountPlanBar">
+            <div class="account-plan-left">
+              <span class="account-plan-icon" id="accountPlanIcon">🔔</span>
+              <div>
+                <div class="account-plan-name" id="accountPlanName">Push Notifications</div>
+                <div class="account-plan-email muted" id="accountPlanEmail">you@email.com</div>
+              </div>
+            </div>
+            <span class="plan-badge plan-badge-accent" id="accountPlanBadge">ACTIVE</span>
+          </div>
+    
+          <div class="card" style="margin-top: 12px;">
+            <h3 class="card-title">Alert Preferences</h3>
+            <p class="card-sub muted">Changes take effect on your next scheduled alert.</p>
+    
+            <div class="form-grid" style="margin-top: 12px;">
+    
+              <!-- Asset Types -->
+              <div>
+                <label class="form-label">Asset Types</label>
+                <div class="segmented" id="accountAssetControl">
+                  <button type="button" class="segmented-btn" data-value="stocks">📈 Stocks</button>
+                  <button type="button" class="segmented-btn segmented-on" data-value="both">⚡ Both</button>
+                  <button type="button" class="segmented-btn" data-value="crypto">🪙 Crypto</button>
+                </div>
+                <p class="hint muted" id="accountAssetHint" style="margin-top: 6px;">
+                  Stocks during market hours + crypto 24/7
+                </p>
+              </div>
+    
+              <!-- Region -->
+              <div>
+                <label class="form-label">Region</label>
+                <div class="segmented" id="accountRegionControl">
+                  <button type="button" class="segmented-btn segmented-on" data-value="americas">🌎 Americas</button>
+                  <button type="button" class="segmented-btn" data-value="global">🌍 Global</button>
+                </div>
+                <p class="hint muted" id="accountRegionHint" style="margin-top: 6px;"></p>
+              </div>
+    
+              <!-- Frequency (push/bundle only) -->
+              <div id="accountFreqSection">
+                <label class="form-label">Alert Frequency</label>
+                <div class="segmented" id="accountFreqControl">
+                  <button type="button" class="segmented-btn segmented-on" data-value="1">1/day</button>
+                  <button type="button" class="segmented-btn" data-value="2">2/day</button>
+                  <button type="button" class="segmented-btn" data-value="3">3/day</button>
+                  <button type="button" class="segmented-btn" data-value="4">4/day</button>
+                </div>
+                <p class="hint muted" id="accountFreqHint" style="margin-top: 6px;"></p>
+              </div>
+    
+              <!-- Webhook URL (webhook/bundle only) -->
+              <div id="accountWebhookSection" style="display: none;">
+                <label class="form-label">Webhook Endpoint URL</label>
+                <input
+                  type="url"
+                  id="accountWebhookInput"
+                  class="form-input form-input-mono"
+                  placeholder="https://your-server.com/webhook"
+                />
+                <p class="hint muted" style="margin-top: 4px;">
+                  JSON payloads will be POSTed to this URL.
+                </p>
+              </div>
+    
+            </div>
+    
+            <!-- Save button -->
+            <button class="btn btn-primary btn-wide" id="accountSaveBtn" style="margin-top: 20px;">
+              Save Preferences
+            </button>
+            <p id="accountSaveMsg" class="hint" style="display: none; text-align: center; margin-top: 8px;"></p>
+          </div>
+    
+          <!-- Manage billing -->
+          <div style="margin-top: 12px; padding: 16px; background: rgba(255,255,255,0.02); border-radius: 8px; border: 1px solid rgba(255,255,255,0.04);">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <div>
+                <div style="font-size: 13px; font-weight: 600; color: var(--text-primary, #e6edf3);">Billing & Subscription</div>
+                <div class="muted" style="font-size: 12px; margin-top: 2px;">Manage payment method, invoices, or cancel</div>
+              </div>
+              <a href="https://billing.stripe.com/p/login/cNi28jaCC6iW7JMfLJ3sI00" target="_blank" rel="noopener" class="btn btn-ghost" style="font-size: 12px; padding: 8px 14px;">
+                Stripe Portal →
+              </a>
+            </div>
+          </div>
+    
+          <!-- Upgrade prompt (push-only subscribers) -->
+          <div id="accountUpgradePrompt" style="display: none; margin-top: 12px; padding: 16px; background: rgba(96,165,250,0.04); border-radius: 8px; border: 1px solid rgba(96,165,250,0.12);">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <div>
+                <div style="font-size: 13px; font-weight: 600; color: var(--accent, #60a5fa);">⚡ Upgrade to Bundle</div>
+                <div class="muted" style="font-size: 12px; margin-top: 2px;">Add Webhook API for just $27/mo more ($32 total)</div>
+              </div>
+              <button class="btn btn-primary" id="accountUpgradeBtn" style="font-size: 12px; padding: 8px 14px;">
+                Upgrade →
+              </button>
+            </div>
+          </div>
+    
+          <!-- Sign out -->
+          <div style="text-align: center; margin-top: 16px;">
+            <button class="btn btn-ghost" id="accountSignOutBtn" type="button" style="font-size: 12px; opacity: 0.5;">
+              Sign Out
+            </button>
+          </div>
+    
+        </div>
+      </div>
+    </div>
 
 </body>
 </html>

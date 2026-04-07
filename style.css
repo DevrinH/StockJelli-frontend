@@ -3653,12 +3653,7 @@ tbody tr:nth-child(2) .whale-indicator {
    Append to checkout.css or style.css
    ============================================ */
 
-   .modal-account {
-    max-width: 520px;
-    max-height: 90vh;
-    overflow-y: auto;
-  }
-  
+
   /* Plan status bar at top of prefs */
   .account-plan-bar {
     display: flex;
@@ -3690,4 +3685,8 @@ tbody tr:nth-child(2) .whale-indicator {
   .account-plan-email {
     font-size: 12px;
     margin-top: 1px;
+  }
+
+  .modal-account {
+    margin-top: var(--header-h, 56px);
   }

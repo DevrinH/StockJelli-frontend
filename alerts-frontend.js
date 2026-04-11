@@ -254,8 +254,12 @@
 
 document.getElementById("checkoutLoginBtn")?.addEventListener("click", () => {
   closeModal();
-  const accountBtn = document.getElementById("drawerAccountBtn");
-  if (accountBtn) accountBtn.click();
+  const accountModal = document.getElementById("accountModal");
+  if (accountModal) {
+    accountModal.classList.add("is-open");
+    accountModal.setAttribute("aria-hidden", "false");
+    document.body.style.overflow = "hidden";
+  }
 });
 
   // ═══════════════════════════════════════════════════════════════════════════

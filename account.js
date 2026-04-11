@@ -195,8 +195,7 @@
   
     function updateDrawerButton() {
       if (!drawerAccountBtn) return;
-      const isSubscriber = !!localStorage.getItem(STORAGE_KEY);
-      drawerAccountBtn.textContent = isSubscriber ? "Account" : "Subscribe";
+      drawerAccountBtn.textContent = "Account";
     }
   
     updateDrawerButton();
@@ -328,15 +327,7 @@ if (window.StockJelliPush && window.StockJelliPush.isSupported()) {
       }
       if (drawerOverlay) drawerOverlay.classList.remove("is-open");
       document.body.style.overflow = "";
-  
-      // If not a subscriber, open the checkout modal instead
-      const isSubscriber = !!localStorage.getItem(STORAGE_KEY);
-      if (!isSubscriber) {
-        const alertsBtn = document.getElementById("enableAlertsBtn");
-        if (alertsBtn) alertsBtn.click();
-        return;
-      }
-  
+    
       openModal();
     });
   

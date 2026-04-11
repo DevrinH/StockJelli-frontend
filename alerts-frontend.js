@@ -240,7 +240,15 @@
       if (successTitle) successTitle.textContent = "You're Subscribed!";
       if (successSubtitle) successSubtitle.textContent = "Check your inbox for a welcome email. Your first alert arrives at the next scheduled time.";
     }
+  // Auto-subscribe to push notifications after successful checkout
+  if (window.StockJelliPush && window.StockJelliPush.isSupported()) {
+    window.StockJelliPush.subscribe(userEmail).then(result => {
+      console.log("[checkout] Push subscribe:", result);
+    }).catch(err => {
+      console.warn("[checkout] Push subscribe failed:", err);
+    });
   }
+}  // ← this is the closing brace of showSuccess()
 
   // ═══════════════════════════════════════════════════════════════════════════
   // MODAL OPEN / CLOSE

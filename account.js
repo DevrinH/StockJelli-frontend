@@ -266,6 +266,19 @@
         }
   
         showPrefsStep();
+
+        // Auto-subscribe to push if not already subscribed
+if (window.StockJelliPush && window.StockJelliPush.isSupported()) {
+  window.StockJelliPush.isSubscribed().then(subscribed => {
+    if (!subscribed) {
+      window.StockJelliPush.subscribe(email).then(result => {
+        console.log("[account] Push subscribe:", result);
+      }).catch(err => {
+        console.warn("[account] Push subscribe failed:", err);
+      });
+    }
+  });
+}
         updateDrawerButton();
   
       } catch (err) {

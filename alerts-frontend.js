@@ -121,6 +121,8 @@
   // Success
   const closeSuccessBtn = document.getElementById("closeSuccessBtn");
 
+  
+
   // ═══════════════════════════════════════════════════════════════════════════
   // HELPERS
   // ═══════════════════════════════════════════════════════════════════════════
@@ -249,6 +251,12 @@
     });
   }
 }  // ← this is the closing brace of showSuccess()
+
+document.getElementById("checkoutLoginBtn")?.addEventListener("click", () => {
+  closeModal();
+  const accountBtn = document.getElementById("drawerAccountBtn");
+  if (accountBtn) accountBtn.click();
+});
 
   // ═══════════════════════════════════════════════════════════════════════════
   // MODAL OPEN / CLOSE

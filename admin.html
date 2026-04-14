@@ -369,14 +369,14 @@
   // ── Column definitions ──
   const MOMENTUM_COLS = ['symbol','name','date','priceAtEntry','pctChangeAtEntry','volumeAtEntry','marketCapAtEntry','sjScoreAtEntry','rangePositionAtEntry','rvolAtEntry','volMcapRatioAtEntry','peakPctChange','peakMinutesAfterEntry','marketSessionAtEntry','enteredAt','qualifiedAtEntry','sectorAtEntry','industryAtEntry','floatShares','floatPct','hasNews','peakAfter15m','peakAfter1h','peakAfter2h'];
   const MOMENTUM_OUTCOME_KEYS = ['outcome_5m','outcome_10m','outcome_15m','outcome_30m','outcome_45m','outcome_1h','outcome_1h15m','outcome_1h30m','outcome_1h45m','outcome_2h','outcome_2h15m','outcome_2h30m','outcome_2h45m','outcome_3h','outcome_3h15m','outcome_3h30m','outcome_3h45m','outcome_4h','outcome_6h','outcome_8h','outcome_10h','outcome_12h','outcome_14h','outcome_16h','outcome_18h'];
-  const SWING_BASE_COLS = ['symbol','name','date','priceAtEntry','pctChangeAtEntry','marketCapAtEntry','sjScoreAtEntry','sectorAtEntry','industryAtEntry','floatShares','floatPct','rvolAtEntry','volMcapRatioAtEntry','outcome_eod'];
+  const SWING_BASE_COLS = ['symbol','name','date','priceAtEntry','pctChangeAtEntry','marketCapAtEntry','sjScoreAtEntry','sectorAtEntry','industryAtEntry','sharesOutstanding','rvolAtEntry','volMcapRatioAtEntry','outcome_eod'];
 
   const COL_LABELS = {
     symbol:'Sym',name:'Name',date:'Date',priceAtEntry:'Entry $',pctChangeAtEntry:'Entry %',
     volumeAtEntry:'Vol',marketCapAtEntry:'MCap',sjScoreAtEntry:'SJ',rangePositionAtEntry:'Rng',
     rvolAtEntry:'RVOL',volMcapRatioAtEntry:'V/MC',peakPctChange:'Pk%',peakMinutesAfterEntry:'PkM',
     marketSessionAtEntry:'Sess',enteredAt:'Time',qualifiedAtEntry:'Q',
-    sectorAtEntry:'Sector',industryAtEntry:'Industry',floatShares:'Float',floatPct:'Flt%',peakAfter15m:'Pk15m+',
+    sectorAtEntry:'Sector',industryAtEntry:'Industry',sharesOutstanding:'Shares',peakAfter15m:'Pk15m+',
     outcome_5m:'5m',outcome_10m:'10m',outcome_15m:'15m',outcome_30m:'30m',
     outcome_1h:'1h',outcome_2h:'2h',outcome_4h:'4h',outcome_6h:'6h',outcome_8h:'8h',outcome_45m:'45m',
     outcome_1h15m:'1:15',outcome_1h30m:'1:30',outcome_1h45m:'1:45',
@@ -586,8 +586,7 @@
         }
       case 'peakAfter2h': { const pp2=entry.peakAfter2hPrice; const o2=entry.outcomes?.outcome_2h?.price; if(!pp2||!o2||o2<=0) return '<span style="color:var(--muted)">—</span>'; const g2=((pp2/o2)-1)*100; return `<span class="${g2>0?'pct-up':g2<0?'pct-down':'pct-flat'}">${g2>0?'+':''}${g2.toFixed(1)}%</span>`; }
 
-      case 'floatShares': return val ? fmtC(val) : '<span style="color:var(--muted)">—</span>';
-      case 'floatPct': { if (!val) return '<span style="color:var(--muted)">—</span>'; const fp=Number(val); const color=fp<20?'var(--amber)':fp<50?'var(--text)':'var(--muted)'; return `<span style="color:${color};font-weight:600">${fp.toFixed(1)}%</span>`; }
+      case 'sharesOutstanding': return val ? fmtC(val) : '<span style="color:var(--muted)">—</span>';
       case 'hasNews': return val?'📰':'';
       default: return String(val);
     }

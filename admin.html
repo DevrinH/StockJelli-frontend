@@ -560,6 +560,12 @@
       const p = o.pctFromEntry;
       return `<span class="${p>0?'outcome-pos':p<0?'outcome-neg':'outcome-na'}">${p>0?'+':''}${p.toFixed(2)}%</span>`;
     }
+// RVOL at checkpoints — read from outcomes, not top-level fields
+if (col === 'rvol5m') { const r=entry.outcomes?.outcome_5m?.rvolAtCheck; if(!r) return '<span style="color:var(--muted)">—</span>'; const c=r>=2?'var(--green)':r>=1?'var(--text)':'var(--muted)'; return `<span style="color:${c};font-weight:600">${r.toFixed(1)}x</span>`; }
+    if (col === 'rvol10m') { const r=entry.outcomes?.outcome_10m?.rvolAtCheck; if(!r) return '<span style="color:var(--muted)">—</span>'; const c=r>=2?'var(--green)':r>=1?'var(--text)':'var(--muted)'; return `<span style="color:${c};font-weight:600">${r.toFixed(1)}x</span>`; }
+    if (col === 'rvol15m') { const r=entry.outcomes?.outcome_15m?.rvolAtCheck; if(!r) return '<span style="color:var(--muted)">—</span>'; const c=r>=2?'var(--green)':r>=1?'var(--text)':'var(--muted)'; return `<span style="color:${c};font-weight:600">${r.toFixed(1)}x</span>`; }
+    if (col === 'rvol30m') { const r=entry.outcomes?.outcome_30m?.rvolAtCheck; if(!r) return '<span style="color:var(--muted)">—</span>'; const c=r>=2?'var(--green)':r>=1?'var(--text)':'var(--muted)'; return `<span style="color:${c};font-weight:600">${r.toFixed(1)}x</span>`; }
+
     if (val===null||val===undefined) return '<span style="color:var(--muted)">—</span>';
     switch (col) {
       case 'symbol': return `<span class="sym">${val}</span>`;
@@ -587,10 +593,7 @@
       case 'peakAfter2h': { const pp2=entry.peakAfter2hPrice; const o2=entry.outcomes?.outcome_2h?.price; if(!pp2||!o2||o2<=0) return '<span style="color:var(--muted)">—</span>'; const g2=((pp2/o2)-1)*100; return `<span class="${g2>0?'pct-up':g2<0?'pct-down':'pct-flat'}">${g2>0?'+':''}${g2.toFixed(1)}%</span>`; }
 
       case 'sharesOutstandingAtEntry': return val ? fmtC(val) : '<span style="color:var(--muted)">—</span>';
-      case 'rvol5m': { const r=entry.outcomes?.outcome_5m?.rvolAtCheck; if(!r) return '<span style="color:var(--muted)">—</span>'; const c=r>=2?'var(--green)':r>=1?'var(--text)':'var(--muted)'; return `<span style="color:${c};font-weight:600">${r.toFixed(1)}x</span>`; }
-      case 'rvol10m': { const r=entry.outcomes?.outcome_10m?.rvolAtCheck; if(!r) return '<span style="color:var(--muted)">—</span>'; const c=r>=2?'var(--green)':r>=1?'var(--text)':'var(--muted)'; return `<span style="color:${c};font-weight:600">${r.toFixed(1)}x</span>`; }
-      case 'rvol15m': { const r=entry.outcomes?.outcome_15m?.rvolAtCheck; if(!r) return '<span style="color:var(--muted)">—</span>'; const c=r>=2?'var(--green)':r>=1?'var(--text)':'var(--muted)'; return `<span style="color:${c};font-weight:600">${r.toFixed(1)}x</span>`; }
-      case 'rvol30m': { const r=entry.outcomes?.outcome_30m?.rvolAtCheck; if(!r) return '<span style="color:var(--muted)">—</span>'; const c=r>=2?'var(--green)':r>=1?'var(--text)':'var(--muted)'; return `<span style="color:${c};font-weight:600">${r.toFixed(1)}x</span>`; }
+
       case 'hasNews': return val?'📰':'';
       default: return String(val);
     }

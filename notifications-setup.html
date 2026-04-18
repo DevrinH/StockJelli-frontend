@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>How to Enable Push Notifications — StockJelli</title>
+  <meta name="description" content="Step-by-step guide to enable StockJelli push notifications on Android, iOS, and desktop browsers.">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://stockjelli.com/notifications-setup.html">
+  <link rel="icon" type="image/png" href="/StockJelli-S-Logo.png">
+  <link rel="apple-touch-icon" href="/StockJelli-Social-Logo.png">
+  <link rel="stylesheet" href="style.css">
+  <meta name="theme-color" content="#0d1117">
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-FM3HXT7ECV"></script>
+  <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date());gtag('config','G-FM3HXT7ECV',{anonymize_ip:true});</script>
+  <style>
+    .setup-page { max-width: 720px; margin: 0 auto; padding: 24px 20px 60px; }
+    .setup-back { display: inline-flex; align-items: center; gap: 6px; color: rgba(255,255,255,0.4); text-decoration: none; font-size: 0.8rem; margin-bottom: 20px; transition: color 0.15s; }
+    .setup-back:hover { color: rgba(255,255,255,0.7); }
+
+    .setup-title { font-size: 1.5rem; font-weight: 800; color: #e6edf3; margin: 0 0 6px; line-height: 1.2; }
+    .setup-sub { font-size: 0.85rem; color: rgba(255,255,255,0.4); margin: 0 0 28px; }
+
+    .setup-section { margin-bottom: 28px; }
+    .setup-platform {
+      display: flex; align-items: center; gap: 10px;
+      margin-bottom: 14px; padding-bottom: 8px;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    .setup-platform-icon { font-size: 1.4rem; flex-shrink: 0; }
+    .setup-platform-name { font-size: 1.05rem; font-weight: 700; color: #e6edf3; }
+    .setup-platform-req { font-size: 0.7rem; color: rgba(255,255,255,0.25); margin-left: auto; }
+
+    .setup-steps { list-style: none; padding: 0; margin: 0; counter-reset: setup-step; }
+    .setup-step {
+      counter-increment: setup-step;
+      position: relative;
+      padding: 12px 16px 12px 52px;
+      margin-bottom: 8px;
+      background: rgba(18, 24, 38, 0.7);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 10px;
+      font-size: 0.88rem;
+      color: rgba(255,255,255,0.8);
+      line-height: 1.5;
+    }
+    .setup-step::before {
+      content: counter(setup-step);
+      position: absolute;
+      left: 16px;
+      top: 12px;
+      width: 24px; height: 24px;
+      border-radius: 6px;
+      background: rgba(77, 163, 255, 0.12);
+      border: 1px solid rgba(77, 163, 255, 0.25);
+      color: #60a5fa;
+      font-size: 0.72rem;
+      font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .setup-step strong { color: #e6edf3; }
+    .setup-step em { color: rgba(255,255,255,0.45); font-style: normal; font-size: 0.8rem; }
+    .setup-step .step-note {
+      display: block;
+      margin-top: 6px;
+      font-size: 0.75rem;
+      color: rgba(255,255,255,0.3);
+      line-height: 1.4;
+    }
+
+    .setup-tip {
+      margin-top: 28px;
+      padding: 14px 18px;
+      background: rgba(34, 197, 94, 0.06);
+      border: 1px solid rgba(34, 197, 94, 0.15);
+      border-radius: 10px;
+      font-size: 0.82rem;
+      color: rgba(255,255,255,0.7);
+      line-height: 1.5;
+    }
+    .setup-tip strong { color: #22c55e; }
+
+    .setup-troubleshoot {
+      margin-top: 28px;
+      padding: 14px 18px;
+      background: rgba(245, 158, 11, 0.05);
+      border: 1px solid rgba(245, 158, 11, 0.12);
+      border-radius: 10px;
+    }
+    .setup-troubleshoot-title { font-size: 0.82rem; font-weight: 700; color: #f59e0b; margin: 0 0 8px; }
+    .setup-troubleshoot p { font-size: 0.78rem; color: rgba(255,255,255,0.5); margin: 6px 0; line-height: 1.5; }
+    .setup-troubleshoot code { background: rgba(255,255,255,0.06); padding: 1px 5px; border-radius: 3px; font-size: 0.75rem; color: rgba(255,255,255,0.6); }
+
+    .setup-cta {
+      margin-top: 32px;
+      text-align: center;
+      padding: 20px;
+      background: rgba(18, 24, 38, 0.7);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 12px;
+    }
+    .setup-cta p { margin: 0 0 12px; font-size: 0.85rem; color: rgba(255,255,255,0.5); }
+    .setup-cta-btn {
+      display: inline-block;
+      padding: 10px 24px;
+      background: #4da3ff;
+      color: #0b0f14;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 0.88rem;
+      text-decoration: none;
+      transition: opacity 0.15s;
+    }
+    .setup-cta-btn:hover { opacity: 0.9; }
+
+    @media (max-width: 640px) {
+      .setup-page { padding: 16px 14px 40px; }
+      .setup-title { font-size: 1.2rem; }
+      .setup-step { padding: 10px 12px 10px 44px; font-size: 0.82rem; }
+      .setup-step::before { left: 12px; width: 22px; height: 22px; font-size: 0.68rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="header">
+    <div class="header-inner">
+      <div class="header-left">
+        <a href="/" aria-label="StockJelli Home"><img class="logo" src="StockJelli-Logo.png" alt="StockJelli" width="150" height="32"></a>
+      </div>
+      <div class="header-right">
+        <a href="/" style="color:rgba(255,255,255,0.5);text-decoration:none;font-size:0.8rem;font-weight:500;">← Back to Screener</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="setup-page">
+    <a href="/" class="setup-back">← Back to screener</a>
+
+    <h1 class="setup-title">🔔 How to Enable Push Notifications</h1>
+    <p class="setup-sub">Get real-time momentum alerts on your phone or desktop. Takes about 30 seconds.</p>
+
+    <!-- Android -->
+    <div class="setup-section">
+      <div class="setup-platform">
+        <span class="setup-platform-icon">🤖</span>
+        <span class="setup-platform-name">Android (Chrome)</span>
+        <span class="setup-platform-req">Chrome required</span>
+      </div>
+      <ol class="setup-steps">
+        <li class="setup-step">Open <strong>stockjelli.com</strong> in Chrome</li>
+        <li class="setup-step">Tap the <strong>three-dot menu</strong> (top right) → <strong>"Add to Home Screen"</strong></li>
+        <li class="setup-step">Open StockJelli from your <strong>home screen</strong>
+          <span class="step-note">This makes it behave like a native app — full screen, no browser bar.</span>
+        </li>
+        <li class="setup-step">Subscribe to notifications when prompted — you'll get <strong>native push alerts</strong> just like any other app</li>
+      </ol>
+    </div>
+
+    <!-- iOS -->
+    <div class="setup-section">
+      <div class="setup-platform">
+        <span class="setup-platform-icon">🍎</span>
+        <span class="setup-platform-name">iOS (Safari)</span>
+        <span class="setup-platform-req">iOS 16.4+ · Safari only</span>
+      </div>
+      <ol class="setup-steps">
+        <li class="setup-step">Open <strong>stockjelli.com</strong> in <strong>Safari</strong>
+          <span class="step-note">Must be Safari — Chrome on iOS doesn't support web push notifications.</span>
+        </li>
+        <li class="setup-step">Tap the <strong>Share button</strong> (bottom center, square with arrow) → <strong>"Add to Home Screen"</strong></li>
+        <li class="setup-step">Open StockJelli from your <strong>home screen</strong>
+          <span class="step-note">This step is required — notifications only work from the home screen app, not from Safari directly.</span>
+        </li>
+        <li class="setup-step">Subscribe when prompted — alerts will appear in your <strong>notification center</strong> and <strong>lock screen</strong></li>
+      </ol>
+    </div>
+
+    <!-- Desktop -->
+    <div class="setup-section">
+      <div class="setup-platform">
+        <span class="setup-platform-icon">💻</span>
+        <span class="setup-platform-name">Chrome Desktop (Mac / Windows)</span>
+        <span class="setup-platform-req">Chrome, Edge, or Firefox</span>
+      </div>
+      <ol class="setup-steps">
+        <li class="setup-step">Go to <strong>stockjelli.com</strong> in Chrome</li>
+        <li class="setup-step">Click the <strong>subscribe / enable notifications</strong> prompt on the site</li>
+        <li class="setup-step">Click <strong>"Allow"</strong> when Chrome asks for notification permission — alerts will pop up on your desktop in real time</li>
+      </ol>
+    </div>
+
+    <!-- Tip -->
+    <div class="setup-tip">
+      <strong>Tip:</strong> For the best experience on mobile, add StockJelli to your home screen. This makes it open full-screen like a native app and ensures push notifications work reliably. You only need to do this once.
+    </div>
+
+    <!-- Troubleshooting -->
+    <div class="setup-troubleshoot">
+      <h3 class="setup-troubleshoot-title">Not getting notifications?</h3>
+      <p><strong>Check your browser permissions:</strong> Go to your browser settings → Site Settings → Notifications → make sure stockjelli.com is set to "Allow."</p>
+      <p><strong>iOS users:</strong> You must open StockJelli from the home screen icon, not from Safari. Also make sure you're on iOS 16.4 or later.</p>
+      <p><strong>Do Not Disturb:</strong> If your phone is in DND or Focus mode, notifications may be silenced. Add StockJelli to your allowed apps.</p>
+      <p><strong>Still stuck?</strong> Email us at <a href="mailto:support@stockjelli.com" style="color:#60a5fa;">support@stockjelli.com</a> and we'll help you get set up.</p>
+    </div>
+
+    <!-- CTA -->
+    <div class="setup-cta">
+      <p>Not subscribed yet? Get momentum alerts for $5/mo.</p>
+      <a href="/?alerts=open" class="setup-cta-btn">Subscribe →</a>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-inner">
+      <p>Educational tool only. Not financial advice.</p>
+      <p class="muted">© 2026 StockJelli · <a href="/privacy.html" class="footer-link">Privacy</a> · <a href="/terms.html" class="footer-link">Terms</a></p>
+    </div>
+  </footer>
+
+</body>
+</html>

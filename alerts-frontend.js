@@ -4,6 +4,8 @@
  * 
  * April 2026 Launch — Multi-plan checkout flow + live alert display
  * 
+ * UPDATED: Frequency options expanded to 1–8/day + Unlimited (stored as 99)
+ * 
  * FEATURES:
  *   - Multi-step checkout (Plan → Configure → Review → Stripe)
  *   - Today's alert cards below screener (respects stocks/crypto toggle)
@@ -28,8 +30,37 @@
   const ASSET_LABELS = { stocks: "📈 Stocks", crypto: "🪙 Crypto", both: "⚡ Stocks + Crypto" };
   const ASSET_HINTS = { stocks: "US equities — signals during market hours (9:30 AM–4 PM ET)", crypto: "Top crypto by market cap — 24/7 signals", both: "Stocks during market hours + crypto 24/7" };
   const REGION_INFO = { americas: { label: "🌎 Americas", hint: "Alerts timed for US market hours (ET)" }, global: { label: "🌍 Global", hint: "Crypto-only alerts at convenient UTC times" } };
-  const FREQ_HINTS_AMERICAS = { 1: "First hour momentum alert (10:00 AM ET)", 2: "Morning + midday (10:00 AM, 12:30 PM ET)", 3: "Morning + midday + power hour (10:00, 12:30, 3:30 PM ET)", 4: "All windows + evening crypto (10:00, 12:30, 3:30, 8:00 PM ET)" };
-  const FREQ_HINTS_GLOBAL = { 1: "Morning crypto alert (8:00 AM UTC)", 2: "Morning + afternoon crypto (8:00 AM, 2:00 PM UTC)", 3: "All day crypto (8:00 AM, 2:00 PM, 8:00 PM UTC)", 4: "Same as 3 (crypto is 24/7, 3 is optimal)" };
+
+  // ═══════════════════════════════════════════════════════════════════
+  // UPDATED: Frequency hints expanded to 1–8 + Unlimited (99)
+  // ═══════════════════════════════════════════════════════════════════
+  const FREQ_HINTS_AMERICAS = {
+    1:  "First hour momentum alert (10:00 AM ET)",
+    2:  "Morning + midday (10:00 AM, 12:30 PM ET)",
+    3:  "Morning + midday + power hour (10:00, 12:30, 3:30 PM ET)",
+    4:  "All core windows + evening crypto (10:00, 12:30, 3:30, 8:00 PM ET)",
+    5:  "Adds opening momentum (9:15, 10:00, 12:30, 3:30, 8:00 PM ET)",
+    6:  "Adds late morning (9:15, 10:00, 11:00, 12:30, 3:30, 8:00 PM ET)",
+    7:  "Adds early afternoon (9:15, 10:00, 11:00, 12:30, 2:00, 3:30, 8:00 PM ET)",
+    8:  "All windows including after-hours (9:15, 10:00, 11:00, 12:30, 2:00, 3:30, 5:00, 8:00 PM ET)",
+    99: "Unlimited — every alert window, every signal",
+  };
+
+  const FREQ_HINTS_GLOBAL = {
+    1:  "Morning crypto alert (8:00 AM UTC)",
+    2:  "Morning + afternoon crypto (8:00 AM, 2:00 PM UTC)",
+    3:  "All day crypto (8:00 AM, 2:00 PM, 8:00 PM UTC)",
+    4:  "Adds early morning (4:00 AM, 8:00 AM, 2:00 PM, 8:00 PM UTC)",
+    5:  "Adds late morning (4:00, 8:00, 11:00 AM, 2:00, 8:00 PM UTC)",
+    6:  "Adds evening (4:00, 8:00, 11:00 AM, 2:00, 5:00, 8:00 PM UTC)",
+    7:  "Adds late evening (4:00, 8:00, 11:00 AM, 2:00, 5:00, 8:00, 11:00 PM UTC)",
+    8:  "All 8 windows across the day",
+    99: "Unlimited — every alert window, every signal",
+  };
+
+  // Max frequency per region (updated from 4/3 to 8/8)
+  const MAX_FREQ_AMERICAS = 8;
+  const MAX_FREQ_GLOBAL = 8;
 
   let currentStep = 1, selectedPlan = null, selectedAssets = "both", selectedRegion = "americas", selectedFrequency = 1, userEmail = "", webhookUrl = "", autoExecValue = "";
   const acks = { ack1: false, ack2: false, ack3: false, ack4: false, ack5: false };
@@ -70,6 +101,14 @@
   function hasWebhook() { return selectedPlan === "webhook" || selectedPlan === "bundle"; }
   function setSegmented(c, v) { if (!c) return; c.querySelectorAll(".segmented-btn").forEach(b => b.classList.toggle("segmented-on", b.dataset.value === v)); }
 
+  // ═══════════════════════════════════════════════════════════════════
+  // HELPER: Format frequency for display
+  // ═══════════════════════════════════════════════════════════════════
+  function fmtFreq(f) {
+    if (f === 99 || f === "99") return "Unlimited";
+    return `${f}/day`;
+  }
+
   function showStep(step) {
     currentStep = step;
     if (stepDots) stepDots.forEach(d => { const s = Number(d.dataset.step); d.classList.remove("step-active", "step-complete"); if (s === step) d.classList.add("step-active"); else if (s < step) d.classList.add("step-complete"); });
@@ -104,11 +143,51 @@
   step1NextBtn?.addEventListener("click", () => { if (!selectedPlan) return; configureStep2(); showStep(2); emailInput?.focus(); });
 
   // Step 2
-  function configureStep2() { if (frequencySection) frequencySection.style.display = hasPush() ? "" : "none"; if (webhookUrlSection) webhookUrlSection.style.display = hasWebhook() ? "" : "none"; if (webhookConsentCard) webhookConsentCard.style.display = hasWebhook() ? "" : "none"; if (consentItems) consentItems.forEach(i => i.classList.remove("checked")); Object.keys(acks).forEach(k => acks[k] = false); autoExecValue = ""; if (autoExecGroup) autoExecGroup.querySelectorAll("input").forEach(r => r.checked = false); if (autoTradeNotice) autoTradeNotice.classList.remove("visible"); if (configTitle) configTitle.textContent = `Configure Your ${PLANS[selectedPlan]?.name || "Plan"}`; validateStep2(); }
+  function configureStep2() { if (frequencySection) frequencySection.style.display = hasPush() ? "" : "none"; if (webhookUrlSection) webhookUrlSection.style.display = hasWebhook() ? "" : "none"; if (webhookConsentCard) webhookConsentCard.style.display = hasWebhook() ? "" : "none"; if (consentItems) consentItems.forEach(i => i.classList.remove("checked")); Object.keys(acks).forEach(k => acks[k] = false); autoExecValue = ""; if (autoExecGroup) autoExecGroup.querySelectorAll("input").forEach(r => r.checked = false); if (autoTradeNotice) autoTradeNotice.classList.remove("visible"); if (configTitle) configTitle.textContent = `Configure Your ${PLANS[selectedPlan]?.name || "Plan"}`; applyFreqConstraints(); validateStep2(); }
   assetTypeControl?.addEventListener("click", e => { const b = e.target.closest(".segmented-btn"); if (!b) return; selectedAssets = b.dataset.value; setSegmented(assetTypeControl, selectedAssets); if (assetTypeHint) assetTypeHint.textContent = ASSET_HINTS[selectedAssets] || ""; });
-  regionControl?.addEventListener("click", e => { const b = e.target.closest(".segmented-btn"); if (!b) return; selectedRegion = b.dataset.value; setSegmented(regionControl, selectedRegion); if (regionHint) regionHint.textContent = REGION_INFO[selectedRegion]?.hint || ""; updateFreqHint(); if (selectedRegion === "global" && selectedFrequency > 3) { selectedFrequency = 3; setSegmented(frequencyControl, "3"); } if (frequencyControl) frequencyControl.querySelectorAll(".segmented-btn").forEach(b => { if (b.dataset.value === "4") { b.style.opacity = selectedRegion === "global" ? "0.35" : ""; b.style.pointerEvents = selectedRegion === "global" ? "none" : ""; } }); });
+
+  // ═══════════════════════════════════════════════════════════════════
+  // UPDATED: Region change — no longer caps frequency at 3 for global
+  // ═══════════════════════════════════════════════════════════════════
+  regionControl?.addEventListener("click", e => {
+    const b = e.target.closest(".segmented-btn");
+    if (!b) return;
+    selectedRegion = b.dataset.value;
+    setSegmented(regionControl, selectedRegion);
+    if (regionHint) regionHint.textContent = REGION_INFO[selectedRegion]?.hint || "";
+    applyFreqConstraints();
+    updateFreqHint();
+  });
+
   frequencyControl?.addEventListener("click", e => { const b = e.target.closest(".segmented-btn"); if (!b || b.style.pointerEvents === "none") return; selectedFrequency = Number(b.dataset.value); setSegmented(frequencyControl, String(selectedFrequency)); updateFreqHint(); });
-  function updateFreqHint() { if (!frequencyHint) return; frequencyHint.textContent = (selectedRegion === "americas" ? FREQ_HINTS_AMERICAS : FREQ_HINTS_GLOBAL)[selectedFrequency] || ""; }
+
+  // ═══════════════════════════════════════════════════════════════════
+  // UPDATED: Apply frequency constraints based on region
+  // Both regions now support 1–8 + unlimited. No buttons disabled.
+  // ═══════════════════════════════════════════════════════════════════
+  function applyFreqConstraints() {
+    const maxFreq = selectedRegion === "global" ? MAX_FREQ_GLOBAL : MAX_FREQ_AMERICAS;
+    if (frequencyControl) {
+      frequencyControl.querySelectorAll(".segmented-btn").forEach(b => {
+        const v = Number(b.dataset.value);
+        // Only disable if value exceeds max (and isn't the unlimited option)
+        const disabled = v !== 99 && v > maxFreq;
+        b.style.opacity = disabled ? "0.35" : "";
+        b.style.pointerEvents = disabled ? "none" : "";
+      });
+    }
+    // If current selection exceeds max, clamp it
+    if (selectedFrequency !== 99 && selectedFrequency > maxFreq) {
+      selectedFrequency = maxFreq;
+      setSegmented(frequencyControl, String(selectedFrequency));
+    }
+  }
+
+  function updateFreqHint() {
+    if (!frequencyHint) return;
+    frequencyHint.textContent = (selectedRegion === "americas" ? FREQ_HINTS_AMERICAS : FREQ_HINTS_GLOBAL)[selectedFrequency] || "";
+  }
+
   if (consentItems) consentItems.forEach(item => { item.addEventListener("click", e => { if (e.target.tagName === "A") return; const k = item.dataset.ack; if (!k) return; acks[k] = !acks[k]; item.classList.toggle("checked", acks[k]); validateStep2(); }); });
   if (autoExecGroup) autoExecGroup.querySelectorAll("input[name='auto_exec']").forEach(r => { r.addEventListener("change", () => { autoExecValue = r.value; if (autoTradeNotice) autoTradeNotice.classList.toggle("visible", autoExecValue === "yes" || autoExecValue === "exploring"); validateStep2(); }); });
   emailInput?.addEventListener("input", () => { if (emailError) emailError.style.display = "none"; validateStep2(); });
@@ -116,16 +195,69 @@
   step2BackBtn?.addEventListener("click", () => showStep(1));
   step2NextBtn?.addEventListener("click", async () => { const e = emailInput?.value?.trim(); if (!e || !isValidEmail(e)) { if (emailError) emailError.style.display = "block"; emailInput?.focus(); return; } userEmail = e; webhookUrl = webhookUrlInput?.value?.trim() || ""; try { const r = await fetch(`${API_BASE}/api/alerts/status?email=${encodeURIComponent(e)}`); if (r.ok) { const d = await r.json(); if (d.subscribed) { alert("You're already subscribed!"); closeModal(); return; } } } catch {} populateReview(); showStep(3); });
 
-  // Step 3
-  function populateReview() { const p = PLANS[selectedPlan]; if (!p) return; const el = id => document.getElementById(id); if (el("reviewPlanIcon")) el("reviewPlanIcon").textContent = p.icon; if (el("reviewPlanName")) el("reviewPlanName").textContent = p.name; const b = el("reviewPlanBadge"); if (b) { b.textContent = p.badge; b.className = `plan-badge ${p.badgeClass}`; } if (el("reviewPlanPrice")) el("reviewPlanPrice").textContent = `$${p.price}`; if (el("summaryEmail")) el("summaryEmail").textContent = userEmail; if (el("summaryAssets")) el("summaryAssets").textContent = ASSET_LABELS[selectedAssets] || "—"; if (el("summaryRegion")) el("summaryRegion").textContent = REGION_INFO[selectedRegion]?.label || "—"; const fr = el("summaryFreqRow"); if (fr) fr.style.display = hasPush() ? "" : "none"; if (el("summaryFrequency")) { const f = selectedRegion === "global" && selectedFrequency > 3 ? 3 : selectedFrequency; el("summaryFrequency").textContent = `${f}/day`; } const wr = el("summaryWebhookRow"), ar = el("summaryAutoExecRow"); if (wr) wr.style.display = hasWebhook() ? "" : "none"; if (ar) ar.style.display = hasWebhook() ? "" : "none"; if (el("summaryWebhook")) el("summaryWebhook").textContent = webhookUrl || "(later)"; if (el("summaryAutoExec")) el("summaryAutoExec").textContent = autoExecValue || "—"; }
+  // ═══════════════════════════════════════════════════════════════════
+  // Step 3 — UPDATED: Use fmtFreq() for frequency display
+  // ═══════════════════════════════════════════════════════════════════
+  function populateReview() {
+    const p = PLANS[selectedPlan];
+    if (!p) return;
+    const el = id => document.getElementById(id);
+    if (el("reviewPlanIcon")) el("reviewPlanIcon").textContent = p.icon;
+    if (el("reviewPlanName")) el("reviewPlanName").textContent = p.name;
+    const b = el("reviewPlanBadge");
+    if (b) { b.textContent = p.badge; b.className = `plan-badge ${p.badgeClass}`; }
+    if (el("reviewPlanPrice")) el("reviewPlanPrice").textContent = `$${p.price}`;
+    if (el("summaryEmail")) el("summaryEmail").textContent = userEmail;
+    if (el("summaryAssets")) el("summaryAssets").textContent = ASSET_LABELS[selectedAssets] || "—";
+    if (el("summaryRegion")) el("summaryRegion").textContent = REGION_INFO[selectedRegion]?.label || "—";
+    const fr = el("summaryFreqRow");
+    if (fr) fr.style.display = hasPush() ? "" : "none";
+    if (el("summaryFrequency")) {
+      // UPDATED: Use fmtFreq helper, no more global cap at 3
+      el("summaryFrequency").textContent = fmtFreq(selectedFrequency);
+    }
+    const wr = el("summaryWebhookRow"), ar = el("summaryAutoExecRow");
+    if (wr) wr.style.display = hasWebhook() ? "" : "none";
+    if (ar) ar.style.display = hasWebhook() ? "" : "none";
+    if (el("summaryWebhook")) el("summaryWebhook").textContent = webhookUrl || "(later)";
+    if (el("summaryAutoExec")) el("summaryAutoExec").textContent = autoExecValue || "—";
+  }
+
   step3BackBtn?.addEventListener("click", () => showStep(2));
 
-  // Stripe — NO DATE GATE
+  // ═══════════════════════════════════════════════════════════════════
+  // Stripe checkout — UPDATED: Send raw frequency value (1–8 or 99)
+  // ═══════════════════════════════════════════════════════════════════
   stripeCheckoutBtn?.addEventListener("click", async () => {
     if (!userEmail || !selectedPlan) { showStep(1); return; }
-    localStorage.setItem("sj_checkout_email", userEmail); localStorage.setItem("sj_checkout_plan", selectedPlan);
-    stripeCheckoutBtn.disabled = true; stripeCheckoutBtn.textContent = "Redirecting to Stripe...";
-    try { const f = selectedRegion === "global" && selectedFrequency > 3 ? 3 : selectedFrequency; const r = await fetch(`${API_BASE}/api/alerts/create-checkout`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email: userEmail, plan: selectedPlan, assetTypes: selectedAssets, region: selectedRegion, alertFrequency: hasPush() ? f : 0, webhookUrl: hasWebhook() ? webhookUrl : undefined, tosVersion: "2026-04-19" }) }); if (!r.ok) throw new Error((await r.json().catch(() => ({}))).error || "Failed"); const { url } = await r.json(); if (url) window.location.href = url; else throw new Error("No URL"); } catch (err) { alert("Checkout failed. Please try again."); stripeCheckoutBtn.disabled = false; stripeCheckoutBtn.textContent = "Subscribe with Stripe →"; }
+    localStorage.setItem("sj_checkout_email", userEmail);
+    localStorage.setItem("sj_checkout_plan", selectedPlan);
+    stripeCheckoutBtn.disabled = true;
+    stripeCheckoutBtn.textContent = "Redirecting to Stripe...";
+    try {
+      // UPDATED: Send selectedFrequency directly (no more global cap at 3)
+      const r = await fetch(`${API_BASE}/api/alerts/create-checkout`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: userEmail,
+          plan: selectedPlan,
+          assetTypes: selectedAssets,
+          region: selectedRegion,
+          alertFrequency: hasPush() ? selectedFrequency : 0,
+          webhookUrl: hasWebhook() ? webhookUrl : undefined,
+          tosVersion: "2026-04-19",
+        }),
+      });
+      if (!r.ok) throw new Error((await r.json().catch(() => ({}))).error || "Failed");
+      const { url } = await r.json();
+      if (url) window.location.href = url;
+      else throw new Error("No URL");
+    } catch (err) {
+      alert("Checkout failed. Please try again.");
+      stripeCheckoutBtn.disabled = false;
+      stripeCheckoutBtn.textContent = "Subscribe with Stripe →";
+    }
   });
 
   // Triggers
@@ -179,7 +311,6 @@
         const today = new Date().toISOString().split("T")[0];
         const mode = getCurrentMode();
   
-        // Filter by today AND current asset mode
         let todayAlerts = (data.notifications || []).filter(a => a.date === today);
         if (mode === "stocks") todayAlerts = todayAlerts.filter(a => a.mode === "stocks");
         else if (mode === "crypto") todayAlerts = todayAlerts.filter(a => a.mode === "crypto");
@@ -245,7 +376,6 @@
       }
     }
   
-    // Re-render when screener mode changes
     document.getElementById("assetControl")?.querySelectorAll(".segmented-btn").forEach(btn => {
       btn.addEventListener("click", () => setTimeout(renderFeaturedAlert, 100));
     });
@@ -279,11 +409,9 @@
     const bodyEl = document.getElementById("alertCardsBody");
     const emptyEl = document.getElementById("alertCardsEmpty");
 
-    // Sync toggle
     const toggleEl = document.getElementById("alertCardsToggle");
     if (toggleEl) toggleEl.querySelectorAll(".segmented-btn").forEach(b => b.classList.toggle("segmented-on", b.dataset.value === mode));
 
-    // Stats
     if (statsEl) {
       statsEl.innerHTML = todayAlerts.length === 0 ? "" : `
         <div class="alert-stat"><span class="alert-stat-val">${todayAlerts.length}</span><span class="alert-stat-lbl">Alerts</span></div>
@@ -294,7 +422,6 @@
       `;
     }
 
-    // Rows
     if (bodyEl) {
       if (todayAlerts.length === 0) {
         bodyEl.innerHTML = "";
@@ -335,7 +462,6 @@
       }
     }
 
-    // View all link
     const viewAllEl = document.getElementById("alertCardsViewAll");
     if (viewAllEl) {
       const total = (alertLogData.notifications || []).length;
@@ -346,7 +472,6 @@
     container.style.display = "";
   }
 
-  // Highlight alerted tickers in the screener table
   function highlightAlertedRows() {
     if (!alertedSymbolsToday || alertedSymbolsToday.size === 0) return;
     document.querySelectorAll("#stocksTbody tr[data-symbol], #cryptoTbody tr[data-symbol]").forEach(tr => {
@@ -354,7 +479,6 @@
       if (alertedSymbolsToday.has(sym)) {
         tr.style.borderLeft = "3px solid rgba(96, 165, 250, 0.5)";
         tr.style.background = "rgba(96, 165, 250, 0.03)";
-        // Add badge if not already present
         const tickerCell = tr.querySelector("td.ticker");
         if (tickerCell && !tickerCell.querySelector(".alerted-badge")) {
           const badge = document.createElement("span");
@@ -368,18 +492,11 @@
     });
   }
 
-  // Re-highlight after each screener render
-  const origRenderStocks = window.renderStocks;
-  if (typeof origRenderStocks === "function") {
-    // Can't easily hook — instead, observe tbody changes
-  }
-  // Use MutationObserver to re-highlight after table re-renders
   const stocksTbody = document.getElementById("stocksTbody");
   const cryptoTbody = document.getElementById("cryptoTbody");
   if (stocksTbody) new MutationObserver(() => setTimeout(highlightAlertedRows, 50)).observe(stocksTbody, { childList: true });
   if (cryptoTbody) new MutationObserver(() => setTimeout(highlightAlertedRows, 50)).observe(cryptoTbody, { childList: true });
 
-  // Toggle handler syncs with screener
   document.addEventListener("click", e => {
     const btn = e.target.closest("#alertCardsToggle .segmented-btn");
     if (!btn) return;
@@ -388,7 +505,6 @@
     setTimeout(renderTodayAlerts, 100);
   });
 
-  // Also re-render when main screener toggle changes
   document.getElementById("assetControl")?.querySelectorAll(".segmented-btn").forEach(btn => {
     btn.addEventListener("click", () => setTimeout(renderTodayAlerts, 100));
   });

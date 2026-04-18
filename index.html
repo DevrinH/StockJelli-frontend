@@ -262,49 +262,24 @@
    tag and BEFORE the pulse-ticker div.
    ============================================ -->
 
-<div class="notif-banner" id="notifBanner">
-  <div class="notif-banner-inner">
-
-    <!-- Left: Icon + Copy -->
-    <div class="notif-banner-left">
-      <span class="notif-banner-icon">
-        <span class="notif-bell">🔔</span>
-      </span>
-      <div class="notif-banner-copy">
-        <span class="notif-banner-title">
-          Push Notifications Beta
-          <span class="notif-banner-tag">April 20, 2026</span>
-        </span>
-        <span class="notif-banner-sub">Real-time momentum alerts straight to your device. Be first to try it.</span>
-      </div>
-    </div>
-
-    <!-- Right: Email waitlist -->
-    <form class="notif-banner-form" id="notifWaitlistForm" autocomplete="off">
-      <div class="notif-input-wrap">
-        <input
-          type="email"
-          id="notifEmail"
-          class="notif-input"
-          placeholder="you@email.com"
-          autocomplete="email"
-          required
-        />
-        <button type="submit" class="notif-submit-btn" id="notifSubmitBtn">
-          <span class="notif-submit-text">Join Waitlist</span>
-          <span class="notif-submit-loading" style="display:none;">
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="2" stroke-dasharray="28" stroke-dashoffset="8"><animateTransform attributeName="transform" type="rotate" from="0 8 8" to="360 8 8" dur="0.8s" repeatCount="indefinite"/></circle></svg>
+   <div class="notif-banner" id="notifBanner">
+    <div class="notif-banner-inner">
+      <div class="notif-banner-left">
+        <span class="notif-banner-icon"><span class="notif-bell">🔔</span></span>
+        <div class="notif-banner-copy">
+          <span class="notif-banner-title">
+            Push Notifications
+            <span class="notif-banner-tag">LIVE</span>
           </span>
-        </button>
+          <span class="notif-banner-sub">Real-time momentum alerts · $5/mo</span>
+        </div>
       </div>
-      <p class="notif-form-msg" id="notifFormMsg" style="display:none;"></p>
-    </form>
-
-    <!-- Dismiss -->
-    <button class="notif-banner-close" id="notifBannerClose" type="button" aria-label="Dismiss banner">✕</button>
-
+      <button type="button" class="notif-submit-btn" id="notifSubscribeBtn" onclick="document.getElementById('inlineAlertBtn')?.click()" style="border-radius:8px;border:1px solid rgba(77,163,255,0.25);">
+        <span class="notif-submit-text">Subscribe →</span>
+      </button>
+      <button class="notif-banner-close" id="notifBannerClose" type="button" aria-label="Dismiss">✕</button>
+    </div>
   </div>
-</div>
 
   <!-- Scrolling Pulse Ticker — below header -->
 <div class="pulse-ticker" id="pulseTicker" style="display: none;">
@@ -532,6 +507,32 @@
             </div>
             <button class="btn btn-primary btn-sm" id="inlineAlertBtn">$5/mo →</button>
           </div>
+
+          <section id="alertCardsSection" style="display:none; margin-bottom: 24px;">
+            <!-- Header with toggle -->
+            <div class="section-head" style="margin-bottom:10px;">
+              <div class="section-head-left">
+                <span style="font-size:1rem;">📋</span>
+                <h2 style="font-size:1rem; margin:0; font-weight:700; letter-spacing:0.04em; text-transform:uppercase; color:rgb(255,251,0);">Notification Log</h2>
+                <div class="segmented segmented-small" id="alertCardsToggle" role="tablist">
+                  <button class="segmented-btn segmented-on" type="button" data-value="stocks" role="tab">Stocks</button>
+                  <button class="segmented-btn" type="button" data-value="crypto" role="tab">Crypto</button>
+                </div>
+              </div>
+              <span style="font-size:0.68rem; color:rgba(255,255,255,0.2);" id="alertCardsDate"></span>
+            </div>
+           
+            <!-- Stats row -->
+            <div id="alertCardsStats" class="alert-stats-row"></div>
+           
+            <!-- Alert rows -->
+            <div class="table-wrap" style="margin-top:10px;">
+              <div id="alertCardsBody"></div>
+              <div id="alertCardsEmpty" style="display:none; padding:20px; text-align:center; color:rgba(255,255,255,0.25); font-size:0.82rem;"></div>
+              <div id="alertCardsViewAll" style="display:none; padding:10px 14px; text-align:center; border-top:1px solid rgba(255,255,255,0.04);"></div>
+            </div>
+          </section>
+
 
 <!-- Yesterday's Top Movers (always visible, no dropdown) -->
 <div class="yesterday-section" id="yesterdaySection" style="display: none;">
@@ -979,13 +980,9 @@
       <div class="modal modal-checkout">
         <button class="modal-close" id="closeModalBtn" type="button" aria-label="Close">✕</button>
     
-        <div class="modal-header">
-          <div class="modal-kicker">
-            <span class="kicker-dot"></span>
-            LAUNCHING APRIL 20
-          </div>
-          <h2 class="modal-title" id="checkoutTitle">Choose Your Plan</h2>
-          <p class="modal-subtitle muted" id="checkoutSubtitle">Momentum intelligence, delivered how you want it.</p>
+        <div class="modal-kicker">
+          <span class="kicker-dot"></span>
+          LIVE NOW
         </div>
     
         <!-- Step dots -->

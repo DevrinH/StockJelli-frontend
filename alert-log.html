@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Alert Performance Log — StockJelli</title>
+  <meta name="description" content="Full history of StockJelli momentum alerts with win rates, peak tracking, and performance metrics.">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://stockjelli.com/alert-log.html">
+  <link rel="icon" type="image/png" href="/StockJelli-S-Logo.png">
+  <link rel="apple-touch-icon" href="/StockJelli-Social-Logo.png">
+  <link rel="stylesheet" href="style.css">
+  <meta name="theme-color" content="#0d1117">
+  <!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-FM3HXT7ECV"></script>
+  <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date());gtag('config','G-FM3HXT7ECV',{anonymize_ip:true});</script>
+  <style>
+    .log-page { max-width: 900px; margin: 0 auto; padding: 20px; }
+    .log-back { display: inline-flex; align-items: center; gap: 6px; color: rgba(255,255,255,0.4); text-decoration: none; font-size: 0.8rem; margin-bottom: 16px; transition: color 0.15s; }
+    .log-back:hover { color: rgba(255,255,255,0.7); }
+    .log-page-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; flex-wrap: wrap; gap: 12px; }
+    .log-page-title { font-size: 1.3rem; font-weight: 800; color: rgb(255,251,0); margin: 0; letter-spacing: 0.04em; text-transform: uppercase; }
+    .log-page-sub { font-size: 0.78rem; color: rgba(255,255,255,0.35); margin: 4px 0 0; }
+
+    .log-overall-stats { display: flex; gap: 12px; margin-bottom: 20px; }
+    .log-overall-stat { flex: 1; background: rgba(18,24,38,0.88); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; padding: 14px 10px; text-align: center; }
+    .log-overall-val { font-size: 1.6rem; font-weight: 800; color: #f9fafb; font-variant-numeric: tabular-nums; }
+    .log-overall-lbl { font-size: 0.62rem; color: rgba(255,255,255,0.3); text-transform: uppercase; letter-spacing: 0.04em; margin-top: 4px; }
+
+    .log-table-wrap { background: rgba(18,24,38,0.88); border: 1px solid rgba(255,255,255,0.06); border-radius: 14px; overflow: hidden; }
+    .log-row-header { display: grid; grid-template-columns: 90px 80px 1fr 80px 50px 50px; padding: 10px 16px; font-size: 0.65rem; font-weight: 600; color: rgba(255,255,255,0.3); text-transform: uppercase; letter-spacing: 0.04em; border-bottom: 1px solid rgba(255,255,255,0.06); }
+    .log-row { display: grid; grid-template-columns: 90px 80px 1fr 80px 50px 50px; align-items: center; padding: 10px 16px; font-size: 0.78rem; border-bottom: 1px solid rgba(255,255,255,0.04); transition: background 0.1s; }
+    .log-row:hover { background: rgba(255,255,255,0.02); }
+    .log-row:last-child { border-bottom: none; }
+    .log-row-date { color: rgba(255,255,255,0.25); font-size: 0.7rem; font-variant-numeric: tabular-nums; }
+    .log-row-ticker { font-weight: 700; color: #e6edf3; text-decoration: none; font-size: 0.82rem; }
+    .log-row-ticker:hover { color: #60a5fa; }
+    .log-row-prices { color: rgba(255,255,255,0.4); font-size: 0.72rem; font-variant-numeric: tabular-nums; }
+    .log-row-gain { font-weight: 700; font-variant-numeric: tabular-nums; }
+    .log-row-score { font-weight: 600; text-align: center; font-variant-numeric: tabular-nums; }
+    .log-row-result { text-align: center; font-size: 0.9rem; }
+    .log-empty { padding: 40px; text-align: center; color: rgba(255,255,255,0.2); font-size: 0.85rem; }
+    .log-loading { padding: 40px; text-align: center; color: rgba(255,255,255,0.3); font-size: 0.82rem; }
+    .log-disclaimer { margin-top: 16px; font-size: 0.62rem; color: rgba(255,255,255,0.1); text-align: center; }
+
+    @media (max-width: 640px) {
+      .log-page { padding: 14px; }
+      .log-page-title { font-size: 1rem; }
+      .log-overall-stats { gap: 6px; }
+      .log-overall-stat { padding: 10px 6px; }
+      .log-overall-val { font-size: 1.2rem; }
+      .log-row-header, .log-row { grid-template-columns: 70px 64px 1fr 64px 40px 36px; padding: 8px 10px; font-size: 0.7rem; }
+      .log-row-header { font-size: 0.58rem; }
+      .log-row-prices { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Minimal header -->
+  <header class="header">
+    <div class="header-inner">
+      <div class="header-left">
+        <a href="/" aria-label="StockJelli Home"><img class="logo" src="StockJelli-Logo.png" alt="StockJelli" width="150" height="32"></a>
+      </div>
+      <div class="header-right">
+        <a href="/" style="color:rgba(255,255,255,0.5);text-decoration:none;font-size:0.8rem;font-weight:500;">← Back to Screener</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="log-page">
+    <a href="/" class="log-back">← Back to screener</a>
+
+    <div class="log-page-head">
+      <div>
+        <h1 class="log-page-title">📋 Alert Performance Log</h1>
+        <p class="log-page-sub">Every momentum alert we've sent, with tracked outcomes.</p>
+      </div>
+      <div class="segmented segmented-small" id="logToggle" role="tablist">
+        <button class="segmented-btn segmented-on" type="button" data-value="all" role="tab">All</button>
+        <button class="segmented-btn" type="button" data-value="stocks" role="tab">Stocks</button>
+        <button class="segmented-btn" type="button" data-value="crypto" role="tab">Crypto</button>
+      </div>
+    </div>
+
+    <!-- Overall stats -->
+    <div class="log-overall-stats" id="logStats"></div>
+
+    <!-- Log table -->
+    <div class="log-table-wrap">
+      <div class="log-row-header">
+        <span>DATE</span><span>TICKER</span><span>ALERT → PEAK</span><span>MAX GAIN</span><span>SCORE</span><span>RESULT</span>
+      </div>
+      <div id="logBody"><div class="log-loading">Loading alert history...</div></div>
+    </div>
+
+    <p class="log-disclaimer">Educational tool only. Not financial advice. Past performance does not guarantee future results.</p>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-inner">
+      <p>Educational tool only. Not financial advice.</p>
+      <p class="muted">© 2026 StockJelli · <a href="/privacy.html" class="footer-link">Privacy</a> · <a href="/terms.html" class="footer-link">Terms</a></p>
+    </div>
+  </footer>
+
+  <script>
+    const API_BASE = "https://api.stockjelli.com";
+    let logData = null;
+    let logMode = "all";
+
+    async function fetchLog() {
+      try {
+        const res = await fetch(`${API_BASE}/api/notification-log?limit=500`);
+        if (!res.ok) return;
+        logData = await res.json();
+        renderLog();
+      } catch (e) {
+        document.getElementById("logBody").innerHTML = '<div class="log-empty">Failed to load alert data.</div>';
+      }
+    }
+
+    function renderLog() {
+      if (!logData) return;
+      let alerts = logData.notifications || [];
+      if (logMode === "stocks") alerts = alerts.filter(a => a.mode === "stocks");
+      else if (logMode === "crypto") alerts = alerts.filter(a => a.mode === "crypto");
+
+      // Stats
+      const wp = alerts.filter(a => a.peakAfterPush != null);
+      const w3 = wp.filter(a => a.peakAfterPush >= 3).length;
+      const duds = wp.filter(a => a.peakAfterPush < 3).length;
+      const nr = wp.filter(a => a.peakAfterPush >= 0).length;
+      const avg = wp.length > 0 ? Math.round(wp.reduce((s, a) => s + (a.peakAfterPush || 0), 0) / wp.length * 10) / 10 : 0;
+      const wr = wp.length > 0 ? Math.round(w3 / wp.length * 100) : 0;
+
+      const statsEl = document.getElementById("logStats");
+      statsEl.innerHTML = `
+        <div class="log-overall-stat"><div class="log-overall-val">${alerts.length}</div><div class="log-overall-lbl">Total Alerts</div></div>
+        <div class="log-overall-stat"><div class="log-overall-val" style="color:#22c55e">${wr}%</div><div class="log-overall-lbl">Hit +3%</div></div>
+        <div class="log-overall-stat"><div class="log-overall-val" style="color:#34d399">+${avg}%</div><div class="log-overall-lbl">Avg Peak</div></div>
+        <div class="log-overall-stat"><div class="log-overall-val" style="color:${duds === 0 ? '#22c55e' : '#ef4444'}">${duds}</div><div class="log-overall-lbl">Duds</div></div>
+        <div class="log-overall-stat"><div class="log-overall-val" style="color:${nr === wp.length ? '#22c55e' : '#fbbf24'}">${nr}/${wp.length}</div><div class="log-overall-lbl">Never Red</div></div>
+      `;
+
+      // Rows
+      const body = document.getElementById("logBody");
+      if (alerts.length === 0) {
+        body.innerHTML = '<div class="log-empty">No alerts found.</div>';
+        return;
+      }
+
+      body.innerHTML = alerts.map(a => {
+        const peak = a.peakAfterPush;
+        const isWin = peak != null && peak >= 3;
+        const isDud = peak != null && peak < 3;
+        const peakStr = peak != null ? `+${peak.toFixed(1)}%` : "—";
+        const peakColor = isWin ? "#4ade80" : isDud && peak >= 0 ? "#fbbf24" : isDud ? "#ef4444" : "rgba(255,255,255,0.3)";
+        const resultIcon = peak == null ? "⏳" : isWin ? "✅" : "❌";
+        const modeIcon = a.mode === "crypto" ? "🪙" : "📈";
+        const date = a.pushTimestamp ? new Date(a.pushTimestamp).toLocaleDateString("en-US", { month: "short", day: "numeric" }) : a.date || "—";
+        const time = a.pushTimestamp ? new Date(a.pushTimestamp).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", hour12: true }).toLowerCase() : "";
+        const priceAtPush = a.priceAtPush != null ? `$${a.priceAtPush.toFixed(2)}` : "$—";
+        const peakPriceStr = a.peakAfterPushPrice ? `$${a.peakAfterPushPrice.toFixed(2)}` : peakStr;
+        const tvUrl = a.mode === "crypto" ? `https://www.tradingview.com/chart/?symbol=BINANCE:${a.symbol}USDT&aff_id=162729` : `https://www.tradingview.com/chart/?symbol=${a.symbol}&aff_id=162729`;
+        const sj = a.sjScore || "—";
+        const sjColor = sj >= 75 ? "#4ade80" : sj >= 60 ? "#e2e8f0" : "#64748b";
+
+        return `<div class="log-row">
+          <span class="log-row-date">${date}<br><span style="opacity:0.5">${time}</span></span>
+          <a href="${tvUrl}" target="_blank" rel="noopener" class="log-row-ticker">${modeIcon} ${a.symbol}</a>
+          <span class="log-row-prices">${priceAtPush} → <span style="color:${peakColor}">${peakPriceStr}</span></span>
+          <span class="log-row-gain" style="color:${peakColor}">${peakStr}</span>
+          <span class="log-row-score" style="color:${sjColor}">${sj}</span>
+          <span class="log-row-result">${resultIcon}</span>
+        </div>`;
+      }).join("");
+    }
+
+    // Toggle
+    document.getElementById("logToggle")?.addEventListener("click", e => {
+      const btn = e.target.closest(".segmented-btn");
+      if (!btn) return;
+      logMode = btn.dataset.value;
+      document.querySelectorAll("#logToggle .segmented-btn").forEach(b => b.classList.toggle("segmented-on", b.dataset.value === logMode));
+      renderLog();
+    });
+
+    fetchLog();
+  </script>
+</body>
+</html>

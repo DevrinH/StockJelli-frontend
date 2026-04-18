@@ -3706,3 +3706,157 @@ tbody tr:nth-child(2) .whale-indicator {
     color: #f9fafb;
     border-color: rgba(255,255,255,0.2);
   }
+
+  /* ═══ Alert Stats Row ═══ */
+.alert-stats-row {
+  display: flex;
+  gap: 10px;
+}
+ 
+.alert-stat {
+  flex: 1;
+  background: rgba(18, 24, 38, 0.88);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 10px;
+  padding: 10px 8px;
+  text-align: center;
+}
+ 
+.alert-stat-val {
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: #f9fafb;
+  font-variant-numeric: tabular-nums;
+  display: block;
+}
+ 
+.alert-stat-lbl {
+  font-size: 0.62rem;
+  color: rgba(255, 255, 255, 0.3);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-top: 2px;
+  display: block;
+}
+ 
+/* ═══ Alert Log Rows (notification log style) ═══ */
+.alert-log-header-row {
+  display: grid;
+  grid-template-columns: 62px 72px 1fr 80px 50px 50px;
+  padding: 8px 14px;
+  font-size: 0.62rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.28);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  gap: 4px;
+}
+ 
+.alert-log-row {
+  display: grid;
+  grid-template-columns: 62px 72px 1fr 80px 50px 50px;
+  align-items: center;
+  padding: 9px 14px;
+  font-size: 0.76rem;
+  gap: 4px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  transition: background 0.1s ease;
+}
+ 
+.alert-log-row:hover {
+  background: rgba(255, 255, 255, 0.02);
+}
+ 
+.alert-log-row:last-child {
+  border-bottom: none;
+}
+ 
+.alert-log-time {
+  color: rgba(255, 255, 255, 0.25);
+  font-variant-numeric: tabular-nums;
+  font-size: 0.7rem;
+}
+ 
+.alert-log-ticker {
+  font-weight: 700;
+  color: #e6edf3;
+  letter-spacing: 0.02em;
+  text-decoration: none;
+  font-size: 0.78rem;
+}
+ 
+.alert-log-ticker:hover {
+  color: #60a5fa;
+}
+ 
+.alert-log-prices {
+  font-variant-numeric: tabular-nums;
+  color: rgba(255, 255, 255, 0.45);
+  font-size: 0.72rem;
+}
+ 
+.alert-log-gain {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  font-size: 0.78rem;
+}
+ 
+.alert-log-score {
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  font-size: 0.74rem;
+  text-align: center;
+}
+ 
+.alert-log-result {
+  text-align: center;
+  font-size: 0.85rem;
+}
+ 
+/* View all link */
+.alert-view-all-link {
+  color: rgba(77, 163, 255, 0.75);
+  text-decoration: none;
+  font-size: 0.76rem;
+  font-weight: 500;
+  transition: color 0.15s ease;
+}
+ 
+.alert-view-all-link:hover {
+  color: rgba(77, 163, 255, 1);
+}
+ 
+/* ═══ Mobile ═══ */
+@media (max-width: 640px) {
+  .alert-stats-row { gap: 6px; }
+  .alert-stat { padding: 8px 4px; border-radius: 8px; }
+  .alert-stat-val { font-size: 1rem; }
+  .alert-stat-lbl { font-size: 0.55rem; }
+ 
+  .alert-log-header-row {
+    grid-template-columns: 50px 58px 1fr 60px 40px 36px;
+    padding: 6px 10px;
+    font-size: 0.55rem;
+  }
+  .alert-log-row {
+    grid-template-columns: 50px 58px 1fr 60px 40px 36px;
+    padding: 7px 10px;
+    font-size: 0.68rem;
+  }
+  .alert-log-time { font-size: 0.62rem; }
+  .alert-log-ticker { font-size: 0.7rem; }
+  .alert-log-prices { font-size: 0.64rem; }
+  .alert-log-gain { font-size: 0.7rem; }
+  .alert-log-score { font-size: 0.65rem; }
+  .alert-log-result { font-size: 0.75rem; }
+}
+ 
+@media (max-width: 380px) {
+  .alert-log-header-row,
+  .alert-log-row {
+    grid-template-columns: 44px 50px 1fr 52px 34px 30px;
+    gap: 2px;
+  }
+  .alert-log-prices { display: none; }
+}

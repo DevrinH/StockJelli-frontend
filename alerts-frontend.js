@@ -1,20 +1,16 @@
 /**
- * StockJelli Checkout Modal — Frontend JavaScript
- * ================================================
+ * StockJelli Checkout Modal + Alert Performance — Frontend JavaScript
+ * ====================================================================
  * 
- * April 2026 Launch — Multi-plan checkout flow
+ * April 2026 Launch — Multi-plan checkout flow + live alert display
  * 
- * Plans:
- *   push     — $5/mo  (Push Notifications)
- *   webhook  — $30/mo (Webhook API)
- *   bundle   — $32/mo (Push + API)
- * 
- * Steps:
- *   1. Choose Plan
- *   2. Configure (email, assets, region, frequency, webhook consent)
- *   3. Review & Checkout → Stripe
- * 
- * Replaces the previous alerts-frontend.js entirely.
+ * FEATURES:
+ *   - Multi-step checkout (Plan → Configure → Review → Stripe)
+ *   - Today's alert cards below screener (respects stocks/crypto toggle)
+ *   - Stats bar above alerts (win rate, duds, avg peak)
+ *   - Screener row highlights for alerted tickers
+ *   - Link to full alert log page (/alert-log.html)
+ *   - Real credentials fetch after Stripe redirect
  */
 
 (() => {
@@ -23,77 +19,29 @@
 
   const API_BASE = "https://api.stockjelli.com";
 
-  // ═══════════════════════════════════════════════════════════════════════════
-  // PLAN CONFIG
-  // ═══════════════════════════════════════════════════════════════════════════
-
   const PLANS = {
     push:    { name: "Push Notifications", icon: "🔔", price: 5,  badge: "POPULAR",    badgeClass: "plan-badge-accent" },
-    webhook: { name: "Webhook API",        icon: "⚡", price: 30, badge: "DEVELOPER",  badgeClass: "plan-badge-warn" },
-    bundle:  { name: "Push + API Bundle",  icon: "🚀", price: 32, badge: "BEST VALUE", badgeClass: "plan-badge-green" },
+    webhook: { name: "Webhook API",        icon: "⚡", price: 50, badge: "DEVELOPER",  badgeClass: "plan-badge-warn" },
+    bundle:  { name: "Push + API Bundle",  icon: "🚀", price: 52, badge: "BEST VALUE", badgeClass: "plan-badge-green" },
   };
 
-  const ASSET_LABELS = {
-    stocks: "📈 Stocks",
-    crypto: "🪙 Crypto",
-    both:   "⚡ Stocks + Crypto",
-  };
+  const ASSET_LABELS = { stocks: "📈 Stocks", crypto: "🪙 Crypto", both: "⚡ Stocks + Crypto" };
+  const ASSET_HINTS = { stocks: "US equities — signals during market hours (9:30 AM–4 PM ET)", crypto: "Top crypto by market cap — 24/7 signals", both: "Stocks during market hours + crypto 24/7" };
+  const REGION_INFO = { americas: { label: "🌎 Americas", hint: "Alerts timed for US market hours (ET)" }, global: { label: "🌍 Global", hint: "Crypto-only alerts at convenient UTC times" } };
+  const FREQ_HINTS_AMERICAS = { 1: "First hour momentum alert (10:00 AM ET)", 2: "Morning + midday (10:00 AM, 12:30 PM ET)", 3: "Morning + midday + power hour (10:00, 12:30, 3:30 PM ET)", 4: "All windows + evening crypto (10:00, 12:30, 3:30, 8:00 PM ET)" };
+  const FREQ_HINTS_GLOBAL = { 1: "Morning crypto alert (8:00 AM UTC)", 2: "Morning + afternoon crypto (8:00 AM, 2:00 PM UTC)", 3: "All day crypto (8:00 AM, 2:00 PM, 8:00 PM UTC)", 4: "Same as 3 (crypto is 24/7, 3 is optimal)" };
 
-  const ASSET_HINTS = {
-    stocks: "US equities — signals during market hours (9:30 AM–4 PM ET)",
-    crypto: "Top crypto by market cap — 24/7 signals",
-    both:   "Stocks during market hours + crypto 24/7",
-  };
-
-  const REGION_INFO = {
-    americas: { label: "🌎 Americas",  hint: "Alerts timed for US market hours (ET)" },
-    global:   { label: "🌍 Global",    hint: "Crypto-only alerts at convenient UTC times" },
-  };
-
-  const FREQ_HINTS_AMERICAS = {
-    1: "First hour momentum alert (10:00 AM ET)",
-    2: "Morning + midday (10:00 AM, 12:30 PM ET)",
-    3: "Morning + midday + power hour (10:00, 12:30, 3:30 PM ET)",
-    4: "All windows + evening crypto (10:00, 12:30, 3:30, 8:00 PM ET)",
-  };
-
-  const FREQ_HINTS_GLOBAL = {
-    1: "Morning crypto alert (8:00 AM UTC)",
-    2: "Morning + afternoon crypto (8:00 AM, 2:00 PM UTC)",
-    3: "All day crypto (8:00 AM, 2:00 PM, 8:00 PM UTC)",
-    4: "Same as 3 (crypto is 24/7, 3 is optimal)",
-  };
-
-  // ═══════════════════════════════════════════════════════════════════════════
-  // STATE
-  // ═══════════════════════════════════════════════════════════════════════════
-
-  let currentStep = 1;
-  let selectedPlan = null;    // "push" | "webhook" | "bundle"
-  let selectedAssets = "both";
-  let selectedRegion = "americas";
-  let selectedFrequency = 1;
-  let userEmail = "";
-  let webhookUrl = "";
-  let autoExecValue = "";
+  let currentStep = 1, selectedPlan = null, selectedAssets = "both", selectedRegion = "americas", selectedFrequency = 1, userEmail = "", webhookUrl = "", autoExecValue = "";
   const acks = { ack1: false, ack2: false, ack3: false, ack4: false, ack5: false };
-
-  // ═══════════════════════════════════════════════════════════════════════════
-  // DOM REFS
-  // ═══════════════════════════════════════════════════════════════════════════
 
   const modal = document.getElementById("alertsModal");
   const closeModalBtn = document.getElementById("closeModalBtn");
   const stepsEl = document.getElementById("checkoutSteps");
   const stepDots = modal?.querySelectorAll(".step-dot");
   const modalSteps = modal?.querySelectorAll(".modal-step");
-
-  // Step 1
   const planCards = modal?.querySelectorAll(".plan-card");
   const step1NextBtn = document.getElementById("step1NextBtn");
   const step1Hint = document.getElementById("step1Hint");
-
-  // Step 2
   const emailInput = document.getElementById("alertEmail");
   const emailError = document.getElementById("emailError");
   const assetTypeControl = document.getElementById("assetTypeControl");
@@ -113,540 +61,245 @@
   const step2NextBtn = document.getElementById("step2NextBtn");
   const step2Hint = document.getElementById("step2Hint");
   const configTitle = document.getElementById("configTitle");
-
-  // Step 3
   const step3BackBtn = document.getElementById("step3BackBtn");
   const stripeCheckoutBtn = document.getElementById("stripeCheckoutBtn");
-
-  // Success
   const closeSuccessBtn = document.getElementById("closeSuccessBtn");
 
-  
-
-  // ═══════════════════════════════════════════════════════════════════════════
-  // HELPERS
-  // ═══════════════════════════════════════════════════════════════════════════
-
-  function isValidEmail(email) {
-    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-  }
-
-  function hasPush() {
-    return selectedPlan === "push" || selectedPlan === "bundle";
-  }
-
-  function hasWebhook() {
-    return selectedPlan === "webhook" || selectedPlan === "bundle";
-  }
-
-  function setSegmented(controlEl, value) {
-    if (!controlEl) return;
-    controlEl.querySelectorAll(".segmented-btn").forEach(btn => {
-      btn.classList.toggle("segmented-on", btn.dataset.value === value);
-    });
-  }
-
-  // ═══════════════════════════════════════════════════════════════════════════
-  // STEP NAVIGATION
-  // ═══════════════════════════════════════════════════════════════════════════
+  function isValidEmail(e) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e); }
+  function hasPush() { return selectedPlan === "push" || selectedPlan === "bundle"; }
+  function hasWebhook() { return selectedPlan === "webhook" || selectedPlan === "bundle"; }
+  function setSegmented(c, v) { if (!c) return; c.querySelectorAll(".segmented-btn").forEach(b => b.classList.toggle("segmented-on", b.dataset.value === v)); }
 
   function showStep(step) {
     currentStep = step;
-
-    if (stepDots) {
-      stepDots.forEach(dot => {
-        const s = Number(dot.dataset.step);
-        dot.classList.remove("step-active", "step-complete");
-        if (s === step) dot.classList.add("step-active");
-        else if (s < step) dot.classList.add("step-complete");
-      });
-    }
-
-    if (modalSteps) {
-      modalSteps.forEach(section => {
-        section.hidden = section.dataset.step !== String(step);
-      });
-    }
-
-    // Update title/subtitle per step
-    const titleEl = document.getElementById("checkoutTitle");
-    const subtitleEl = document.getElementById("checkoutSubtitle");
-    if (titleEl && subtitleEl) {
-      if (step === 1) {
-        titleEl.textContent = "Choose Your Plan";
-        subtitleEl.textContent = "Momentum intelligence, delivered how you want it.";
-      } else if (step === 2) {
-        titleEl.textContent = `Configure Your ${PLANS[selectedPlan]?.name || "Plan"}`;
-        subtitleEl.textContent = "Customize how you receive momentum data.";
-      } else if (step === 3) {
-        titleEl.textContent = "Review Your Order";
-        subtitleEl.textContent = "Confirm your settings before checkout.";
-      }
-    }
-
-    // Show/hide steps indicator
+    if (stepDots) stepDots.forEach(d => { const s = Number(d.dataset.step); d.classList.remove("step-active", "step-complete"); if (s === step) d.classList.add("step-active"); else if (s < step) d.classList.add("step-complete"); });
+    if (modalSteps) modalSteps.forEach(s => { s.hidden = s.dataset.step !== String(step); });
+    const t = document.getElementById("checkoutTitle"), s = document.getElementById("checkoutSubtitle");
+    if (t && s) { if (step === 1) { t.textContent = "Choose Your Plan"; s.textContent = "Momentum intelligence, delivered how you want it."; } else if (step === 2) { t.textContent = `Configure Your ${PLANS[selectedPlan]?.name || "Plan"}`; s.textContent = "Customize how you receive momentum data."; } else if (step === 3) { t.textContent = "Review Your Order"; s.textContent = "Confirm your settings before checkout."; } }
     if (stepsEl) stepsEl.classList.remove("hidden");
   }
 
-  function showSuccess() {
-    if (modalSteps) {
-      modalSteps.forEach(section => {
-        section.hidden = section.dataset.step !== "success";
-      });
-    }
+  async function showSuccess() {
+    if (modalSteps) modalSteps.forEach(s => { s.hidden = s.dataset.step !== "success"; });
     if (stepsEl) stepsEl.classList.add("hidden");
-
-    const titleEl = document.getElementById("checkoutTitle");
-    const subtitleEl = document.getElementById("checkoutSubtitle");
-    if (titleEl) titleEl.textContent = "";
-    if (subtitleEl) subtitleEl.textContent = "";
-
-    // Show API key block for webhook plans
-    const apiKeyBlock = document.getElementById("successApiKeyBlock");
-    const consentLogBlock = document.getElementById("successConsentLog");
-    const successTitle = document.getElementById("successTitle");
-    const successSubtitle = document.getElementById("successSubtitle");
-
-    if (hasWebhook()) {
-      // Generate mock API key (real key comes from backend in production)
-      const chars = "abcdef0123456789";
-      let key = "sj_wh_";
-      for (let i = 0; i < 24; i++) key += chars[Math.floor(Math.random() * chars.length)];
-
-      if (apiKeyBlock) {
-        apiKeyBlock.style.display = "";
-        document.getElementById("successApiKey").textContent = key;
-      }
-      if (consentLogBlock) {
-        consentLogBlock.style.display = "";
-        const logEl = document.getElementById("consentLogContent");
-        if (logEl) {
-          logEl.innerHTML = `
-            <span>timestamp:</span> ${new Date().toISOString()}<br>
-            <span>key:</span> ${key.substring(0, 10)}...<br>
-            <span>auto_execution:</span> ${autoExecValue}<br>
-            <span>acks:</span> 5/5 accepted<br>
-            <span>tos_version:</span> 2026-03-23
-          `;
-        }
-      }
-      if (successTitle) successTitle.textContent = "You're All Set!";
-      if (successSubtitle) {
-        successSubtitle.textContent = selectedPlan === "bundle"
-          ? "Push notifications + webhook API are both active."
-          : "Your webhook API is live. Signals will be delivered to your endpoint.";
-      }
-    } else {
-      if (apiKeyBlock) apiKeyBlock.style.display = "none";
-      if (consentLogBlock) consentLogBlock.style.display = "none";
-      if (successTitle) successTitle.textContent = "You're Subscribed!";
-      if (successSubtitle) successSubtitle.textContent = "Check your inbox for a welcome email. Your first alert arrives at the next scheduled time.";
-    }
-  // Auto-subscribe to push notifications after successful checkout
-  if (window.StockJelliPush && window.StockJelliPush.isSupported()) {
-    window.StockJelliPush.subscribe(userEmail).then(result => {
-      console.log("[checkout] Push subscribe:", result);
-    }).catch(err => {
-      console.warn("[checkout] Push subscribe failed:", err);
-    });
+    const t = document.getElementById("checkoutTitle"), s = document.getElementById("checkoutSubtitle");
+    if (t) t.textContent = ""; if (s) s.textContent = "";
+    const apiKeyBlock = document.getElementById("successApiKeyBlock"), consentLogBlock = document.getElementById("successConsentLog"), successTitle = document.getElementById("successTitle"), successSubtitle = document.getElementById("successSubtitle");
+    const savedEmail = userEmail || localStorage.getItem("sj_checkout_email") || "", savedPlan = selectedPlan || localStorage.getItem("sj_checkout_plan") || "push";
+    if (savedEmail && (savedPlan === "webhook" || savedPlan === "bundle")) {
+      try { const r = await fetch(`${API_BASE}/api/alerts/credentials?email=${encodeURIComponent(savedEmail)}`); const d = await r.json(); if (d.found && d.webhookSecret) { if (apiKeyBlock) { apiKeyBlock.style.display = ""; document.getElementById("successApiKey").textContent = d.webhookSecret; } if (consentLogBlock) { consentLogBlock.style.display = ""; document.getElementById("consentLogContent").innerHTML = `<span>timestamp:</span> ${new Date().toISOString()}<br><span>key:</span> ${d.webhookSecret.substring(0, 14)}...<br><span>tos_version:</span> 2026-04-19`; } if (successTitle) successTitle.textContent = "You're All Set!"; if (successSubtitle) successSubtitle.textContent = savedPlan === "bundle" ? "Push notifications + webhook API are both active." : "Your webhook API is live."; } else { showPushOnly(successTitle, successSubtitle, apiKeyBlock, consentLogBlock); } } catch (e) { showPushOnly(successTitle, successSubtitle, apiKeyBlock, consentLogBlock); }
+    } else { showPushOnly(successTitle, successSubtitle, apiKeyBlock, consentLogBlock); }
+    if (window.StockJelliPush?.isSupported?.() && savedEmail) window.StockJelliPush.subscribe(savedEmail).catch(() => {});
+    localStorage.removeItem("sj_checkout_email"); localStorage.removeItem("sj_checkout_plan");
   }
-}  // ← this is the closing brace of showSuccess()
+  function showPushOnly(t, s, a, c) { if (a) a.style.display = "none"; if (c) c.style.display = "none"; if (t) t.textContent = "You're Subscribed!"; if (s) s.textContent = "Check your inbox for a welcome email. Your first alert arrives at the next scheduled time."; }
 
-document.getElementById("checkoutLoginBtn")?.addEventListener("click", () => {
-  closeModal();
-  const accountModal = document.getElementById("accountModal");
-  if (accountModal) {
-    accountModal.classList.add("is-open");
-    accountModal.setAttribute("aria-hidden", "false");
-    document.body.style.overflow = "hidden";
-  }
-});
+  document.getElementById("checkoutLoginBtn")?.addEventListener("click", () => { closeModal(); const am = document.getElementById("accountModal"); if (am) { am.classList.add("is-open"); am.setAttribute("aria-hidden", "false"); document.body.style.overflow = "hidden"; } });
 
-  // ═══════════════════════════════════════════════════════════════════════════
-  // MODAL OPEN / CLOSE
-  // ═══════════════════════════════════════════════════════════════════════════
+  function openModal() { if (!modal) return; modal.classList.add("is-open"); modal.setAttribute("aria-hidden", "false"); document.body.style.overflow = "hidden"; const p = new URLSearchParams(window.location.search); if (p.get("alerts") === "success") { showSuccess(); window.history.replaceState({}, "", window.location.pathname); } else showStep(1); }
+  function closeModal() { if (!modal) return; modal.classList.remove("is-open"); modal.setAttribute("aria-hidden", "true"); document.body.style.overflow = ""; }
 
-  function openModal() {
-    if (!modal) return;
-    modal.classList.add("is-open");
-    modal.setAttribute("aria-hidden", "false");
-    document.body.style.overflow = "hidden";
+  // Step 1
+  if (planCards) planCards.forEach(card => { card.addEventListener("click", () => { selectedPlan = card.dataset.plan; planCards.forEach(c => c.classList.toggle("plan-selected", c.dataset.plan === selectedPlan)); if (step1NextBtn) step1NextBtn.disabled = false; if (step1Hint) { step1Hint.textContent = `${PLANS[selectedPlan].name} — $${PLANS[selectedPlan].price}/mo`; step1Hint.style.color = "var(--green, #34d399)"; } }); });
+  step1NextBtn?.addEventListener("click", () => { if (!selectedPlan) return; configureStep2(); showStep(2); emailInput?.focus(); });
 
-    // Check for Stripe success redirect
-    const params = new URLSearchParams(window.location.search);
-    if (params.get("alerts") === "success") {
-      showSuccess();
-      window.history.replaceState({}, "", window.location.pathname);
-    } else {
-      showStep(1);
-    }
-  }
-
-  function closeModal() {
-    if (!modal) return;
-    modal.classList.remove("is-open");
-    modal.setAttribute("aria-hidden", "true");
-    document.body.style.overflow = "";
-  }
-
-  // ═══════════════════════════════════════════════════════════════════════════
-  // STEP 1: PLAN SELECTION
-  // ═══════════════════════════════════════════════════════════════════════════
-
-  if (planCards) {
-    planCards.forEach(card => {
-      card.addEventListener("click", () => {
-        selectedPlan = card.dataset.plan;
-        planCards.forEach(c => c.classList.toggle("plan-selected", c.dataset.plan === selectedPlan));
-        if (step1NextBtn) step1NextBtn.disabled = false;
-        if (step1Hint) {
-          step1Hint.textContent = `${PLANS[selectedPlan].name} — $${PLANS[selectedPlan].price}/mo`;
-          step1Hint.style.color = "var(--green, #34d399)";
-        }
-      });
-    });
-  }
-
-  step1NextBtn?.addEventListener("click", () => {
-    if (!selectedPlan) return;
-    configureStep2ForPlan();
-    showStep(2);
-    emailInput?.focus();
-  });
-
-  // ═══════════════════════════════════════════════════════════════════════════
-  // STEP 2: CONFIGURATION
-  // ═══════════════════════════════════════════════════════════════════════════
-
-  function configureStep2ForPlan() {
-    // Show/hide sections based on plan
-    if (frequencySection) {
-      frequencySection.style.display = hasPush() ? "" : "none";
-    }
-    if (webhookUrlSection) {
-      webhookUrlSection.style.display = hasWebhook() ? "" : "none";
-    }
-    if (webhookConsentCard) {
-      webhookConsentCard.style.display = hasWebhook() ? "" : "none";
-    }
-
-    // Reset webhook consent state
-    if (consentItems) {
-      consentItems.forEach(item => item.classList.remove("checked"));
-    }
-    Object.keys(acks).forEach(k => acks[k] = false);
-    autoExecValue = "";
-    if (autoExecGroup) {
-      autoExecGroup.querySelectorAll("input").forEach(r => r.checked = false);
-    }
-    if (autoTradeNotice) autoTradeNotice.classList.remove("visible");
-
-    // Update config title
-    if (configTitle) {
-      configTitle.textContent = `Configure Your ${PLANS[selectedPlan]?.name || "Plan"}`;
-    }
-
-    validateStep2();
-  }
-
-  // Asset type selector
-  assetTypeControl?.addEventListener("click", (e) => {
-    const btn = e.target.closest(".segmented-btn");
-    if (!btn) return;
-    selectedAssets = btn.dataset.value;
-    setSegmented(assetTypeControl, selectedAssets);
-    if (assetTypeHint) assetTypeHint.textContent = ASSET_HINTS[selectedAssets] || "";
-  });
-
-  // Region selector
-  regionControl?.addEventListener("click", (e) => {
-    const btn = e.target.closest(".segmented-btn");
-    if (!btn) return;
-    selectedRegion = btn.dataset.value;
-    setSegmented(regionControl, selectedRegion);
-    if (regionHint) regionHint.textContent = REGION_INFO[selectedRegion]?.hint || "";
-    updateFrequencyHint();
-
-    // Cap frequency at 3 for global
-    if (selectedRegion === "global" && selectedFrequency > 3) {
-      selectedFrequency = 3;
-      setSegmented(frequencyControl, String(selectedFrequency));
-    }
-
-    // Disable 4th option for global
-    if (frequencyControl) {
-      frequencyControl.querySelectorAll(".segmented-btn").forEach(btn => {
-        if (btn.dataset.value === "4") {
-          btn.style.opacity = selectedRegion === "global" ? "0.35" : "";
-          btn.style.pointerEvents = selectedRegion === "global" ? "none" : "";
-        }
-      });
-    }
-  });
-
-  // Frequency selector
-  frequencyControl?.addEventListener("click", (e) => {
-    const btn = e.target.closest(".segmented-btn");
-    if (!btn || btn.style.pointerEvents === "none") return;
-    selectedFrequency = Number(btn.dataset.value);
-    setSegmented(frequencyControl, String(selectedFrequency));
-    updateFrequencyHint();
-  });
-
-  function updateFrequencyHint() {
-    if (!frequencyHint) return;
-    const hints = selectedRegion === "americas" ? FREQ_HINTS_AMERICAS : FREQ_HINTS_GLOBAL;
-    frequencyHint.textContent = hints[selectedFrequency] || "";
-  }
-
-  // Webhook consent items
-  if (consentItems) {
-    consentItems.forEach(item => {
-      item.addEventListener("click", (e) => {
-        // Don't toggle if clicking a link
-        if (e.target.tagName === "A") return;
-        const ackKey = item.dataset.ack;
-        if (!ackKey) return;
-        acks[ackKey] = !acks[ackKey];
-        item.classList.toggle("checked", acks[ackKey]);
-        validateStep2();
-      });
-    });
-  }
-
-  // Auto-execution radio
-  if (autoExecGroup) {
-    autoExecGroup.querySelectorAll("input[name='auto_exec']").forEach(radio => {
-      radio.addEventListener("change", () => {
-        autoExecValue = radio.value;
-        if (autoTradeNotice) {
-          autoTradeNotice.classList.toggle("visible", autoExecValue === "yes" || autoExecValue === "exploring");
-        }
-        validateStep2();
-      });
-    });
-  }
-
-  // Email input validation on change
-  emailInput?.addEventListener("input", () => {
-    if (emailError) emailError.style.display = "none";
-    validateStep2();
-  });
-
-  function validateStep2() {
-    const emailOk = emailInput && isValidEmail(emailInput.value.trim());
-    let webhookOk = true;
-
-    if (hasWebhook()) {
-      const allAcks = Object.values(acks).every(Boolean);
-      const execOk = !!autoExecValue;
-      webhookOk = allAcks && execOk;
-    }
-
-    const ready = emailOk && webhookOk;
-
-    if (step2NextBtn) step2NextBtn.disabled = !ready;
-
-    if (step2Hint) {
-      if (!emailOk && emailInput?.value.trim()) {
-        step2Hint.style.display = "";
-        step2Hint.textContent = "Enter a valid email address";
-        step2Hint.style.color = "var(--red, #f87171)";
-      } else if (hasWebhook() && !webhookOk) {
-        step2Hint.style.display = "";
-        step2Hint.textContent = "Complete all acknowledgments and usage disclosure to continue";
-        step2Hint.style.color = "var(--warn, #f59e0b)";
-      } else if (ready) {
-        step2Hint.style.display = "";
-        step2Hint.textContent = "Ready to continue";
-        step2Hint.style.color = "var(--green, #34d399)";
-      } else {
-        step2Hint.style.display = "none";
-      }
-    }
-  }
-
+  // Step 2
+  function configureStep2() { if (frequencySection) frequencySection.style.display = hasPush() ? "" : "none"; if (webhookUrlSection) webhookUrlSection.style.display = hasWebhook() ? "" : "none"; if (webhookConsentCard) webhookConsentCard.style.display = hasWebhook() ? "" : "none"; if (consentItems) consentItems.forEach(i => i.classList.remove("checked")); Object.keys(acks).forEach(k => acks[k] = false); autoExecValue = ""; if (autoExecGroup) autoExecGroup.querySelectorAll("input").forEach(r => r.checked = false); if (autoTradeNotice) autoTradeNotice.classList.remove("visible"); if (configTitle) configTitle.textContent = `Configure Your ${PLANS[selectedPlan]?.name || "Plan"}`; validateStep2(); }
+  assetTypeControl?.addEventListener("click", e => { const b = e.target.closest(".segmented-btn"); if (!b) return; selectedAssets = b.dataset.value; setSegmented(assetTypeControl, selectedAssets); if (assetTypeHint) assetTypeHint.textContent = ASSET_HINTS[selectedAssets] || ""; });
+  regionControl?.addEventListener("click", e => { const b = e.target.closest(".segmented-btn"); if (!b) return; selectedRegion = b.dataset.value; setSegmented(regionControl, selectedRegion); if (regionHint) regionHint.textContent = REGION_INFO[selectedRegion]?.hint || ""; updateFreqHint(); if (selectedRegion === "global" && selectedFrequency > 3) { selectedFrequency = 3; setSegmented(frequencyControl, "3"); } if (frequencyControl) frequencyControl.querySelectorAll(".segmented-btn").forEach(b => { if (b.dataset.value === "4") { b.style.opacity = selectedRegion === "global" ? "0.35" : ""; b.style.pointerEvents = selectedRegion === "global" ? "none" : ""; } }); });
+  frequencyControl?.addEventListener("click", e => { const b = e.target.closest(".segmented-btn"); if (!b || b.style.pointerEvents === "none") return; selectedFrequency = Number(b.dataset.value); setSegmented(frequencyControl, String(selectedFrequency)); updateFreqHint(); });
+  function updateFreqHint() { if (!frequencyHint) return; frequencyHint.textContent = (selectedRegion === "americas" ? FREQ_HINTS_AMERICAS : FREQ_HINTS_GLOBAL)[selectedFrequency] || ""; }
+  if (consentItems) consentItems.forEach(item => { item.addEventListener("click", e => { if (e.target.tagName === "A") return; const k = item.dataset.ack; if (!k) return; acks[k] = !acks[k]; item.classList.toggle("checked", acks[k]); validateStep2(); }); });
+  if (autoExecGroup) autoExecGroup.querySelectorAll("input[name='auto_exec']").forEach(r => { r.addEventListener("change", () => { autoExecValue = r.value; if (autoTradeNotice) autoTradeNotice.classList.toggle("visible", autoExecValue === "yes" || autoExecValue === "exploring"); validateStep2(); }); });
+  emailInput?.addEventListener("input", () => { if (emailError) emailError.style.display = "none"; validateStep2(); });
+  function validateStep2() { const ok = emailInput && isValidEmail(emailInput.value.trim()); let wh = true; if (hasWebhook()) wh = Object.values(acks).every(Boolean) && !!autoExecValue; const ready = ok && wh; if (step2NextBtn) step2NextBtn.disabled = !ready; if (step2Hint) { if (!ok && emailInput?.value.trim()) { step2Hint.style.display = ""; step2Hint.textContent = "Enter a valid email"; step2Hint.style.color = "#f87171"; } else if (hasWebhook() && !wh) { step2Hint.style.display = ""; step2Hint.textContent = "Complete all acknowledgments"; step2Hint.style.color = "#f59e0b"; } else if (ready) { step2Hint.style.display = ""; step2Hint.textContent = "Ready"; step2Hint.style.color = "#34d399"; } else step2Hint.style.display = "none"; } }
   step2BackBtn?.addEventListener("click", () => showStep(1));
+  step2NextBtn?.addEventListener("click", async () => { const e = emailInput?.value?.trim(); if (!e || !isValidEmail(e)) { if (emailError) emailError.style.display = "block"; emailInput?.focus(); return; } userEmail = e; webhookUrl = webhookUrlInput?.value?.trim() || ""; try { const r = await fetch(`${API_BASE}/api/alerts/status?email=${encodeURIComponent(e)}`); if (r.ok) { const d = await r.json(); if (d.subscribed) { alert("You're already subscribed!"); closeModal(); return; } } } catch {} populateReview(); showStep(3); });
 
-  step2NextBtn?.addEventListener("click", async () => {
-    const email = emailInput?.value?.trim();
-    if (!email || !isValidEmail(email)) {
-      if (emailError) emailError.style.display = "block";
-      emailInput?.focus();
-      return;
-    }
-
-    userEmail = email;
-    webhookUrl = webhookUrlInput?.value?.trim() || "";
-
-    // Check if already subscribed
-    try {
-      const res = await fetch(`${API_BASE}/api/alerts/status?email=${encodeURIComponent(email)}`);
-      if (res.ok) {
-        const data = await res.json();
-        if (data.subscribed) {
-          alert("You're already subscribed! Check your email for alerts.");
-          closeModal();
-          return;
-        }
-      }
-    } catch (err) {
-      console.warn("[checkout] Status check failed:", err);
-    }
-
-    populateReview();
-    showStep(3);
-  });
-
-  // ═══════════════════════════════════════════════════════════════════════════
-  // STEP 3: REVIEW
-  // ═══════════════════════════════════════════════════════════════════════════
-
-  function populateReview() {
-    const plan = PLANS[selectedPlan];
-    if (!plan) return;
-
-    // Plan header
-    const icon = document.getElementById("reviewPlanIcon");
-    const name = document.getElementById("reviewPlanName");
-    const badge = document.getElementById("reviewPlanBadge");
-    const price = document.getElementById("reviewPlanPrice");
-    if (icon) icon.textContent = plan.icon;
-    if (name) name.textContent = plan.name;
-    if (badge) { badge.textContent = plan.badge; badge.className = `plan-badge ${plan.badgeClass}`; }
-    if (price) price.textContent = `$${plan.price}`;
-
-    // Summary rows
-    const el = (id) => document.getElementById(id);
-    if (el("summaryEmail")) el("summaryEmail").textContent = userEmail;
-    if (el("summaryAssets")) el("summaryAssets").textContent = ASSET_LABELS[selectedAssets] || "—";
-    if (el("summaryRegion")) el("summaryRegion").textContent = REGION_INFO[selectedRegion]?.label || "—";
-
-    // Frequency (push/bundle only)
-    const freqRow = document.getElementById("summaryFreqRow");
-    if (freqRow) freqRow.style.display = hasPush() ? "" : "none";
-    if (el("summaryFrequency")) {
-      const freq = selectedRegion === "global" && selectedFrequency > 3 ? 3 : selectedFrequency;
-      el("summaryFrequency").textContent = `${freq} alert${freq > 1 ? "s" : ""}/day`;
-    }
-
-    // Webhook rows
-    const webhookRow = document.getElementById("summaryWebhookRow");
-    const autoExecRow = document.getElementById("summaryAutoExecRow");
-    if (webhookRow) webhookRow.style.display = hasWebhook() ? "" : "none";
-    if (autoExecRow) autoExecRow.style.display = hasWebhook() ? "" : "none";
-    if (el("summaryWebhook")) el("summaryWebhook").textContent = webhookUrl || "(configure later)";
-    if (el("summaryAutoExec")) el("summaryAutoExec").textContent = autoExecValue || "—";
-  }
-
+  // Step 3
+  function populateReview() { const p = PLANS[selectedPlan]; if (!p) return; const el = id => document.getElementById(id); if (el("reviewPlanIcon")) el("reviewPlanIcon").textContent = p.icon; if (el("reviewPlanName")) el("reviewPlanName").textContent = p.name; const b = el("reviewPlanBadge"); if (b) { b.textContent = p.badge; b.className = `plan-badge ${p.badgeClass}`; } if (el("reviewPlanPrice")) el("reviewPlanPrice").textContent = `$${p.price}`; if (el("summaryEmail")) el("summaryEmail").textContent = userEmail; if (el("summaryAssets")) el("summaryAssets").textContent = ASSET_LABELS[selectedAssets] || "—"; if (el("summaryRegion")) el("summaryRegion").textContent = REGION_INFO[selectedRegion]?.label || "—"; const fr = el("summaryFreqRow"); if (fr) fr.style.display = hasPush() ? "" : "none"; if (el("summaryFrequency")) { const f = selectedRegion === "global" && selectedFrequency > 3 ? 3 : selectedFrequency; el("summaryFrequency").textContent = `${f}/day`; } const wr = el("summaryWebhookRow"), ar = el("summaryAutoExecRow"); if (wr) wr.style.display = hasWebhook() ? "" : "none"; if (ar) ar.style.display = hasWebhook() ? "" : "none"; if (el("summaryWebhook")) el("summaryWebhook").textContent = webhookUrl || "(later)"; if (el("summaryAutoExec")) el("summaryAutoExec").textContent = autoExecValue || "—"; }
   step3BackBtn?.addEventListener("click", () => showStep(2));
 
-  // ═══════════════════════════════════════════════════════════════════════════
-  // STRIPE CHECKOUT
-  // ═══════════════════════════════════════════════════════════════════════════
-
+  // Stripe — NO DATE GATE
   stripeCheckoutBtn?.addEventListener("click", async () => {
-    // Gate: block checkout until April 20, 2026 midnight ET
-    const launchDate = new Date("2026-04-20T00:00:00-04:00");
-    if (Date.now() < launchDate.getTime()) {
-      alert("Subscriptions go live April 20th! Join the push notification waitlist to be first in line.");
-      return;
-    }
+    if (!userEmail || !selectedPlan) { showStep(1); return; }
+    localStorage.setItem("sj_checkout_email", userEmail); localStorage.setItem("sj_checkout_plan", selectedPlan);
+    stripeCheckoutBtn.disabled = true; stripeCheckoutBtn.textContent = "Redirecting to Stripe...";
+    try { const f = selectedRegion === "global" && selectedFrequency > 3 ? 3 : selectedFrequency; const r = await fetch(`${API_BASE}/api/alerts/create-checkout`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email: userEmail, plan: selectedPlan, assetTypes: selectedAssets, region: selectedRegion, alertFrequency: hasPush() ? f : 0, webhookUrl: hasWebhook() ? webhookUrl : undefined, tosVersion: "2026-04-19" }) }); if (!r.ok) throw new Error((await r.json().catch(() => ({}))).error || "Failed"); const { url } = await r.json(); if (url) window.location.href = url; else throw new Error("No URL"); } catch (err) { alert("Checkout failed. Please try again."); stripeCheckoutBtn.disabled = false; stripeCheckoutBtn.textContent = "Subscribe with Stripe →"; }
+  });
 
-    if (!userEmail || !selectedPlan) {
-      showStep(1);
-      return;
-    }
+  // Triggers
+  ["enableAlertsBtn", "inlineAlertBtn", "noClutterBtn"].forEach(id => document.getElementById(id)?.addEventListener("click", e => { e.preventDefault(); openModal(); }));
+  closeModalBtn?.addEventListener("click", closeModal); closeSuccessBtn?.addEventListener("click", closeModal);
+  modal?.addEventListener("click", e => { if (e.target === modal) closeModal(); });
+  document.addEventListener("keydown", e => { if (e.key === "Escape" && modal?.classList.contains("is-open")) closeModal(); });
+  const urlParams = new URLSearchParams(window.location.search);
+  if (urlParams.get("alerts") === "success") setTimeout(() => { openModal(); showSuccess(); window.history.replaceState({}, "", window.location.pathname); }, 300);
+  else if (urlParams.get("alerts") === "cancelled") window.history.replaceState({}, "", window.location.pathname);
+  setSegmented(assetTypeControl, "both"); setSegmented(regionControl, "americas"); setSegmented(frequencyControl, "1");
 
-    stripeCheckoutBtn.disabled = true;
-    stripeCheckoutBtn.textContent = "Redirecting to Stripe...";
+  // ═══════════════════════════════════════════════════════════════════════════
+  // TODAY'S ALERTS — Notification Log Cards below screener
+  // ═══════════════════════════════════════════════════════════════════════════
 
+  let alertLogData = null;
+  let alertedSymbolsToday = new Set();
+  window.__sjAlertedSymbols = alertedSymbolsToday;
+
+  async function fetchAlertLog() {
     try {
-      const freq = selectedRegion === "global" && selectedFrequency > 3 ? 3 : selectedFrequency;
-
-      const payload = {
-        email: userEmail,
-        plan: selectedPlan,
-        assetTypes: selectedAssets,
-        region: selectedRegion,
-        alertFrequency: hasPush() ? freq : 0,
-        webhookUrl: hasWebhook() ? webhookUrl : undefined,
-        autoExecution: hasWebhook() ? autoExecValue : undefined,
-        acknowledgments: hasWebhook() ? Object.keys(acks) : undefined,
-        tosVersion: "2026-03-23",
-      };
-
-      const res = await fetch(`${API_BASE}/api/alerts/create-checkout`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({}));
-        throw new Error(err.error || "Checkout failed");
-      }
-
-      const { url } = await res.json();
-      if (url) {
-        window.location.href = url;
-      } else {
-        throw new Error("No checkout URL returned");
-      }
-    } catch (err) {
-      console.error("[checkout] Error:", err);
-      alert("Failed to start checkout. Please try again.");
-      stripeCheckoutBtn.disabled = false;
-      stripeCheckoutBtn.textContent = "Subscribe with Stripe →";
-    }
-  });
-  // ═══════════════════════════════════════════════════════════════════════════
-  // MODAL TRIGGERS
-  // ═══════════════════════════════════════════════════════════════════════════
-
-  // All the existing trigger buttons
-  const triggers = [
-    "enableAlertsBtn",
-    "inlineAlertBtn",
-    "noClutterBtn",
-  ];
-
-  triggers.forEach(id => {
-    document.getElementById(id)?.addEventListener("click", (e) => {
-      e.preventDefault();
-      openModal();
-    });
-  });
-
-  closeModalBtn?.addEventListener("click", closeModal);
-  closeSuccessBtn?.addEventListener("click", closeModal);
-
-  modal?.addEventListener("click", (e) => {
-    if (e.target === modal) closeModal();
-  });
-
-  document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape" && modal?.classList.contains("is-open")) closeModal();
-  });
-
-  // ═══════════════════════════════════════════════════════════════════════════
-  // AUTO-OPEN ON STRIPE REDIRECT
-  // ═══════════════════════════════════════════════════════════════════════════
-
-  const params = new URLSearchParams(window.location.search);
-  if (params.get("alerts") === "success") {
-    setTimeout(() => {
-      openModal();
-      showSuccess();
-      window.history.replaceState({}, "", window.location.pathname);
-    }, 300);
-  } else if (params.get("alerts") === "cancelled") {
-    window.history.replaceState({}, "", window.location.pathname);
+      const res = await fetch(`${API_BASE}/api/notification-log?limit=200`);
+      if (!res.ok) return;
+      alertLogData = await res.json();
+      const today = new Date().toISOString().split("T")[0];
+      alertedSymbolsToday.clear();
+      for (const a of (alertLogData.notifications || [])) { if (a.date === today) alertedSymbolsToday.add(a.symbol); }
+      window.__sjAlertedSymbols = alertedSymbolsToday;
+      renderTodayAlerts();
+      highlightAlertedRows();
+    } catch (e) { console.warn("[alert-log] Fetch failed:", e.message); }
   }
 
-  // Initialize defaults
-  setSegmented(assetTypeControl, "both");
-  setSegmented(regionControl, "americas");
-  setSegmented(frequencyControl, "1");
+  function getCurrentAssetMode() {
+    return document.querySelector("#assetControl .segmented-on")?.dataset?.value || "stocks";
+  }
+
+  function renderTodayAlerts() {
+    const container = document.getElementById("alertCardsSection");
+    if (!container || !alertLogData) return;
+
+    const today = new Date().toISOString().split("T")[0];
+    const mode = getCurrentAssetMode();
+    let todayAlerts = (alertLogData.notifications || []).filter(a => a.date === today);
+    if (mode === "stocks") todayAlerts = todayAlerts.filter(a => a.mode === "stocks");
+    else if (mode === "crypto") todayAlerts = todayAlerts.filter(a => a.mode === "crypto");
+
+    const withPeak = todayAlerts.filter(a => a.peakAfterPush != null);
+    const winners = withPeak.filter(a => a.peakAfterPush >= 3).length;
+    const duds = withPeak.filter(a => a.peakAfterPush < 3).length;
+    const neverRed = withPeak.filter(a => a.peakAfterPush >= 0).length;
+    const avgPeak = withPeak.length > 0 ? Math.round(withPeak.reduce((s, a) => s + (a.peakAfterPush || 0), 0) / withPeak.length * 10) / 10 : 0;
+    const winRate = withPeak.length > 0 ? Math.round((winners / withPeak.length) * 100) : 0;
+
+    const statsEl = document.getElementById("alertCardsStats");
+    const bodyEl = document.getElementById("alertCardsBody");
+    const emptyEl = document.getElementById("alertCardsEmpty");
+
+    // Sync toggle
+    const toggleEl = document.getElementById("alertCardsToggle");
+    if (toggleEl) toggleEl.querySelectorAll(".segmented-btn").forEach(b => b.classList.toggle("segmented-on", b.dataset.value === mode));
+
+    // Stats
+    if (statsEl) {
+      statsEl.innerHTML = todayAlerts.length === 0 ? "" : `
+        <div class="alert-stat"><span class="alert-stat-val">${todayAlerts.length}</span><span class="alert-stat-lbl">Alerts</span></div>
+        <div class="alert-stat"><span class="alert-stat-val" style="color:#22c55e">${winRate}%</span><span class="alert-stat-lbl">Hit +3%</span></div>
+        <div class="alert-stat"><span class="alert-stat-val" style="color:#34d399">+${avgPeak}%</span><span class="alert-stat-lbl">Avg Peak</span></div>
+        <div class="alert-stat"><span class="alert-stat-val" style="color:${duds === 0 ? '#22c55e' : '#ef4444'}">${duds}</span><span class="alert-stat-lbl">Duds</span></div>
+        <div class="alert-stat"><span class="alert-stat-val" style="color:${neverRed === withPeak.length ? '#22c55e' : '#fbbf24'}">${neverRed}/${withPeak.length}</span><span class="alert-stat-lbl">Never Red</span></div>
+      `;
+    }
+
+    // Rows
+    if (bodyEl) {
+      if (todayAlerts.length === 0) {
+        bodyEl.innerHTML = "";
+        if (emptyEl) { emptyEl.style.display = ""; emptyEl.textContent = `No ${mode} alerts today yet.`; }
+      } else {
+        if (emptyEl) emptyEl.style.display = "none";
+        bodyEl.innerHTML = `
+          <div class="alert-log-header-row">
+            <span>TIME</span><span>TICKER</span><span>ALERT → PEAK</span><span>MAX GAIN</span><span>SCORE</span><span>RESULT</span>
+          </div>
+        ` + todayAlerts.map(a => {
+          const pct = a.pctAtSignal || a.pct15m || a.pct30m || a.pct1h || 0;
+          const peak = a.peakAfterPush;
+          const isWin = peak != null && peak >= 3;
+          const isDud = peak != null && peak < 3;
+          const peakStr = peak != null ? `+${peak.toFixed(1)}%` : "—";
+          const peakColor = isWin ? "#4ade80" : isDud && peak >= 0 ? "#fbbf24" : isDud ? "#ef4444" : "rgba(255,255,255,0.3)";
+          const resultIcon = peak == null ? '<span style="color:rgba(255,255,255,0.15);font-size:0.7rem">⏳</span>' : isWin ? '<span style="background:rgba(34,197,94,0.15);padding:2px 5px;border-radius:4px">✅</span>' : '<span style="background:rgba(239,68,68,0.12);padding:2px 5px;border-radius:4px">❌</span>';
+          const modeIcon = a.mode === "crypto" ? "🪙" : "📈";
+          const time = new Date(a.pushTimestamp).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", hour12: true }).toLowerCase();
+          const priceAtPush = a.priceAtPush != null ? `$${a.priceAtPush.toFixed(2)}` : "$—";
+          const peakPriceStr = a.peakAfterPushPrice ? `$${a.peakAfterPushPrice.toFixed(2)}` : peakStr;
+          const tvUrl = a.mode === "crypto" ? `https://www.tradingview.com/chart/?symbol=BINANCE:${a.symbol}USDT&aff_id=162729` : `https://www.tradingview.com/chart/?symbol=${a.symbol}&aff_id=162729`;
+          const sj = a.sjScore || "—";
+          const sjColor = sj >= 75 ? "#4ade80" : sj >= 60 ? "#e2e8f0" : "#64748b";
+
+          return `
+            <div class="alert-log-row">
+              <span class="alert-log-time">${time}</span>
+              <a href="${tvUrl}" target="_blank" rel="noopener" class="alert-log-ticker">${modeIcon} <strong>${a.symbol}</strong></a>
+              <span class="alert-log-prices">${priceAtPush} → <span style="color:${peakColor}">${peakPriceStr}</span></span>
+              <span class="alert-log-gain" style="color:${peakColor}">${peakStr}</span>
+              <span class="alert-log-score" style="color:${sjColor}">${sj}</span>
+              <span class="alert-log-result">${resultIcon}</span>
+            </div>
+          `;
+        }).join("");
+      }
+    }
+
+    // View all link
+    const viewAllEl = document.getElementById("alertCardsViewAll");
+    if (viewAllEl) {
+      const total = (alertLogData.notifications || []).length;
+      if (total > 0) { viewAllEl.style.display = ""; viewAllEl.innerHTML = `<a href="/alert-log.html" class="alert-view-all-link">Show all ${total} alerts →</a>`; }
+      else viewAllEl.style.display = "none";
+    }
+
+    container.style.display = "";
+  }
+
+  // Highlight alerted tickers in the screener table
+  function highlightAlertedRows() {
+    if (!alertedSymbolsToday || alertedSymbolsToday.size === 0) return;
+    document.querySelectorAll("#stocksTbody tr[data-symbol], #cryptoTbody tr[data-symbol]").forEach(tr => {
+      const sym = tr.dataset.symbol;
+      if (alertedSymbolsToday.has(sym)) {
+        tr.style.borderLeft = "3px solid rgba(96, 165, 250, 0.5)";
+        tr.style.background = "rgba(96, 165, 250, 0.03)";
+        // Add badge if not already present
+        const tickerCell = tr.querySelector("td.ticker");
+        if (tickerCell && !tickerCell.querySelector(".alerted-badge")) {
+          const badge = document.createElement("span");
+          badge.className = "alerted-badge";
+          badge.textContent = "⚡";
+          badge.title = "Momentum alert sent";
+          badge.style.cssText = "margin-left:4px;font-size:0.7rem;opacity:0.7;";
+          tickerCell.appendChild(badge);
+        }
+      }
+    });
+  }
+
+  // Re-highlight after each screener render
+  const origRenderStocks = window.renderStocks;
+  if (typeof origRenderStocks === "function") {
+    // Can't easily hook — instead, observe tbody changes
+  }
+  // Use MutationObserver to re-highlight after table re-renders
+  const stocksTbody = document.getElementById("stocksTbody");
+  const cryptoTbody = document.getElementById("cryptoTbody");
+  if (stocksTbody) new MutationObserver(() => setTimeout(highlightAlertedRows, 50)).observe(stocksTbody, { childList: true });
+  if (cryptoTbody) new MutationObserver(() => setTimeout(highlightAlertedRows, 50)).observe(cryptoTbody, { childList: true });
+
+  // Toggle handler syncs with screener
+  document.addEventListener("click", e => {
+    const btn = e.target.closest("#alertCardsToggle .segmented-btn");
+    if (!btn) return;
+    const mainToggle = document.getElementById("assetControl");
+    if (mainToggle) { const t = mainToggle.querySelector(`[data-value="${btn.dataset.value}"]`); if (t) t.click(); }
+    setTimeout(renderTodayAlerts, 100);
+  });
+
+  // Also re-render when main screener toggle changes
+  document.getElementById("assetControl")?.querySelectorAll(".segmented-btn").forEach(btn => {
+    btn.addEventListener("click", () => setTimeout(renderTodayAlerts, 100));
+  });
+
+  fetchAlertLog();
+  setInterval(fetchAlertLog, 60_000);
 
 })();

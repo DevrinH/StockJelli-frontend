@@ -160,78 +160,99 @@
     } catch (e) { console.warn("[alert-log] Fetch failed:", e.message); }
   }
 
-  // Featured Alert Card — shows today's best performer above screener
-// Runs after alertLogData is populated by alerts-frontend.js
- 
-(function initFeaturedAlert() {
-  const API_BASE = "https://api.stockjelli.com";
- 
-  async function renderFeaturedAlert() {
-    const wrap = document.getElementById("featuredAlertWrap");
-    const el = document.getElementById("featuredAlert");
-    if (!wrap || !el) return;
- 
-    try {
-      const res = await fetch(`${API_BASE}/api/notification-log?limit=50`);
-      if (!res.ok) return;
-      const data = await res.json();
-      const today = new Date().toISOString().split("T")[0];
-      const todayAlerts = (data.notifications || []).filter(a => a.date === today);
- 
-      if (todayAlerts.length === 0) { wrap.style.display = "none"; return; }
- 
-      // Find best performer (highest peak)
-      const withPeak = todayAlerts.filter(a => a.peakAfterPush != null);
-      let best;
-      if (withPeak.length > 0) {
-        best = withPeak.reduce((a, b) => (b.peakAfterPush || 0) > (a.peakAfterPush || 0) ? b : a);
-      } else {
-        best = todayAlerts[0]; // Most recent if no peaks yet
-      }
- 
-      const peak = best.peakAfterPush;
-      const isWin = peak != null && peak >= 3;
-      const isDud = peak != null && peak < 3;
-      const peakStr = peak != null ? `+${peak.toFixed(1)}%` : "tracking...";
-      const peakColor = isWin ? "#4ade80" : isDud && peak >= 0 ? "#fbbf24" : isDud ? "#ef4444" : "rgba(255,255,255,0.4)";
-      const resultIcon = peak == null ? "⏳" : isWin ? "✅" : "❌";
-      const modeIcon = best.mode === "crypto" ? "🪙" : "📈";
-      const tvUrl = best.mode === "crypto" ? `https://www.tradingview.com/chart/?symbol=BINANCE:${best.symbol}USDT&aff_id=162729` : `https://www.tradingview.com/chart/?symbol=${best.symbol}&aff_id=162729`;
-      const priceAtPush = best.priceAtPush != null ? `$${best.priceAtPush.toFixed(2)}` : "$—";
-      const peakPriceStr = best.peakAfterPushPrice ? `$${best.peakAfterPushPrice.toFixed(2)}` : "";
-      const time = new Date(best.pushTimestamp).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", hour12: true }).toLowerCase();
-      const tierLabel = best.tier === 2 ? "T2" : "";
-      const ch = (best.channel || "CH1") + (tierLabel ? " " + tierLabel : "");
- 
-      // Stats summary
-      const wP = todayAlerts.filter(a => a.peakAfterPush != null);
-      const w3 = wP.filter(a => a.peakAfterPush >= 3).length;
-      const wr = wP.length > 0 ? Math.round(w3 / wP.length * 100) : 0;
-      const statsStr = wP.length > 0 ? `${w3}/${wP.length} hit +3% (${wr}%)` : `${todayAlerts.length} alert${todayAlerts.length !== 1 ? "s" : ""} today`;
- 
-      el.className = `featured-alert${isDud ? " featured-dud" : ""}`;
-      el.innerHTML = `
-        <span class="featured-alert-badge featured-alert-badge-live"><span class="featured-alert-badge-dot"></span>LATEST</span>
-        <a href="${tvUrl}" target="_blank" rel="noopener" class="featured-alert-ticker">${modeIcon} ${best.symbol}</a>
-        <div class="featured-alert-detail">
-          <span class="featured-alert-prices">${priceAtPush}${peakPriceStr ? " → " + '<span style="color:' + peakColor + '">' + peakPriceStr + '</span>' : ""}</span>
-          <span class="featured-alert-gain" style="color:${peakColor}">${peakStr}</span>
-          <span class="featured-alert-meta">${ch} · ${time}</span>
-        </div>
-        <span class="featured-alert-result">${resultIcon}</span>
-        <a href="/alert-log.html" class="featured-alert-link">${statsStr} →</a>
-      `;
- 
-      wrap.style.display = "";
-    } catch (e) {
-      console.warn("[featured-alert] Error:", e.message);
+  (function initFeaturedAlert() {
+    const API_BASE = "https://api.stockjelli.com";
+  
+    function getCurrentMode() {
+      return document.querySelector("#assetControl .segmented-on")?.dataset?.value || "stocks";
     }
-  }
- 
-  // Initial render + refresh every 60s
-  setTimeout(renderFeaturedAlert, 500);
-  setInterval(renderFeaturedAlert, 60_000);
-})();
+  
+    async function renderFeaturedAlert() {
+      const wrap = document.getElementById("featuredAlertWrap");
+      const el = document.getElementById("featuredAlert");
+      if (!wrap || !el) return;
+  
+      try {
+        const res = await fetch(`${API_BASE}/api/notification-log?limit=50`);
+        if (!res.ok) return;
+        const data = await res.json();
+        const today = new Date().toISOString().split("T")[0];
+        const mode = getCurrentMode();
+  
+        // Filter by today AND current asset mode
+        let todayAlerts = (data.notifications || []).filter(a => a.date === today);
+        if (mode === "stocks") todayAlerts = todayAlerts.filter(a => a.mode === "stocks");
+        else if (mode === "crypto") todayAlerts = todayAlerts.filter(a => a.mode === "crypto");
+  
+        if (todayAlerts.length === 0) { wrap.style.display = "none"; return; }
+  
+        const withPeak = todayAlerts.filter(a => a.peakAfterPush != null);
+        let best;
+        if (withPeak.length > 0) {
+          best = withPeak.reduce((a, b) => (b.peakAfterPush || 0) > (a.peakAfterPush || 0) ? b : a);
+        } else {
+          best = todayAlerts[0];
+        }
+  
+        const peak = best.peakAfterPush;
+        const isWin = peak != null && peak >= 3;
+        const isDud = peak != null && peak < 3;
+        const peakStr = peak != null ? `+${peak.toFixed(1)}%` : "tracking...";
+        const peakColor = isWin ? "#4ade80" : isDud && peak >= 0 ? "#fbbf24" : isDud ? "#ef4444" : "rgba(255,255,255,0.4)";
+        const resultIcon = peak == null ? "⏳" : isWin ? "✅" : "❌";
+        const modeIcon = best.mode === "crypto" ? "🪙" : "📈";
+        const tvUrl = best.mode === "crypto" ? `https://www.tradingview.com/chart/?symbol=BINANCE:${best.symbol}USDT&aff_id=162729` : `https://www.tradingview.com/chart/?symbol=${best.symbol}&aff_id=162729`;
+        const priceAtPush = best.priceAtPush != null ? `$${best.priceAtPush.toFixed(2)}` : "$—";
+        const peakPriceStr = best.peakAfterPushPrice ? `$${best.peakAfterPushPrice.toFixed(2)}` : "";
+        const time = new Date(best.pushTimestamp).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", hour12: true }).toLowerCase();
+        const tierLabel = best.tier === 2 ? "T2" : "";
+        const ch = (best.channel || "CH1") + (tierLabel ? " " + tierLabel : "");
+        const sj = best.sjScore || "—";
+        const sjColor = sj >= 75 ? "#4ade80" : sj >= 60 ? "#e2e8f0" : "#64748b";
+  
+        const wP = todayAlerts.filter(a => a.peakAfterPush != null);
+        const w3 = wP.filter(a => a.peakAfterPush >= 3).length;
+        const wr = wP.length > 0 ? Math.round(w3 / wP.length * 100) : 0;
+        const statsStr = wP.length > 0 ? `${w3}/${wP.length} hit +3% (${wr}%)` : `${todayAlerts.length} alert${todayAlerts.length !== 1 ? "s" : ""} today`;
+  
+        el.className = `featured-alert${isDud ? " featured-dud" : ""}`;
+        el.innerHTML = `
+          <div class="featured-alert-header-row">
+            <span></span>
+            <span>TICKER</span>
+            <span>ALERT → PEAK</span>
+            <span>MAX GAIN</span>
+            <span>SCORE</span>
+            <span>RESULT</span>
+          </div>
+          <div class="featured-alert-data-row">
+            <span class="featured-alert-badge featured-alert-badge-live"><span class="featured-alert-badge-dot"></span>BEST</span>
+            <a href="${tvUrl}" target="_blank" rel="noopener" class="featured-alert-ticker">${modeIcon} ${best.symbol}</a>
+            <span class="featured-alert-prices">${priceAtPush}${peakPriceStr ? " → <span style='color:" + peakColor + "'>" + peakPriceStr + "</span>" : ""}</span>
+            <span class="featured-alert-gain" style="color:${peakColor}">${peakStr}</span>
+            <span class="featured-alert-score" style="color:${sjColor}">${sj}</span>
+            <span class="featured-alert-result">${resultIcon}</span>
+          </div>
+          <div class="featured-alert-footer">
+            <span class="featured-alert-meta">${ch} · ${time}</span>
+            <a href="/alert-log.html" class="featured-alert-link">${statsStr} →</a>
+          </div>
+        `;
+  
+        wrap.style.display = "";
+      } catch (e) {
+        console.warn("[featured-alert] Error:", e.message);
+      }
+    }
+  
+    // Re-render when screener mode changes
+    document.getElementById("assetControl")?.querySelectorAll(".segmented-btn").forEach(btn => {
+      btn.addEventListener("click", () => setTimeout(renderFeaturedAlert, 100));
+    });
+  
+    setTimeout(renderFeaturedAlert, 500);
+    setInterval(renderFeaturedAlert, 60_000);
+  })();
 
   function getCurrentAssetMode() {
     return document.querySelector("#assetControl .segmented-on")?.dataset?.value || "stocks";

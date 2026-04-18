@@ -477,17 +477,24 @@
     document.querySelectorAll("#stocksTbody tr[data-symbol], #cryptoTbody tr[data-symbol]").forEach(tr => {
       const sym = tr.dataset.symbol;
       if (alertedSymbolsToday.has(sym)) {
-        tr.style.borderLeft = "3px solid rgba(96, 165, 250, 0.5)";
-        tr.style.background = "rgba(96, 165, 250, 0.03)";
+        // Add pulsing class to the row
+        if (!tr.classList.contains("sj-alerted")) {
+          tr.classList.add("sj-alerted");
+        }
+        // Add ALERTED badge if not already there
         const tickerCell = tr.querySelector("td.ticker");
         if (tickerCell && !tickerCell.querySelector(".alerted-badge")) {
           const badge = document.createElement("span");
           badge.className = "alerted-badge";
-          badge.textContent = "⚡";
-          badge.title = "Momentum alert sent";
-          badge.style.cssText = "margin-left:4px;font-size:0.7rem;opacity:0.7;";
+          badge.innerHTML = "⚡ ALERTED";
+          badge.title = "Momentum alert sent — check notification log";
           tickerCell.appendChild(badge);
         }
+      } else {
+        // Clean up if a row was previously alerted but no longer matches
+        tr.classList.remove("sj-alerted");
+        const oldBadge = tr.querySelector(".alerted-badge");
+        if (oldBadge) oldBadge.remove();
       }
     });
   }

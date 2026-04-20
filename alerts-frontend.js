@@ -283,7 +283,7 @@
       const res = await fetch(`${API_BASE}/api/notification-log?limit=200`);
       if (!res.ok) return;
       alertLogData = await res.json();
-      const today = new Date().toISOString().split("T")[0];
+      const today = new Date().toLocaleDateString("en-CA", { timeZone: "America/New_York" });
       alertedSymbolsToday.clear();
       for (const a of (alertLogData.notifications || [])) { if (a.date === today) alertedSymbolsToday.add(a.symbol); }
       window.__sjAlertedSymbols = alertedSymbolsToday;
@@ -308,7 +308,7 @@
         const res = await fetch(`${API_BASE}/api/notification-log?limit=50`);
         if (!res.ok) return;
         const data = await res.json();
-        const today = new Date().toISOString().split("T")[0];
+        const today = new Date().toLocaleDateString("en-CA", { timeZone: "America/New_York" });
         const mode = getCurrentMode();
   
         let todayAlerts = (data.notifications || []).filter(a => a.date === today);
@@ -392,7 +392,7 @@
     const container = document.getElementById("alertCardsSection");
     if (!container || !alertLogData) return;
 
-    const today = new Date().toISOString().split("T")[0];
+    const today = new Date().toLocaleDateString("en-CA", { timeZone: "America/New_York" });
     const mode = getCurrentAssetMode();
     let todayAlerts = (alertLogData.notifications || []).filter(a => a.date === today);
     if (mode === "stocks") todayAlerts = todayAlerts.filter(a => a.mode === "stocks");

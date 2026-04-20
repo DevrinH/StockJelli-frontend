@@ -434,7 +434,7 @@
           </div>
         ` + todayAlerts.map(a => {
           const pct = a.pctAtSignal || a.pct15m || a.pct30m || a.pct1h || 0;
-          const peak = a.peakAfterPush;
+          const peak = a.peakAfterPush != null ? Math.round(a.peakAfterPush * 10) / 10 : null;
           const isWin = peak != null && peak >= 3;
           const isDud = peak != null && peak < 3;
           const peakStr = peak != null ? `+${peak.toFixed(1)}%` : "—";

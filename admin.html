@@ -123,6 +123,116 @@
     td, th { padding: 5px 6px; font-size: 0.65rem; }
     .col-name, .col-rvol, .col-volmcap, .col-peakmin, .col-session { display: none; }
   }
+
+  .notif-chart-section {
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+}
+ 
+.notif-chart-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+ 
+.notif-chart-title-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+ 
+.notif-chart-icon { font-size: 1rem; }
+ 
+.notif-chart-title {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--purple);
+  font-family: var(--mono);
+  margin: 0;
+  letter-spacing: 0.02em;
+}
+ 
+.notif-chart-sub {
+  font-size: 0.68rem;
+  color: var(--muted);
+  font-family: var(--mono);
+}
+ 
+.notif-chart-controls {
+  display: flex;
+  gap: 6px;
+}
+ 
+.notif-toggle {
+  padding: 4px 10px !important;
+  font-size: 0.68rem !important;
+  background: rgba(167, 139, 250, 0.06) !important;
+  border-color: rgba(167, 139, 250, 0.15) !important;
+  color: var(--muted) !important;
+}
+ 
+.notif-toggle.active {
+  background: var(--purple) !important;
+  color: #0a0d14 !important;
+  border-color: var(--purple) !important;
+}
+ 
+.notif-stats-row {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+ 
+.notif-stat-card {
+  flex: 1;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 10px;
+  text-align: center;
+}
+ 
+.notif-stat-val {
+  font-size: 1.05rem;
+  font-weight: 800;
+  font-family: var(--mono);
+  color: var(--text);
+}
+ 
+.notif-stat-lbl {
+  font-size: 0.55rem;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-top: 2px;
+}
+ 
+.notif-chart-wrap {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px 8px 8px;
+  overflow: hidden;
+}
+ 
+.notif-chart-wrap canvas {
+  display: block;
+  width: 100%;
+  height: 220px;
+}
+ 
+@media (max-width: 640px) {
+  .notif-chart-section { padding: 10px 12px; }
+  .notif-chart-header { flex-direction: column; align-items: flex-start; }
+  .notif-stats-row { gap: 6px; }
+  .notif-stat-card { padding: 6px 8px; }
+  .notif-stat-val { font-size: 0.88rem; }
+  .notif-chart-wrap canvas { height: 160px; }
+}
 </style>
 </head>
 <body>
@@ -192,6 +302,29 @@
     <div class="stat" id="statSwingHighWrap" style="display:none;"><span class="stat-label">Avg Swing Hi</span><span class="stat-value green" id="statSwingHigh">—</span></div>
     <div class="stat" id="statSwingLowWrap" style="display:none;"><span class="stat-label">Avg Swing Lo</span><span class="stat-value" style="color:var(--red)" id="statSwingLow">—</span></div>
     <div class="stat" id="statSwingDataWrap" style="display:none;"><span class="stat-label">Has Swing</span><span class="stat-value purple" id="statSwingData">—</span></div>
+  </div>
+
+  <div class="notif-chart-section" id="notifChartSection">
+    <div class="notif-chart-header">
+      <div class="notif-chart-title-row">
+        <span class="notif-chart-icon">📊</span>
+        <h3 class="notif-chart-title">Notification Win Rate</h3>
+        <span class="notif-chart-sub" id="notifChartSub">— alerts, —% win rate</span>
+      </div>
+      <div class="notif-chart-controls">
+        <button class="ctrl-btn notif-toggle active" data-nmode="all">All</button>
+        <button class="ctrl-btn notif-toggle" data-nmode="stocks">Stocks</button>
+        <button class="ctrl-btn notif-toggle" data-nmode="crypto">Crypto</button>
+      </div>
+    </div>
+   
+    <!-- Stats cards -->
+    <div class="notif-stats-row" id="notifStatsRow"></div>
+   
+    <!-- Chart -->
+    <div class="notif-chart-wrap">
+      <canvas id="notifChart" width="900" height="220"></canvas>
+    </div>
   </div>
 
   <div class="table-container" id="tableContainer">
@@ -651,6 +784,295 @@ if (col === 'rvol5m') { const r=entry.outcomes?.outcome_5m?.rvolAtCheck; if(!r) 
     URL.revokeObjectURL(url); showToast('Downloaded '+filename);
   }
   function showToast(msg) { const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('visible'); setTimeout(()=>t.classList.remove('visible'),2000); }
+
+  (function initNotifChart() {
+  const API = 'https://api.stockjelli.com';
+  let notifData = null;
+  let notifMode = 'all';
+ 
+  // Toggle buttons
+  document.querySelectorAll('.notif-toggle').forEach(btn => {
+    btn.addEventListener('click', () => {
+      notifMode = btn.dataset.nmode;
+      document.querySelectorAll('.notif-toggle').forEach(b => b.classList.toggle('active', b.dataset.nmode === notifMode));
+      renderNotifChart();
+    });
+  });
+ 
+  async function fetchNotifData() {
+    try {
+      const res = await fetch(`${API}/api/notification-log?limit=500`);
+      if (!res.ok) return;
+      notifData = await res.json();
+      renderNotifChart();
+    } catch (e) {
+      console.warn('[notif-chart] Fetch failed:', e.message);
+    }
+  }
+ 
+  function renderNotifChart() {
+    if (!notifData) return;
+ 
+    let alerts = notifData.notifications || [];
+    if (notifMode === 'stocks') alerts = alerts.filter(a => a.mode === 'stocks');
+    else if (notifMode === 'crypto') alerts = alerts.filter(a => a.mode === 'crypto');
+ 
+    // Overall stats
+    const withPeak = alerts.filter(a => a.peakAfterPush != null);
+    const winners = withPeak.filter(a => a.peakAfterPush >= 3).length;
+    const duds = withPeak.filter(a => a.peakAfterPush < 3).length;
+    const neverRed = withPeak.filter(a => a.peakAfterPush >= 0).length;
+    const avgPeak = withPeak.length > 0 ? (withPeak.reduce((s, a) => s + (a.peakAfterPush || 0), 0) / withPeak.length) : 0;
+    const winRate = withPeak.length > 0 ? Math.round(winners / withPeak.length * 100) : 0;
+ 
+    // Update subtitle
+    const sub = document.getElementById('notifChartSub');
+    if (sub) sub.textContent = `${alerts.length} alerts, ${winRate}% win rate`;
+ 
+    // Stats cards
+    const statsRow = document.getElementById('notifStatsRow');
+    if (statsRow) {
+      statsRow.innerHTML = `
+        <div class="notif-stat-card"><div class="notif-stat-val">${alerts.length}</div><div class="notif-stat-lbl">Total</div></div>
+        <div class="notif-stat-card"><div class="notif-stat-val" style="color:var(--green)">${winRate}%</div><div class="notif-stat-lbl">Win Rate</div></div>
+        <div class="notif-stat-card"><div class="notif-stat-val" style="color:var(--green)">+${avgPeak.toFixed(1)}%</div><div class="notif-stat-lbl">Avg Peak</div></div>
+        <div class="notif-stat-card"><div class="notif-stat-val" style="color:var(--red)">${duds}</div><div class="notif-stat-lbl">Duds</div></div>
+        <div class="notif-stat-card"><div class="notif-stat-val" style="color:${neverRed === withPeak.length ? 'var(--green)' : 'var(--amber)'}">${neverRed}/${withPeak.length}</div><div class="notif-stat-lbl">Never Red</div></div>
+      `;
+    }
+ 
+    // Group by date → daily win rate
+    const byDate = new Map();
+    for (const a of alerts) {
+      const d = a.date || 'unknown';
+      if (!byDate.has(d)) byDate.set(d, { total: 0, withPeak: 0, winners: 0 });
+      const day = byDate.get(d);
+      day.total++;
+      if (a.peakAfterPush != null) {
+        day.withPeak++;
+        if (a.peakAfterPush >= 3) day.winners++;
+      }
+    }
+ 
+    // Sort by date ascending
+    const dates = [...byDate.keys()].sort();
+    const dailyData = dates.map(d => {
+      const day = byDate.get(d);
+      return {
+        date: d,
+        total: day.total,
+        winRate: day.withPeak > 0 ? Math.round(day.winners / day.withPeak * 100) : null,
+        winners: day.winners,
+        withPeak: day.withPeak,
+      };
+    });
+ 
+    // Calculate rolling win rate (cumulative)
+    let cumWinners = 0, cumWithPeak = 0;
+    const rollingData = dailyData.map(d => {
+      cumWinners += d.winners;
+      cumWithPeak += d.withPeak;
+      return {
+        ...d,
+        rollingWinRate: cumWithPeak > 0 ? Math.round(cumWinners / cumWithPeak * 100) : null,
+      };
+    });
+ 
+    drawChart(rollingData);
+  }
+ 
+  function drawChart(data) {
+    const canvas = document.getElementById('notifChart');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    const dpr = window.devicePixelRatio || 1;
+    const rect = canvas.getBoundingClientRect();
+    canvas.width = rect.width * dpr;
+    canvas.height = rect.height * dpr;
+    ctx.scale(dpr, dpr);
+    const W = rect.width, H = rect.height;
+ 
+    ctx.clearRect(0, 0, W, H);
+ 
+    if (data.length < 2) {
+      ctx.fillStyle = '#64748b';
+      ctx.font = '12px "JetBrains Mono", monospace';
+      ctx.textAlign = 'center';
+      ctx.fillText('Not enough data to chart', W / 2, H / 2);
+      return;
+    }
+ 
+    const pad = { top: 20, right: 16, bottom: 36, left: 44 };
+    const cW = W - pad.left - pad.right;
+    const cH = H - pad.top - pad.bottom;
+ 
+    // Filter to data with valid rolling win rate
+    const valid = data.filter(d => d.rollingWinRate != null);
+    if (valid.length < 2) {
+      ctx.fillStyle = '#64748b';
+      ctx.font = '12px "JetBrains Mono", monospace';
+      ctx.textAlign = 'center';
+      ctx.fillText('Waiting for outcome data', W / 2, H / 2);
+      return;
+    }
+ 
+    // Y range: 0-100% (win rate)
+    const yMin = 0, yMax = 100;
+    const xToCanvas = (i) => pad.left + (i / (valid.length - 1)) * cW;
+    const yToCanvas = (v) => pad.top + cH - ((v - yMin) / (yMax - yMin)) * cH;
+ 
+    // Grid lines
+    ctx.strokeStyle = 'rgba(255,255,255,0.04)';
+    ctx.lineWidth = 1;
+    for (const pct of [0, 25, 50, 75, 100]) {
+      const y = yToCanvas(pct);
+      ctx.beginPath(); ctx.moveTo(pad.left, y); ctx.lineTo(W - pad.right, y); ctx.stroke();
+    }
+ 
+    // Y axis labels
+    ctx.fillStyle = '#475569';
+    ctx.font = '10px "JetBrains Mono", monospace';
+    ctx.textAlign = 'right';
+    for (const pct of [0, 25, 50, 75, 100]) {
+      ctx.fillText(pct + '%', pad.left - 6, yToCanvas(pct) + 3);
+    }
+ 
+    // X axis labels (show every Nth date)
+    ctx.textAlign = 'center';
+    ctx.fillStyle = '#475569';
+    ctx.font = '9px "JetBrains Mono", monospace';
+    const step = Math.max(1, Math.floor(valid.length / 8));
+    for (let i = 0; i < valid.length; i += step) {
+      const x = xToCanvas(i);
+      const label = valid[i].date.slice(5); // MM-DD
+      ctx.fillText(label, x, H - pad.bottom + 14);
+    }
+    // Always show last
+    if (valid.length > 1) {
+      const x = xToCanvas(valid.length - 1);
+      ctx.fillText(valid[valid.length - 1].date.slice(5), x, H - pad.bottom + 14);
+    }
+ 
+    // Build path points
+    const points = valid.map((d, i) => ({ x: xToCanvas(i), y: yToCanvas(d.rollingWinRate) }));
+ 
+    // Purple gradient fill under line
+    const grad = ctx.createLinearGradient(0, pad.top, 0, pad.top + cH);
+    grad.addColorStop(0, 'rgba(167, 139, 250, 0.25)');
+    grad.addColorStop(0.5, 'rgba(167, 139, 250, 0.08)');
+    grad.addColorStop(1, 'rgba(167, 139, 250, 0)');
+ 
+    ctx.beginPath();
+    ctx.moveTo(points[0].x, pad.top + cH); // bottom-left
+    for (const p of points) ctx.lineTo(p.x, p.y);
+    ctx.lineTo(points[points.length - 1].x, pad.top + cH); // bottom-right
+    ctx.closePath();
+    ctx.fillStyle = grad;
+    ctx.fill();
+ 
+    // Line
+    ctx.beginPath();
+    ctx.moveTo(points[0].x, points[0].y);
+    for (let i = 1; i < points.length; i++) {
+      // Smooth curve
+      const prev = points[i - 1];
+      const curr = points[i];
+      const cpx = (prev.x + curr.x) / 2;
+      ctx.bezierCurveTo(cpx, prev.y, cpx, curr.y, curr.x, curr.y);
+    }
+    ctx.strokeStyle = '#a78bfa';
+    ctx.lineWidth = 2.5;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    ctx.stroke();
+ 
+    // Glow effect
+    ctx.shadowColor = 'rgba(167, 139, 250, 0.4)';
+    ctx.shadowBlur = 8;
+    ctx.stroke();
+    ctx.shadowColor = 'transparent';
+    ctx.shadowBlur = 0;
+ 
+    // Daily win rate dots
+    for (let i = 0; i < valid.length; i++) {
+      const d = valid[i];
+      if (d.winRate == null) continue;
+      const x = xToCanvas(i);
+      const y = yToCanvas(d.winRate);
+      const r = d.total >= 5 ? 3.5 : 2.5;
+ 
+      // Dot color based on daily win rate
+      const color = d.winRate >= 70 ? '#22c55e' : d.winRate >= 50 ? '#f59e0b' : '#ef4444';
+      ctx.beginPath();
+      ctx.arc(x, y, r, 0, Math.PI * 2);
+      ctx.fillStyle = color;
+      ctx.globalAlpha = 0.6;
+      ctx.fill();
+      ctx.globalAlpha = 1;
+    }
+ 
+    // End dot (current rolling rate) — larger, glowing
+    const last = points[points.length - 1];
+    const lastRate = valid[valid.length - 1].rollingWinRate;
+    ctx.beginPath();
+    ctx.arc(last.x, last.y, 5, 0, Math.PI * 2);
+    ctx.fillStyle = '#a78bfa';
+    ctx.fill();
+    ctx.shadowColor = 'rgba(167, 139, 250, 0.6)';
+    ctx.shadowBlur = 10;
+    ctx.fill();
+    ctx.shadowColor = 'transparent';
+    ctx.shadowBlur = 0;
+ 
+    // Current rate label
+    ctx.fillStyle = '#e2e8f0';
+    ctx.font = 'bold 11px "JetBrains Mono", monospace';
+    ctx.textAlign = 'left';
+    ctx.fillText(lastRate + '%', last.x + 10, last.y + 4);
+ 
+    // 3% threshold line (reference)
+    // Actually show 50% win rate reference line
+    const ref50 = yToCanvas(50);
+    ctx.strokeStyle = 'rgba(245, 158, 11, 0.2)';
+    ctx.lineWidth = 1;
+    ctx.setLineDash([4, 4]);
+    ctx.beginPath(); ctx.moveTo(pad.left, ref50); ctx.lineTo(W - pad.right, ref50); ctx.stroke();
+    ctx.setLineDash([]);
+ 
+    // Label for 50% line
+    ctx.fillStyle = 'rgba(245, 158, 11, 0.4)';
+    ctx.font = '9px "JetBrains Mono", monospace';
+    ctx.textAlign = 'right';
+    ctx.fillText('50% baseline', W - pad.right - 4, ref50 - 4);
+ 
+    // Chart title/legend at top-left
+    ctx.fillStyle = '#64748b';
+    ctx.font = '9px "JetBrains Mono", monospace';
+    ctx.textAlign = 'left';
+    ctx.fillText('● rolling win rate  ○ daily win rate', pad.left + 4, pad.top - 6);
+  }
+ 
+  // Resize handler
+  let resizeTimer;
+  window.addEventListener('resize', () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(() => { if (notifData) renderNotifChart(); }, 200);
+  });
+ 
+  // Load on dashboard show
+  const observer = new MutationObserver(() => {
+    if (document.getElementById('dashboard')?.classList.contains('visible') && !notifData) {
+      fetchNotifData();
+    }
+  });
+  observer.observe(document.getElementById('dashboard'), { attributes: true, attributeFilter: ['class'] });
+ 
+  // Also try immediately if already visible
+  if (document.getElementById('dashboard')?.classList.contains('visible')) {
+    fetchNotifData();
+  }
+})();
+
 })();
 </script>
 </body>

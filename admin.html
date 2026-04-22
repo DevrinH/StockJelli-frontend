@@ -233,6 +233,159 @@
   .notif-stat-val { font-size: 0.88rem; }
   .notif-chart-wrap canvas { height: 160px; }
 }
+.regime-section {
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+}
+.regime-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.regime-title-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.regime-title {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--purple);
+  font-family: var(--mono);
+  margin: 0;
+  letter-spacing: 0.02em;
+}
+.regime-sub {
+  font-size: 0.68rem;
+  color: var(--muted);
+  font-family: var(--mono);
+}
+.regime-badge-mode {
+  font-size: 0.6rem;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  font-family: var(--mono);
+  background: rgba(245,158,11,0.12);
+  color: var(--amber);
+  border: 1px solid rgba(245,158,11,0.2);
+}
+.regime-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 10px;
+  margin-bottom: 12px;
+}
+.regime-card {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 12px;
+}
+.regime-card-label {
+  font-size: 0.55rem;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+.regime-card-value {
+  font-size: 1.05rem;
+  font-family: var(--mono);
+  font-weight: 700;
+  color: var(--text);
+}
+.regime-badge {
+  display: inline-block;
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-weight: 700;
+  font-size: 0.75rem;
+  font-family: var(--mono);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.regime-badge.up { background: rgba(34,197,94,0.15); color: var(--green); }
+.regime-badge.down { background: rgba(239,68,68,0.15); color: var(--red); }
+.regime-badge.chop { background: rgba(100,116,139,0.15); color: var(--muted); }
+ 
+.regime-chart-wrap {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px 8px 8px;
+  overflow: hidden;
+  margin-bottom: 12px;
+}
+.regime-chart-wrap canvas {
+  display: block;
+  width: 100%;
+  height: 180px;
+}
+ 
+.regime-alerts-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.72rem;
+  font-family: var(--mono);
+  margin-top: 8px;
+}
+.regime-alerts-table th {
+  text-align: left;
+  padding: 6px 8px;
+  color: var(--muted);
+  font-size: 0.6rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  border-bottom: 1px solid var(--border);
+  font-weight: 600;
+  background: var(--surface2);
+}
+.regime-alerts-table td {
+  padding: 6px 8px;
+  border-bottom: 1px solid var(--border);
+}
+.regime-alerts-table tr:hover td {
+  background: rgba(167,139,250,0.04);
+}
+.regime-alerts-empty {
+  text-align: center;
+  padding: 20px;
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 0.75rem;
+}
+.regime-refresh-btn {
+  padding: 4px 10px;
+  background: rgba(167,139,250,0.1);
+  border: 1px solid rgba(167,139,250,0.2);
+  border-radius: 6px;
+  color: var(--purple);
+  font-size: 0.68rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: var(--mono);
+}
+.regime-refresh-btn:hover { background: var(--purple); color: #0a0d14; }
+.regime-refresh-btn:disabled { opacity: 0.4; cursor: wait; }
+ 
+@media (max-width: 640px) {
+  .regime-section { padding: 10px 12px; }
+  .regime-header { flex-direction: column; align-items: flex-start; }
+  .regime-grid { grid-template-columns: repeat(2, 1fr); }
+  .regime-card-value { font-size: 0.88rem; }
+  .regime-chart-wrap canvas { height: 140px; }
+  .regime-alerts-table th, .regime-alerts-table td { padding: 4px 6px; font-size: 0.65rem; }
+  .regime-alerts-table .col-hide-mobile { display: none; }
+}
 </style>
 </head>
 <body>
@@ -326,6 +479,43 @@
       <canvas id="notifChart" width="900" height="220"></canvas>
     </div>
   </div>
+
+
+  <div class="regime-section" id="regimeSection">
+    <div class="regime-header">
+      <div class="regime-title-row">
+        <span style="font-size:1rem;">⚡</span>
+        <h3 class="regime-title">Leveraged ETF Regime (TQQQ/SQQQ)</h3>
+        <span class="regime-sub" id="regimeSub">Loading…</span>
+        <span class="regime-badge-mode" id="regimeModeBadge">LOGGING ONLY</span>
+      </div>
+      <div style="display:flex; gap:6px;">
+        <button class="regime-refresh-btn" id="regimeEvaluateBtn" title="Run manual capture + evaluate">⚡ Run Now</button>
+        <button class="regime-refresh-btn" id="regimeRefreshBtn">↻ Refresh</button>
+      </div>
+    </div>
+   
+    <!-- Stat cards -->
+    <div class="regime-grid" id="regimeGrid"></div>
+   
+    <!-- QQQ daily %chg bar chart colored by regime -->
+    <div class="regime-chart-wrap">
+      <canvas id="regimeChart" width="900" height="180"></canvas>
+    </div>
+   
+    <!-- Swing alerts history -->
+    <div>
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+        <span style="font-size:0.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.06em;font-weight:600;">Logged Alerts</span>
+        <span class="regime-sub" id="regimeAlertCount">—</span>
+      </div>
+      <div id="regimeAlertsWrap">
+        <div class="regime-alerts-empty">Loading…</div>
+      </div>
+    </div>
+  </div>
+
+
 
   <div class="table-container" id="tableContainer">
     <div class="loading">Loading data...</div>
@@ -800,6 +990,8 @@ if (col === 'rvol25m') { const r=entry.outcomes?.outcome_25m?.rvolAtCheck; if(!r
       renderNotifChart();
     });
   });
+
+  
  
   async function fetchNotifData() {
     try {
@@ -1072,6 +1264,288 @@ if (col === 'rvol25m') { const r=entry.outcomes?.outcome_25m?.rvolAtCheck; if(!r
   // Also try immediately if already visible
   if (document.getElementById('dashboard')?.classList.contains('visible')) {
     fetchNotifData();
+  }
+})();
+
+(function initRegimePanel() {
+  const API = 'https://api.stockjelli.com';
+  let regimeData = null;
+  let weeklyReport = null; // cached weekly-logger response for outcome cross-ref
+ 
+  const $ = id => document.getElementById(id);
+ 
+  $('regimeRefreshBtn').addEventListener('click', fetchRegimeData);
+  $('regimeEvaluateBtn').addEventListener('click', async () => {
+    const btn = $('regimeEvaluateBtn');
+    btn.textContent = '⏳ Running…';
+    btn.disabled = true;
+    try {
+      const res = await fetch(`${API}/api/admin/regime-evaluate`, { method: 'POST' });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+      console.log('[regime] Manual eval result:', data);
+      await fetchRegimeData();
+    } catch (e) {
+      console.error('[regime] Manual evaluate failed:', e);
+      alert('Evaluate failed: ' + e.message);
+    }
+    btn.textContent = '⚡ Run Now';
+    btn.disabled = false;
+  });
+ 
+  async function fetchRegimeData() {
+    try {
+      const [rRes, wRes] = await Promise.all([
+        fetch(`${API}/api/admin/regime-state`),
+        fetch(`${API}/api/weekly-report`),
+      ]);
+      if (!rRes.ok) { console.warn('[regime] fetch failed:', rRes.status); renderEmpty(); return; }
+      regimeData = await rRes.json();
+      if (wRes.ok) weeklyReport = await wRes.json();
+      renderPanel();
+    } catch (e) {
+      console.warn('[regime] fetch error:', e.message);
+      renderEmpty();
+    }
+  }
+ 
+  function renderEmpty() {
+    $('regimeSub').textContent = 'No data yet';
+    $('regimeGrid').innerHTML = '<div class="regime-alerts-empty">Run ⚡ once to capture first close, then wait for data to accumulate.</div>';
+    $('regimeAlertsWrap').innerHTML = '<div class="regime-alerts-empty">No alerts yet.</div>';
+  }
+ 
+  function renderPanel() {
+    if (!regimeData) return;
+ 
+    const history = regimeData.regimeHistory || [];
+    const alerts = regimeData.swingAlerts || [];
+    const closes = regimeData.dailyCloses || [];
+    const today = history[history.length - 1] || null;
+ 
+    // Subtitle
+    if (today) {
+      $('regimeSub').textContent = `${history.length} days tracked · last eval ${today.date}`;
+    } else if (closes.length > 0) {
+      $('regimeSub').textContent = `${closes.length} closes captured · awaiting 6-day minimum`;
+    } else {
+      $('regimeSub').textContent = 'No closes captured yet';
+    }
+ 
+    // Stat cards
+    const grid = $('regimeGrid');
+    if (!today) {
+      grid.innerHTML = `<div class="regime-alerts-empty" style="grid-column:1/-1;">Need ${6 - closes.length} more trading days of closes before first regime classification.</div>`;
+    } else {
+      const qqq = today.qqq;
+      const pctClass = qqq.pctDay > 0 ? 'pct-up' : qqq.pctDay < 0 ? 'pct-down' : 'pct-flat';
+      const slopeClass = qqq.sma5Slope > 0 ? 'pct-up' : qqq.sma5Slope < 0 ? 'pct-down' : 'pct-flat';
+      grid.innerHTML = `
+        <div class="regime-card">
+          <div class="regime-card-label">Current Regime</div>
+          <div class="regime-card-value"><span class="regime-badge ${qqq.regime}">${qqq.regime}</span></div>
+        </div>
+        <div class="regime-card">
+          <div class="regime-card-label">Days in Regime</div>
+          <div class="regime-card-value">${qqq.daysInRegime} ${qqq.regimeConfirmed ? '<span style="color:var(--green)">✓</span>' : '<span style="color:var(--muted)">…</span>'}</div>
+        </div>
+        <div class="regime-card">
+          <div class="regime-card-label">QQQ Today</div>
+          <div class="regime-card-value"><span class="${pctClass}">${qqq.pctDay > 0 ? '+' : ''}${qqq.pctDay?.toFixed(2)}%</span></div>
+        </div>
+        <div class="regime-card">
+          <div class="regime-card-label">3d / 5d SMA</div>
+          <div class="regime-card-value" style="font-size:0.88rem;">
+            ${qqq.sma3 != null ? (qqq.sma3 > 0 ? '+' : '') + qqq.sma3.toFixed(2) : '—'}%
+            / ${qqq.sma5 != null ? (qqq.sma5 > 0 ? '+' : '') + qqq.sma5.toFixed(2) : '—'}%
+          </div>
+        </div>
+        <div class="regime-card">
+          <div class="regime-card-label">5d Slope</div>
+          <div class="regime-card-value"><span class="${slopeClass}">${qqq.sma5Slope != null ? (qqq.sma5Slope > 0 ? '+' : '') + qqq.sma5Slope.toFixed(2) : '—'}</span></div>
+        </div>
+        <div class="regime-card">
+          <div class="regime-card-label">Last Alert</div>
+          <div class="regime-card-value" style="font-size:0.85rem;">
+            ${alerts.length ? alerts[alerts.length-1].ticker + ' · ' + alerts[alerts.length-1].triggerDate.slice(5) : '—'}
+          </div>
+        </div>
+      `;
+    }
+ 
+    drawRegimeChart(history, closes);
+    renderAlertsTable(alerts);
+  }
+ 
+  function drawRegimeChart(history, closes) {
+    const canvas = $('regimeChart');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    const dpr = window.devicePixelRatio || 1;
+    const rect = canvas.getBoundingClientRect();
+    canvas.width = rect.width * dpr;
+    canvas.height = rect.height * dpr;
+    ctx.scale(dpr, dpr);
+    const W = rect.width, H = rect.height;
+    ctx.clearRect(0, 0, W, H);
+ 
+    // Prefer history (colored by regime); fall back to closes if pre-evaluation
+    const series = history.length > 0
+      ? history.map(h => ({ date: h.date, pct: h.qqq.pctDay, regime: h.qqq.regime, alertLogged: h.alertLogged }))
+      : closes.map(c => ({ date: c.date, pct: c.qqqPctDay, regime: null, alertLogged: null }));
+ 
+    if (series.length < 2) {
+      ctx.fillStyle = '#64748b';
+      ctx.font = '11px "JetBrains Mono", monospace';
+      ctx.textAlign = 'center';
+      ctx.fillText('Need more data to chart', W/2, H/2);
+      return;
+    }
+ 
+    const pad = { top: 18, right: 16, bottom: 28, left: 36 };
+    const cW = W - pad.left - pad.right;
+    const cH = H - pad.top - pad.bottom;
+ 
+    const pcts = series.map(s => s.pct || 0);
+    const yMax = Math.max(3, Math.ceil(Math.max(...pcts, 1)));
+    const yMin = Math.min(-3, Math.floor(Math.min(...pcts, -1)));
+    const yRange = yMax - yMin;
+ 
+    const xToCanvas = i => pad.left + (i / (series.length - 1)) * cW;
+    const yToCanvas = v => pad.top + cH - ((v - yMin) / yRange) * cH;
+ 
+    // Zero line
+    ctx.strokeStyle = 'rgba(255,255,255,0.08)';
+    ctx.lineWidth = 1;
+    const zeroY = yToCanvas(0);
+    ctx.beginPath(); ctx.moveTo(pad.left, zeroY); ctx.lineTo(W - pad.right, zeroY); ctx.stroke();
+ 
+    // Y axis labels
+    ctx.fillStyle = '#475569';
+    ctx.font = '9px "JetBrains Mono", monospace';
+    ctx.textAlign = 'right';
+    for (const v of [yMax, 0, yMin]) {
+      ctx.fillText((v > 0 ? '+' : '') + v + '%', pad.left - 4, yToCanvas(v) + 3);
+    }
+ 
+    // Bars colored by regime
+    const barW = Math.max(2, cW / series.length - 2);
+    for (let i = 0; i < series.length; i++) {
+      const s = series[i];
+      const x = xToCanvas(i) - barW / 2;
+      const y = s.pct >= 0 ? yToCanvas(s.pct) : zeroY;
+      const h = Math.abs(yToCanvas(s.pct) - zeroY);
+ 
+      let fill;
+      if (s.regime === 'up') fill = 'rgba(34,197,94,0.75)';
+      else if (s.regime === 'down') fill = 'rgba(239,68,68,0.75)';
+      else if (s.regime === 'chop') fill = 'rgba(100,116,139,0.4)';
+      else fill = s.pct >= 0 ? 'rgba(34,197,94,0.4)' : 'rgba(239,68,68,0.4)';
+ 
+      ctx.fillStyle = fill;
+      ctx.fillRect(x, y, barW, h);
+ 
+      // Alert marker (purple dot + ticker label)
+      if (s.alertLogged) {
+        ctx.fillStyle = '#a78bfa';
+        ctx.beginPath();
+        ctx.arc(x + barW/2, pad.top + 6, 4, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = '#a78bfa';
+        ctx.font = 'bold 8px "JetBrains Mono", monospace';
+        ctx.textAlign = 'center';
+        ctx.fillText(s.alertLogged, x + barW/2, pad.top - 3);
+      }
+    }
+ 
+    // X axis date labels (sparse)
+    ctx.fillStyle = '#475569';
+    ctx.font = '9px "JetBrains Mono", monospace';
+    ctx.textAlign = 'center';
+    const step = Math.max(1, Math.floor(series.length / 8));
+    for (let i = 0; i < series.length; i += step) {
+      ctx.fillText(series[i].date.slice(5), xToCanvas(i), H - pad.bottom + 14);
+    }
+    if (series.length > 1) {
+      ctx.fillText(series[series.length-1].date.slice(5), xToCanvas(series.length-1), H - pad.bottom + 14);
+    }
+  }
+ 
+  /**
+   * Cross-reference swing alerts with weekly-logger entries to show
+   * D2/D5/D10 outcomes that the weekly-logger pipeline has populated.
+   */
+  function findOutcomesForAlert(alert) {
+    if (!weeklyReport) return {};
+    const entries = weeklyReport?.stocks?.allEntries || [];
+    const match = entries.find(e =>
+      e.symbol === alert.ticker &&
+      (e.date === alert.triggerDate || e.date === alert.triggerDate?.slice(0, 10))
+    );
+    if (!match) return {};
+    return {
+      peak: match.peakPctChange,
+      d2: match.outcomes?.outcome_d2_close?.pctFromEntry,
+      d5: match.outcomes?.outcome_d5_close?.pctFromEntry,
+      d10: match.outcomes?.outcome_d10_close?.pctFromEntry,
+      swingHigh: match.swingHighPct,
+      swingLow: match.swingLowPct,
+    };
+  }
+ 
+  function renderAlertsTable(alerts) {
+    $('regimeAlertCount').textContent = `${alerts.length} total`;
+    const wrap = $('regimeAlertsWrap');
+    if (!alerts.length) {
+      wrap.innerHTML = '<div class="regime-alerts-empty">No swing alerts logged yet — awaiting first regime flip.</div>';
+      return;
+    }
+ 
+    const sorted = [...alerts].sort((a,b) => (b.triggerDate || '').localeCompare(a.triggerDate || ''));
+    let html = '<table class="regime-alerts-table"><thead><tr>';
+    html += '<th>Date</th><th>Ticker</th><th>Dir</th><th>Price</th>';
+    html += '<th class="col-hide-mobile">Regime Ctx</th>';
+    html += '<th>Peak</th><th>D2</th><th>D5</th><th>D10</th><th>Swing Hi</th><th>Swing Lo</th>';
+    html += '</tr></thead><tbody>';
+ 
+    for (const a of sorted) {
+      const ctx = a.regimeContext || {};
+      const ctxStr = `${ctx.regime}·${ctx.daysInRegime}d·slope ${ctx.sma5Slope >= 0 ? '+' : ''}${ctx.sma5Slope}`;
+      const out = findOutcomesForAlert(a);
+      html += '<tr>';
+      html += `<td>${a.triggerDate || '—'}</td>`;
+      html += `<td><span class="sym">${a.ticker}</span></td>`;
+      html += `<td>${a.direction === 'long' ? '🟢 Long' : '🔴 Short'}</td>`;
+      html += `<td>${a.priceAtAlert ? '$' + a.priceAtAlert.toFixed(2) : '—'}</td>`;
+      html += `<td class="col-hide-mobile" style="color:var(--muted);font-size:0.68rem;">${ctxStr}</td>`;
+      html += '<td>' + formatOutcomePct(out.peak) + '</td>';
+      html += '<td>' + formatOutcomePct(out.d2) + '</td>';
+      html += '<td>' + formatOutcomePct(out.d5) + '</td>';
+      html += '<td>' + formatOutcomePct(out.d10) + '</td>';
+      html += '<td>' + formatOutcomePct(out.swingHigh, true) + '</td>';
+      html += '<td>' + formatOutcomePct(out.swingLow) + '</td>';
+      html += '</tr>';
+    }
+    html += '</tbody></table>';
+    wrap.innerHTML = html;
+  }
+ 
+  function formatOutcomePct(v, highlightPositive) {
+    if (v == null || isNaN(v)) return '<span style="color:var(--muted)">—</span>';
+    const cls = v > 0 ? 'pct-up' : v < 0 ? 'pct-down' : 'pct-flat';
+    return `<span class="${cls}">${v > 0 ? '+' : ''}${v.toFixed(1)}%</span>`;
+  }
+ 
+  // Load when dashboard becomes visible
+  const observer = new MutationObserver(() => {
+    if ($('dashboard')?.classList.contains('visible') && !regimeData) {
+      fetchRegimeData();
+    }
+  });
+  observer.observe($('dashboard'), { attributes: true, attributeFilter: ['class'] });
+ 
+  if ($('dashboard')?.classList.contains('visible')) {
+    fetchRegimeData();
   }
 })();
 

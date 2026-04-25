@@ -4013,3 +4013,19 @@ tr.sj-alerted:hover {
     margin-left: 3px;
   }
 }
+
+/* Loading spinner for screener tables */
+.loading-spinner {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(255,255,255,0.1);
+  border-top-color: rgba(255,255,255,0.4);
+  border-radius: 50%;
+  animation: sj-spin 0.8s linear infinite;
+  vertical-align: middle;
+  margin-right: 6px;
+}
+@keyframes sj-spin {
+  to { transform: rotate(360deg); }
+}

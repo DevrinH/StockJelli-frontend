@@ -391,6 +391,26 @@
   .lev-stat-val { font-size: 0.85rem; }
   .leveraged-table th, .leveraged-table td { padding: 4px 6px; font-size: 0.65rem; }
 }
+.section-collapse-btn {
+  background: none;
+  border: none;
+  color: var(--muted);
+  font-size: 1.1rem;
+  cursor: pointer;
+  padding: 2px 6px;
+  transition: transform 0.2s ease;
+  line-height: 1;
+}
+.section-collapse-btn.collapsed {
+  transform: rotate(-90deg);
+}
+.section-body {
+  transition: none;
+}
+.section-body.collapsed {
+  display: none;
+}
+
 
 </style>
 </head>
@@ -490,6 +510,8 @@
   <div class="leveraged-section" id="leveragedSection">
     <div class="leveraged-header">
       <div class="leveraged-title-row">
+        <button class="section-collapse-btn" id="leveragedCollapseBtn" title="Collapse">▼</button>
+<span style="font-size:1rem;">⚡</span>
         <span style="font-size:1rem;">⚡</span>
         <h3 class="leveraged-title">TQQQ / SQQQ Tracker</h3>
         <span class="leveraged-sub" id="leveragedSub">Loading…</span>
@@ -508,14 +530,16 @@
       </div>
     </div>
     
-    <!-- Live stat cards -->
-    <div class="leveraged-stats-grid" id="leveragedStatsGrid"></div>
-    
-    <!-- Entries table with outcomes -->
-    <div class="leveraged-table-wrap" id="leveragedTableWrap">
-      <div class="leveraged-empty">Loading…</div>
+    <div class="section-body" id="leveragedBody">
+      <!-- Live stat cards -->
+      <div class="leveraged-stats-grid" id="leveragedStatsGrid"></div>
+      
+      <!-- Entries table with outcomes -->
+      <div class="leveraged-table-wrap" id="leveragedTableWrap">
+        <div class="leveraged-empty">Loading…</div>
+      </div>
     </div>
-  </div>
+  </div><!-- end leveragedSection -->
 
 
 
@@ -1282,6 +1306,20 @@ if (col === 'rvol25m') { const r=entry.outcomes?.outcome_25m?.rvolAtCheck; if(!r
   let levSortDir = 'desc';
  
   const $ = id => document.getElementById(id);
+
+  // Collapse toggle
+$('leveragedCollapseBtn').addEventListener('click', () => {
+  const btn = $('leveragedCollapseBtn');
+  const body = $('leveragedBody');
+  btn.classList.toggle('collapsed');
+  body.classList.toggle('collapsed');
+  localStorage.setItem('sj_lev_collapsed', btn.classList.contains('collapsed') ? '1' : '0');
+});
+// Restore collapse state
+if (localStorage.getItem('sj_lev_collapsed') === '1') {
+  $('leveragedCollapseBtn').classList.add('collapsed');
+  $('leveragedBody').classList.add('collapsed');
+}
  
   // Outcome keys to display (matching weekly-logger intervals)
   const LEV_OUTCOME_KEYS = [

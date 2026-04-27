@@ -435,7 +435,7 @@
         ` + todayAlerts.map(a => {
           const pct = a.pctAtSignal || a.pct15m || a.pct30m || a.pct1h || 0;
           const peak = a.peakAfterPush != null ? Math.round(a.peakAfterPush * 10) / 10 : null;
-          const isWin = peak != null && peak >= 3;
+          const isWin = peak != null && peak >= 2.95;
           const isDud = peak != null && peak < 3;
           const peakStr = peak != null ? `+${peak.toFixed(1)}%` : "—";
           const peakColor = isWin ? "#4ade80" : isDud && peak >= 0 ? "#fbbf24" : isDud ? "#ef4444" : "rgba(255,255,255,0.3)";

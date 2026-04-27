@@ -342,7 +342,7 @@
         const sjColor = sj >= 75 ? "#4ade80" : sj >= 60 ? "#e2e8f0" : "#64748b";
   
         const wP = todayAlerts.filter(a => a.peakAfterPush != null);
-        const w3 = wP.filter(a => a.peakAfterPush >= 3).length;
+        const w3 = wP.filter(a => a.peakAfterPush >= 2.95).length;
         const wr = wP.length > 0 ? Math.round(w3 / wP.length * 100) : 0;
         const statsStr = wP.length > 0 ? `${w3}/${wP.length} hit +3% (${wr}%)` : `${todayAlerts.length} alert${todayAlerts.length !== 1 ? "s" : ""} today`;
   
@@ -399,7 +399,7 @@
     else if (mode === "crypto") todayAlerts = todayAlerts.filter(a => a.mode === "crypto");
 
     const withPeak = todayAlerts.filter(a => a.peakAfterPush != null);
-    const winners = withPeak.filter(a => a.peakAfterPush >= 3).length;
+    const winners = withPeak.filter(a => a.peakAfterPush >= 2.95).length;
     const duds = withPeak.filter(a => a.peakAfterPush < 0).length;
     const neverRed = withPeak.filter(a => a.peakAfterPush >= 0).length;
     const avgPeak = withPeak.length > 0 ? Math.round(withPeak.reduce((s, a) => s + (a.peakAfterPush || 0), 0) / withPeak.length * 10) / 10 : 0;

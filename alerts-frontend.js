@@ -400,7 +400,7 @@
 
     const withPeak = todayAlerts.filter(a => a.peakAfterPush != null);
     const winners = withPeak.filter(a => a.peakAfterPush >= 3).length;
-    const duds = withPeak.filter(a => a.peakAfterPush < 3).length;
+    const duds = withPeak.filter(a => a.peakAfterPush < 0).length;
     const neverRed = withPeak.filter(a => a.peakAfterPush >= 0).length;
     const avgPeak = withPeak.length > 0 ? Math.round(withPeak.reduce((s, a) => s + (a.peakAfterPush || 0), 0) / withPeak.length * 10) / 10 : 0;
     const winRate = withPeak.length > 0 ? Math.round((winners / withPeak.length) * 100) : 0;

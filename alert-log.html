@@ -11,22 +11,90 @@
   <link rel="apple-touch-icon" href="/StockJelli-Social-Logo.png">
   <link rel="stylesheet" href="style.css">
   <meta name="theme-color" content="#0d1117">
-  <!-- Google Analytics -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-FM3HXT7ECV"></script>
   <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date());gtag('config','G-FM3HXT7ECV',{anonymize_ip:true});</script>
   <style>
     .log-page { max-width: 900px; margin: 0 auto; padding: 20px; }
     .log-back { display: inline-flex; align-items: center; gap: 6px; color: rgba(255,255,255,0.4); text-decoration: none; font-size: 0.8rem; margin-bottom: 16px; transition: color 0.15s; }
     .log-back:hover { color: rgba(255,255,255,0.7); }
-    .log-page-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; flex-wrap: wrap; gap: 12px; }
+    .log-page-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; flex-wrap: wrap; gap: 12px; }
     .log-page-title { font-size: 1.3rem; font-weight: 800; color: rgb(255,251,0); margin: 0; letter-spacing: 0.04em; text-transform: uppercase; }
     .log-page-sub { font-size: 0.78rem; color: rgba(255,255,255,0.35); margin: 4px 0 0; }
 
+    /* ── Version comparison bar ── */
+    .version-compare {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 12px; margin-bottom: 18px;
+    }
+    .version-card {
+      background: rgba(18,24,38,0.88);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 12px; padding: 16px; cursor: pointer;
+      transition: border-color 0.15s, background 0.15s;
+      position: relative;
+    }
+    .version-card:hover { background: rgba(18,24,38,1); }
+    .version-card.version-active {
+      border-color: rgba(77,163,255,0.4);
+      background: rgba(77,163,255,0.04);
+    }
+    .version-card-head {
+      display: flex; align-items: center; gap: 8px; margin-bottom: 10px;
+    }
+    .version-badge {
+      display: inline-block; padding: 2px 8px; border-radius: 6px;
+      font-size: 0.6rem; font-weight: 700; letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    .version-badge-legacy {
+      background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.35);
+    }
+    .version-badge-current {
+      background: rgba(34,197,94,0.12); color: #4ade80;
+      border: 1px solid rgba(34,197,94,0.2);
+    }
+    .version-card-name {
+      font-size: 0.88rem; font-weight: 700; color: #e6edf3;
+    }
+    .version-card-desc {
+      font-size: 0.68rem; color: rgba(255,255,255,0.3); margin-bottom: 12px; line-height: 1.4;
+    }
+    .version-stats-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;
+    }
+    .version-stat {
+      text-align: center; padding: 8px 4px;
+      background: rgba(0,0,0,0.2); border-radius: 8px;
+    }
+    .version-stat-val {
+      font-size: 1.1rem; font-weight: 800; font-variant-numeric: tabular-nums;
+    }
+    .version-stat-lbl {
+      font-size: 0.55rem; color: rgba(255,255,255,0.25);
+      text-transform: uppercase; letter-spacing: 0.03em; margin-top: 2px;
+    }
+    .version-empty-note {
+      font-size: 0.72rem; color: rgba(255,255,255,0.2);
+      text-align: center; padding: 12px 0; font-style: italic;
+    }
+
+    /* ── Toggles row ── */
+    .log-toggles {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 16px; flex-wrap: wrap; gap: 8px;
+    }
+    .log-toggles-label {
+      font-size: 0.72rem; color: rgba(255,255,255,0.25); font-weight: 600;
+      text-transform: uppercase; letter-spacing: 0.04em;
+    }
+
+    /* ── Stats bar ── */
     .log-overall-stats { display: flex; gap: 12px; margin-bottom: 20px; }
     .log-overall-stat { flex: 1; background: rgba(18,24,38,0.88); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; padding: 14px 10px; text-align: center; }
     .log-overall-val { font-size: 1.6rem; font-weight: 800; color: #f9fafb; font-variant-numeric: tabular-nums; }
     .log-overall-lbl { font-size: 0.62rem; color: rgba(255,255,255,0.3); text-transform: uppercase; letter-spacing: 0.04em; margin-top: 4px; }
 
+    /* ── Table ── */
     .log-table-wrap { background: rgba(18,24,38,0.88); border: 1px solid rgba(255,255,255,0.06); border-radius: 14px; overflow: hidden; }
     .log-row-header { display: grid; grid-template-columns: 90px 80px 1fr 80px 50px 50px; padding: 10px 16px; font-size: 0.65rem; font-weight: 600; color: rgba(255,255,255,0.3); text-transform: uppercase; letter-spacing: 0.04em; border-bottom: 1px solid rgba(255,255,255,0.06); }
     .log-row { display: grid; grid-template-columns: 90px 80px 1fr 80px 50px 50px; align-items: center; padding: 10px 16px; font-size: 0.78rem; border-bottom: 1px solid rgba(255,255,255,0.04); transition: background 0.1s; }
@@ -43,9 +111,21 @@
     .log-loading { padding: 40px; text-align: center; color: rgba(255,255,255,0.3); font-size: 0.82rem; }
     .log-disclaimer { margin-top: 16px; font-size: 0.62rem; color: rgba(255,255,255,0.1); text-align: center; }
 
+    /* ── Row version tag ── */
+    .log-row-vtag {
+      display: inline-block; font-size: 0.5rem; font-weight: 700;
+      padding: 1px 4px; border-radius: 3px; margin-left: 4px;
+      vertical-align: middle; letter-spacing: 0.02em;
+    }
+    .log-row-vtag-v1 { background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.2); }
+    .log-row-vtag-v2 { background: rgba(34,197,94,0.12); color: #4ade80; }
+
     @media (max-width: 640px) {
       .log-page { padding: 14px; }
       .log-page-title { font-size: 1rem; }
+      .version-compare { grid-template-columns: 1fr; }
+      .version-stats-grid { grid-template-columns: repeat(3, 1fr); }
+      .version-stat-val { font-size: 0.95rem; }
       .log-overall-stats { gap: 6px; }
       .log-overall-stat { padding: 10px 6px; }
       .log-overall-val { font-size: 1.2rem; }
@@ -57,7 +137,6 @@
 </head>
 <body>
 
-  <!-- Minimal header -->
   <header class="header">
     <div class="header-inner">
       <div class="header-left">
@@ -77,11 +156,45 @@
         <h1 class="log-page-title">📋 Alert Performance Log</h1>
         <p class="log-page-sub">Every momentum alert we've sent, with tracked outcomes.</p>
       </div>
+    </div>
+
+    <!-- Version comparison cards -->
+    <div class="version-compare" id="versionCompare">
+      <div class="version-card" id="versionCardV1" data-version="v1">
+        <div class="version-card-head">
+          <span class="version-badge version-badge-legacy">v1 Legacy</span>
+          <span class="version-card-name">Original Formula</span>
+        </div>
+        <div class="version-card-desc">15m confirmation with 20m/30m gates. Ran Apr 20 – Apr 30.</div>
+        <div class="version-stats-grid" id="v1Stats">
+          <div class="version-stat"><div class="version-stat-val" style="color:rgba(255,255,255,0.3)">—</div><div class="version-stat-lbl">Alerts</div></div>
+          <div class="version-stat"><div class="version-stat-val" style="color:rgba(255,255,255,0.3)">—</div><div class="version-stat-lbl">Hit +3%</div></div>
+          <div class="version-stat"><div class="version-stat-val" style="color:rgba(255,255,255,0.3)">—</div><div class="version-stat-lbl">Never Red</div></div>
+        </div>
+      </div>
+      <div class="version-card version-active" id="versionCardV2" data-version="v2">
+        <div class="version-card-head">
+          <span class="version-badge version-badge-current">v2 Current</span>
+          <span class="version-card-name">Optimized Formula</span>
+        </div>
+        <div class="version-card-desc">15m instant send · accel ≥ 2.0 · &lt;$10B mcap. 91.7% backtested.</div>
+        <div class="version-stats-grid" id="v2Stats">
+          <div class="version-stat"><div class="version-stat-val" style="color:rgba(255,255,255,0.3)">—</div><div class="version-stat-lbl">Alerts</div></div>
+          <div class="version-stat"><div class="version-stat-val" style="color:rgba(255,255,255,0.3)">—</div><div class="version-stat-lbl">Hit +3%</div></div>
+          <div class="version-stat"><div class="version-stat-val" style="color:rgba(255,255,255,0.3)">—</div><div class="version-stat-lbl">Never Red</div></div>
+        </div>
+        <div class="version-empty-note" id="v2EmptyNote" style="display:none">Collecting live data — first alerts appear tomorrow.</div>
+      </div>
+    </div>
+
+    <!-- Toggles row -->
+    <div class="log-toggles">
       <div class="segmented segmented-small" id="logToggle" role="tablist">
         <button class="segmented-btn segmented-on" type="button" data-value="all" role="tab">All</button>
         <button class="segmented-btn" type="button" data-value="stocks" role="tab">Stocks</button>
         <button class="segmented-btn" type="button" data-value="crypto" role="tab">Crypto</button>
       </div>
+      <span class="log-toggles-label" id="versionLabel">Showing: v2 Current</span>
     </div>
 
     <!-- Overall stats -->
@@ -108,46 +221,134 @@
   <script>
     const API_BASE = "https://api.stockjelli.com";
     let logData = null;
-    let logMode = "all";
+    let logMode = "all";       // all | stocks | crypto
+    let logVersion = "v2";     // v1 | v2
 
     async function fetchLog() {
       try {
         const res = await fetch(`${API_BASE}/api/notification-log?limit=500`);
         if (!res.ok) return;
         logData = await res.json();
+        renderVersionCards();
         renderLog();
       } catch (e) {
         document.getElementById("logBody").innerHTML = '<div class="log-empty">Failed to load alert data.</div>';
       }
     }
 
-    function renderLog() {
-      if (!logData) return;
-      let alerts = logData.notifications || [];
-      if (logMode === "stocks") alerts = alerts.filter(a => a.mode === "stocks");
-      else if (logMode === "crypto") alerts = alerts.filter(a => a.mode === "crypto");
+    // ── Helpers ──
+    function isV2(a) { return a.formulaVersion === "v2.1"; }
+    function isV1(a) { return !isV2(a); }
 
-      // Stats
+    function computeStats(alerts) {
       const wp = alerts.filter(a => a.peakAfterPush != null);
       const w3 = wp.filter(a => a.peakAfterPush >= 3).length;
       const duds = wp.filter(a => a.peakAfterPush < 3).length;
       const nr = wp.filter(a => a.peakAfterPush >= 0).length;
       const avg = wp.length > 0 ? Math.round(wp.reduce((s, a) => s + (a.peakAfterPush || 0), 0) / wp.length * 10) / 10 : 0;
       const wr = wp.length > 0 ? Math.round(w3 / wp.length * 100) : 0;
+      return { total: alerts.length, wp: wp.length, w3, duds, nr, avg, wr };
+    }
 
-      const statsEl = document.getElementById("logStats");
-      statsEl.innerHTML = `
-        <div class="log-overall-stat"><div class="log-overall-val">${alerts.length}</div><div class="log-overall-lbl">Total Alerts</div></div>
-        <div class="log-overall-stat"><div class="log-overall-val" style="color:#22c55e">${wr}%</div><div class="log-overall-lbl">Hit +3%</div></div>
-        <div class="log-overall-stat"><div class="log-overall-val" style="color:#34d399">+${avg}%</div><div class="log-overall-lbl">Avg Peak</div></div>
-        <div class="log-overall-stat"><div class="log-overall-val" style="color:${duds === 0 ? '#22c55e' : '#ef4444'}">${duds}</div><div class="log-overall-lbl">Duds</div></div>
-        <div class="log-overall-stat"><div class="log-overall-val" style="color:${nr === wp.length ? '#22c55e' : '#fbbf24'}">${nr}/${wp.length}</div><div class="log-overall-lbl">Never Red</div></div>
+    // ── Version comparison cards ──
+    function renderVersionCards() {
+      if (!logData) return;
+      const all = logData.notifications || [];
+
+      const v1Alerts = all.filter(isV1);
+      const v2Alerts = all.filter(isV2);
+      const v1s = computeStats(v1Alerts);
+      const v2s = computeStats(v2Alerts);
+
+      // v1 card stats
+      document.getElementById("v1Stats").innerHTML = `
+        <div class="version-stat">
+          <div class="version-stat-val" style="color:#f9fafb">${v1s.total}</div>
+          <div class="version-stat-lbl">Alerts</div>
+        </div>
+        <div class="version-stat">
+          <div class="version-stat-val" style="color:${v1s.wp > 0 ? '#fbbf24' : 'rgba(255,255,255,0.3)'}">${v1s.wp > 0 ? v1s.wr + '%' : '—'}</div>
+          <div class="version-stat-lbl">Hit +3%</div>
+        </div>
+        <div class="version-stat">
+          <div class="version-stat-val" style="color:${v1s.wp > 0 && v1s.nr === v1s.wp ? '#22c55e' : v1s.wp > 0 ? '#fbbf24' : 'rgba(255,255,255,0.3)'}">${v1s.wp > 0 ? v1s.nr + '/' + v1s.wp : '—'}</div>
+          <div class="version-stat-lbl">Never Red</div>
+        </div>
       `;
+
+      // v2 card stats
+      const v2Empty = v2s.total === 0;
+      document.getElementById("v2EmptyNote").style.display = v2Empty ? "" : "none";
+      document.getElementById("v2Stats").innerHTML = v2Empty ? `
+        <div class="version-stat">
+          <div class="version-stat-val" style="color:rgba(255,255,255,0.15)">0</div>
+          <div class="version-stat-lbl">Alerts</div>
+        </div>
+        <div class="version-stat">
+          <div class="version-stat-val" style="color:rgba(255,255,255,0.15)">—</div>
+          <div class="version-stat-lbl">Hit +3%</div>
+        </div>
+        <div class="version-stat">
+          <div class="version-stat-val" style="color:rgba(255,255,255,0.15)">—</div>
+          <div class="version-stat-lbl">Never Red</div>
+        </div>
+      ` : `
+        <div class="version-stat">
+          <div class="version-stat-val" style="color:#f9fafb">${v2s.total}</div>
+          <div class="version-stat-lbl">Alerts</div>
+        </div>
+        <div class="version-stat">
+          <div class="version-stat-val" style="color:#22c55e">${v2s.wr}%</div>
+          <div class="version-stat-lbl">Hit +3%</div>
+        </div>
+        <div class="version-stat">
+          <div class="version-stat-val" style="color:${v2s.nr === v2s.wp ? '#22c55e' : '#fbbf24'}">${v2s.nr}/${v2s.wp}</div>
+          <div class="version-stat-lbl">Never Red</div>
+        </div>
+      `;
+    }
+
+    // ── Main render ──
+    function renderLog() {
+      if (!logData) return;
+      let alerts = logData.notifications || [];
+
+      // Filter by version
+      if (logVersion === "v1") alerts = alerts.filter(isV1);
+      else if (logVersion === "v2") alerts = alerts.filter(isV2);
+
+      // Filter by asset mode
+      if (logMode === "stocks") alerts = alerts.filter(a => a.mode === "stocks");
+      else if (logMode === "crypto") alerts = alerts.filter(a => a.mode === "crypto");
+
+      // Stats bar
+      const s = computeStats(alerts);
+      const statsEl = document.getElementById("logStats");
+      if (alerts.length === 0) {
+        statsEl.innerHTML = "";
+      } else {
+        statsEl.innerHTML = `
+          <div class="log-overall-stat"><div class="log-overall-val">${s.total}</div><div class="log-overall-lbl">Total Alerts</div></div>
+          <div class="log-overall-stat"><div class="log-overall-val" style="color:#22c55e">${s.wr}%</div><div class="log-overall-lbl">Hit +3%</div></div>
+          <div class="log-overall-stat"><div class="log-overall-val" style="color:#34d399">+${s.avg}%</div><div class="log-overall-lbl">Avg Peak</div></div>
+          <div class="log-overall-stat"><div class="log-overall-val" style="color:${s.duds === 0 ? '#22c55e' : '#ef4444'}">${s.duds}</div><div class="log-overall-lbl">Duds</div></div>
+          <div class="log-overall-stat"><div class="log-overall-val" style="color:${s.nr === s.wp ? '#22c55e' : '#fbbf24'}">${s.nr}/${s.wp}</div><div class="log-overall-lbl">Never Red</div></div>
+        `;
+      }
+
+      // Version label
+      const vlabel = document.getElementById("versionLabel");
+      if (vlabel) {
+        vlabel.textContent = logVersion === "v1" ? "Showing: v1 Legacy" : "Showing: v2 Current";
+      }
 
       // Rows
       const body = document.getElementById("logBody");
       if (alerts.length === 0) {
-        body.innerHTML = '<div class="log-empty">No alerts found.</div>';
+        const msg = logVersion === "v2"
+          ? "No v2 alerts yet — first signals arrive tomorrow."
+          : "No alerts found.";
+        body.innerHTML = `<div class="log-empty">${msg}</div>`;
         return;
       }
 
@@ -166,10 +367,13 @@
         const tvUrl = a.mode === "crypto" ? `https://www.tradingview.com/chart/?symbol=BINANCE:${a.symbol}USDT&aff_id=162729` : `https://www.tradingview.com/chart/?symbol=${a.symbol}&aff_id=162729`;
         const sj = a.sjScore || "—";
         const sjColor = sj >= 75 ? "#4ade80" : sj >= 60 ? "#e2e8f0" : "#64748b";
+        const vtag = isV2(a)
+          ? '<span class="log-row-vtag log-row-vtag-v2">v2</span>'
+          : '<span class="log-row-vtag log-row-vtag-v1">v1</span>';
 
         return `<div class="log-row">
           <span class="log-row-date">${date}<br><span style="opacity:0.5">${time}</span></span>
-          <a href="${tvUrl}" target="_blank" rel="noopener" class="log-row-ticker">${modeIcon} ${a.symbol}</a>
+          <a href="${tvUrl}" target="_blank" rel="noopener" class="log-row-ticker">${modeIcon} ${a.symbol}${vtag}</a>
           <span class="log-row-prices">${priceAtPush} → <span style="color:${peakColor}">${peakPriceStr}</span></span>
           <span class="log-row-gain" style="color:${peakColor}">${peakStr}</span>
           <span class="log-row-score" style="color:${sjColor}">${sj}</span>
@@ -178,12 +382,23 @@
       }).join("");
     }
 
-    // Toggle
+    // ── Asset toggle ──
     document.getElementById("logToggle")?.addEventListener("click", e => {
       const btn = e.target.closest(".segmented-btn");
       if (!btn) return;
       logMode = btn.dataset.value;
       document.querySelectorAll("#logToggle .segmented-btn").forEach(b => b.classList.toggle("segmented-on", b.dataset.value === logMode));
+      renderLog();
+    });
+
+    // ── Version card toggle ──
+    document.getElementById("versionCompare")?.addEventListener("click", e => {
+      const card = e.target.closest(".version-card");
+      if (!card) return;
+      const ver = card.dataset.version;
+      if (!ver) return;
+      logVersion = ver;
+      document.querySelectorAll(".version-card").forEach(c => c.classList.toggle("version-active", c.dataset.version === ver));
       renderLog();
     });
 

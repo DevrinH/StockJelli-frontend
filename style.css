@@ -4060,3 +4060,40 @@ tr.sj-alerted:hover {
   will-change: transform, opacity;
   position: relative;
 }
+
+/* ═══════════════════════════════════════════════════
+   FLIP ANIMATION — Number Flash + Row Transitions
+   Add to the end of style.css
+   ═══════════════════════════════════════════════════ */
+
+/* Number flash on value change */
+@keyframes numFlashUp {
+  0%   { background: rgba(34, 197, 94, 0.25); }
+  100% { background: transparent; }
+}
+@keyframes numFlashDown {
+  0%   { background: rgba(239, 68, 68, 0.25); }
+  100% { background: transparent; }
+}
+
+.num-flash-up {
+  animation: numFlashUp 600ms ease-out;
+  border-radius: 4px;
+}
+.num-flash-down {
+  animation: numFlashDown 600ms ease-out;
+  border-radius: 4px;
+}
+
+/* Ensure rows can animate transforms without layout issues */
+#stocksTbody tr[data-symbol],
+#cryptoTbody tr[data-symbol] {
+  will-change: transform, opacity;
+  position: relative;
+}
+
+/* Alert log rows — FLIP animation support */
+.alert-log-row[data-alert-sym] {
+  will-change: transform, opacity;
+  position: relative;
+}

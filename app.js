@@ -1,5 +1,3 @@
-///app.st frontend
-
 (() => {
   if (window.__STOCKJELLI_APP_INIT__) return;
   window.__STOCKJELLI_APP_INIT__ = true;
@@ -21,25 +19,21 @@
     },
   };
 
-  const CRYPTO_MCAP_MIN = 5e7;   // 50M (was 200M)
-  const CRYPTO_MCAP_MAX = 1e11;  // 100B
-
-
-    // Add these for stocks:
-  const STOCK_MCAP_MIN = 1e8;    // 100M
-  const STOCK_MCAP_MAX = 5e11;   // 500B
+  const CRYPTO_MCAP_MIN = 5e7;
+  const CRYPTO_MCAP_MAX = 1e11;
+  const STOCK_MCAP_MIN = 1e8;
+  const STOCK_MCAP_MAX = 5e11;
 
   // Track last visit for "new since last visit" markers
-const LAST_VISIT_KEY = "stockjelli_last_visit";
-const previousVisitTime = localStorage.getItem(LAST_VISIT_KEY) || null;
-// Update last visit to NOW so next visit compares against this one
-localStorage.setItem(LAST_VISIT_KEY, new Date().toISOString());
+  const LAST_VISIT_KEY = "stockjelli_last_visit";
+  const previousVisitTime = localStorage.getItem(LAST_VISIT_KEY) || null;
+  localStorage.setItem(LAST_VISIT_KEY, new Date().toISOString());
 
+  // Apply subscriber class to body
+  if (localStorage.getItem("sj_subscriber_email")) {
+    document.body.classList.add("sj-subscriber");
+  }
 
-// Apply subscriber class to body
-if (localStorage.getItem("sj_subscriber_email")) {
-  document.body.classList.add("sj-subscriber");
-}
   // ----------------------------
   // Helpers
   // ----------------------------
@@ -109,73 +103,58 @@ if (localStorage.getItem("sj_subscriber_email")) {
     const t = clamp(dial0to1000, 0, 1000) / 1000;
     const logMin = Math.log10(CRYPTO_MCAP_MIN);
     const logMax = Math.log10(CRYPTO_MCAP_MAX);
-    const logVal = logMin + (logMax - logMin) * t;
-    return Math.round(Math.pow(10, logVal));
+    return Math.round(Math.pow(10, logMin + (logMax - logMin) * t));
   }
-
 
   function stockMcapFromDial(dial0to1000) {
     const t = clamp(dial0to1000, 0, 1000) / 1000;
     const logMin = Math.log10(STOCK_MCAP_MIN);
     const logMax = Math.log10(STOCK_MCAP_MAX);
-    const logVal = logMin + (logMax - logMin) * t;
-    return Math.round(Math.pow(10, logVal));
+    return Math.round(Math.pow(10, logMin + (logMax - logMin) * t));
   }
+
   // ----------------------------
-  // DOM refs (match your HTML)
+  // DOM refs
   // ----------------------------
   const assetControl = document.getElementById("assetControl");
-
   const stocksTable = document.getElementById("stocksTable");
   const cryptoTable = document.getElementById("cryptoTable");
-
   const heroChartStocks = document.getElementById("heroChartStocks");
   const heroChartCrypto = document.getElementById("heroChartCrypto");
-
   const idxWrap = document.querySelector(".market-indices");
   const idxLeftLabel = document.getElementById("idxLeftLabel");
   const idxLeftValue = document.getElementById("idxLeftValue");
   const idxRightLabel = document.getElementById("idxRightLabel");
   const idxRightValue = document.getElementById("idxRightValue");
-
   let lastCryptoMcapMin = null;
 
-  // Filter UI pieces you actually have
   const filterEls = {
     mcapLabel: document.getElementById("mcapLabel"),
     mcapRange: document.getElementById("mcapRange"),
-
     mcapPillStocks: document.getElementById("mcapPillStocks"),
     mcapNumStocks: document.getElementById("mcapNumStocks"),
-
     mcapPillCrypto: document.getElementById("mcapPillCrypto"),
     mcapTextCrypto: document.getElementById("mcapTextCrypto"),
-
     mcapMetaLeft: document.getElementById("mcapMetaLeft"),
     mcapMetaRight: document.getElementById("mcapMetaRight"),
-
     priceRange: document.getElementById("priceRange"),
     volRange: document.getElementById("volRange"),
     newsRequiredChk: document.getElementById("newsRequiredChk"),
     highVolChk: document.getElementById("highVolChk"),
-
     applyBtn: document.getElementById("filtersApplyBtn"),
     resetBtn: document.getElementById("filtersResetBtn"),
   };
 
-  // Price pill input (no id in HTML) - grab it by location
   const priceCard = filterEls.priceRange?.closest(".filter-card");
   const priceNum = priceCard?.querySelector(".pill .num") || null;
   const priceMetaLeft = priceCard?.querySelector(".filter-meta .muted:first-child") || null;
   const priceMetaRight = priceCard?.querySelector(".filter-meta .muted:last-child") || null;
 
-  // Volume pill input (no id in HTML)
   const volCard = filterEls.volRange?.closest(".filter-card");
   const volNum = volCard?.querySelector(".pill .num") || null;
   const volMetaLeft = volCard?.querySelector(".filter-meta .muted:first-child") || null;
   const volMetaRight = volCard?.querySelector(".filter-meta .muted:last-child") || null;
 
-  // Helper to format volume for display
   function fmtVolume(n) {
     if (!Number.isFinite(n)) return "0";
     if (n >= 1e6) return `${(n / 1e6).toFixed(n % 1e6 === 0 ? 0 : 1)}M`;
@@ -184,10 +163,9 @@ if (localStorage.getItem("sj_subscriber_email")) {
   }
 
   // ----------------------------
-  // Renderers
+  // Renderers (cell-level)
   // ----------------------------
-  
-  // Format volume as compact (248,448,229 → 248M)
+
   function fmtVolumeCompact(n) {
     if (n === null || n === undefined || Number.isNaN(Number(n))) return "—";
     const v = Number(n);
@@ -197,447 +175,447 @@ if (localStorage.getItem("sj_subscriber_email")) {
     return String(Math.round(v));
   }
 
-  // Generate the "sideways candle" range indicator HTML
-  // Shows: L ──────●──────── H with dot position based on current price
   function renderRangeIndicator(low, high, current) {
-    // If we don't have valid data, return empty
-    if (low === null || high === null || current === null) {
+    if (low === null || high === null || current === null)
       return '<span class="range-indicator range-na">—</span>';
-    }
-    
-    const lo = Number(low);
-    const hi = Number(high);
-    const cur = Number(current);
-    
-    if (!Number.isFinite(lo) || !Number.isFinite(hi) || !Number.isFinite(cur)) {
+    const lo = Number(low), hi = Number(high), cur = Number(current);
+    if (!Number.isFinite(lo) || !Number.isFinite(hi) || !Number.isFinite(cur))
       return '<span class="range-indicator range-na">—</span>';
-    }
-    
-    // Calculate position (0 = at low, 1 = at high)
     let position = 0.5;
-    if (hi !== lo) {
-      position = (cur - lo) / (hi - lo);
-      position = Math.max(0, Math.min(1, position)); // clamp 0-1
-    }
-    
-    // Convert to percentage for CSS
+    if (hi !== lo) position = Math.max(0, Math.min(1, (cur - lo) / (hi - lo)));
     const pct = Math.round(position * 100);
-    
-    // Determine color class based on position
-    // Near high (>70%) = bullish/green, near low (<30%) = bearish/red, middle = neutral
-    let posClass = "range-mid";
-    if (pct >= 70) posClass = "range-high";
-    else if (pct <= 30) posClass = "range-low";
-    
-    return `
-      <span class="range-indicator ${posClass}" title="L: ${fmtUsd(lo, 2)} | H: ${fmtUsd(hi, 2)} | Now: ${fmtUsd(cur, 2)}">
-        <span class="range-track">
-          <span class="range-dot" style="left: ${pct}%"></span>
-        </span>
-      </span>
-    `;
+    const posClass = pct >= 70 ? "range-high" : pct <= 30 ? "range-low" : "range-mid";
+    return `<span class="range-indicator ${posClass}" title="L: ${fmtUsd(lo, 2)} | H: ${fmtUsd(hi, 2)} | Now: ${fmtUsd(cur, 2)}"><span class="range-track"><span class="range-dot" style="left: ${pct}%"></span></span></span>`;
   }
 
-  // Generate news HTML with tier styling
   function renderNewsCell(news) {
-    if (!Array.isArray(news) || news.length === 0) {
-      return '<span class="news-none">—</span>';
-    }
-    
-    // Get the best (lowest tier) news item
+    if (!Array.isArray(news) || news.length === 0) return '<span class="news-none">—</span>';
     const item = news[0];
     if (!item) return '<span class="news-none">—</span>';
-    
     const source = item.source || "News";
     const tier = item.tier || 3;
     const tierClass = tier === 1 ? "news-tier1" : tier === 2 ? "news-tier2" : "news-tier3";
-    
-    if (item.url) {
-      return `<a class="news-source ${tierClass}" href="${item.url}" target="_blank" rel="noopener" title="${item.title || source}">${source}</a>`;
-    }
+    if (item.url) return `<a class="news-source ${tierClass}" href="${item.url}" target="_blank" rel="noopener" title="${item.title || source}">${source}</a>`;
     return `<span class="news-source ${tierClass}" title="${item.title || ''}">${source}</span>`;
   }
 
-  // "NEW" badge for tickers that entered since user's last visit
   function renderNewBadge(enteredAt) {
     if (!previousVisitTime || !enteredAt) return "";
-    
     try {
-      const enteredTime = new Date(enteredAt).getTime();
-      const lastVisit = new Date(previousVisitTime).getTime();
-      
-      if (enteredTime > lastVisit) {
+      if (new Date(enteredAt).getTime() > new Date(previousVisitTime).getTime())
         return ' <span class="new-badge-corner" title="New since last visit"></span>';
-      }
-    } catch (e) {
-      // Invalid date, skip
-    }
-    
+    } catch (e) {}
     return "";
   }
 
-// SJ Score cell renderer
-// Top 3 rows show score, rest are blurred for non-subscribers
-// SJ Score cell renderer
-// Checks localStorage for subscriber status
-function renderSJScore(score, idx) {
-  if (score === null || score === undefined) return '<span class="sj-cell sj-na">—</span>';
-  
-  const s = Number(score);
-  let tier = "sj-low";
-  let icon = "";
-  if (s >= 75) { tier = "sj-high"; icon = " 🔥"; }
-  else if (s >= 60) { tier = "sj-mid"; }
-  
-  // Check if subscriber (unlocked)
-  const isUnlocked = !!localStorage.getItem("sj_subscriber_email");
-  
-  // First 3 rows OR subscriber: always visible
-  if (idx < 3 || isUnlocked) {
-    return `<span class="sj-cell ${tier}" title="SJ Momentum Strength Score">${s}${icon}</span>`;
-  }
-  
-  // Rows 4+: blurred with unlock prompt
-  return `<span class="sj-cell sj-blurred-wrap">
-    <span class="sj-blurred ${tier}">${s}${icon}</span>
-    <button class="sj-unlock-btn" title="Unlock all SJ Scores">🔒</button>
-  </span>`;
-}
-
-// ── Market Regime Indicator ──────────────────────────────────────────────
-// ── REGIME CONFIG ────────────────────────────────────────────────────────────
-// Each regime has a color, BPM (visual heartbeat speed), and EKG waveform params
-const REGIME_CONFIG = {
-  expansion: {
-    color: "#22c55e",
-    colorRgb: "34, 197, 94",
-    bpm: 62,
-    amplitude: 0.35,     // calm, smooth wave
-    frequency: 0.07,
-    spikeStrength: 0.25,
-    noise: 0.02,
-    label: "Expansion",
-  },
-  rotation: {
-    color: "#3b82f6",
-    colorRgb: "59, 130, 246",
-    bpm: 78,
-    amplitude: 0.45,
-    frequency: 0.10,
-    spikeStrength: 0.35,
-    noise: 0.05,
-    label: "Rotation",
-  },
-  caution: {
-    color: "#f59e0b",
-    colorRgb: "245, 158, 11",
-    bpm: 95,
-    amplitude: 0.55,
-    frequency: 0.15,
-    spikeStrength: 0.45,
-    noise: 0.10,
-    label: "Caution",
-  },
-  contraction: {
-    color: "#ef4444",
-    colorRgb: "239, 68, 68",
-    bpm: 120,
-    amplitude: 0.75,
-    frequency: 0.22,
-    spikeStrength: 0.6,
-    noise: 0.18,
-    label: "Contraction",
-  },
-};
-
-
-// ── REPLACE renderRegime() in app.js with this ──────────────────────────────
-// Copy this function and replace the existing renderRegime(regime) in app.js
-
-function renderRegime(regime) {
-  const bar = document.getElementById("regimeBar");
-  const desc = document.getElementById("regimeDescription");
-  const subDetail = document.getElementById("regimeSubDetail");
-  const bpmNumber = document.getElementById("pulseBpmNumber");
-  const bpmDot = document.getElementById("pulseBpmDot");
-  const pulseInner = document.querySelector(".pulse-inner");
-
-  if (!bar || !regime) return;
-
-  const regimeKey = regime.regime || "rotation";
-  const config = REGIME_CONFIG[regimeKey] || REGIME_CONFIG.rotation;
-
-  // Update active segment (works with both old .regime-segment and new .pulse-regime-seg)
-  bar.querySelectorAll("[data-regime]").forEach(seg => {
-    seg.classList.toggle("regime-active", seg.dataset.regime === regimeKey);
-  });
-
-  // Update description
-  if (desc) {
-    desc.textContent = regime.description || "Analyzing market conditions…";
+  function renderSJScore(score, idx) {
+    if (score === null || score === undefined) return '<span class="sj-cell sj-na">—</span>';
+    const s = Number(score);
+    let tier = "sj-low", icon = "";
+    if (s >= 75) { tier = "sj-high"; icon = " 🔥"; }
+    else if (s >= 60) { tier = "sj-mid"; }
+    const isUnlocked = !!localStorage.getItem("sj_subscriber_email");
+    if (idx < 3 || isUnlocked)
+      return `<span class="sj-cell ${tier}" title="SJ Momentum Strength Score">${s}${icon}</span>`;
+    return `<span class="sj-cell sj-blurred-wrap"><span class="sj-blurred ${tier}">${s}${icon}</span><button class="sj-unlock-btn" title="Unlock all SJ Scores">🔒</button></span>`;
   }
 
-  // Update BPM display
-  if (bpmNumber) {
-    bpmNumber.textContent = String(config.bpm);
-  }
+  // ── Market Regime Config ──
+  const REGIME_CONFIG = {
+    expansion:   { color: "#22c55e", colorRgb: "34, 197, 94",   bpm: 62,  amplitude: 0.35, frequency: 0.07, spikeStrength: 0.25, noise: 0.02, label: "Expansion" },
+    rotation:    { color: "#3b82f6", colorRgb: "59, 130, 246",  bpm: 78,  amplitude: 0.45, frequency: 0.10, spikeStrength: 0.35, noise: 0.05, label: "Rotation" },
+    caution:     { color: "#f59e0b", colorRgb: "245, 158, 11",  bpm: 95,  amplitude: 0.55, frequency: 0.15, spikeStrength: 0.45, noise: 0.10, label: "Caution" },
+    contraction: { color: "#ef4444", colorRgb: "239, 68, 68",   bpm: 120, amplitude: 0.75, frequency: 0.22, spikeStrength: 0.6,  noise: 0.18, label: "Contraction" },
+  };
 
-  // Set CSS custom property for pulse color
-  if (pulseInner) {
-    pulseInner.style.setProperty("--pulse-color", config.color);
-  }
-  if (bpmDot) {
-    bpmDot.style.background = config.color;
-    bpmDot.style.boxShadow = `0 0 6px ${config.color}80`;
-  }
-
-  // Start/update BPM dot flash
-  if (bpmDot && config.bpm) {
-    // Clear any existing interval
-    if (window.__pulseBpmInterval) clearInterval(window.__pulseBpmInterval);
-    const beatMs = (60 / config.bpm) * 1000;
-    window.__pulseBpmInterval = setInterval(() => {
-      bpmDot.classList.add("beat");
-      setTimeout(() => bpmDot.classList.remove("beat"), beatMs * 0.3);
-    }, beatMs);
-  }
-
-  // Notify EKG of regime change
-  if (window.__pulseEkgSetRegime) {
-    window.__pulseEkgSetRegime(regimeKey);
-  }
-
-  // Update subscriber detail (same as before)
-  if (subDetail) {
-    const isSubscriber = !!localStorage.getItem("sj_subscriber_email");
-
-    if (isSubscriber) {
-      const impactClass = regime.sjMultiplier > 1
-        ? "regime-impact-positive"
-        : regime.sjMultiplier < 1
-          ? "regime-impact-negative"
-          : "regime-impact-neutral";
-
-      subDetail.innerHTML = `<span class="regime-sub-text ${impactClass}">${regime.sjImpactLabel || ""}</span>`;
-    } else {
-      subDetail.innerHTML = `
-        <span class="regime-locked">
-          🔒 SJ impact hidden · <a href="#" id="regimeUnlockLink">Unlock with alerts →</a>
-        </span>
-      `;
-
-      const link = document.getElementById("regimeUnlockLink");
-      if (link) {
-        link.addEventListener("click", (e) => {
-          e.preventDefault();
-          const alertsBtn = document.getElementById("enableAlertsBtn");
-          if (alertsBtn) alertsBtn.click();
-        });
+  function renderRegime(regime) {
+    const bar = document.getElementById("regimeBar");
+    const desc = document.getElementById("regimeDescription");
+    const subDetail = document.getElementById("regimeSubDetail");
+    const bpmNumber = document.getElementById("pulseBpmNumber");
+    const bpmDot = document.getElementById("pulseBpmDot");
+    const pulseInner = document.querySelector(".pulse-inner");
+    if (!bar || !regime) return;
+    const regimeKey = regime.regime || "rotation";
+    const config = REGIME_CONFIG[regimeKey] || REGIME_CONFIG.rotation;
+    bar.querySelectorAll("[data-regime]").forEach(seg => seg.classList.toggle("regime-active", seg.dataset.regime === regimeKey));
+    if (desc) desc.textContent = regime.description || "Analyzing market conditions…";
+    if (bpmNumber) bpmNumber.textContent = String(config.bpm);
+    if (pulseInner) pulseInner.style.setProperty("--pulse-color", config.color);
+    if (bpmDot) { bpmDot.style.background = config.color; bpmDot.style.boxShadow = `0 0 6px ${config.color}80`; }
+    if (bpmDot && config.bpm) {
+      if (window.__pulseBpmInterval) clearInterval(window.__pulseBpmInterval);
+      const beatMs = (60 / config.bpm) * 1000;
+      window.__pulseBpmInterval = setInterval(() => {
+        bpmDot.classList.add("beat");
+        setTimeout(() => bpmDot.classList.remove("beat"), beatMs * 0.3);
+      }, beatMs);
+    }
+    if (window.__pulseEkgSetRegime) window.__pulseEkgSetRegime(regimeKey);
+    if (subDetail) {
+      const isSubscriber = !!localStorage.getItem("sj_subscriber_email");
+      if (isSubscriber) {
+        const impactClass = regime.sjMultiplier > 1 ? "regime-impact-positive" : regime.sjMultiplier < 1 ? "regime-impact-negative" : "regime-impact-neutral";
+        subDetail.innerHTML = `<span class="regime-sub-text ${impactClass}">${regime.sjImpactLabel || ""}</span>`;
+      } else {
+        subDetail.innerHTML = `<span class="regime-locked">🔒 SJ impact hidden · <a href="#" id="regimeUnlockLink">Unlock with alerts →</a></span>`;
+        document.getElementById("regimeUnlockLink")?.addEventListener("click", (e) => { e.preventDefault(); document.getElementById("enableAlertsBtn")?.click(); });
       }
     }
   }
-}
 
-
-
-  // Generate TradingView URL for a symbol
-// Generate TradingView URL for a symbol (with affiliate link)
-function getTradingViewUrl(symbol, type = "stock") {
-  const affiliateId = "162729";
-  if (type === "crypto") {
-    // For crypto, link to the symbol page with affiliate
-    return `https://www.tradingview.com/chart/?symbol=BINANCE:${symbol}USDT&aff_id=${affiliateId}`;
-  }
-  // For stocks, use default exchange detection with affiliate
-  return `https://www.tradingview.com/chart/?symbol=${symbol}&aff_id=${affiliateId}`;
-}
-
-// Render ticker cell with TradingView hover tooltip (affiliate link)
-function renderTickerCell(symbol, type = "stock", imageUrl = null) {
-  const tvUrl = getTradingViewUrl(symbol, type);
-
-  let logoHtml = "";
-  if (type === "crypto" && imageUrl) {
-    // Crypto: CoinGecko image URL from API response
-    logoHtml = `<img class="ticker-logo" src="${imageUrl}" alt="" loading="lazy" onerror="this.dataset.failed='true'">`;
-  } else if (type === "stock" && symbol && symbol !== "—") {
-    // Stocks: FMP image CDN — free, no API key needed
-    const fmpLogoUrl = `https://financialmodelingprep.com/image-stock/${encodeURIComponent(symbol)}.png`;
-    logoHtml = `<img class="ticker-logo" src="${fmpLogoUrl}" alt="" loading="lazy" onerror="this.dataset.failed='true'">`;
+  function getTradingViewUrl(symbol, type = "stock") {
+    const aff = "162729";
+    return type === "crypto"
+      ? `https://www.tradingview.com/chart/?symbol=BINANCE:${symbol}USDT&aff_id=${aff}`
+      : `https://www.tradingview.com/chart/?symbol=${symbol}&aff_id=${aff}`;
   }
 
-  return `
-    <span class="ticker-wrap">
-      ${logoHtml}<span class="ticker-symbol">${symbol}</span>
-      <a class="ticker-tv-link" href="${tvUrl}" target="_blank" rel="noopener" title="Open ${symbol} on TradingView">
-        <span class="ticker-tv-tooltip">Open in TradingView ↗</span>
-      </a>
-    </span>
-  `;
-}
-
-function renderWhaleIndicator(volume, avgVolume, marketCap, pctChange, rangePosition, mode) {
-  if (!volume || !marketCap || marketCap === 0) return "";
-
-  const pct = Math.abs(pctChange || 0);
-  const rangePosVal = rangePosition ?? 0.5;
-  const volMcapRatio = volume / marketCap;
-
-  let isWhale = false;
-
-  if (mode === "stock") {
-    const rvol = (avgVolume && avgVolume > 0) ? (volume / avgVolume) : 0;
-    isWhale = (
-      rvol >= 5.0 &&
-      volMcapRatio >= 0.03 &&
-      pct >= 8 &&
-      rangePosVal >= 0.50
-    );
-  } else if (mode === "crypto") {
-    isWhale = (
-      volMcapRatio >= 0.50 &&
-      pct >= 10 &&
-      rangePosVal >= 0.50
-    );
-  }
-
-  if (!isWhale) return "";
-
-  // Build tooltip with context
-  const rvolText = (avgVolume && avgVolume > 0)
-    ? `RVOL: ${(volume / avgVolume).toFixed(1)}x`
-    : "";
-  const volMcapText = `Vol/MCap: ${(volMcapRatio * 100).toFixed(1)}%`;
-  const rangeText = `Range: ${Math.round(rangePosVal * 100)}%`;
-  const tooltipParts = [rvolText, volMcapText, rangeText].filter(Boolean).join(" · ");
-
-  return ` <span class="whale-indicator"><span class="liquidity-tooltip" style="--liq-color: rgba(96, 165, 250, 0.4)">Heavy flow detected — unusual institutional-level activity · ${tooltipParts}</span>🐋</span>`;
-}
-
-function renderSinceEntryAttrs(currentPrice, enteredPrice, enteredAt, symbol) {
-  if (!enteredPrice || !currentPrice || !enteredAt) return "";
- 
-  const current = Number(currentPrice);
-  const entry = Number(enteredPrice);
-  if (!Number.isFinite(current) || !Number.isFinite(entry) || entry <= 0) return "";
- 
-  const sincePct = ((current - entry) / entry) * 100;
-  if (Math.abs(sincePct) < 0.3) return "";
- 
-  const sign = sincePct >= 0 ? "+" : "";
-  const sincePctText = `${sign}${sincePct.toFixed(1)}%`;
- 
-  // Format entry price
-  let dec = 2;
-  if (entry > 0 && entry < 0.01) {
-    dec = Math.min(6, Math.max(2, Math.ceil(-Math.log10(entry)) + 1));
-  }
-  const entryPriceText = `$${entry.toFixed(dec)}`;
- 
-  // Time ago
-  let timeAgoText = "";
-  try {
-    const diffMs = Date.now() - new Date(enteredAt).getTime();
-    const mins = Math.floor(diffMs / 60000);
-    if (mins < 1) timeAgoText = "just now";
-    else if (mins < 60) timeAgoText = `${mins}m ago`;
-    else {
-      const h = Math.floor(mins / 60);
-      const m = mins % 60;
-      timeAgoText = m > 0 ? `${h}h ${m}m ago` : `${h}h ago`;
+  function renderTickerCell(symbol, type = "stock", imageUrl = null) {
+    const tvUrl = getTradingViewUrl(symbol, type);
+    let logoHtml = "";
+    if (type === "crypto" && imageUrl) {
+      logoHtml = `<img class="ticker-logo" src="${imageUrl}" alt="" loading="lazy" onerror="this.dataset.failed='true'">`;
+    } else if (type === "stock" && symbol && symbol !== "—") {
+      logoHtml = `<img class="ticker-logo" src="https://financialmodelingprep.com/image-stock/${encodeURIComponent(symbol)}.png" alt="" loading="lazy" onerror="this.dataset.failed='true'">`;
     }
-  } catch (e) {}
- 
-  // Build tooltip lines
-  const line1 = `${sincePctText} since entering screener`;
- 
-  let line2 = "";
-  if (symbol) {
-    const peakPct = getPeakPct(symbol, entry);
-    if (peakPct !== null && peakPct > sincePct + 0.5) {
-      line2 = `Peak: +${peakPct.toFixed(1)}% since entry`;
+    return `<span class="ticker-wrap">${logoHtml}<span class="ticker-symbol">${symbol}</span><a class="ticker-tv-link" href="${tvUrl}" target="_blank" rel="noopener" title="Open ${symbol} on TradingView"><span class="ticker-tv-tooltip">Open in TradingView ↗</span></a></span>`;
+  }
+
+  function renderWhaleIndicator(volume, avgVolume, marketCap, pctChange, rangePosition, mode) {
+    if (!volume || !marketCap || marketCap === 0) return "";
+    const pct = Math.abs(pctChange || 0);
+    const rangePosVal = rangePosition ?? 0.5;
+    const volMcapRatio = volume / marketCap;
+    let isWhale = false;
+    if (mode === "stock") {
+      const rvol = (avgVolume && avgVolume > 0) ? (volume / avgVolume) : 0;
+      isWhale = rvol >= 5.0 && volMcapRatio >= 0.03 && pct >= 8 && rangePosVal >= 0.50;
+    } else if (mode === "crypto") {
+      isWhale = volMcapRatio >= 0.50 && pct >= 10 && rangePosVal >= 0.50;
     }
+    if (!isWhale) return "";
+    const rvolText = (avgVolume && avgVolume > 0) ? `RVOL: ${(volume / avgVolume).toFixed(1)}x` : "";
+    const tooltipParts = [rvolText, `Vol/MCap: ${(volMcapRatio * 100).toFixed(1)}%`, `Range: ${Math.round(rangePosVal * 100)}%`].filter(Boolean).join(" · ");
+    return ` <span class="whale-indicator"><span class="liquidity-tooltip" style="--liq-color: rgba(96, 165, 250, 0.4)">Heavy flow detected — unusual institutional-level activity · ${tooltipParts}</span>🐋</span>`;
   }
- 
-  const line3 = `Entered at ${entryPriceText} · ${timeAgoText}`;
- 
-  const dir = sincePct >= 0 ? "up" : "down";
- 
-  // Single data attribute with all lines — CSS uses \A for line breaks
-  // We separate lines with a pipe character, then CSS replaces in content
-  // Actually simpler: just use data-entry-line1, data-entry-line2, data-entry-line3
-  return ` data-entry-line1="${line1}" data-entry-line2="${line2}" data-entry-line3="${line3}" data-entry-color="${dir}"`;
-}
 
-// Track peak prices since page load (per symbol)
-const peakSinceEntry = new Map();
-
-function updatePeakPrice(symbol, price, enteredPrice) {
-  if (!symbol || !price || !enteredPrice) return;
-  const prev = peakSinceEntry.get(symbol);
-  if (!prev || price > prev) {
-    peakSinceEntry.set(symbol, price);
+  // Track peak prices since page load
+  const peakSinceEntry = new Map();
+  function updatePeakPrice(symbol, price, enteredPrice) {
+    if (!symbol || !price || !enteredPrice) return;
+    const prev = peakSinceEntry.get(symbol);
+    if (!prev || price > prev) peakSinceEntry.set(symbol, price);
   }
-}
+  function getPeakPct(symbol, enteredPrice) {
+    if (!symbol || !enteredPrice) return null;
+    const peak = peakSinceEntry.get(symbol);
+    if (!peak || !Number.isFinite(peak) || enteredPrice <= 0) return null;
+    const pct = ((peak - enteredPrice) / enteredPrice) * 100;
+    return Math.abs(pct) >= 0.3 ? pct : null;
+  }
 
-function getPeakPct(symbol, enteredPrice) {
-  if (!symbol || !enteredPrice) return null;
-  const peak = peakSinceEntry.get(symbol);
-  if (!peak || !Number.isFinite(peak) || enteredPrice <= 0) return null;
-  const pct = ((peak - enteredPrice) / enteredPrice) * 100;
-  return Math.abs(pct) >= 0.3 ? pct : null;
-}
+  function renderSinceEntryAttrs(currentPrice, enteredPrice, enteredAt, symbol) {
+    if (!enteredPrice || !currentPrice || !enteredAt) return "";
+    const current = Number(currentPrice), entry = Number(enteredPrice);
+    if (!Number.isFinite(current) || !Number.isFinite(entry) || entry <= 0) return "";
+    const sincePct = ((current - entry) / entry) * 100;
+    if (Math.abs(sincePct) < 0.3) return "";
+    const sign = sincePct >= 0 ? "+" : "";
+    let dec = 2;
+    if (entry > 0 && entry < 0.01) dec = Math.min(6, Math.max(2, Math.ceil(-Math.log10(entry)) + 1));
+    let timeAgoText = "";
+    try {
+      const mins = Math.floor((Date.now() - new Date(enteredAt).getTime()) / 60000);
+      if (mins < 1) timeAgoText = "just now";
+      else if (mins < 60) timeAgoText = `${mins}m ago`;
+      else { const h = Math.floor(mins / 60), m = mins % 60; timeAgoText = m > 0 ? `${h}h ${m}m ago` : `${h}h ago`; }
+    } catch (e) {}
+    const line1 = `${sign}${sincePct.toFixed(1)}% since entering screener`;
+    let line2 = "";
+    if (symbol) { const pp = getPeakPct(symbol, entry); if (pp !== null && pp > sincePct + 0.5) line2 = `Peak: +${pp.toFixed(1)}% since entry`; }
+    const line3 = `Entered at $${entry.toFixed(dec)} · ${timeAgoText}`;
+    const dir = sincePct >= 0 ? "up" : "down";
+    return ` data-entry-line1="${line1}" data-entry-line2="${line2}" data-entry-line3="${line3}" data-entry-color="${dir}"`;
+  }
 
-function renderSinceEntryMobile(currentPrice, enteredPrice, enteredAt, symbol) {
-  if (!enteredPrice || !currentPrice || !enteredAt) return "";
-  const current = Number(currentPrice);
-  const entry = Number(enteredPrice);
-  if (!Number.isFinite(current) || !Number.isFinite(entry) || entry <= 0) return "";
-  const sincePct = ((current - entry) / entry) * 100;
-  if (Math.abs(sincePct) < 0.3) return "";
-  const sign = sincePct >= 0 ? "+" : "";
-  const dir = sincePct >= 0 ? "up" : "down";
+  function renderSinceEntryMobile(currentPrice, enteredPrice, enteredAt, symbol) {
+    if (!enteredPrice || !currentPrice || !enteredAt) return "";
+    const current = Number(currentPrice), entry = Number(enteredPrice);
+    if (!Number.isFinite(current) || !Number.isFinite(entry) || entry <= 0) return "";
+    const sincePct = ((current - entry) / entry) * 100;
+    if (Math.abs(sincePct) < 0.3) return "";
+    const sign = sincePct >= 0 ? "+" : "", dir = sincePct >= 0 ? "up" : "down";
+    let peakStr = "";
+    if (symbol) { const pp = getPeakPct(symbol, entry); if (pp !== null && pp > sincePct + 0.5) peakStr = ` · pk +${pp.toFixed(1)}%`; }
+    let dec = 2;
+    if (entry > 0 && entry < 0.01) dec = Math.min(6, Math.max(2, Math.ceil(-Math.log10(entry)) + 1));
+    return `<span class="since-entry-mobile ${dir}">${sign}${sincePct.toFixed(1)}%${peakStr} · $${entry.toFixed(dec)}</span>`;
+  }
 
-  let peakStr = "";
-  if (symbol) {
-    const peakPct = getPeakPct(symbol, entry);
-    if (peakPct !== null && peakPct > sincePct + 0.5) {
-      peakStr = ` · pk +${peakPct.toFixed(1)}%`;
+  function renderVolumeFire() { return ""; }
+
+  function renderRvol(volume, avgVolume, marketCap, mode) {
+    if (!volume) return '<span class="rvol-normal">—</span>';
+    if (mode === "stock") {
+      if (avgVolume && avgVolume > 0) {
+        const ratio = volume / avgVolume;
+        let tier = "rvol-normal", suffix = "";
+        if (ratio >= 3.0) { tier = "rvol-hot"; suffix = " 🔥"; }
+        else if (ratio >= 1.5) { tier = "rvol-warm"; }
+        return `<span class="${tier}" title="Volume is ${ratio.toFixed(1)}× the average">${ratio.toFixed(1)}x${suffix}</span>`;
+      }
+      return '<span class="rvol-normal" title="Average volume data unavailable">—</span>';
     }
+    if (mode === "crypto" && marketCap && marketCap > 0) {
+      const ratio = volume / marketCap;
+      let tier = "rvol-normal", suffix = "";
+      if (ratio >= 0.50) { tier = "rvol-hot"; suffix = " 🔥"; }
+      else if (ratio >= 0.15) { tier = "rvol-warm"; }
+      return `<span class="${tier}" title="24h volume is ${ratio.toFixed(2)}× market cap">${ratio.toFixed(1)}x${suffix}</span>`;
+    }
+    return '<span class="rvol-normal">—</span>';
   }
 
-  let dec = 2;
-  if (entry > 0 && entry < 0.01) {
-    dec = Math.min(6, Math.max(2, Math.ceil(-Math.log10(entry)) + 1));
+  function renderRvolRaw(volume, avgVolume, marketCap, mode) {
+    if (!volume) return null;
+    if (mode === "stock" && avgVolume && avgVolume > 0) return `${(volume / avgVolume).toFixed(1)}x`;
+    if (mode === "crypto" && marketCap && marketCap > 0) return `${(volume / marketCap).toFixed(1)}x`;
+    return null;
   }
 
-  return `<span class="since-entry-mobile ${dir}">${sign}${sincePct.toFixed(1)}%${peakStr} · $${entry.toFixed(dec)}</span>`;
-}
-
-
-function renderStocks(rows) {
-  const tbody = document.getElementById("stocksTbody");
-  if (!tbody) return;
- 
-  if (!rows || rows.length === 0) {
-    tbody.innerHTML = `<tr><td class="ticker">—</td><td>$—</td><td>—</td><td>—</td><td class="rvol">—</td><td class="news">—</td><td class="sj">—</td></tr>`;
-    return;
+  function renderLiquidityDot(volume, marketCap) {
+    if (!volume || !marketCap || marketCap === 0) return "";
+    const ratio = volume / marketCap;
+    let level, color;
+    if (ratio >= 0.50) { level = "High Liquidity"; color = "#22c55e"; }
+    else if (ratio >= 0.10) { level = "Medium Liquidity"; color = "#f59e0b"; }
+    else { level = "Low Liquidity — exit may cause slippage"; color = "#ef4444"; }
+    return ` <span class="liquidity-wrap"><span class="liquidity-dot" style="--liq-color: ${color}"></span><span class="liquidity-tooltip" style="--liq-color: ${color}">${level} (Vol/MCap: ${(ratio * 100).toFixed(1)}%)</span></span>`;
   }
- 
-  const oldValues = snapshotTableValues(tbody);
-  const medals = ["🥇", "🥈", "🥉"];
- 
-  tbody.innerHTML = rows.map((x, idx) => {
-    const pct = x.pctChange;
-    const changeClass = classUpDown(pct);
-    const rangeHtml = renderRangeIndicator(x.dayLow ?? x.rangeLow, x.dayHigh ?? x.rangeHigh, x.price);
-    const newsHtml = renderNewsCell(x.news);
-    const tickerHtml = renderTickerCell(x.symbol || "—", "stock");
-    if (x.enteredPrice) updatePeakPrice(x.symbol, x.price, x.enteredPrice);
-    const entryAttrs = renderSinceEntryAttrs(x.price, x.enteredPrice, x.enteredAt, x.symbol);
- 
-    return `
-      <tr data-symbol="${x.symbol || ''}">
+
+  // ══════════════════════════════════════════════════════════════════
+  // FLIP ANIMATION ENGINE — Bar Chart Race Style Reordering
+  // ══════════════════════════════════════════════════════════════════
+  //
+  // Instead of replacing innerHTML (which destroys DOM and kills
+  // animation), we:
+  //   1. Build desired row HTML keyed by symbol
+  //   2. Record current row positions (FIRST)
+  //   3. Reorder DOM: update existing rows, add new, remove stale
+  //   4. Record new positions (LAST)
+  //   5. Apply inverse transform (INVERT) then animate to 0 (PLAY)
+  //
+  // Rows slide smoothly to their new rank positions.
+  // New rows fade in. Removed rows fade out.
+  // ══════════════════════════════════════════════════════════════════
+
+  const FLIP_DURATION = 450; // ms for row slide animation
+  const FADE_DURATION = 300; // ms for new/removed row fade
+
+  /**
+   * FLIP-animate rows in a tbody.
+   * @param {HTMLElement} tbody - the <tbody> element
+   * @param {Array<{key: string, html: string, data: object}>} newRows
+   *   key = unique identifier (symbol)
+   *   html = full innerHTML for the <tr>
+   *   data = { price, pct } for number animation
+   */
+  function flipUpdateRows(tbody, newRows) {
+    if (!tbody) return;
+
+    // Handle empty state
+    if (!newRows || newRows.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding:40px 0; color:rgba(255,255,255,0.3); font-size:0.85rem;">No data matching filters</td></tr>`;
+      return;
+    }
+
+    // --- FIRST: snapshot current positions ---
+    const firstPositions = new Map();
+    const existingRows = new Map();
+    tbody.querySelectorAll("tr[data-symbol]").forEach(tr => {
+      const sym = tr.dataset.symbol;
+      firstPositions.set(sym, tr.getBoundingClientRect());
+      existingRows.set(sym, tr);
+    });
+
+    const isFirstRender = existingRows.size === 0;
+
+    // --- BUILD: create/update row elements ---
+    const newKeys = new Set(newRows.map(r => r.key));
+    const fragment = document.createDocumentFragment();
+    const keptRows = new Map();
+
+    for (const { key, html, data } of newRows) {
+      let tr = existingRows.get(key);
+      if (tr) {
+        // Existing row — update contents with number animation
+        const oldPrice = parseFloat(tr.querySelector(".price-cell")?.dataset.rawPrice) || null;
+        const oldPct = parseFloat(tr.querySelector(".change-pct")?.dataset.rawPct) || null;
+
+        tr.innerHTML = html;
+
+        // Animate numbers if changed
+        if (!isFirstRender && data) {
+          const priceCell = tr.querySelector(".price-cell");
+          const pctCell = tr.querySelector(".change-pct");
+          if (priceCell && oldPrice !== null && data.price !== null && oldPrice !== data.price) {
+            animateNumber(priceCell, oldPrice, data.price, 400, formatPrice);
+            flashCell(priceCell, data.price > oldPrice ? "up" : "down");
+          }
+          if (pctCell && oldPct !== null && data.pct !== null && Math.abs(oldPct - data.pct) > 0.005) {
+            animateNumber(pctCell, oldPct, data.pct, 400, formatPct);
+            flashCell(pctCell, data.pct > oldPct ? "up" : "down");
+          }
+        }
+        keptRows.set(key, tr);
+      } else {
+        // New row — create fresh
+        tr = document.createElement("tr");
+        tr.dataset.symbol = key;
+        tr.innerHTML = html;
+        if (!isFirstRender) {
+          // Will fade in
+          tr.style.opacity = "0";
+          tr.style.transform = "translateX(-20px)";
+        }
+        keptRows.set(key, tr);
+      }
+    }
+
+    // --- Remove stale rows with fade-out ---
+    existingRows.forEach((tr, sym) => {
+      if (!newKeys.has(sym)) {
+        tr.style.transition = `opacity ${FADE_DURATION}ms ease, transform ${FADE_DURATION}ms ease`;
+        tr.style.opacity = "0";
+        tr.style.transform = "translateX(20px)";
+        tr.style.pointerEvents = "none";
+        setTimeout(() => tr.remove(), FADE_DURATION);
+      }
+    });
+
+    // --- Reorder DOM to match new order ---
+    for (const { key } of newRows) {
+      const tr = keptRows.get(key);
+      if (tr) tbody.appendChild(tr);
+    }
+
+    // --- LAST: record new positions ---
+    if (!isFirstRender) {
+      const lastPositions = new Map();
+      tbody.querySelectorAll("tr[data-symbol]").forEach(tr => {
+        lastPositions.set(tr.dataset.symbol, tr.getBoundingClientRect());
+      });
+
+      // --- INVERT + PLAY ---
+      tbody.querySelectorAll("tr[data-symbol]").forEach(tr => {
+        const sym = tr.dataset.symbol;
+        const first = firstPositions.get(sym);
+        const last = lastPositions.get(sym);
+
+        if (first && last) {
+          // Existing row that moved position
+          const deltaY = first.top - last.top;
+          if (Math.abs(deltaY) > 1) {
+            // INVERT: place at old position
+            tr.style.transition = "none";
+            tr.style.transform = `translateY(${deltaY}px)`;
+            tr.style.zIndex = "10";
+
+            // Force reflow
+            void tr.offsetHeight;
+
+            // PLAY: animate to new position
+            tr.style.transition = `transform ${FLIP_DURATION}ms cubic-bezier(0.25, 0.46, 0.45, 0.94)`;
+            tr.style.transform = "translateY(0)";
+
+            // Cleanup
+            const onEnd = () => {
+              tr.style.transition = "";
+              tr.style.transform = "";
+              tr.style.zIndex = "";
+              tr.removeEventListener("transitionend", onEnd);
+            };
+            tr.addEventListener("transitionend", onEnd);
+          }
+        } else if (!first && last) {
+          // New row — fade in
+          void tr.offsetHeight;
+          tr.style.transition = `opacity ${FADE_DURATION}ms ease ${FLIP_DURATION * 0.3}ms, transform ${FADE_DURATION}ms ease ${FLIP_DURATION * 0.3}ms`;
+          tr.style.opacity = "1";
+          tr.style.transform = "translateX(0)";
+          setTimeout(() => {
+            tr.style.transition = "";
+          }, FADE_DURATION + FLIP_DURATION * 0.3 + 50);
+        }
+      });
+    }
+
+    trimMobileDecimals();
+  }
+
+  // ══════════════════════════════════════════════════════════════════
+  // Number Animation Helpers
+  // ══════════════════════════════════════════════════════════════════
+
+  function animateNumber(el, from, to, duration, formatter) {
+    const start = performance.now();
+    function tick(now) {
+      const progress = Math.min(1, (now - start) / duration);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      el.textContent = formatter(from + (to - from) * eased, to);
+      if (progress < 1) requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+  }
+
+  function flashCell(el, direction) {
+    el.classList.remove("num-flash-up", "num-flash-down");
+    void el.offsetWidth;
+    el.classList.add(direction === "up" ? "num-flash-up" : "num-flash-down");
+    setTimeout(() => el.classList.remove("num-flash-up", "num-flash-down"), 650);
+  }
+
+  function formatPrice(current, finalValue) {
+    if (!Number.isFinite(current)) return "$—";
+    let decimals = 2;
+    if (Number.isFinite(finalValue) && finalValue > 0 && finalValue < 0.01) {
+      decimals = Math.min(6, Math.max(2, Math.ceil(-Math.log10(finalValue)) + 1));
+    }
+    return `$${current.toFixed(decimals)}`;
+  }
+
+  function formatPct(current) {
+    if (!Number.isFinite(current)) return "—";
+    const decimals = window.innerWidth <= 640 ? 1 : 2;
+    return `${current > 0 ? "+" : ""}${current.toFixed(decimals)}%`;
+  }
+
+  // ══════════════════════════════════════════════════════════════════
+  // RENDER STOCKS — Uses FLIP engine
+  // ══════════════════════════════════════════════════════════════════
+
+  function renderStocks(rows) {
+    const tbody = document.getElementById("stocksTbody");
+    if (!tbody) return;
+
+    if (!rows || rows.length === 0) {
+      flipUpdateRows(tbody, []);
+      return;
+    }
+
+    const medals = ["🥇", "🥈", "🥉"];
+
+    const flipRows = rows.map((x, idx) => {
+      const pct = x.pctChange;
+      const changeClass = classUpDown(pct);
+      const rangeHtml = renderRangeIndicator(x.dayLow ?? x.rangeLow, x.dayHigh ?? x.rangeHigh, x.price);
+      const newsHtml = renderNewsCell(x.news);
+      const tickerHtml = renderTickerCell(x.symbol || "—", "stock");
+      if (x.enteredPrice) updatePeakPrice(x.symbol, x.price, x.enteredPrice);
+      const entryAttrs = renderSinceEntryAttrs(x.price, x.enteredPrice, x.enteredAt, x.symbol);
+
+      const html = `
         <td class="ticker">${tickerHtml}${idx < 3 ? ' <span class="ticker-medal">' + medals[idx] + '</span>' : ''}${renderNewBadge(x.enteredAt)}${window.sjShareBtn ? window.sjShareBtn(x.symbol, x.pctChange, fmtUsd(x.price), renderRvolRaw(x.volume, x.avgVolume, x.marketCap, 'stock'), 'stock') : ''}</td>
         <td class="price-cell" data-raw-price="${x.price ?? ''}">${fmtUsd(x.price)}</td>
         <td class="${changeClass}">
@@ -650,146 +628,70 @@ function renderStocks(rows) {
         <td class="rvol">${renderRvol(x.volume, x.avgVolume, x.marketCap, "stock")}</td>
         <td class="news">${newsHtml}</td>
         <td class="sj">${renderSJScore(x.sjScore, idx)}</td>
-      </tr>
-    `;
-  }).join("");
- 
-  trimMobileDecimals();
-  animateTableValues(tbody, oldValues);
-}
+      `;
 
+      return {
+        key: x.symbol || `row-${idx}`,
+        html,
+        data: { price: x.price, pct },
+      };
+    });
 
-// Liquidity indicator dot for crypto
-function renderLiquidityDot(volume, marketCap) {
-  if (!volume || !marketCap || marketCap === 0) return "";
-  
-  const ratio = volume / marketCap;
-  
-  let level, color;
-  if (ratio >= 0.50) {
-    level = "High Liquidity";
-    color = "#22c55e"; // green
-  } else if (ratio >= 0.10) {
-    level = "Medium Liquidity";
-    color = "#f59e0b"; // amber
-  } else {
-    level = "Low Liquidity — exit may cause slippage";
-    color = "#ef4444"; // red
+    flipUpdateRows(tbody, flipRows);
+    shortenMobileHeaders();
   }
-  
-  return ` <span class="liquidity-wrap"><span class="liquidity-dot" style="--liq-color: ${color}"></span><span class="liquidity-tooltip" style="--liq-color: ${color}">${level} (Vol/MCap: ${(ratio * 100).toFixed(1)}%)</span></span>`;
-}
 
-function renderCrypto(rows) {
-  const tbody = document.getElementById("cryptoTbody");
-  if (!tbody) return;
- 
-  if (!rows || rows.length === 0) {
-    tbody.innerHTML = `<tr><td class="ticker">—</td><td>$—</td><td>—</td><td>—</td><td class="rvol">—</td><td>—</td><td class="sj">—</td></tr>`;
-    return;
-  }
- 
-  const oldValues = snapshotTableValues(tbody);
-  const medals = ["🥇", "🥈", "🥉"];
- 
-  tbody.innerHTML = rows.map((x, idx) => {
-    const pct = x.pctChange || 0;
-    const changeClass = classUpDown(pct);
- 
-    let priceDecimals = 2;
-    if (x.price !== null && x.price !== undefined) {
-      const p = Number(x.price);
-      if (p > 0 && p < 0.01) {
-        priceDecimals = Math.max(2, Math.ceil(-Math.log10(p)) + 1);
-        priceDecimals = Math.min(priceDecimals, 6);
+  // ══════════════════════════════════════════════════════════════════
+  // RENDER CRYPTO — Uses FLIP engine
+  // ══════════════════════════════════════════════════════════════════
+
+  function renderCrypto(rows) {
+    const tbody = document.getElementById("cryptoTbody");
+    if (!tbody) return;
+
+    if (!rows || rows.length === 0) {
+      flipUpdateRows(tbody, []);
+      return;
+    }
+
+    const medals = ["🥇", "🥈", "🥉"];
+
+    const flipRows = rows.map((x, idx) => {
+      const pct = x.pctChange || 0;
+      const changeClass = classUpDown(pct);
+
+      let priceDecimals = 2;
+      if (x.price !== null && x.price !== undefined) {
+        const p = Number(x.price);
+        if (p > 0 && p < 0.01) priceDecimals = Math.min(6, Math.max(2, Math.ceil(-Math.log10(p)) + 1));
       }
-    }
- 
-    const rangeHtml = renderRangeIndicator(x.low24h ?? x.rangeLow, x.high24h ?? x.rangeHigh, x.price);
- 
-    let rugWarning = "";
-    const mcap = x.marketCap || 0;
-    const vol = x.volume || 0;
-    const rangePos = x.rangePosition ?? 0.5;
-    const volMcapRatio = mcap > 0 ? vol / mcap : 0;
- 
-    // ── Pump & Dump Warning Signals ──────────────────────────────
-    // Tiered system: red ⚠️ for high confidence, yellow ⚠️ for caution
-    //
-    // KEY INSIGHT from W09-W11 data:
-    //   Most real pump-and-dumps are +50-200%, not +1000%.
-    //   The strongest signal is: big move + crashed range + high vol churn.
-    //   That means it spiked, people dumped, and exit liquidity is drying up.
- 
-    let warningLevel = 0; // 0 = none, 1 = caution (yellow), 2 = danger (red)
-    let warningReasons = [];
- 
-    // ── DANGER (red) — high confidence pump-and-dump ──
-    
-    // Massive gain, already crashed from highs
-    if (pct > 200 && rangePos < 0.25) {
-      warningLevel = 2;
-      warningReasons.push("extreme gain + crashed from highs");
-    }
-    // Insane volume churn — vol > 150% of entire market cap
-    if (volMcapRatio > 1.5) {
-      warningLevel = 2;
-      warningReasons.push("volume exceeds 150% of market cap");
-    }
-    // Classic dump pattern: big spike + heavy volume + price fading
-    if (pct > 100 && volMcapRatio > 0.8 && rangePos < 0.30) {
-      warningLevel = 2;
-      warningReasons.push("spike + heavy churn + fading");
-    }
-    // Micro cap + extreme gain = almost always manipulation
-    if (mcap > 0 && mcap < 50e6 && pct > 100) {
-      warningLevel = Math.max(warningLevel, 2);
-      warningReasons.push("micro cap + extreme gain");
-    }
-    // +500% on anything
-    if (pct > 500) {
-      warningLevel = 2;
-      warningReasons.push("gain exceeds 500%");
-    }
- 
-    // ── CAUTION (yellow) — elevated risk ──
- 
-    // Moderate spike that's already fading
-    if (warningLevel === 0 && pct > 50 && rangePos < 0.25) {
-      warningLevel = 1;
-      warningReasons.push("significant gain but fading from highs");
-    }
-    // High volume churn on a moderate move
-    if (warningLevel === 0 && pct > 30 && volMcapRatio > 0.8 && rangePos < 0.40) {
-      warningLevel = 1;
-      warningReasons.push("heavy volume churn + weakening");
-    }
-    // Small cap with big move and volume exceeding mcap
-    if (warningLevel === 0 && mcap > 0 && mcap < 200e6 && pct > 60 && volMcapRatio > 0.5) {
-      warningLevel = 1;
-      warningReasons.push("small cap + large move + high volume ratio");
-    }
-    // Any coin where vol > mcap (regardless of % change)
-    if (warningLevel === 0 && volMcapRatio > 1.0) {
-      warningLevel = 1;
-      warningReasons.push("24h volume exceeds market cap");
-    }
- 
-    // Build the warning HTML
-    if (warningLevel >= 2) {
-      const reasonText = warningReasons.join("; ");
-      rugWarning = ` <span class="rug-warning rug-danger" title="⚠️ High risk: ${reasonText}">⚠️</span>`;
-    } else if (warningLevel >= 1) {
-      const reasonText = warningReasons.join("; ");
-      rugWarning = ` <span class="rug-warning rug-caution" title="⚠️ Elevated risk: ${reasonText}">⚠️</span>`;
-    }
- 
-    const tickerHtml = renderTickerCell(x.coinSymbol || "—", "crypto", x.image || null);
-    if (x.enteredPrice) updatePeakPrice(x.coinSymbol, x.price, x.enteredPrice);
-    const entryAttrs = renderSinceEntryAttrs(x.price, x.enteredPrice, x.enteredAt, x.coinSymbol);
- 
-    return `
-      <tr data-symbol="${x.coinSymbol || ''}">
+
+      const rangeHtml = renderRangeIndicator(x.low24h ?? x.rangeLow, x.high24h ?? x.rangeHigh, x.price);
+
+      // ── Pump & Dump Warning ──
+      let rugWarning = "";
+      const mcap = x.marketCap || 0, vol = x.volume || 0, rangePos = x.rangePosition ?? 0.5;
+      const volMcapRatio = mcap > 0 ? vol / mcap : 0;
+      let warningLevel = 0, warningReasons = [];
+
+      if (pct > 200 && rangePos < 0.25) { warningLevel = 2; warningReasons.push("extreme gain + crashed from highs"); }
+      if (volMcapRatio > 1.5) { warningLevel = 2; warningReasons.push("volume exceeds 150% of market cap"); }
+      if (pct > 100 && volMcapRatio > 0.8 && rangePos < 0.30) { warningLevel = 2; warningReasons.push("spike + heavy churn + fading"); }
+      if (mcap > 0 && mcap < 50e6 && pct > 100) { warningLevel = Math.max(warningLevel, 2); warningReasons.push("micro cap + extreme gain"); }
+      if (pct > 500) { warningLevel = 2; warningReasons.push("gain exceeds 500%"); }
+      if (warningLevel === 0 && pct > 50 && rangePos < 0.25) { warningLevel = 1; warningReasons.push("significant gain but fading from highs"); }
+      if (warningLevel === 0 && pct > 30 && volMcapRatio > 0.8 && rangePos < 0.40) { warningLevel = 1; warningReasons.push("heavy volume churn + weakening"); }
+      if (warningLevel === 0 && mcap > 0 && mcap < 200e6 && pct > 60 && volMcapRatio > 0.5) { warningLevel = 1; warningReasons.push("small cap + large move + high volume ratio"); }
+      if (warningLevel === 0 && volMcapRatio > 1.0) { warningLevel = 1; warningReasons.push("24h volume exceeds market cap"); }
+
+      if (warningLevel >= 2) rugWarning = ` <span class="rug-warning rug-danger" title="⚠️ High risk: ${warningReasons.join("; ")}">⚠️</span>`;
+      else if (warningLevel >= 1) rugWarning = ` <span class="rug-warning rug-caution" title="⚠️ Elevated risk: ${warningReasons.join("; ")}">⚠️</span>`;
+
+      const tickerHtml = renderTickerCell(x.coinSymbol || "—", "crypto", x.image || null);
+      if (x.enteredPrice) updatePeakPrice(x.coinSymbol, x.price, x.enteredPrice);
+      const entryAttrs = renderSinceEntryAttrs(x.price, x.enteredPrice, x.enteredAt, x.coinSymbol);
+
+      const html = `
         <td class="ticker">${tickerHtml}${idx < 3 ? ' <span class="ticker-medal">' + medals[idx] + '</span>' : ''}${rugWarning}${renderNewBadge(x.enteredAt)}${window.sjShareBtn ? window.sjShareBtn(x.coinSymbol, x.pctChange, fmtUsd(x.price, priceDecimals), renderRvolRaw(x.volume, null, x.marketCap, 'crypto'), 'crypto') : ''}</td>
         <td class="price-cell" data-raw-price="${x.price ?? ''}">${fmtUsd(x.price, priceDecimals)}</td>
         <td class="${changeClass}">
@@ -802,239 +704,44 @@ function renderCrypto(rows) {
         <td class="rvol">${renderRvol(x.volume, null, x.marketCap, "crypto")}</td>
         <td>${fmtCompactUsd(x.marketCap, 1)}</td>
         <td class="sj">${renderSJScore(x.sjScore, idx)}</td>
-      </tr>
-    `;
-  }).join("");
- 
-  trimMobileDecimals();
-  animateTableValues(tbody, oldValues);
-}
+      `;
 
-
-// ──────────────────────────────────────────────────────────────────────
-// 4. NEW: Animated number transitions
-//
-//    snapshotTableValues() — captures current values before re-render
-//    animateTableValues()  — compares old vs new, runs count animation
-//
-//    The system works by:
-//    - Before innerHTML replacement, we snapshot {symbol → {price, pct}}
-//    - After innerHTML replacement, we find matching rows by data-symbol
-//    - If a value changed, we animate from old → new over 400ms
-//    - We also flash green (up) or red (down) briefly
-// ──────────────────────────────────────────────────────────────────────
-
-function snapshotTableValues(tbody) {
-  const map = new Map();
-  if (!tbody) return map;
-
-  tbody.querySelectorAll("tr[data-symbol]").forEach(tr => {
-    const sym = tr.dataset.symbol;
-    if (!sym) return;
-
-    const priceCell = tr.querySelector(".price-cell");
-    const pctCell = tr.querySelector(".change-pct");
-
-    map.set(sym, {
-      price: parseFloat(priceCell?.dataset.rawPrice) || null,
-      pct: parseFloat(pctCell?.dataset.rawPct) || null,
+      return {
+        key: x.coinSymbol || `row-${idx}`,
+        html,
+        data: { price: x.price, pct },
+      };
     });
-  });
 
-  return map;
-}
-
-function animateTableValues(tbody, oldValues) {
-  if (!tbody || !oldValues || oldValues.size === 0) return;
-
-  tbody.querySelectorAll("tr[data-symbol]").forEach(tr => {
-    const sym = tr.dataset.symbol;
-    if (!sym) return;
-
-    const old = oldValues.get(sym);
-    if (!old) return; // new row, no animation needed
-
-    const priceCell = tr.querySelector(".price-cell");
-    const pctCell = tr.querySelector(".change-pct");
-
-    // Animate price
-    const newPrice = parseFloat(priceCell?.dataset.rawPrice);
-    if (priceCell && old.price !== null && Number.isFinite(newPrice) && old.price !== newPrice) {
-      animateNumber(priceCell, old.price, newPrice, 400, formatPrice);
-      flashCell(priceCell, newPrice > old.price ? "up" : "down");
-    }
-
-    // Animate percentage
-    const newPct = parseFloat(pctCell?.dataset.rawPct);
-    if (pctCell && old.pct !== null && Number.isFinite(newPct) && Math.abs(old.pct - newPct) > 0.005) {
-      animateNumber(pctCell, old.pct, newPct, 400, formatPct);
-      flashCell(pctCell, newPct > old.pct ? "up" : "down");
-    }
-  });
-}
-
-/**
- * Animate a number from `from` to `to` inside `el` over `duration` ms.
- * Uses ease-out cubic for smooth deceleration.
- * `formatter` converts the current number to display string.
- */
-function animateNumber(el, from, to, duration, formatter) {
-  const start = performance.now();
-
-  function tick(now) {
-    const elapsed = now - start;
-    const progress = Math.min(1, elapsed / duration);
-    // Ease-out cubic
-    const eased = 1 - Math.pow(1 - progress, 3);
-    const current = from + (to - from) * eased;
-    el.textContent = formatter(current, to);
-    if (progress < 1) requestAnimationFrame(tick);
+    flipUpdateRows(tbody, flipRows);
+    shortenMobileHeaders();
   }
 
-  requestAnimationFrame(tick);
-}
+  // ══════════════════════════════════════════════════════════════════
+  // Mobile helpers
+  // ══════════════════════════════════════════════════════════════════
 
-/**
- * Flash a cell green or red briefly on change
- */
-function flashCell(el, direction) {
-  // Remove any existing flash class
-  el.classList.remove("num-flash-up", "num-flash-down");
-  // Force reflow to restart animation
-  void el.offsetWidth;
-  el.classList.add(direction === "up" ? "num-flash-up" : "num-flash-down");
-  // Clean up after animation
-  setTimeout(() => {
-    el.classList.remove("num-flash-up", "num-flash-down");
-  }, 650);
-}
-
-/**
- * Format price for animation display.
- * Uses the final value's decimal precision to stay consistent.
- */
-function formatPrice(current, finalValue) {
-  if (!Number.isFinite(current)) return "$—";
-  // Match decimals to the final value
-  let decimals = 2;
-  if (Number.isFinite(finalValue) && finalValue > 0 && finalValue < 0.01) {
-    decimals = Math.max(2, Math.ceil(-Math.log10(finalValue)) + 1);
-    decimals = Math.min(decimals, 6);
-  }
-  return `$${current.toFixed(decimals)}`;
-}
-
-/**
- * Format percentage for animation display.
- */
-function formatPct(current, finalValue) {
-  if (!Number.isFinite(current)) return "—";
-  // On mobile use 1 decimal, desktop use 2
-  const decimals = window.innerWidth <= 640 ? 1 : 2;
-  const sign = current > 0 ? "+" : "";
-  return `${sign}${current.toFixed(decimals)}%`;
-}
-
-
-
-
-
-// Volume fire emoji — shows when volume is elevated vs average
-function renderVolumeFire(volume, avgVolume, marketCap, mode) {
-  return "";
-}
-
-// RVOL (Relative Volume) cell renderer
-// Stocks: volume / avgVolume → "3.2x"
-// Crypto: volume / marketCap → "42%"
-function renderRvol(volume, avgVolume, marketCap, mode) {
-  if (!volume) return '<span class="rvol-normal">—</span>';
-
-  if (mode === "stock") {
-    // Prefer avgVolume ratio if available
-    if (mode === "stock") {
-      if (avgVolume && avgVolume > 0) {
-        const ratio = volume / avgVolume;
-        let tier = "rvol-normal";
-        let suffix = "";
-        if (ratio >= 3.0) { tier = "rvol-hot"; suffix = " 🔥"; }
-        else if (ratio >= 1.5) { tier = "rvol-warm"; }
-        return `<span class="${tier}" title="Volume is ${ratio.toFixed(1)}× the average">${ratio.toFixed(1)}x${suffix}</span>`;
+  function trimMobileDecimals() {
+    if (window.innerWidth > 640) return;
+    document.querySelectorAll('.change-pct').forEach(el => {
+      const match = el.textContent.trim().match(/^([+-]?)(\d+\.\d{2,})%$/);
+      if (match) {
+        const num = parseFloat(match[1] + match[2]);
+        el.textContent = (num >= 0 ? '+' : '') + num.toFixed(1) + '%';
       }
-      // No avgVolume available — show dash instead of misleading vol/mcap ratio
-      return '<span class="rvol-normal" title="Average volume data unavailable">—</span>';
-    }
-    // Fallback: vol/mcap ratio
-    if (marketCap && marketCap > 0) {
-      const ratio = volume / marketCap;
-      let tier = "rvol-normal";
-      let suffix = "";
-      if (ratio >= 0.05) { tier = "rvol-hot"; suffix = " 🔥"; }
-      else if (ratio >= 0.01) { tier = "rvol-warm"; }
-      return `<span class="${tier}" title="Volume is ${(ratio * 100).toFixed(1)}% of market cap">${ratio.toFixed(1)}x${suffix}</span>`;
-    }
+    });
   }
 
-  if (mode === "crypto" && marketCap && marketCap > 0) {
-    const ratio = volume / marketCap;
-    let tier = "rvol-normal";
-    let suffix = "";
-    if (ratio >= 0.50) { tier = "rvol-hot"; suffix = " 🔥"; }
-    else if (ratio >= 0.15) { tier = "rvol-warm"; }
-    return `<span class="${tier}" title="24h volume is ${ratio.toFixed(2)}× market cap">${ratio.toFixed(1)}x${suffix}</span>`;
+  function shortenMobileHeaders() {
+    if (window.innerWidth > 640) return;
+    document.querySelectorAll('.stocks-table thead th').forEach(th => {
+      const text = th.textContent.trim();
+      if (text === '% Change 24h') th.textContent = '% Chg';
+      if (text === '% Change')     th.textContent = '% Chg';
+      if (text === 'Vol 24h')      th.textContent = 'Vol';
+      if (text === 'Market Cap')   th.textContent = 'MCap';
+    });
   }
-
-  return '<span class="rvol-normal">—</span>';
-}
-
-// Returns plain text RVOL for tweet (e.g. "3.2x") — no HTML
-function renderRvolRaw(volume, avgVolume, marketCap, mode) {
-  if (!volume) return null;
-  if (mode === "stock" && avgVolume && avgVolume > 0) {
-    return `${(volume / avgVolume).toFixed(1)}x`;
-  }
-  if (mode === "crypto" && marketCap && marketCap > 0) {
-    return `${(volume / marketCap).toFixed(1)}x`;
-  }
-  return null;
-}
-
-/**
- * Mobile: trim percent-change values to 1 decimal place
- * Drop this into app.js wherever you build/update table rows,
- * or call it after each data refresh.
- *
- * Example usage:
- *   if (window.innerWidth <= 640) trimMobileDecimals();
- */
-function trimMobileDecimals() {
-  if (window.innerWidth > 640) return;
-
-  document.querySelectorAll('.change-pct').forEach(el => {
-    const text = el.textContent.trim();
-    // Match patterns like +34.36% or -2.15%
-    const match = text.match(/^([+-]?)(\d+\.\d{2,})%$/);
-    if (match) {
-      const num = parseFloat(match[1] + match[2]);
-      el.textContent = (num >= 0 ? '+' : '') + num.toFixed(1) + '%';
-    }
-  });
-}
-
-/** Mobile: shorten table header labels */
-function shortenMobileHeaders() {
-  if (window.innerWidth > 640) return;
-  document.querySelectorAll('.stocks-table thead th').forEach(th => {
-    const text = th.textContent.trim();
-    if (text === '% Change 24h') th.textContent = '% Chg';
-    if (text === '% Change')     th.textContent = '% Chg';
-    if (text === 'Vol 24h')      th.textContent = 'Vol';
-    if (text === 'Market Cap')   th.textContent = 'MCap';
-  });
-}
-
-// Run after each table render / data refresh
-// You can also integrate this directly into your renderStocksTable / renderCryptoTable functions
 
   // ----------------------------
   // Header indices
@@ -1053,155 +760,66 @@ function shortenMobileHeaders() {
   function applyHeaderFromApi(data) {
     const leftLabel = data?.header?.left?.label;
     const rightLabel = data?.header?.right?.label;
-  
     if (idxLeftLabel && leftLabel) idxLeftLabel.textContent = leftLabel;
     if (idxRightLabel && rightLabel) idxRightLabel.textContent = rightLabel;
-  
-    const leftPct = data?.header?.left?.pct ?? data?.header?.btcPct ?? null;
-    const rightPct = data?.header?.right?.pct ?? data?.header?.totalMarketPct ?? null;
-  
-    setIdxValue(idxLeftValue, leftPct);
-    setIdxValue(idxRightValue, rightPct);
-  
+    setIdxValue(idxLeftValue, data?.header?.left?.pct ?? data?.header?.btcPct ?? null);
+    setIdxValue(idxRightValue, data?.header?.right?.pct ?? data?.header?.totalMarketPct ?? null);
     idxWrap?.classList.toggle("crypto", currentMode === "crypto");
-    
-    // Market session indicator (stocks only)
+
     const marketSessionNotice = document.getElementById("marketClosedNotice");
     const marketSessionText = marketSessionNotice?.querySelector(".market-session-text");
-  
     if (marketSessionNotice && currentMode === "stocks") {
       const session = data?.marketSession || "closed";
-      
-      // Remove all session classes
       marketSessionNotice.classList.remove("session-closed", "session-premarket", "session-afterhours", "session-open");
-      
-      if (session === "open") {
-        // Hide when market is open
-        marketSessionNotice.style.display = "none";
-      } else {
-// NEW:
-marketSessionNotice.style.display = "flex";
-marketSessionNotice.classList.add(`session-${session}`);
-
-if (marketSessionText) {
-  const affiliateId = "162729";
-  const tvLink = `https://www.tradingview.com/markets/stocks-usa/market-movers-active/?aff_id=${affiliateId}`;
-  
-  if (session === "premarket") {
-    marketSessionText.innerHTML = `Pre-Market — Live extended hours prices`;
-  } else if (session === "afterhours") {
-    marketSessionText.innerHTML = `After-Hours — Live extended hours prices`;
-  } else {
-    marketSessionText.textContent = data?.marketSessionLabel || "Market Closed";
-  }
-}
+      if (session === "open") { marketSessionNotice.style.display = "none"; }
+      else {
+        marketSessionNotice.style.display = "flex";
+        marketSessionNotice.classList.add(`session-${session}`);
+        if (marketSessionText) {
+          if (session === "premarket") marketSessionText.innerHTML = `Pre-Market — Live extended hours prices`;
+          else if (session === "afterhours") marketSessionText.innerHTML = `After-Hours — Live extended hours prices`;
+          else marketSessionText.textContent = data?.marketSessionLabel || "Market Closed";
+        }
       }
-    } else if (marketSessionNotice) {
-      // Hide for crypto (24/7 market)
-      marketSessionNotice.style.display = "none";
-    }
+    } else if (marketSessionNotice) { marketSessionNotice.style.display = "none"; }
   }
 
   // ----------------------------
-  // Filters (mode-aware, matches HTML)
+  // Filters
   // ----------------------------
-  
-  // Track separate touched states and values for each mode
   const filterState = {
-    stocks: {
-      mcapTouched: false,
-      mcapValue: MODE_DEFAULTS.stocks.mcapDial,
-      priceTouched: false,
-      priceValue: MODE_DEFAULTS.stocks.priceMax,
-      volTouched: false,
-      volValue: MODE_DEFAULTS.stocks.volMin,
-      pctMinOverride: null,
-    },
-    crypto: {
-      mcapTouched: false,
-      mcapValue: MODE_DEFAULTS.crypto.mcapDial,
-      priceTouched: false,
-      priceValue: MODE_DEFAULTS.crypto.priceMax,
-      volTouched: false,
-      volValue: MODE_DEFAULTS.crypto.volMin,
-      pctMinOverride: null,
-    },
+    stocks: { mcapTouched: false, mcapValue: MODE_DEFAULTS.stocks.mcapDial, priceTouched: false, priceValue: MODE_DEFAULTS.stocks.priceMax, volTouched: false, volValue: MODE_DEFAULTS.stocks.volMin, pctMinOverride: null },
+    crypto: { mcapTouched: false, mcapValue: MODE_DEFAULTS.crypto.mcapDial, priceTouched: false, priceValue: MODE_DEFAULTS.crypto.priceMax, volTouched: false, volValue: MODE_DEFAULTS.crypto.volMin, pctMinOverride: null },
   };
 
   function setMcapUiForMode(mode) {
     if (!filterEls.mcapRange) return;
-  
-    // Both modes now use dial: 0..1000 (logarithmic scale)
-    filterEls.mcapRange.min = "0";
-    filterEls.mcapRange.max = "1000";
-    filterEls.mcapRange.step = "1";
-  
+    filterEls.mcapRange.min = "0"; filterEls.mcapRange.max = "1000"; filterEls.mcapRange.step = "1";
+    if (filterEls.mcapLabel) filterEls.mcapLabel.textContent = "Market Cap (Min)";
+    if (filterEls.mcapPillStocks) filterEls.mcapPillStocks.style.display = "none";
+    if (filterEls.mcapPillCrypto) filterEls.mcapPillCrypto.style.display = "";
     if (mode === "crypto") {
-      if (filterEls.mcapLabel) filterEls.mcapLabel.textContent = "Market Cap (Min)";
-      
-      // Show crypto pill, hide stocks pill
-      if (filterEls.mcapPillStocks) filterEls.mcapPillStocks.style.display = "none";
-      if (filterEls.mcapPillCrypto) filterEls.mcapPillCrypto.style.display = "";
-  
-      // Update meta labels for crypto
       if (filterEls.mcapMetaLeft) filterEls.mcapMetaLeft.textContent = "$50M";
       if (filterEls.mcapMetaRight) filterEls.mcapMetaRight.textContent = "$100B+";
-  
-      const dial = filterState.crypto.mcapTouched 
-        ? filterState.crypto.mcapValue 
-        : MODE_DEFAULTS.crypto.mcapDial;
-      
+      const dial = filterState.crypto.mcapTouched ? filterState.crypto.mcapValue : MODE_DEFAULTS.crypto.mcapDial;
       filterEls.mcapRange.value = String(dial);
       lastCryptoMcapMin = cryptoMcapFromDial(dial);
-      
-      if (filterEls.mcapTextCrypto) {
-        filterEls.mcapTextCrypto.textContent = `${fmtMoneyShort(lastCryptoMcapMin)}+`;
-      }
-      
+      if (filterEls.mcapTextCrypto) filterEls.mcapTextCrypto.textContent = `${fmtMoneyShort(lastCryptoMcapMin)}+`;
     } else {
-      // Stocks - now also uses log dial for MIN market cap
-      if (filterEls.mcapLabel) filterEls.mcapLabel.textContent = "Market Cap (Min)";
-  
-      // Show stocks pill (reuse crypto pill style), hide the old stocks pill
-      if (filterEls.mcapPillStocks) filterEls.mcapPillStocks.style.display = "none";
-      if (filterEls.mcapPillCrypto) filterEls.mcapPillCrypto.style.display = "";
-  
-      // Update meta labels for stocks
       if (filterEls.mcapMetaLeft) filterEls.mcapMetaLeft.textContent = "$100M";
       if (filterEls.mcapMetaRight) filterEls.mcapMetaRight.textContent = "$500B";
-  
-      const dial = filterState.stocks.mcapTouched 
-        ? filterState.stocks.mcapValue 
-        : MODE_DEFAULTS.stocks.mcapDial;
-      
+      const dial = filterState.stocks.mcapTouched ? filterState.stocks.mcapValue : MODE_DEFAULTS.stocks.mcapDial;
       filterEls.mcapRange.value = String(dial);
-      
-      // Use the crypto text element for stocks too
-      if (filterEls.mcapTextCrypto) {
-        filterEls.mcapTextCrypto.textContent = `${fmtMoneyShort(stockMcapFromDial(dial))}+`;
-      }
+      if (filterEls.mcapTextCrypto) filterEls.mcapTextCrypto.textContent = `${fmtMoneyShort(stockMcapFromDial(dial))}+`;
     }
   }
 
   function setPriceUiForMode(mode) {
     if (!filterEls.priceRange) return;
-
-    const state = filterState[mode];
-    const d = MODE_DEFAULTS[mode];
-
-    // Price filter config (same for both modes currently, but can diverge)
-    const priceMin = 1;
-    const priceMax = 5000;
-
-    filterEls.priceRange.min = String(priceMin);
-    filterEls.priceRange.max = String(priceMax);
-    filterEls.priceRange.step = "1";
-
-    // Update meta labels
-    if (priceMetaLeft) priceMetaLeft.textContent = `$${priceMin}`;
-    if (priceMetaRight) priceMetaRight.textContent = `$${priceMax.toLocaleString()}`;
-
-    // Set current value
+    const state = filterState[mode], d = MODE_DEFAULTS[mode];
+    filterEls.priceRange.min = "1"; filterEls.priceRange.max = "5000"; filterEls.priceRange.step = "1";
+    if (priceMetaLeft) priceMetaLeft.textContent = "$1";
+    if (priceMetaRight) priceMetaRight.textContent = "$5,000";
     const price = state.priceTouched ? state.priceValue : d.priceMax;
     filterEls.priceRange.value = String(price);
     if (priceNum) priceNum.value = String(price);
@@ -1209,195 +827,104 @@ if (marketSessionText) {
 
   function setVolumeUiForMode(mode) {
     if (!filterEls.volRange) return;
-
-    const state = filterState[mode];
-    const d = MODE_DEFAULTS[mode];
-
-    // Volume filter config (same for both modes currently)
-    const volMin = 0;
-    const volMax = 50_000_000;
-
-    filterEls.volRange.min = String(volMin);
-    filterEls.volRange.max = String(volMax);
-    filterEls.volRange.step = "100000";
-
-    // Update meta labels
+    const state = filterState[mode], d = MODE_DEFAULTS[mode];
+    filterEls.volRange.min = "0"; filterEls.volRange.max = "50000000"; filterEls.volRange.step = "100000";
     if (volMetaLeft) volMetaLeft.textContent = "0";
     if (volMetaRight) volMetaRight.textContent = "50M";
-
-    // Set current value
     const vol = state.volTouched ? state.volValue : d.volMin;
     filterEls.volRange.value = String(vol);
     if (volNum) volNum.value = String(vol);
   }
 
+  function setCatalystUiForMode(mode) {
+    const catalystCard = document.querySelector(".filter-card .checklist")?.closest(".filter-card");
+    if (!catalystCard) return;
+    if (mode === "crypto") {
+      catalystCard.classList.add("filter-card-disabled");
+      catalystCard.querySelectorAll("input").forEach(i => i.disabled = true);
+    } else {
+      catalystCard.classList.remove("filter-card-disabled");
+      catalystCard.querySelectorAll("input").forEach(i => i.disabled = false);
+    }
+  }
+
   function setUiDefaultsForMode(mode) {
     const d = MODE_DEFAULTS[mode];
-
-    // News required checkbox
-    if (filterEls.newsRequiredChk) {
-      filterEls.newsRequiredChk.checked = !!d.newsRequired;
-    }
-    if (filterEls.highVolChk) {
-      filterEls.highVolChk.checked = !!d.highVolumeOnly;
-    }
-    // Update all filter UIs for the current mode
+    if (filterEls.newsRequiredChk) filterEls.newsRequiredChk.checked = !!d.newsRequired;
+    if (filterEls.highVolChk) filterEls.highVolChk.checked = !!d.highVolumeOnly;
     setMcapUiForMode(mode);
     setPriceUiForMode(mode);
     setVolumeUiForMode(mode);
-    
-    // Disable/enable catalyst filter card for crypto mode
     setCatalystUiForMode(mode);
-  }
-  
-  function setCatalystUiForMode(mode) {
-    // Find the catalyst filter card (it's the one with the checklist)
-    const catalystCard = document.querySelector(".filter-card .checklist")?.closest(".filter-card");
-    if (!catalystCard) return;
-    
-    if (mode === "crypto") {
-      // Disable the catalyst card for crypto
-      catalystCard.classList.add("filter-card-disabled");
-      catalystCard.querySelectorAll("input").forEach(input => {
-        input.disabled = true;
-      });
-    } else {
-      // Enable the catalyst card for stocks
-      catalystCard.classList.remove("filter-card-disabled");
-      catalystCard.querySelectorAll("input").forEach(input => {
-        input.disabled = false;
-      });
-    }
   }
 
   function readFiltersForMode(mode) {
     const d = MODE_DEFAULTS[mode];
-  
-    const highVolumeOnly = filterEls.highVolChk ? !!filterEls.highVolChk.checked : false;
-  
     const limit = d.limit;
     const pctMin = filterState[mode].pctMinOverride ?? d.pctMin;
-  
     const volMin = filterEls.volRange ? Number(filterEls.volRange.value) : d.volMin;
     const priceMax = filterEls.priceRange ? Number(filterEls.priceRange.value) : d.priceMax;
-  
-    const newsRequired = filterEls.newsRequiredChk
-      ? !!filterEls.newsRequiredChk.checked
-      : d.newsRequired;
-  
-    if (mode === "crypto") {
-      const dial = filterEls.mcapRange ? Number(filterEls.mcapRange.value) : d.mcapDial;
-      const mcapMin = cryptoMcapFromDial(dial);
-      lastCryptoMcapMin = mcapMin;
-      return { limit, pctMin, volMin, priceMax, mcapMin, newsRequired, dial };
-    }
-  
-    // Stocks - now uses mcapMin from dial (no mcapMax)
+    const newsRequired = filterEls.newsRequiredChk ? !!filterEls.newsRequiredChk.checked : d.newsRequired;
     const dial = filterEls.mcapRange ? Number(filterEls.mcapRange.value) : d.mcapDial;
-    const mcapMin = stockMcapFromDial(dial);
-    
+    const mcapMin = mode === "crypto" ? cryptoMcapFromDial(dial) : stockMcapFromDial(dial);
+    if (mode === "crypto") lastCryptoMcapMin = mcapMin;
     return { limit, pctMin, volMin, priceMax, mcapMin, newsRequired, dial };
   }
-  
 
   function buildApiPath(mode) {
     const f = readFiltersForMode(mode);
-    if (!f) throw new Error("readFiltersForMode returned nothing");
-  
     const p = new URLSearchParams();
-    p.set("limit", String(f.limit));
-    p.set("pctMin", String(f.pctMin));
-    p.set("volMin", String(f.volMin));
-    p.set("priceMax", String(f.priceMax));
-    p.set("newsRequired", f.newsRequired ? "true" : "false");
-    p.set("highVolumeOnly", f.highVolumeOnly ? "true" : "false");
-    
-    // Both modes now use mcapMin
-    p.set("mcapMin", String(f.mcapMin));
-  
-    const path = mode === "crypto"
-      ? `/api/crypto?${p.toString()}`
-      : `/api/stocks?${p.toString()}`;
-  
-    console.log("[StockJelli] mode:", mode, "filters:", f, "path:", path);
-    return path;
+    p.set("limit", String(f.limit)); p.set("pctMin", String(f.pctMin)); p.set("volMin", String(f.volMin));
+    p.set("priceMax", String(f.priceMax)); p.set("newsRequired", f.newsRequired ? "true" : "false");
+    p.set("highVolumeOnly", f.highVolumeOnly ? "true" : "false"); p.set("mcapMin", String(f.mcapMin));
+    return mode === "crypto" ? `/api/crypto?${p}` : `/api/stocks?${p}`;
   }
-  
 
-  // ---- wire inputs / touch markers ----
+  // ---- wire filter inputs ----
   filterEls.mcapRange?.addEventListener("input", () => {
-    const state = filterState[currentMode];
-    const dial = Number(filterEls.mcapRange.value || 0);
-    
-    state.mcapTouched = true;
-    state.mcapValue = dial;
-    
+    const state = filterState[currentMode], dial = Number(filterEls.mcapRange.value || 0);
+    state.mcapTouched = true; state.mcapValue = dial;
     if (currentMode === "crypto") {
       lastCryptoMcapMin = cryptoMcapFromDial(dial);
-      if (filterEls.mcapTextCrypto) {
-        filterEls.mcapTextCrypto.textContent = `${fmtMoneyShort(lastCryptoMcapMin)}+`;
-      }
+      if (filterEls.mcapTextCrypto) filterEls.mcapTextCrypto.textContent = `${fmtMoneyShort(lastCryptoMcapMin)}+`;
     } else {
-      if (filterEls.mcapTextCrypto) {
-        filterEls.mcapTextCrypto.textContent = `${fmtMoneyShort(stockMcapFromDial(dial))}+`;
-      }
+      if (filterEls.mcapTextCrypto) filterEls.mcapTextCrypto.textContent = `${fmtMoneyShort(stockMcapFromDial(dial))}+`;
     }
   });
-  
 
-  // stocks-only: mcapNumStocks editable
   filterEls.mcapNumStocks?.addEventListener("input", () => {
-    if (currentMode !== "stocks") return;
-    if (!filterEls.mcapRange) return;
+    if (currentMode !== "stocks" || !filterEls.mcapRange) return;
     const v = clamp(filterEls.mcapNumStocks.value, 1, 500);
-    filterEls.mcapNumStocks.value = String(v);
-    filterEls.mcapRange.value = String(v);
-    filterState.stocks.mcapTouched = true;
-    filterState.stocks.mcapValue = v;
+    filterEls.mcapNumStocks.value = String(v); filterEls.mcapRange.value = String(v);
+    filterState.stocks.mcapTouched = true; filterState.stocks.mcapValue = v;
   });
 
-  // price sync (range <-> pill input)
   filterEls.priceRange?.addEventListener("input", () => {
-    const state = filterState[currentMode];
-    state.priceTouched = true;
-    state.priceValue = Number(filterEls.priceRange.value);
+    const state = filterState[currentMode]; state.priceTouched = true; state.priceValue = Number(filterEls.priceRange.value);
     if (priceNum) priceNum.value = filterEls.priceRange.value;
   });
-  
   priceNum?.addEventListener("input", () => {
     if (!filterEls.priceRange) return;
-    const v = clamp(priceNum.value, Number(filterEls.priceRange.min || 1), Number(filterEls.priceRange.max || 5000));
-    priceNum.value = String(v);
-    filterEls.priceRange.value = String(v);
-    const state = filterState[currentMode];
-    state.priceTouched = true;
-    state.priceValue = v;
+    const v = clamp(priceNum.value, 1, 5000); priceNum.value = String(v); filterEls.priceRange.value = String(v);
+    filterState[currentMode].priceTouched = true; filterState[currentMode].priceValue = v;
   });
 
-  // volume sync
   filterEls.volRange?.addEventListener("input", () => {
-    const state = filterState[currentMode];
-    state.volTouched = true;
-    state.volValue = Number(filterEls.volRange.value);
+    const state = filterState[currentMode]; state.volTouched = true; state.volValue = Number(filterEls.volRange.value);
     if (volNum) volNum.value = filterEls.volRange.value;
   });
-  
   volNum?.addEventListener("input", () => {
     if (!filterEls.volRange) return;
-    const v = clamp(volNum.value, Number(filterEls.volRange.min || 0), Number(filterEls.volRange.max || 50_000_000));
-    volNum.value = String(v);
-    filterEls.volRange.value = String(v);
-    const state = filterState[currentMode];
-    state.volTouched = true;
-    state.volValue = v;
+    const v = clamp(volNum.value, 0, 50_000_000); volNum.value = String(v); filterEls.volRange.value = String(v);
+    filterState[currentMode].volTouched = true; filterState[currentMode].volValue = v;
   });
 
   // ----------------------------
   // Polling + Mode switching
   // ----------------------------
   const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || "";
-const isNorthAmerica = tz.startsWith("America/");
-let currentMode = isNorthAmerica ? "stocks" : "crypto";
+  const isNorthAmerica = tz.startsWith("America/");
+  let currentMode = isNorthAmerica ? "stocks" : "crypto";
   let pollTimer = null;
 
   async function refreshOnce() {
@@ -1405,32 +932,19 @@ let currentMode = isNorthAmerica ? "stocks" : "crypto";
       const path = buildApiPath(currentMode);
       const data = await apiGet(path);
       applyHeaderFromApi(data);
-      
       let rows = data.rows;
-      
-      // Client-side high volume filter
-// Client-side RVOL filter
-const highVolOnly = filterEls.highVolChk?.checked || false;
-if (highVolOnly && rows) {
-    rows = rows.filter(r => {
-        if (currentMode === "stocks") {
-            return r.avgVolume && r.avgVolume > 0 && (r.volume / r.avgVolume) >= 1.5;
-        } else {
-            return r.marketCap && r.marketCap > 0 && (r.volume / r.marketCap) >= 1.5;
-        }
-    });
-}
-      data.rows = rows;
-      
-      if (currentMode === "crypto") renderCrypto(data.rows);
-      else renderStocks(data.rows);
+      const highVolOnly = filterEls.highVolChk?.checked || false;
+      if (highVolOnly && rows) {
+        rows = rows.filter(r => {
+          if (currentMode === "stocks") return r.avgVolume && r.avgVolume > 0 && (r.volume / r.avgVolume) >= 1.5;
+          else return r.marketCap && r.marketCap > 0 && (r.volume / r.marketCap) >= 1.5;
+        });
+      }
+      if (currentMode === "crypto") renderCrypto(rows);
+      else renderStocks(rows);
       renderRegime(data.regime);
-    } catch (e) {
-      console.error("[StockJelli] refreshOnce failed:", e);
-    }
+    } catch (e) { console.error("[StockJelli] refreshOnce failed:", e); }
   }
-
-  
 
   function startPolling() {
     if (pollTimer) clearInterval(pollTimer);
@@ -1441,18 +955,12 @@ if (highVolOnly && rows) {
   function applyMode(mode) {
     currentMode = mode;
     setSegmented(assetControl, mode);
-
     if (stocksTable) stocksTable.style.display = mode === "stocks" ? "" : "none";
     if (cryptoTable) cryptoTable.style.display = mode === "crypto" ? "" : "none";
-
-    // CoinGecko attribution — show only on crypto tab
     const cryptoAttr = document.getElementById("cryptoAttribution");
     if (cryptoAttr) cryptoAttr.style.display = mode === "crypto" ? "" : "none";
-
     if (heroChartStocks) heroChartStocks.style.display = mode === "stocks" ? "" : "none";
     if (heroChartCrypto) heroChartCrypto.style.display = mode === "crypto" ? "" : "none";
-
-    // baseline labels (backend will overwrite on refresh)
     if (mode === "stocks") {
       if (idxLeftLabel) idxLeftLabel.textContent = "NASDAQ";
       if (idxRightLabel) idxRightLabel.textContent = "S&P 500";
@@ -1462,10 +970,9 @@ if (highVolOnly && rows) {
     }
     if (idxLeftValue) idxLeftValue.textContent = "—";
     if (idxRightValue) idxRightValue.textContent = "—";
-
     setUiDefaultsForMode(mode);
     localStorage.setItem("sj_asset_mode", mode);
-    shortenMobileHeaders();  // ← HERE
+    shortenMobileHeaders();
     startPolling();
   }
 
@@ -1475,562 +982,201 @@ if (highVolOnly && rows) {
     applyMode(btn.dataset.value === "crypto" ? "crypto" : "stocks");
   });
 
-  // init
-
-
   const savedMode = localStorage.getItem("sj_asset_mode");
   applyMode(savedMode === "crypto" ? "crypto" : "stocks");
 
-  // apply/reset
   filterEls.applyBtn?.addEventListener("click", () => refreshOnce());
-
   filterEls.resetBtn?.addEventListener("click", () => {
-    const state = filterState[currentMode];
-    const d = MODE_DEFAULTS[currentMode];
-    
-    state.mcapTouched = false;
-    state.mcapValue = currentMode === "crypto" ? d.mcapDial : d.mcapMaxB;
-    state.priceTouched = false;
-    state.priceValue = d.priceMax;
-    state.volTouched = false;
-    state.volValue = d.volMin;
-    state.pctMinOverride = null;
-    
+    const state = filterState[currentMode], d = MODE_DEFAULTS[currentMode];
+    state.mcapTouched = false; state.mcapValue = d.mcapDial; state.priceTouched = false; state.priceValue = d.priceMax;
+    state.volTouched = false; state.volValue = d.volMin; state.pctMinOverride = null;
     setUiDefaultsForMode(currentMode);
     refreshOnce();
   });
 
-// --- Filter Presets ---
-(function initFilterPresets() {
-  const presetsRow = document.getElementById("filterPresets");
-  const presetDefault = document.getElementById("presetDefault");
-  const presetMidCap = document.getElementById("presetMidCap");
-  const presetLargeCap = document.getElementById("presetLargeCap");
-  if (!presetsRow) return;
-
-  function updateVisibility() {
-    presetsRow.style.display = currentMode === "stocks" ? "flex" : "none";
-  }
-  const stocksTableEl = document.getElementById("stocksTable");
-  if (stocksTableEl) {
-    new MutationObserver(updateVisibility).observe(stocksTableEl, { attributes: true, attributeFilter: ["style"] });
-  }
-  updateVisibility();
-
-  function setActive(btn) {
-    [presetDefault, presetMidCap, presetLargeCap].forEach(b => b?.classList.remove("preset-active"));
-    btn?.classList.add("preset-active");
-  }
-
-  presetDefault?.addEventListener("click", () => {
-    setActive(presetDefault);
-    const state = filterState.stocks;
-    const d = MODE_DEFAULTS.stocks;
-    state.mcapTouched = false;
-    state.mcapValue = d.mcapDial;
-    state.priceTouched = false;
-    state.priceValue = d.priceMax;
-    state.volTouched = false;
-    state.volValue = d.volMin;
-    state.pctMinOverride = null;
-    setUiDefaultsForMode("stocks");
-    refreshOnce();
-  });
-
-  presetMidCap?.addEventListener("click", () => {
-    setActive(presetMidCap);
-    filterState.stocks.mcapTouched = true;
-    filterState.stocks.mcapValue = 270;
-    filterState.stocks.priceTouched = true;
-    filterState.stocks.priceValue = 5000;
-    filterState.stocks.volTouched = true;
-    filterState.stocks.volValue = 500_000;
-    filterState.stocks.pctMinOverride = 3;
-    setMcapUiForMode("stocks");
-    setPriceUiForMode("stocks");
-    setVolumeUiForMode("stocks");
-    refreshOnce();
-  });
-
-  presetLargeCap?.addEventListener("click", () => {
-    setActive(presetLargeCap);
-    filterState.stocks.mcapTouched = true;
-    filterState.stocks.mcapValue = 541;
-    filterState.stocks.priceTouched = true;
-    filterState.stocks.priceValue = 5000;
-    filterState.stocks.volTouched = true;
-    filterState.stocks.volValue = 500_000;
-    filterState.stocks.pctMinOverride = 3;
-    setMcapUiForMode("stocks");
-    setPriceUiForMode("stocks");
-    setVolumeUiForMode("stocks");
-    refreshOnce();
-  });
-})();
+  // --- Filter Presets ---
+  (function initFilterPresets() {
+    const presetsRow = document.getElementById("filterPresets");
+    const presetDefault = document.getElementById("presetDefault");
+    const presetMidCap = document.getElementById("presetMidCap");
+    const presetLargeCap = document.getElementById("presetLargeCap");
+    if (!presetsRow) return;
+    function updateVisibility() { presetsRow.style.display = currentMode === "stocks" ? "flex" : "none"; }
+    const stocksTableEl = document.getElementById("stocksTable");
+    if (stocksTableEl) new MutationObserver(updateVisibility).observe(stocksTableEl, { attributes: true, attributeFilter: ["style"] });
+    updateVisibility();
+    function setActive(btn) { [presetDefault, presetMidCap, presetLargeCap].forEach(b => b?.classList.remove("preset-active")); btn?.classList.add("preset-active"); }
+    presetDefault?.addEventListener("click", () => {
+      setActive(presetDefault);
+      const state = filterState.stocks, d = MODE_DEFAULTS.stocks;
+      state.mcapTouched = false; state.mcapValue = d.mcapDial; state.priceTouched = false; state.priceValue = d.priceMax;
+      state.volTouched = false; state.volValue = d.volMin; state.pctMinOverride = null;
+      setUiDefaultsForMode("stocks"); refreshOnce();
+    });
+    presetMidCap?.addEventListener("click", () => {
+      setActive(presetMidCap);
+      Object.assign(filterState.stocks, { mcapTouched: true, mcapValue: 270, priceTouched: true, priceValue: 5000, volTouched: true, volValue: 500_000, pctMinOverride: 3 });
+      setMcapUiForMode("stocks"); setPriceUiForMode("stocks"); setVolumeUiForMode("stocks"); refreshOnce();
+    });
+    presetLargeCap?.addEventListener("click", () => {
+      setActive(presetLargeCap);
+      Object.assign(filterState.stocks, { mcapTouched: true, mcapValue: 541, priceTouched: true, priceValue: 5000, volTouched: true, volValue: 500_000, pctMinOverride: 3 });
+      setMcapUiForMode("stocks"); setPriceUiForMode("stocks"); setVolumeUiForMode("stocks"); refreshOnce();
+    });
+  })();
 
   // ----------------------------
-  // Legal modals (Privacy / Terms)
+  // Legal modals
   // ----------------------------
   (function initLegalModals() {
-    const privacyModal = document.getElementById("privacyModal");
-    const termsModal = document.getElementById("termsModal");
-
-    const openPrivacyBtn = document.getElementById("openPrivacyBtn");
-    const openTermsBtn = document.getElementById("openTermsBtn");
-
-    const closePrivacyBtn = document.getElementById("closePrivacyBtn");
-    const closeTermsBtn = document.getElementById("closeTermsBtn");
-
+    const privacyModal = document.getElementById("privacyModal"), termsModal = document.getElementById("termsModal");
+    const closePrivacyBtn = document.getElementById("closePrivacyBtn"), closeTermsBtn = document.getElementById("closeTermsBtn");
     if (!privacyModal || !termsModal) return;
-
-    function openModal(modalEl) {
-      modalEl.classList.add("is-open");
-      modalEl.setAttribute("aria-hidden", "false");
-      document.body.style.overflow = "hidden";
-    }
-
-    function closeModal(modalEl) {
-      modalEl.classList.remove("is-open");
-      modalEl.setAttribute("aria-hidden", "true");
-      document.body.style.overflow = "";
-    }
-
-    openPrivacyBtn?.addEventListener("click", () => openModal(privacyModal));
-    openTermsBtn?.addEventListener("click", () => openModal(termsModal));
-
-    closePrivacyBtn?.addEventListener("click", () => closeModal(privacyModal));
-    closeTermsBtn?.addEventListener("click", () => closeModal(termsModal));
-
-    // Click outside closes
-    privacyModal.addEventListener("click", (e) => {
-      if (e.target === privacyModal) closeModal(privacyModal);
-    });
-    termsModal.addEventListener("click", (e) => {
-      if (e.target === termsModal) closeModal(termsModal);
-    });
-
-    // ESC closes whichever is open
-    document.addEventListener("keydown", (e) => {
-      if (e.key !== "Escape") return;
-      if (privacyModal.classList.contains("is-open")) closeModal(privacyModal);
-      if (termsModal.classList.contains("is-open")) closeModal(termsModal);
-    });
+    function openM(m) { m.classList.add("is-open"); m.setAttribute("aria-hidden", "false"); document.body.style.overflow = "hidden"; }
+    function closeM(m) { m.classList.remove("is-open"); m.setAttribute("aria-hidden", "true"); document.body.style.overflow = ""; }
+    document.getElementById("openPrivacyBtn")?.addEventListener("click", () => openM(privacyModal));
+    document.getElementById("openTermsBtn")?.addEventListener("click", () => openM(termsModal));
+    closePrivacyBtn?.addEventListener("click", () => closeM(privacyModal));
+    closeTermsBtn?.addEventListener("click", () => closeM(termsModal));
+    privacyModal.addEventListener("click", (e) => { if (e.target === privacyModal) closeM(privacyModal); });
+    termsModal.addEventListener("click", (e) => { if (e.target === termsModal) closeM(termsModal); });
+    document.addEventListener("keydown", (e) => { if (e.key !== "Escape") return; if (privacyModal.classList.contains("is-open")) closeM(privacyModal); if (termsModal.classList.contains("is-open")) closeM(termsModal); });
   })();
 
   // ----------------------------
   // About / Contact modals
   // ----------------------------
   (function initAboutContactModals() {
-    const aboutModal = document.getElementById("aboutModal");
-    const contactModal = document.getElementById("contactModal");
+    const aboutModal = document.getElementById("aboutModal"), contactModal = document.getElementById("contactModal");
+    function openM(m) { if (!m) return; m.classList.add("is-open"); m.setAttribute("aria-hidden", "false"); document.body.style.overflow = "hidden"; }
+    function closeM(m) { if (!m) return; m.classList.remove("is-open"); m.setAttribute("aria-hidden", "true"); document.body.style.overflow = ""; }
+    document.getElementById("openAboutBtn")?.addEventListener("click", () => openM(aboutModal));
+    document.getElementById("openContactBtn")?.addEventListener("click", () => openM(contactModal));
+    document.getElementById("closeAboutBtn")?.addEventListener("click", () => closeM(aboutModal));
+    document.getElementById("closeContactBtn")?.addEventListener("click", () => closeM(contactModal));
+    document.getElementById("contactCancelBtn")?.addEventListener("click", () => closeM(contactModal));
+    aboutModal?.addEventListener("click", (e) => { if (e.target === aboutModal) closeM(aboutModal); });
+    contactModal?.addEventListener("click", (e) => { if (e.target === contactModal) closeM(contactModal); });
 
-    const openAboutBtn = document.getElementById("openAboutBtn");
-    const openContactBtn = document.getElementById("openContactBtn");
-
-    const closeAboutBtn = document.getElementById("closeAboutBtn");
-    const closeContactBtn = document.getElementById("closeContactBtn");
-    const contactCancelBtn = document.getElementById("contactCancelBtn");
-
-    function openModalSafe(modalEl) {
-      if (!modalEl) return;
-      modalEl.classList.add("is-open");
-      modalEl.setAttribute("aria-hidden", "false");
-      document.body.style.overflow = "hidden";
-    }
-
-    function closeModalSafe(modalEl) {
-      if (!modalEl) return;
-      modalEl.classList.remove("is-open");
-      modalEl.setAttribute("aria-hidden", "true");
-      document.body.style.overflow = "";
-    }
-
-    openAboutBtn?.addEventListener("click", () => openModalSafe(aboutModal));
-    openContactBtn?.addEventListener("click", () => openModalSafe(contactModal));
-
-    closeAboutBtn?.addEventListener("click", () => closeModalSafe(aboutModal));
-    closeContactBtn?.addEventListener("click", () => closeModalSafe(contactModal));
-    contactCancelBtn?.addEventListener("click", () => closeModalSafe(contactModal));
-
-    aboutModal?.addEventListener("click", (e) => {
-      if (e.target === aboutModal) closeModalSafe(aboutModal);
-    });
-
-    contactModal?.addEventListener("click", (e) => {
-      if (e.target === contactModal) closeModalSafe(contactModal);
-    });
-
-    // Contact form placeholder (no backend yet)
-    const contactForm = document.getElementById("contactForm");
-    contactForm?.addEventListener("submit", async (e) => {
+    document.getElementById("contactForm")?.addEventListener("submit", async (e) => {
       e.preventDefault();
-      
-      const formData = new FormData(contactForm);
-      const name = formData.get("name")?.trim();
-      const email = formData.get("email")?.trim();
-      const message = formData.get("message")?.trim();
-      
-      if (!name || !email || !message) {
-        alert("Please fill in all fields.");
-        return;
-      }
-      
-      const submitBtn = contactForm.querySelector('button[type="submit"]');
-      const originalText = submitBtn?.textContent;
-      if (submitBtn) {
-        submitBtn.disabled = true;
-        submitBtn.textContent = "Sending...";
-      }
-      
+      const fd = new FormData(e.target), name = fd.get("name")?.trim(), email = fd.get("email")?.trim(), message = fd.get("message")?.trim();
+      if (!name || !email || !message) { alert("Please fill in all fields."); return; }
+      const btn = e.target.querySelector('button[type="submit"]'), orig = btn?.textContent;
+      if (btn) { btn.disabled = true; btn.textContent = "Sending..."; }
       try {
-        const res = await fetch(`${API_BASE}/api/contact`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ name, email, message }),
-        });
-        
+        const res = await fetch(`${API_BASE}/api/contact`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name, email, message }) });
         const data = await res.json();
-        
-        if (res.ok) {
-          alert("Thanks! Your message has been sent.");
-          closeModalSafe(contactModal);
-          contactForm.reset();
-        } else {
-          alert(data.error || "Failed to send message. Please try again.");
-        }
-      } catch (err) {
-        console.error("Contact form error:", err);
-        alert("Failed to send message. Please try again.");
-      } finally {
-        if (submitBtn) {
-          submitBtn.disabled = false;
-          submitBtn.textContent = originalText;
-        }
-      }
+        if (res.ok) { alert("Thanks! Your message has been sent."); closeM(contactModal); e.target.reset(); }
+        else alert(data.error || "Failed to send message. Please try again.");
+      } catch { alert("Failed to send message. Please try again."); }
+      finally { if (btn) { btn.disabled = false; btn.textContent = orig; } }
     });
   })();
 
-// ----------------------------
-  // Drawer (burger menu)
+  // ----------------------------
+  // Drawer
   // ----------------------------
   (function initDrawer() {
-    const menuBtn = document.getElementById("menuBtn");
-    const drawer = document.getElementById("drawer");
-    const drawerOverlay = document.getElementById("drawerOverlay");
-    const drawerClose = document.getElementById("drawerClose");
-    const drawerAboutBtn = document.getElementById("drawerAboutBtn");
-    const drawerContactBtn = document.getElementById("drawerContactBtn");
-
+    const menuBtn = document.getElementById("menuBtn"), drawer = document.getElementById("drawer"), overlay = document.getElementById("drawerOverlay"), closeBtn = document.getElementById("drawerClose");
     if (!drawer || !menuBtn) return;
-
-    function openDrawer() {
-      drawer.classList.add("is-open");
-      drawer.setAttribute("aria-hidden", "false");
-      drawerOverlay?.classList.add("is-open");
-      document.body.style.overflow = "hidden";
-    }
-
-    function closeDrawer() {
-      drawer.classList.remove("is-open");
-      drawer.setAttribute("aria-hidden", "true");
-      drawerOverlay?.classList.remove("is-open");
-      document.body.style.overflow = "";
-    }
-
-    menuBtn.addEventListener("click", openDrawer);
-    drawerClose?.addEventListener("click", closeDrawer);
-    drawerOverlay?.addEventListener("click", closeDrawer);
-
-    // Close drawer when clicking a link
-    drawer.querySelectorAll("a.drawer-link").forEach(link => {
-      link.addEventListener("click", closeDrawer);
-    });
-
-    // About button in drawer
-    drawerAboutBtn?.addEventListener("click", () => {
-      closeDrawer();
-      const aboutModal = document.getElementById("aboutModal");
-      if (aboutModal) {
-        aboutModal.classList.add("is-open");
-        aboutModal.setAttribute("aria-hidden", "false");
-        document.body.style.overflow = "hidden";
-      }
-    });
-
-    // Contact button in drawer
-    drawerContactBtn?.addEventListener("click", () => {
-      closeDrawer();
-      const contactModal = document.getElementById("contactModal");
-      if (contactModal) {
-        contactModal.classList.add("is-open");
-        contactModal.setAttribute("aria-hidden", "false");
-        document.body.style.overflow = "hidden";
-      }
-    });
-
-    // ESC to close drawer
-    document.addEventListener("keydown", (e) => {
-      if (e.key === "Escape" && drawer.classList.contains("is-open")) {
-        closeDrawer();
-      }
-    });
-
-
+    function open() { drawer.classList.add("is-open"); drawer.setAttribute("aria-hidden", "false"); overlay?.classList.add("is-open"); document.body.style.overflow = "hidden"; }
+    function close() { drawer.classList.remove("is-open"); drawer.setAttribute("aria-hidden", "true"); overlay?.classList.remove("is-open"); document.body.style.overflow = ""; }
+    menuBtn.addEventListener("click", open);
+    closeBtn?.addEventListener("click", close);
+    overlay?.addEventListener("click", close);
+    drawer.querySelectorAll("a.drawer-link").forEach(l => l.addEventListener("click", close));
+    document.getElementById("drawerAboutBtn")?.addEventListener("click", () => { close(); const m = document.getElementById("aboutModal"); if (m) { m.classList.add("is-open"); m.setAttribute("aria-hidden", "false"); document.body.style.overflow = "hidden"; } });
+    document.getElementById("drawerContactBtn")?.addEventListener("click", () => { close(); const m = document.getElementById("contactModal"); if (m) { m.classList.add("is-open"); m.setAttribute("aria-hidden", "false"); document.body.style.overflow = "hidden"; } });
+    document.addEventListener("keydown", (e) => { if (e.key === "Escape" && drawer.classList.contains("is-open")) close(); });
   })();
 
+  // ----------------------------
+  // SJ Score unlock modal
+  // ----------------------------
+  document.addEventListener("click", (e) => {
+    const btn = e.target.closest(".sj-unlock-btn");
+    if (!btn) return;
+    const m = document.getElementById("sjUnlockModal");
+    if (m) { m.classList.add("is-open"); m.setAttribute("aria-hidden", "false"); document.body.style.overflow = "hidden"; setTimeout(() => document.getElementById("sjUnlockEmail")?.focus(), 100); }
+  });
 
-// SJ Score unlock — open alerts modal (subscription flow)
-// SJ Score unlock — open SJ unlock modal (NOT the subscribe modal)
-document.addEventListener("click", (e) => {
-  const btn = e.target.closest(".sj-unlock-btn");
-  if (!btn) return;
-  
-  const sjModal = document.getElementById("sjUnlockModal");
-  if (sjModal) {
-    sjModal.classList.add("is-open");
-    sjModal.setAttribute("aria-hidden", "false");
-    document.body.style.overflow = "hidden";
-    // Focus the email input
-    const emailInput = document.getElementById("sjUnlockEmail");
-    if (emailInput) setTimeout(() => emailInput.focus(), 100);
-  }
-});
+  (function initSjUnlockModal() {
+    const modal = document.getElementById("sjUnlockModal"), closeBtn = document.getElementById("closeSjUnlockBtn");
+    const verifyBtn = document.getElementById("sjUnlockVerifyBtn"), emailInput = document.getElementById("sjUnlockEmail");
+    const errorEl = document.getElementById("sjUnlockError"), successEl = document.getElementById("sjUnlockSuccess");
+    if (!modal) return;
+    function close() { modal.classList.remove("is-open"); modal.setAttribute("aria-hidden", "true"); document.body.style.overflow = ""; }
+    closeBtn?.addEventListener("click", close);
+    modal.addEventListener("click", (e) => { if (e.target === modal) close(); });
+    document.addEventListener("keydown", (e) => { if (e.key === "Escape" && modal.classList.contains("is-open")) close(); });
+    document.getElementById("sjUnlockSubscribeLink")?.addEventListener("click", (e) => { e.preventDefault(); close(); document.getElementById("enableAlertsBtn")?.click(); });
 
-// SJ Unlock modal — close handlers
-(function initSjUnlockModal() {
-  const modal = document.getElementById("sjUnlockModal");
-  const closeBtn = document.getElementById("closeSjUnlockBtn");
-  const verifyBtn = document.getElementById("sjUnlockVerifyBtn");
-  const emailInput = document.getElementById("sjUnlockEmail");
-  const errorEl = document.getElementById("sjUnlockError");
-  const successEl = document.getElementById("sjUnlockSuccess");
-  const subscribeLink = document.getElementById("sjUnlockSubscribeLink");
-  
-  if (!modal) return;
-  
-  function closeModal() {
-    modal.classList.remove("is-open");
-    modal.setAttribute("aria-hidden", "true");
-    document.body.style.overflow = "";
-  }
-  
-  closeBtn?.addEventListener("click", closeModal);
-  modal.addEventListener("click", (e) => {
-    if (e.target === modal) closeModal();
-  });
-  document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape" && modal.classList.contains("is-open")) closeModal();
-  });
-  
-  // Subscribe link → close this modal, open alerts modal
-  subscribeLink?.addEventListener("click", (e) => {
-    e.preventDefault();
-    closeModal();
-    const alertsBtn = document.getElementById("enableAlertsBtn");
-    if (alertsBtn) alertsBtn.click();
-  });
-  
-  // Verify button
-  verifyBtn?.addEventListener("click", async () => {
-    const email = (emailInput?.value || "").trim().toLowerCase();
-    
-    // Hide previous messages
-    if (errorEl) errorEl.style.display = "none";
-    if (successEl) successEl.style.display = "none";
-    
-    if (!email || !email.includes("@")) {
-      if (errorEl) {
-        errorEl.textContent = "Please enter a valid email address.";
-        errorEl.style.display = "block";
-      }
-      return;
-    }
-    
-    // Show loading state
-    verifyBtn.disabled = true;
-    verifyBtn.textContent = "Verifying...";
-    
-    try {
-      const res = await fetch(`${API_BASE}/api/verify-subscriber?email=${encodeURIComponent(email)}`);
-      const data = await res.json();
-      
-      if (data.active) {
-        // Save to localStorage
-        localStorage.setItem("sj_subscriber_email", email);
-        
-        if (successEl) {
-          successEl.textContent = "✓ Verified! All SJ Scores are now unlocked.";
-          successEl.style.display = "block";
+    verifyBtn?.addEventListener("click", async () => {
+      const email = (emailInput?.value || "").trim().toLowerCase();
+      if (errorEl) errorEl.style.display = "none"; if (successEl) successEl.style.display = "none";
+      if (!email || !email.includes("@")) { if (errorEl) { errorEl.textContent = "Please enter a valid email address."; errorEl.style.display = "block"; } return; }
+      verifyBtn.disabled = true; verifyBtn.textContent = "Verifying...";
+      try {
+        const res = await fetch(`${API_BASE}/api/verify-subscriber?email=${encodeURIComponent(email)}`);
+        const data = await res.json();
+        if (data.active) {
+          localStorage.setItem("sj_subscriber_email", email);
+          if (successEl) { successEl.textContent = "✓ Verified! All SJ Scores are now unlocked."; successEl.style.display = "block"; }
+          setTimeout(() => { close(); refreshOnce(); }, 1200);
+        } else {
+          if (errorEl) { errorEl.textContent = "No active subscription found for this email. Subscribe below to unlock."; errorEl.style.display = "block"; }
         }
-        
-        // Force re-render to unblur all scores
-        setTimeout(() => {
-          closeModal();
-          // Trigger a refresh to re-render with unblurred scores
-          refreshOnce();
-        }, 1200);
-        
-      } else {
-        if (errorEl) {
-          errorEl.textContent = "No active subscription found for this email. Subscribe below to unlock.";
-          errorEl.style.display = "block";
-        }
-      }
-    } catch (err) {
-      console.error("[sj-unlock] Verification error:", err);
-      if (errorEl) {
-        errorEl.textContent = "Verification failed. Please try again.";
-        errorEl.style.display = "block";
-      }
-    } finally {
-      verifyBtn.disabled = false;
-      verifyBtn.textContent = "Verify & Unlock";
-    }
-  });
-  
-  // Enter key submits
-  emailInput?.addEventListener("keydown", (e) => {
-    if (e.key === "Enter") verifyBtn?.click();
-  });
-})();
+      } catch { if (errorEl) { errorEl.textContent = "Verification failed. Please try again."; errorEl.style.display = "block"; } }
+      finally { verifyBtn.disabled = false; verifyBtn.textContent = "Verify & Unlock"; }
+    });
+    emailInput?.addEventListener("keydown", (e) => { if (e.key === "Enter") verifyBtn?.click(); });
+  })();
 
-/* ============================================
-   NOTIFICATION BETA BANNER — JS
-   
-   Add via <script src="notif-banner.js" defer>
-   or paste at the bottom of app.js.
-   ============================================ */
-
-   (function () {
-    'use strict';
-  
-    const DISMISS_KEY = 'sj_notif_banner_dismissed';
-    const WAITLIST_KEY = 'sj_notif_waitlist_joined';
-  
+  // ----------------------------
+  // Notification banner
+  // ----------------------------
+  (function () {
+    const DISMISS_KEY = 'sj_notif_banner_dismissed', WAITLIST_KEY = 'sj_notif_waitlist_joined';
     const banner = document.getElementById('notifBanner');
     if (!banner) return;
-  
-    // ── Already dismissed? Hide immediately ──
-    if (localStorage.getItem(DISMISS_KEY) === '1') {
-      banner.classList.add('notif-dismissed');
-      return;
-    }
-  
-    // ── Already on waitlist? Show "You're on the list" state ──
+    if (localStorage.getItem(DISMISS_KEY) === '1') { banner.classList.add('notif-dismissed'); return; }
     const savedEmail = localStorage.getItem(WAITLIST_KEY);
-    if (savedEmail) {
-      showJoinedState(savedEmail);
-    }
-  
-    // ── Dismiss handler ──
-    const closeBtn = document.getElementById('notifBannerClose');
-    if (closeBtn) {
-      closeBtn.addEventListener('click', () => {
-        banner.classList.add('notif-banner-hiding');
-        setTimeout(() => {
-          banner.classList.add('notif-dismissed');
-          localStorage.setItem(DISMISS_KEY, '1');
-        }, 300);
-      });
-    }
-  
-    // ── Form submit handler ──
-    const form = document.getElementById('notifWaitlistForm');
-    const emailInput = document.getElementById('notifEmail');
-    const submitBtn = document.getElementById('notifSubmitBtn');
-    const msgEl = document.getElementById('notifFormMsg');
-  
+    if (savedEmail) showJoinedState(savedEmail);
+
+    document.getElementById('notifBannerClose')?.addEventListener('click', () => {
+      banner.classList.add('notif-banner-hiding');
+      setTimeout(() => { banner.classList.add('notif-dismissed'); localStorage.setItem(DISMISS_KEY, '1'); }, 300);
+    });
+
+    const form = document.getElementById('notifWaitlistForm'), emailInput = document.getElementById('notifEmail'), submitBtn = document.getElementById('notifSubmitBtn');
     if (form) {
       form.addEventListener('submit', async (e) => {
         e.preventDefault();
-  
         const email = emailInput.value.trim();
-        if (!email || !isValidEmail(email)) {
-          showMsg('Please enter a valid email.', 'error');
-          return;
-        }
-  
-        // Disable button, show loading
+        if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { showMsg('Please enter a valid email.', 'error'); return; }
         submitBtn.disabled = true;
-        submitBtn.querySelector('.notif-submit-text').style.display = 'none';
-        submitBtn.querySelector('.notif-submit-loading').style.display = 'inline-flex';
-  
+        const loadEl = submitBtn.querySelector('.notif-submit-loading'), textEl = submitBtn.querySelector('.notif-submit-text');
+        if (textEl) textEl.style.display = 'none'; if (loadEl) loadEl.style.display = 'inline-flex';
         try {
-          // ── POST to your backend endpoint ──
-          // Replace this URL with your actual waitlist endpoint
-          const res = await fetch('https://api.stockjelli.com/api/notif-waitlist', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email }),
-          });
-  
-          if (res.ok) {
-            localStorage.setItem(WAITLIST_KEY, email);
-            showMsg("You're on the list! We'll notify you when the beta launches.", 'success');
-            showJoinedState(email);
-          } else {
-            const data = await res.json().catch(() => ({}));
-            showMsg(data.message || 'Something went wrong. Try again.', 'error');
-          }
-        } catch (err) {
-          // ── Fallback: save locally even if endpoint isn't wired yet ──
-          console.warn('Waitlist endpoint not available, saving locally:', err);
-          localStorage.setItem(WAITLIST_KEY, email);
-          showMsg("You're on the list! We'll email you when the beta launches.", 'success');
-          showJoinedState(email);
-        } finally {
-          submitBtn.disabled = false;
-          submitBtn.querySelector('.notif-submit-text').style.display = '';
-          submitBtn.querySelector('.notif-submit-loading').style.display = 'none';
-        }
+          const res = await fetch(`${API_BASE}/api/notif-waitlist`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email }) });
+          if (res.ok) { localStorage.setItem(WAITLIST_KEY, email); showMsg("You're on the list!", 'success'); showJoinedState(email); }
+          else { const d = await res.json().catch(() => ({})); showMsg(d.message || 'Something went wrong.', 'error'); }
+        } catch { localStorage.setItem(WAITLIST_KEY, email); showMsg("You're on the list!", 'success'); showJoinedState(email); }
+        finally { submitBtn.disabled = false; if (textEl) textEl.style.display = ''; if (loadEl) loadEl.style.display = 'none'; }
       });
     }
-  
-    // ── Helpers ──
-  
-    function isValidEmail(email) {
-      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-    }
-  
+
     function showMsg(text, type) {
-      if (!msgEl) return;
-      msgEl.textContent = text;
-      msgEl.className = 'notif-form-msg ' + (type === 'success' ? 'msg-success' : 'msg-error');
-      msgEl.style.display = 'block';
+      const el = document.getElementById('notifFormMsg'); if (!el) return;
+      el.textContent = text; el.className = 'notif-form-msg ' + (type === 'success' ? 'msg-success' : 'msg-error'); el.style.display = 'block';
     }
-  
     function showJoinedState(email) {
-      // Replace the form with a compact "you're in" confirmation
       if (!form) return;
-      form.innerHTML = `
-        <div style="display: flex; align-items: center; gap: 6px; font-size: 0.74rem;">
-          <span style="color: #4ade80;">✓</span>
-          <span style="color: rgba(255,255,255,0.5);">
-            <strong style="color: #4ade80;">You're on the list</strong>
-            &middot; ${maskEmail(email)}
-          </span>
-        </div>
-      `;
-    }
-  
-    function maskEmail(email) {
       const [user, domain] = email.split('@');
-      if (!domain) return email;
-      const masked = user.length > 2
-        ? user[0] + '···' + user[user.length - 1]
-        : user[0] + '···';
-      return masked + '@' + domain;
+      const masked = (user.length > 2 ? user[0] + '···' + user[user.length - 1] : user[0] + '···') + '@' + (domain || '');
+      form.innerHTML = `<div style="display:flex;align-items:center;gap:6px;font-size:0.74rem;"><span style="color:#4ade80;">✓</span><span style="color:rgba(255,255,255,0.5);"><strong style="color:#4ade80;">You're on the list</strong> · ${masked}</span></div>`;
     }
-  
   })();
-
-
-
-
-
-
-
-
-
 
 })();

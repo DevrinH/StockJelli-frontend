@@ -430,6 +430,9 @@
       return;
     }
 
+    // Remove loading placeholder and any non-data rows
+    tbody.querySelectorAll("tr:not([data-symbol])").forEach(tr => tr.remove());
+
     // --- FIRST: snapshot current positions ---
     const firstPositions = new Map();
     const existingRows = new Map();

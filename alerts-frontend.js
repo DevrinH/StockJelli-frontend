@@ -261,9 +261,12 @@
     const bar = document.getElementById("alertProofBar");
     if (!bar || !alertLogData) return;
 
-    const all = alertLogData.notifications || [];
-    // v2 alerts only (the current formula)
-    const v2 = all.filter(a => a.formulaVersion === "v2.1");
+    const mode = getCurrentAssetMode();
+    let all = alertLogData.notifications || [];
+    if (mode === "stocks") all = all.filter(a => a.mode === "stocks");
+    else if (mode === "crypto") all = all.filter(a => a.mode === "crypto");
+    // v2 current: v2.1 for stocks, v2 for crypto
+    const v2 = all.filter(a => a.formulaVersion === "v2.1" || (a.formulaVersion === "v2" && a.mode === "crypto"));
     const wp = v2.filter(a => a.peakAfterPush != null);
     if (wp.length < 3) { bar.style.display = "none"; return; } // need minimum sample
 
@@ -518,7 +521,8 @@
   });
 
   document.getElementById("assetControl")?.querySelectorAll(".segmented-btn").forEach(btn => {
-    btn.addEventListener("click", () => setTimeout(renderTodayAlerts, 100));
+    btn.addEventListener("click", () => setTimeout(() => { renderProofBar(); renderTodayAlerts(); }, 100));
+    
   });
 
   fetchAlertLog();

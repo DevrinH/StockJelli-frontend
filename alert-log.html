@@ -237,7 +237,8 @@
     }
 
     // ── Helpers ──
-    function isV2(a) { return a.formulaVersion === "v2.1"; }
+    function isV2(a) { return a.formulaVersion === "v2.1" || a.formulaVersion === "v2"; }
+    
     function isV1(a) { return !isV2(a); }
 
     function computeStats(alerts) {

@@ -253,11 +253,15 @@
 
     // ── Version comparison cards ──
     function renderVersionCards() {
-      if (!logData) return;
-      const all = logData.notifications || [];
+  if (!logData) return;
+  let all = logData.notifications || [];
+  
+  // Filter by current mode toggle
+  if (logMode === "stocks") all = all.filter(a => a.mode === "stocks");
+  else if (logMode === "crypto") all = all.filter(a => a.mode === "crypto");
 
-      const v1Alerts = all.filter(isV1);
-      const v2Alerts = all.filter(isV2);
+  const v1Alerts = all.filter(isV1);
+  const v2Alerts = all.filter(isV2);
       const v1s = computeStats(v1Alerts);
       const v2s = computeStats(v2Alerts);
 

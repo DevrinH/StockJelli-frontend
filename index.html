@@ -72,9 +72,25 @@
       gtag('js', new Date());
       gtag('config', 'G-FM3HXT7ECV', { anonymize_ip: true });
     </script>
+
+    <!-- Prefetch API data IMMEDIATELY — don't wait for deferred scripts -->
+    <script>
+      (function() {
+        var API = "https://api.stockjelli.com";
+        var tz = Intl.DateTimeFormat().resolvedOptions().timeZone || "";
+        var mode = localStorage.getItem("sj_asset_mode") || (tz.startsWith("America/") ? "stocks" : "crypto");
+        var path = mode === "crypto"
+          ? "/api/crypto?limit=15&pctMin=3&volMin=1000000&priceMax=300&newsRequired=false&highVolumeOnly=false&mcapMin=50000000"
+          : "/api/stocks?limit=15&pctMin=4&volMin=1000000&priceMax=300&newsRequired=false&highVolumeOnly=false&mcapMin=100000000";
+        window.__sjPrefetch = fetch(API + path, { cache: "no-store" }).then(function(r) { return r.json(); });
+        window.__sjPrefetchMode = mode;
+        window.__sjAlertPrefetch = fetch(API + "/api/notification-log?limit=500", { cache: "no-store" }).then(function(r) { return r.json(); });
+      })();
+    </script>
+
   <script src="promo-toast.js" defer></script>
-    <script src="app.js?v=2" defer></script>
-    <script src="alerts-frontend.js?v=2" defer></script>
+    <script src="app.js?v=3" defer></script>
+    <script src="alerts-frontend.js?v=3" defer></script>
     <script src="account.js" defer></script>
     <script src="feature-additions.js" defer></script>
     <script src="sponsor.js" defer></script>

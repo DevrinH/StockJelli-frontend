@@ -932,8 +932,26 @@
 
   async function refreshOnce() {
     try {
-      const path = buildApiPath(currentMode);
-      const data = await apiGet(path);
+      let data;
+
+      // On first call, consume prefetched data if available and mode matches
+      if (window.__sjPrefetch && currentMode === window.__sjPrefetchMode) {
+        try {
+          data = await window.__sjPrefetch;
+          window.__sjPrefetch = null; // consume once
+          console.log("[StockJelli] Using prefetched data");
+        } catch (e) {
+          window.__sjPrefetch = null;
+          // Fall through to normal fetch
+        }
+      }
+
+      // Normal fetch (or prefetch failed/consumed)
+      if (!data) {
+        const path = buildApiPath(currentMode);
+        data = await apiGet(path);
+      }
+
       applyHeaderFromApi(data);
       let rows = data.rows;
       const highVolOnly = filterEls.highVolChk?.checked || false;

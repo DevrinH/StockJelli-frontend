@@ -221,9 +221,27 @@
 
   async function fetchAlertLog() {
     try {
-      const res = await fetch(`${API_BASE}/api/notification-log?limit=500`);
-      if (!res.ok) return;
-      alertLogData = await res.json();
+      let data;
+
+      // On first call, consume prefetched alert data if available
+      if (window.__sjAlertPrefetch) {
+        try {
+          data = await window.__sjAlertPrefetch;
+          window.__sjAlertPrefetch = null;
+          console.log("[alert-log] Using prefetched data");
+        } catch (e) {
+          window.__sjAlertPrefetch = null;
+        }
+      }
+
+      // Normal fetch (or prefetch failed/consumed)
+      if (!data) {
+        const res = await fetch(`${API_BASE}/api/notification-log?limit=500`);
+        if (!res.ok) return;
+        data = await res.json();
+      }
+
+      alertLogData = data;
       const today = new Date().toLocaleDateString("en-CA", { timeZone: "America/New_York" });
       alertedSymbolsToday.clear();
       for (const a of (alertLogData.notifications || [])) { if (a.date === today) alertedSymbolsToday.add(a.symbol); }

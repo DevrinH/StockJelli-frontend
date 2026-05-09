@@ -63,8 +63,16 @@
     <link rel="apple-touch-icon" sizes="180x180" href="/StockJelli-Social-Logo.png">
     <link rel="manifest" href="/manifest.json">
   
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8792646979011381"
-    crossorigin="anonymous"></script>
+    <!-- AdSense: delayed load — don't block critical render path -->
+    <script>
+      setTimeout(function() {
+        var s = document.createElement('script');
+        s.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8792646979011381';
+        s.async = true;
+        s.crossOrigin = 'anonymous';
+        document.head.appendChild(s);
+      }, 3000);
+    </script>
   
     <!-- Google Analytics (GA4) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-FM3HXT7ECV"></script>

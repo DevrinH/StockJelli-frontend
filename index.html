@@ -54,6 +54,8 @@
     
     <link rel="stylesheet" href="style.css" />
     <link rel="stylesheet" href="sponsor.css" />
+    <!-- Preload critical JS so download starts during HTML parsing -->
+    <link rel="preload" href="app.js?v=4" as="script" />
     <!-- Favicons -->
     <link rel="icon" type="image/png" sizes="16x16" href="/StockJelli-S-Logo.png">
     <link rel="icon" type="image/png" sizes="32x32" href="/StockJelli-S-Logo.png">
@@ -88,10 +90,12 @@
       })();
     </script>
 
-  <script src="promo-toast.js" defer></script>
-    <script src="app.js?v=3" defer></script>
-    <script src="alerts-frontend.js?v=3" defer></script>
+  <!-- Critical: screener + alerts load first -->
+    <script src="app.js?v=4" defer></script>
+    <script src="alerts-frontend.js?v=4" defer></script>
+    <!-- Non-critical: load after data is rendering -->
     <script src="account.js" defer></script>
+    <script src="promo-toast.js" defer></script>
     <script src="feature-additions.js" defer></script>
     <script src="sponsor.js" defer></script>
     <script src="/push-client.js" defer></script>

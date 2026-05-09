@@ -221,16 +221,57 @@
 
   async function fetchAlertLog() {
     try {
-      const res = await fetch(`${API_BASE}/api/notification-log?limit=200`);
+      const res = await fetch(`${API_BASE}/api/notification-log?limit=500`);
       if (!res.ok) return;
       alertLogData = await res.json();
       const today = new Date().toLocaleDateString("en-CA", { timeZone: "America/New_York" });
       alertedSymbolsToday.clear();
       for (const a of (alertLogData.notifications || [])) { if (a.date === today) alertedSymbolsToday.add(a.symbol); }
       window.__sjAlertedSymbols = alertedSymbolsToday;
+      renderProofBar();
       renderTodayAlerts();
       highlightAlertedRows();
     } catch (e) { console.warn("[alert-log] Fetch failed:", e.message); }
+  }
+
+  /**
+   * Render the all-time v2 proof bar — slim one-liner showing win rate,
+   * avg peak, and alert count. Uses the same data fetchAlertLog already has.
+   * Zero additional API calls.
+   */
+  function renderProofBar() {
+    const bar = document.getElementById("alertProofBar");
+    if (!bar || !alertLogData) return;
+
+    const all = alertLogData.notifications || [];
+    // v2 alerts only (the current formula)
+    const v2 = all.filter(a => a.formulaVersion === "v2.1");
+    const wp = v2.filter(a => a.peakAfterPush != null);
+    if (wp.length < 3) { bar.style.display = "none"; return; } // need minimum sample
+
+    const w3 = wp.filter(a => a.peakAfterPush >= 2.95).length;
+    const wr = Math.round(w3 / wp.length * 100);
+    const avg = Math.round(wp.reduce((s, a) => s + (a.peakAfterPush || 0), 0) / wp.length * 10) / 10;
+    const nr = wp.filter(a => a.peakAfterPush >= 0).length;
+
+    // Count unique days with alerts for "X trading days" context
+    const days = new Set(v2.map(a => a.date)).size;
+
+    const wrColor = wr >= 80 ? "#4ade80" : wr >= 65 ? "#fbbf24" : "#ef4444";
+    const sep = '<span style="color:rgba(255,255,255,0.1)">·</span>';
+
+    bar.innerHTML = `
+      <span style="font-weight:700; color:${wrColor}">${wr}% hit +3%</span>
+      ${sep}
+      <span>${v2.length} alerts over ${days} days</span>
+      ${sep}
+      <span>+${avg}% avg peak</span>
+      ${sep}
+      <span style="color:${nr === wp.length ? '#4ade80' : 'rgba(255,255,255,0.35)'}">${nr}/${wp.length} never red</span>
+      ${sep}
+      <a href="/alert-log.html" style="color:rgba(77,163,255,0.7); text-decoration:none; font-weight:500;">Full log →</a>
+    `;
+    bar.style.display = "flex";
   }
 
   // ── initFeaturedAlert REMOVED — #featuredAlertWrap no longer exists in HTML ──

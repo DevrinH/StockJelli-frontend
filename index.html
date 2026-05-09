@@ -4,8 +4,13 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     
+    <!-- Preconnect to API for faster first fetch -->
+    <link rel="preconnect" href="https://api.stockjelli.com" crossorigin />
+    <link rel="dns-prefetch" href="https://api.stockjelli.com" />
+    <link rel="dns-prefetch" href="https://financialmodelingprep.com" />
+    
     <!-- Primary Meta Tags -->
-    <title>StockJelli — Free Stock & Crypto Momentum Screener | Clean Momentum, No Noise test</title>
+    <title>StockJelli — Free Stock & Crypto Momentum Screener | Clean Momentum, No Noise</title>
     <meta name="title" content="StockJelli — Free Stock & Crypto Momentum Screener | Clean Momentum, No Noise" />
     <meta name="description" content="Free momentum screener for stocks and crypto. Spot clean breakouts with real-time data, volume analysis, and news catalysts. Optional $5/month alerts. No hype, no noise." />
     <meta name="keywords" content="stock screener, crypto screener, momentum trading, momentum stocks, stock scanner, crypto scanner, day trading, swing trading, stock alerts, crypto alerts, free stock screener" />
@@ -68,12 +73,12 @@
       gtag('config', 'G-FM3HXT7ECV', { anonymize_ip: true });
     </script>
   <script src="promo-toast.js" defer></script>
-    <script src="app.js" defer></script>
-    <script src="alerts-frontend.js" defer></script>
+    <script src="app.js?v=2" defer></script>
+    <script src="alerts-frontend.js?v=2" defer></script>
     <script src="account.js" defer></script>
     <script src="feature-additions.js" defer></script>
     <script src="sponsor.js" defer></script>
-    <script src="/push-client.js"></script>
+    <script src="/push-client.js" defer></script>
 
     
     <!-- JSON-LD Structured Data -->
@@ -376,7 +381,11 @@
       </div>
     </div>
    
-    <!-- Stats row -->
+    <!-- All-time v2 proof bar (slim, one-line) -->
+    <div id="alertProofBar" style="display:none; margin-bottom:8px; padding:6px 12px; border-radius:8px; background:rgba(34,197,94,0.04); border:1px solid rgba(34,197,94,0.08); font-size:0.68rem; color:rgba(255,255,255,0.45); display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
+    </div>
+
+    <!-- Today's stats row -->
     <div id="alertCardsStats" class="alert-stats-row"></div>
    
     <!-- Alert rows -->

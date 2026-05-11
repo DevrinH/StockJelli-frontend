@@ -429,7 +429,7 @@ let todayAlerts = (alertLogData.notifications || []).filter(a => {
     const now = Date.now();
     const withPeak = todayAlerts.filter(a => {
       if (a.peakAfterPush == null) return false;
-      if (a.mode === "crypto" && a.pushTimestamp && (now - new Date(a.pushTimestamp).getTime()) < 15 * 60 * 1000) return false;
+      if (a.mode === "crypto" && a.peakAfterPush < 0 && a.pushTimestamp && (now - new Date(a.pushTimestamp).getTime()) < 15 * 60 * 1000) return false;
       return true;
     });
     
@@ -469,7 +469,7 @@ let todayAlerts = (alertLogData.notifications || []).filter(a => {
           const peakStr = peak != null ? `+${peak.toFixed(1)}%` : "—";
           const peakColor = isWin ? "#4ade80" : isDud && peak >= 0 ? "#fbbf24" : isDud ? "#ef4444" : "rgba(255,255,255,0.3)";
           const ageMs = a.pushTimestamp ? Date.now() - new Date(a.pushTimestamp).getTime() : Infinity;
-          const isImmature = a.mode === "crypto" && ageMs < 15 * 60 * 1000;
+          const isImmature = a.mode === "crypto" && peak !== null && peak < 0 && ageMs < 15 * 60 * 1000;
           const resultIcon = (peak == null || isImmature) ? '<span style="color:rgba(255,255,255,0.15);font-size:0.7rem">⏳</span>' : isWin ? '<span style="background:rgba(34,197,94,0.15);padding:2px 5px;border-radius:4px">✅</span>' : '<span style="background:rgba(239,68,68,0.12);padding:2px 5px;border-radius:4px">❌</span>';
           const modeIcon = a.mode === "crypto" ? "🪙" : "📈";
           const time = new Date(a.pushTimestamp).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", hour12: true }).toLowerCase();

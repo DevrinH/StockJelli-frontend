@@ -258,14 +258,6 @@
    * Zero additional API calls.
    */
   function renderProofBar() {
-    
-    const now = Date.now();
-const matured = wp.filter(a => {
-  if (a.mode === 'crypto' && a.pushTimestamp) {
-    return (now - new Date(a.pushTimestamp).getTime()) >= 6 * 60 * 60 * 1000;
-  }
-  return true;
-});
     const bar = document.getElementById("alertProofBar");
     if (!bar || !alertLogData) return;
 
@@ -275,15 +267,20 @@ const matured = wp.filter(a => {
     else if (mode === "crypto") all = all.filter(a => a.mode === "crypto");
     // v2 current: v2.1 for stocks, v2 for crypto
     const v2 = all.filter(a => a.formulaVersion === "v2.1" || (a.formulaVersion === "v2" && a.mode === "crypto"));
-    const wp = v2.filter(a => a.peakAfterPush != null);
-    if (wp.length < 3) { bar.style.display = "none"; return; } // need minimum sample
+    const now = Date.now();
+    // Exclude crypto alerts less than 6h old — still tracking, not yet judged
+    const wp = v2.filter(a => {
+      if (a.peakAfterPush == null) return false;
+      if (a.mode === "crypto" && a.pushTimestamp && (now - new Date(a.pushTimestamp).getTime()) < 6 * 60 * 60 * 1000) return false;
+      return true;
+    });
+    if (wp.length < 1) { bar.style.display = "none"; return; }
 
     const w3 = wp.filter(a => a.peakAfterPush >= 2.95).length;
     const wr = Math.round(w3 / wp.length * 100);
     const avg = Math.round(wp.reduce((s, a) => s + (a.peakAfterPush || 0), 0) / wp.length * 10) / 10;
     const nr = wp.filter(a => a.peakAfterPush >= 0).length;
 
-    // Count unique days with alerts for "X trading days" context
     const days = new Set(v2.map(a => a.date)).size;
 
     const wrColor = wr >= 80 ? "#4ade80" : wr >= 65 ? "#fbbf24" : "#ef4444";
@@ -421,7 +418,14 @@ const matured = wp.filter(a => {
     if (mode === "stocks") todayAlerts = todayAlerts.filter(a => a.mode === "stocks");
     else if (mode === "crypto") todayAlerts = todayAlerts.filter(a => a.mode === "crypto");
 
-    const withPeak = todayAlerts.filter(a => a.peakAfterPush != null);
+
+    const now = Date.now();
+    const withPeak = todayAlerts.filter(a => {
+      if (a.peakAfterPush == null) return false;
+      if (a.mode === "crypto" && a.pushTimestamp && (now - new Date(a.pushTimestamp).getTime()) < 6 * 60 * 60 * 1000) return false;
+      return true;
+    });
+    
     const winners = withPeak.filter(a => a.peakAfterPush >= 2.95).length;
     const duds = withPeak.filter(a => a.peakAfterPush < 0).length;
     const neverRed = withPeak.filter(a => a.peakAfterPush >= 0).length;
@@ -457,7 +461,9 @@ const matured = wp.filter(a => {
           const isDud = peak != null && peak < 3;
           const peakStr = peak != null ? `+${peak.toFixed(1)}%` : "—";
           const peakColor = isWin ? "#4ade80" : isDud && peak >= 0 ? "#fbbf24" : isDud ? "#ef4444" : "rgba(255,255,255,0.3)";
-          const resultIcon = peak == null ? '<span style="color:rgba(255,255,255,0.15);font-size:0.7rem">⏳</span>' : isWin ? '<span style="background:rgba(34,197,94,0.15);padding:2px 5px;border-radius:4px">✅</span>' : '<span style="background:rgba(239,68,68,0.12);padding:2px 5px;border-radius:4px">❌</span>';
+          const ageMs = a.pushTimestamp ? Date.now() - new Date(a.pushTimestamp).getTime() : Infinity;
+          const isImmature = a.mode === "crypto" && ageMs < 6 * 60 * 60 * 1000;
+          const resultIcon = (peak == null || isImmature) ? '<span style="color:rgba(255,255,255,0.15);font-size:0.7rem">⏳</span>' : isWin ? '<span style="background:rgba(34,197,94,0.15);padding:2px 5px;border-radius:4px">✅</span>' : '<span style="background:rgba(239,68,68,0.12);padding:2px 5px;border-radius:4px">❌</span>';
           const modeIcon = a.mode === "crypto" ? "🪙" : "📈";
           const time = new Date(a.pushTimestamp).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", hour12: true }).toLowerCase();
           const priceAtPush = a.priceAtPush != null ? `$${a.priceAtPush.toFixed(2)}` : "$—";

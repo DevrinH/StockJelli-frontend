@@ -414,7 +414,14 @@
 
     const today = new Date().toLocaleDateString("en-CA", { timeZone: "America/New_York" });
     const mode = getCurrentAssetMode();
-    let todayAlerts = (alertLogData.notifications || []).filter(a => a.date === today);
+    
+    const now24h = Date.now() - 24 * 60 * 60 * 1000;
+let todayAlerts = (alertLogData.notifications || []).filter(a => {
+  if (a.mode === "crypto" && a.pushTimestamp) {
+    return new Date(a.pushTimestamp).getTime() >= now24h;
+  }
+  return a.date === today;
+});
     if (mode === "stocks") todayAlerts = todayAlerts.filter(a => a.mode === "stocks");
     else if (mode === "crypto") todayAlerts = todayAlerts.filter(a => a.mode === "crypto");
 

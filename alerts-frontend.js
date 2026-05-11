@@ -258,6 +258,14 @@
    * Zero additional API calls.
    */
   function renderProofBar() {
+    
+    const now = Date.now();
+const matured = wp.filter(a => {
+  if (a.mode === 'crypto' && a.pushTimestamp) {
+    return (now - new Date(a.pushTimestamp).getTime()) >= 6 * 60 * 60 * 1000;
+  }
+  return true;
+});
     const bar = document.getElementById("alertProofBar");
     if (!bar || !alertLogData) return;
 

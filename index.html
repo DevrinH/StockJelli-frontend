@@ -256,6 +256,112 @@
 
 <body>
 
+  <!-- 
+  INCIDENT BANNER — Add right after <body> tag, before <header>
+  Remove after May 16 or when ready
+-->
+ 
+<!-- CSS — Add to style.css or inline in <head> -->
+<style>
+  .incident-banner {
+    background: linear-gradient(90deg, rgba(234, 179, 8, 0.06) 0%, rgba(234, 179, 8, 0.03) 100%);
+    border-bottom: 1px solid rgba(234, 179, 8, 0.15);
+    padding: 10px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    font-size: 0.78rem;
+    color: rgba(255, 255, 255, 0.7);
+    line-height: 1.5;
+    position: relative;
+    z-index: 100;
+  }
+   
+  .incident-banner.hidden {
+    display: none;
+  }
+   
+  .incident-banner-icon {
+    font-size: 1rem;
+    flex-shrink: 0;
+  }
+   
+  .incident-banner-text {
+    max-width: 720px;
+    text-align: center;
+  }
+   
+  .incident-banner-text a {
+    color: rgba(234, 179, 8, 0.9);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+   
+  .incident-banner-text a:hover {
+    color: #eab308;
+  }
+   
+  .incident-banner-close {
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.3);
+    cursor: pointer;
+    font-size: 1rem;
+    padding: 4px 8px;
+    flex-shrink: 0;
+    transition: color 0.2s;
+  }
+   
+  .incident-banner-close:hover {
+    color: rgba(255, 255, 255, 0.6);
+  }
+   
+  /* Mobile: slightly smaller */
+  @media (max-width: 640px) {
+    .incident-banner {
+      font-size: 0.72rem;
+      padding: 8px 12px;
+      gap: 8px;
+    }
+  }
+  </style>
+   
+  <!-- HTML — Add right after <body>, before <header> -->
+  <div class="incident-banner" id="incidentBanner">
+    <span class="incident-banner-icon">⚠️</span>
+    <span class="incident-banner-text">
+      <strong>May 12:</strong> Crypto alerts from 12am–5am ET were affected by stale data from a provider rate limit. All affected alerts removed. Stocks unaffected. 
+      <a href="https://x.com/StockJelli" target="_blank" rel="noopener">Details →</a>
+    </span>
+    <button class="incident-banner-close" id="incidentBannerClose" type="button" aria-label="Dismiss">✕</button>
+  </div>
+   
+  <!-- JS — Add to bottom of page or in existing script -->
+  <script>
+  (function() {
+    var BANNER_KEY = 'sj_incident_banner_may12';
+    var banner = document.getElementById('incidentBanner');
+    var closeBtn = document.getElementById('incidentBannerClose');
+    
+    // Hide if already dismissed
+    if (localStorage.getItem(BANNER_KEY) === 'dismissed') {
+      banner.classList.add('hidden');
+    }
+    
+    // Auto-expire after May 16
+    var expiry = new Date('2026-05-16T23:59:59Z');
+    if (new Date() > expiry) {
+      banner.classList.add('hidden');
+    }
+    
+    closeBtn.addEventListener('click', function() {
+      banner.classList.add('hidden');
+      localStorage.setItem(BANNER_KEY, 'dismissed');
+    });
+  })();
+  </script>
+
   <header class="header">
     <div class="header-inner">
       <div class="header-left">

@@ -271,16 +271,24 @@
       : `https://www.tradingview.com/chart/?symbol=${symbol}&aff_id=${aff}`;
   }
 
+  const failedLogos = new Set();
+
   function renderTickerCell(symbol, type = "stock", imageUrl = null) {
     const tvUrl = getTradingViewUrl(symbol, type);
     let logoHtml = "";
-    if (type === "crypto" && imageUrl) {
-      logoHtml = `<img class="ticker-logo" src="${imageUrl}" alt="" loading="lazy" onerror="this.dataset.failed='true'">`;
-    } else if (type === "stock" && symbol && symbol !== "—") {
-      logoHtml = `<img class="ticker-logo" src="https://financialmodelingprep.com/image-stock/${encodeURIComponent(symbol)}.png" alt="" loading="lazy" onerror="this.dataset.failed='true'">`;
+    if (type === "crypto" && imageUrl && !failedLogos.has(imageUrl)) {
+      logoHtml = `<img class="ticker-logo" src="${imageUrl}" alt="" loading="lazy" onerror="window.__sjLogoFailed(this, '${imageUrl}')">`;
+    } else if (type === "stock" && symbol && symbol !== "—" && !failedLogos.has(symbol)) {
+      const src = "https://financialmodelingprep.com/image-stock/" + encodeURIComponent(symbol) + ".png";
+      logoHtml = `<img class="ticker-logo" src="${src}" alt="" loading="lazy" onerror="window.__sjLogoFailed(this, '${symbol}')">`;
     }
     return `<span class="ticker-wrap">${logoHtml}<span class="ticker-symbol">${symbol}</span><a class="ticker-tv-link" href="${tvUrl}" target="_blank" rel="noopener" title="Open ${symbol} on TradingView"><span class="ticker-tv-tooltip">Open in TradingView ↗</span></a></span>`;
   }
+
+  window.__sjLogoFailed = function(el, key) {
+    failedLogos.add(key);
+    el.remove();
+  };
 
   function renderWhaleIndicator(volume, avgVolume, marketCap, pctChange, rangePosition, mode) {
     if (!volume || !marketCap || marketCap === 0) return "";

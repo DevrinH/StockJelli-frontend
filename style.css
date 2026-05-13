@@ -857,7 +857,18 @@ tbody tr:first-child {
     }
   }
   
-  
+  /* Stabilize column widths during live updates */
+.stocks-table th,
+.stocks-table td {
+  font-variant-numeric: tabular-nums;
+  -webkit-font-feature-settings: "tnum";
+  font-feature-settings: "tnum";
+}
+
+.price-cell {
+  white-space: nowrap;
+  min-width: 68px;
+}
   /* ===========================================
      10. RANGE INDICATOR
      =========================================== */
@@ -4035,31 +4046,16 @@ tr.sj-alerted:hover {
    Add to the end of style.css
    ═══════════════════════════════════════════════════ */
 
-/* Number flash on value change */
-@keyframes numFlashUp {
-  0%   { background: rgba(34, 197, 94, 0.25); }
-  100% { background: transparent; }
-}
-@keyframes numFlashDown {
-  0%   { background: rgba(239, 68, 68, 0.25); }
-  100% { background: transparent; }
-}
-
+/* Color-only flash — no background animation to avoid layout shifts */
 .num-flash-up {
-  animation: numFlashUp 600ms ease-out;
-  border-radius: 4px;
+  color: #4ade80 !important;
+  transition: color 0.6s ease-out;
 }
 .num-flash-down {
-  animation: numFlashDown 600ms ease-out;
-  border-radius: 4px;
+  color: #f87171 !important;
+  transition: color 0.6s ease-out;
 }
 
-/* Ensure rows can animate transforms without layout issues */
-#stocksTbody tr[data-symbol],
-#cryptoTbody tr[data-symbol] {
-  will-change: transform, opacity;
-  position: relative;
-}
 
 /* ═══════════════════════════════════════════════════
    FLIP ANIMATION — Number Flash + Row Transitions
@@ -4085,10 +4081,9 @@ tr.sj-alerted:hover {
   border-radius: 4px;
 }
 
-/* Ensure rows can animate transforms without layout issues */
+/* Row positioning for FLIP — will-change set dynamically by JS only during animation */
 #stocksTbody tr[data-symbol],
 #cryptoTbody tr[data-symbol] {
-  will-change: transform, opacity;
   position: relative;
 }
 

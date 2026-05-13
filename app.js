@@ -563,20 +563,28 @@
 
   function animateNumber(el, from, to, duration, formatter) {
     const start = performance.now();
+    // Lock cell width during animation to prevent column breathing
+    el.style.minWidth = el.offsetWidth + "px";
     function tick(now) {
       const progress = Math.min(1, (now - start) / duration);
       const eased = 1 - Math.pow(1 - progress, 3);
       el.textContent = formatter(from + (to - from) * eased, to);
-      if (progress < 1) requestAnimationFrame(tick);
+      if (progress < 1) {
+        requestAnimationFrame(tick);
+      } else {
+        // Release width lock once final value is painted
+        el.style.minWidth = "";
+      }
     }
     requestAnimationFrame(tick);
   }
 
   function flashCell(el, direction) {
     el.classList.remove("num-flash-up", "num-flash-down");
-    void el.offsetWidth;
-    el.classList.add(direction === "up" ? "num-flash-up" : "num-flash-down");
-    setTimeout(() => el.classList.remove("num-flash-up", "num-flash-down"), 650);
+    requestAnimationFrame(() => {
+      el.classList.add(direction === "up" ? "num-flash-up" : "num-flash-down");
+      setTimeout(() => el.classList.remove("num-flash-up", "num-flash-down"), 650);
+    });
   }
 
   function formatPrice(current, finalValue) {

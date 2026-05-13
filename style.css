@@ -4092,3 +4092,57 @@ tr.sj-alerted:hover {
   will-change: transform, opacity;
   position: relative;
 }
+
+/* ── Fix column twitching: lock column widths ── */
+.stocks-table {
+  table-layout: fixed;
+}
+
+/* Stocks table columns: Ticker | Price | % Change | Volume | RVOL | News | SJ */
+#stocksTable colgroup,
+#cryptoTable colgroup { display: table-column-group; }
+
+#stocksTable { table-layout: fixed; }
+#stocksTable th:nth-child(1), #stocksTable td:nth-child(1) { width: 18%; }  /* Ticker */
+#stocksTable th:nth-child(2), #stocksTable td:nth-child(2) { width: 12%; }  /* Price */
+#stocksTable th:nth-child(3), #stocksTable td:nth-child(3) { width: 22%; }  /* % Change */
+#stocksTable th:nth-child(4), #stocksTable td:nth-child(4) { width: 12%; }  /* Volume */
+#stocksTable th:nth-child(5), #stocksTable td:nth-child(5) { width: 10%; }  /* RVOL */
+#stocksTable th:nth-child(6), #stocksTable td:nth-child(6) { width: 14%; }  /* News */
+#stocksTable th:nth-child(7), #stocksTable td:nth-child(7) { width: 12%; }  /* SJ */
+
+/* Crypto table columns: Coin | Price | % Change 24h | Vol 24h | RVOL | Market Cap | SJ */
+#cryptoTable { table-layout: fixed; }
+#cryptoTable th:nth-child(1), #cryptoTable td:nth-child(1) { width: 18%; }
+#cryptoTable th:nth-child(2), #cryptoTable td:nth-child(2) { width: 12%; }
+#cryptoTable th:nth-child(3), #cryptoTable td:nth-child(3) { width: 22%; }
+#cryptoTable th:nth-child(4), #cryptoTable td:nth-child(4) { width: 12%; }
+#cryptoTable th:nth-child(5), #cryptoTable td:nth-child(5) { width: 10%; }
+#cryptoTable th:nth-child(6), #cryptoTable td:nth-child(6) { width: 14%; }
+#cryptoTable th:nth-child(7), #cryptoTable td:nth-child(7) { width: 12%; }
+
+/* Tabular nums so digit widths don't vary */
+.stocks-table th,
+.stocks-table td {
+  font-variant-numeric: tabular-nums;
+}
+
+.price-cell,
+.change-pct {
+  white-space: nowrap;
+}
+
+@media (max-width: 640px) {
+  /* Adjust fixed widths for mobile (News + RVOL hidden) */
+  #stocksTable th:nth-child(1), #stocksTable td:nth-child(1) { width: 22%; }
+  #stocksTable th:nth-child(2), #stocksTable td:nth-child(2) { width: 16%; }
+  #stocksTable th:nth-child(3), #stocksTable td:nth-child(3) { width: 26%; }
+  #stocksTable th:nth-child(4), #stocksTable td:nth-child(4) { width: 14%; }
+  #stocksTable th:nth-child(7), #stocksTable td:nth-child(7) { width: 14%; }
+
+  #cryptoTable th:nth-child(1), #cryptoTable td:nth-child(1) { width: 22%; }
+  #cryptoTable th:nth-child(2), #cryptoTable td:nth-child(2) { width: 16%; }
+  #cryptoTable th:nth-child(3), #cryptoTable td:nth-child(3) { width: 26%; }
+  #cryptoTable th:nth-child(4), #cryptoTable td:nth-child(4) { width: 14%; }
+  #cryptoTable th:nth-child(7), #cryptoTable td:nth-child(7) { width: 14%; }
+}

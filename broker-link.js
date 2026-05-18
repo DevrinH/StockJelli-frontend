@@ -87,39 +87,39 @@
     // ── Inline Picker — below hero-compact ──
   
     function initBrokerPicker() {
-      const hero = document.querySelector(".hero-compact");
-      if (!hero) return;
-  
-      const bar = document.createElement("div");
-      bar.className = "broker-bar";
-      bar.innerHTML = `
-        <span class="broker-bar-label">Open tickers in</span>
-        <div class="broker-bar-options" id="brokerPickerOptions">
-          <button class="broker-chip" data-broker="tradingview" type="button">
-            <span class="broker-chip-icon">📊</span>
-            <span class="broker-chip-name">TradingView</span>
-          </button>
-          <button class="broker-chip" data-broker="robinhood" type="button">
-            <span class="broker-chip-icon">🪶</span>
-            <span class="broker-chip-name">Robinhood</span>
-          </button>
-          <button class="broker-chip" data-broker="webull" type="button">
-            <span class="broker-chip-icon">🐂</span>
-            <span class="broker-chip-name">Webull</span>
-          </button>
-        </div>
-      `;
-  
-      hero.parentNode.insertBefore(bar, hero.nextSibling);
-      updatePickerUI();
-  
-      document.getElementById("brokerPickerOptions")?.addEventListener("click", (e) => {
-        const btn = e.target.closest(".broker-chip");
-        if (!btn) return;
-        setSelectedBroker(btn.dataset.broker);
+        const hero = document.querySelector(".hero-compact .container .hero-compact-inner");
+        if (!hero) return;
+    
+        const bar = document.createElement("div");
+        bar.className = "broker-bar";
+        bar.innerHTML = `
+          <span class="broker-bar-label">Open tickers in</span>
+          <div class="broker-bar-options" id="brokerPickerOptions">
+            <button class="broker-chip" data-broker="tradingview" type="button">
+              <span class="broker-chip-icon">📊</span>
+              <span class="broker-chip-name">TradingView</span>
+            </button>
+            <button class="broker-chip" data-broker="robinhood" type="button">
+              <span class="broker-chip-icon">🪶</span>
+              <span class="broker-chip-name">Robinhood</span>
+            </button>
+            <button class="broker-chip" data-broker="webull" type="button">
+              <span class="broker-chip-icon">🐂</span>
+              <span class="broker-chip-name">Webull</span>
+            </button>
+          </div>
+        `;
+    
+        hero.appendChild(bar);
         updatePickerUI();
-      });
-    }
+    
+        document.getElementById("brokerPickerOptions")?.addEventListener("click", (e) => {
+          const btn = e.target.closest(".broker-chip");
+          if (!btn) return;
+          setSelectedBroker(btn.dataset.broker);
+          updatePickerUI();
+        });
+      }
   
     function updatePickerUI() {
       const current = getSelectedBroker();

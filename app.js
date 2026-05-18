@@ -273,8 +273,17 @@
 
   const failedLogos = new Set();
 
-  function renderTickerCell(symbol, type = "stock", imageUrl = null) {
-    const tvUrl = getTradingViewUrl(symbol, type);
+  function renderTickerCell(symbol, type = "stock", imageUrl = null, exchange = null) {
+    const url = window.getBrokerUrl
+      ? window.getBrokerUrl(symbol, type, exchange)
+      : (type === "crypto"
+          ? `https://www.tradingview.com/chart/?symbol=BINANCE:${symbol}USDT&aff_id=162729`
+          : `https://www.tradingview.com/chart/?symbol=${symbol}&aff_id=162729`);
+    
+    const tooltip = window.getBrokerTooltip
+      ? window.getBrokerTooltip(symbol)
+      : `Open ${symbol} on TradingView ↗`;
+
     let logoHtml = "";
     if (type === "crypto" && imageUrl && !failedLogos.has(imageUrl)) {
       logoHtml = `<img class="ticker-logo" src="${imageUrl}" alt="" loading="lazy" onerror="window.__sjLogoFailed(this, '${imageUrl}')">`;
@@ -282,7 +291,7 @@
       const src = "https://financialmodelingprep.com/image-stock/" + encodeURIComponent(symbol) + ".png";
       logoHtml = `<img class="ticker-logo" src="${src}" alt="" loading="lazy" onerror="window.__sjLogoFailed(this, '${symbol}')">`;
     }
-    return `<span class="ticker-wrap">${logoHtml}<span class="ticker-symbol">${symbol}</span><a class="ticker-tv-link" href="${tvUrl}" target="_blank" rel="noopener" title="Open ${symbol} on TradingView"><span class="ticker-tv-tooltip">Open in TradingView ↗</span></a></span>`;
+    return `<span class="ticker-wrap">${logoHtml}<span class="ticker-symbol">${symbol}</span><a class="ticker-tv-link" href="${url}" target="_blank" rel="noopener" title="${tooltip}"><span class="ticker-tv-tooltip">${tooltip}</span></a></span>`;
   }
 
   window.__sjLogoFailed = function(el, key) {
@@ -630,7 +639,7 @@
       const changeClass = classUpDown(pct);
       const rangeHtml = renderRangeIndicator(x.dayLow ?? x.rangeLow, x.dayHigh ?? x.rangeHigh, x.price);
       const newsHtml = renderNewsCell(x.news);
-      const tickerHtml = renderTickerCell(x.symbol || "—", "stock");
+      const tickerHtml = renderTickerCell(x.symbol || "—", "stock", null, x.exchange || null);
       if (x.enteredPrice) updatePeakPrice(x.symbol, x.price, x.enteredPrice);
       const entryAttrs = renderSinceEntryAttrs(x.price, x.enteredPrice, x.enteredAt, x.symbol);
 

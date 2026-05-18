@@ -475,7 +475,11 @@ let todayAlerts = (alertLogData.notifications || []).filter(a => {
           const time = new Date(a.pushTimestamp).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", hour12: true }).toLowerCase();
           const priceAtPush = a.priceAtPush != null ? `$${a.priceAtPush.toFixed(2)}` : "$—";
           const peakPriceStr = a.peakAfterPushPrice ? `$${a.peakAfterPushPrice.toFixed(2)}` : peakStr;
-          const tvUrl = a.mode === "crypto" ? `https://www.tradingview.com/chart/?symbol=BINANCE:${a.symbol}USDT&aff_id=162729` : `https://www.tradingview.com/chart/?symbol=${a.symbol}&aff_id=162729`;
+          const tvUrl = window.getBrokerUrl
+          ? window.getBrokerUrl(a.symbol, a.mode === "crypto" ? "crypto" : "stock", a.exchange || null)
+          : (a.mode === "crypto"
+              ? `https://www.tradingview.com/chart/?symbol=BINANCE:${a.symbol}USDT&aff_id=162729`
+              : `https://www.tradingview.com/chart/?symbol=${a.symbol}&aff_id=162729`);
           const sj = a.sjScore || "—";
           const sjColor = sj >= 75 ? "#4ade80" : sj >= 60 ? "#e2e8f0" : "#64748b";
 

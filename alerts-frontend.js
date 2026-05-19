@@ -491,7 +491,7 @@ let todayAlerts = (alertLogData.notifications || []).filter(a => {
               <span class="alert-log-prices">${priceAtPush} → <span style="color:${peakColor}">${peakPriceStr}</span></span>
               <span class="alert-log-gain" style="color:${peakColor}">${peakStr}</span>
               <span class="alert-log-score" style="color:${sjColor}">${sj}</span>
-              <span class="alert-log-result">${resultIcon}${a.tweetUrl ? `<a href="${a.tweetUrl}" target="_blank" rel="noopener" style="opacity:0.35;font-size:0.65rem;margin-left:3px;text-decoration:none;" title="View tweet">𝕏</a>` : ''}</span>
+              <span class="alert-log-result">${resultIcon}${a.tweetUrl ? `<a href="${a.tweetUrl}" target="_blank" rel="noopener" style="color:#fff;opacity:0.5;font-size:0.7rem;margin-left:5px;text-decoration:none;font-weight:700;" title="View on X">𝕏</a>` : ''}</span>
             `,
           };
         });

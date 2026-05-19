@@ -382,7 +382,7 @@
           <span class="log-row-prices">${priceAtPush} → <span style="color:${peakColor}">${peakPriceStr}</span></span>
           <span class="log-row-gain" style="color:${peakColor}">${peakStr}</span>
           <span class="log-row-score" style="color:${sjColor}">${sj}</span>
-          <span class="log-row-result">${resultIcon}</span>
+          <span class="log-row-result">${resultIcon}${a.tweetUrl ? `<a href="${a.tweetUrl}" target="_blank" rel="noopener" style="opacity:0.35;font-size:0.65rem;margin-left:3px;text-decoration:none;" title="View tweet">𝕏</a>` : ''}</span>
         </div>`;
       }).join("");
     }
@@ -393,6 +393,7 @@
       if (!btn) return;
       logMode = btn.dataset.value;
       document.querySelectorAll("#logToggle .segmented-btn").forEach(b => b.classList.toggle("segmented-on", b.dataset.value === logMode));
+      renderVersionCards();
       renderLog();
     });
 

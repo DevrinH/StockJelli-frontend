@@ -96,15 +96,15 @@
       <span class="broker-bar-label">Open tickers in</span>
       <div class="broker-bar-options" id="brokerPickerOptions">
         <button class="broker-chip" data-broker="tradingview" type="button">
-          <img class="broker-chip-logo" src="/icons/tradingview-logo.svg" alt="" width="14" height="14" />
+          <img class="broker-chip-logo" src="/icons/tradingview-logo.png" alt="" width="14" height="14" />
           <span class="broker-chip-name">TradingView</span>
         </button>
         <button class="broker-chip" data-broker="robinhood" type="button">
-          <img class="broker-chip-logo" src="/icons/robinhood-logo.svg" alt="" width="14" height="14" />
+          <img class="broker-chip-logo" src="/icons/robinhood-logo.png" alt="" width="14" height="14" />
           <span class="broker-chip-name">Robinhood</span>
         </button>
         <button class="broker-chip" data-broker="webull" type="button">
-          <img class="broker-chip-logo" src="/icons/webull-logo.svg" alt="" width="14" height="14" />
+          <img class="broker-chip-logo" src="/icons/webull-logo.png" alt="" width="14" height="14" />
           <span class="broker-chip-name">Webull</span>
         </button>
       </div>

@@ -104,3 +104,11 @@
       font-size: 0.56rem;
     }
   }
+
+  .broker-chip-logo {
+    width: 14px;
+    height: 14px;
+    border-radius: 3px;
+    object-fit: contain;
+    flex-shrink: 0;
+  }

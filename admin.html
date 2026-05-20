@@ -410,7 +410,192 @@
 .section-body.collapsed {
   display: none;
 }
-
+.swing-wl-section {
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+}
+.swing-wl-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.swing-wl-title-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.swing-wl-title {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #2dd4bf;
+  font-family: var(--mono);
+  margin: 0;
+  letter-spacing: 0.02em;
+}
+.swing-wl-sub {
+  font-size: 0.68rem;
+  color: var(--muted);
+  font-family: var(--mono);
+}
+.swing-wl-badge {
+  font-size: 0.6rem;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  font-family: var(--mono);
+  background: rgba(45,212,191,0.12);
+  color: #2dd4bf;
+  border: 1px solid rgba(45,212,191,0.2);
+}
+.swing-wl-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.sw-stat-card {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 10px;
+  text-align: center;
+}
+.sw-stat-val {
+  font-size: 1rem;
+  font-weight: 800;
+  font-family: var(--mono);
+  color: var(--text);
+}
+.sw-stat-lbl {
+  font-size: 0.52rem;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-top: 2px;
+}
+.swing-wl-filter-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.sw-filter-input {
+  padding: 5px 10px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text);
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  width: 120px;
+  outline: none;
+}
+.sw-filter-input:focus { border-color: #2dd4bf; }
+.sw-filter-input::placeholder { color: #334155; }
+.sw-filter-select {
+  padding: 5px 8px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text);
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  outline: none;
+  cursor: pointer;
+}
+.sw-ticker-btn {
+  padding: 4px 10px;
+  background: rgba(45,212,191,0.06);
+  border: 1px solid rgba(45,212,191,0.15);
+  border-radius: 6px;
+  color: var(--muted);
+  font-size: 0.68rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: var(--mono);
+}
+.sw-ticker-btn.active {
+  background: #2dd4bf;
+  color: #0a0d14;
+  border-color: #2dd4bf;
+}
+.sw-ticker-btn:hover { background: rgba(45,212,191,0.2); }
+.sw-dl-btn {
+  padding: 4px 10px;
+  background: rgba(59,130,246,0.1);
+  border: 1px solid rgba(59,130,246,0.2);
+  border-radius: 6px;
+  color: var(--accent);
+  font-size: 0.68rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: var(--mono);
+}
+.sw-dl-btn:hover { background: var(--accent); color: #0a0d14; }
+.swing-wl-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.72rem;
+  font-family: var(--mono);
+  margin-top: 8px;
+}
+.swing-wl-table th {
+  text-align: left;
+  padding: 6px 8px;
+  color: var(--muted);
+  font-size: 0.6rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  border-bottom: 1px solid var(--border);
+  font-weight: 600;
+  background: var(--surface2);
+  white-space: nowrap;
+  cursor: pointer;
+  user-select: none;
+}
+.swing-wl-table th:hover { color: #2dd4bf; }
+.swing-wl-table th.sorted { color: #2dd4bf; }
+.swing-wl-table td {
+  padding: 6px 8px;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+.swing-wl-table tr:hover td {
+  background: rgba(45,212,191,0.04);
+}
+.swing-wl-table-wrap {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  max-height: 500px;
+  overflow-y: auto;
+}
+.swing-wl-empty {
+  text-align: center;
+  padding: 20px;
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 0.75rem;
+}
+.sw-count-badge {
+  font-size: 0.62rem;
+  color: var(--muted);
+  font-family: var(--mono);
+}
+@media (max-width: 640px) {
+  .swing-wl-section { padding: 10px 12px; }
+  .swing-wl-header { flex-direction: column; align-items: flex-start; }
+  .swing-wl-stats-grid { grid-template-columns: repeat(2, 1fr); }
+  .sw-stat-val { font-size: 0.85rem; }
+  .swing-wl-table th, .swing-wl-table td { padding: 4px 6px; font-size: 0.65rem; }
+}
 
 </style>
 </head>
@@ -541,7 +726,49 @@
     </div>
   </div><!-- end leveragedSection -->
 
-
+  <div class="swing-wl-section" id="swingWlSection">
+    <div class="swing-wl-header">
+      <div class="swing-wl-title-row">
+        <button class="section-collapse-btn" id="swingWlCollapseBtn" title="Collapse">▼</button>
+        <span style="font-size:1rem;">📊</span>
+        <h3 class="swing-wl-title">Swing Watchlist Tracker</h3>
+        <span class="swing-wl-sub" id="swingWlSub">Loading…</span>
+        <span class="swing-wl-badge">DATA COLLECTION</span>
+      </div>
+      <div style="display:flex; gap:6px; flex-wrap:wrap; align-items:center;">
+        <select class="ctrl-select" id="swingWlWeekSelect"></select>
+        <button class="sw-dl-btn" id="swingWlDlJsonBtn">⬇ JSON</button>
+        <button class="sw-dl-btn" id="swingWlDlCsvBtn">⬇ CSV</button>
+        <button class="sw-ticker-btn" id="swingWlRefreshBtn">↻</button>
+      </div>
+    </div>
+   
+    <div class="section-body" id="swingWlBody">
+      <!-- Filters -->
+      <div class="swing-wl-filter-row" id="swingWlFilterRow">
+        <input type="text" class="sw-filter-input" id="swingWlFilterSymbol" placeholder="Symbol…" style="width:90px;" />
+        <select class="sw-filter-select" id="swingWlFilterSector"><option value="">All Sectors</option></select>
+        <select class="sw-filter-select" id="swingWlFilterPctMin">
+          <option value="">Any %</option>
+          <option value="1">≥ 1%</option>
+          <option value="2">≥ 2%</option>
+          <option value="3">≥ 3%</option>
+          <option value="5">≥ 5%</option>
+          <option value="-999">Negative only</option>
+        </select>
+        <select class="sw-filter-select" id="swingWlFilterDate"><option value="">All Dates</option></select>
+        <span class="sw-count-badge" id="swingWlCount"></span>
+      </div>
+   
+      <!-- Stats -->
+      <div class="swing-wl-stats-grid" id="swingWlStatsGrid"></div>
+   
+      <!-- Table -->
+      <div class="swing-wl-table-wrap" id="swingWlTableWrap">
+        <div class="swing-wl-empty">Loading…</div>
+      </div>
+    </div>
+  </div>
 
   <div class="table-container" id="tableContainer">
     <div class="loading">Loading data...</div>
@@ -1668,6 +1895,431 @@ if (localStorage.getItem('sj_lev_collapsed') === '1') {
  
   if ($('dashboard')?.classList.contains('visible')) {
     fetchLeveragedData();
+  }
+})();
+
+// ══════════════════════════════════════════════════════════════════════════
+// SWING WATCHLIST ADMIN PANEL
+// ══════════════════════════════════════════════════════════════════════════
+(function initSwingWatchlistPanel() {
+  const API = 'https://api.stockjelli.com';
+  let swData = null;
+  let swWeek = null;
+  let swSortCol = 'pctChangeAtEntry';
+  let swSortDir = 'desc';
+ 
+  const $ = id => document.getElementById(id);
+ 
+  // Collapse toggle
+  $('swingWlCollapseBtn').addEventListener('click', () => {
+    const btn = $('swingWlCollapseBtn');
+    const body = $('swingWlBody');
+    btn.classList.toggle('collapsed');
+    body.classList.toggle('collapsed');
+    localStorage.setItem('sj_sw_collapsed', btn.classList.contains('collapsed') ? '1' : '0');
+  });
+  if (localStorage.getItem('sj_sw_collapsed') === '1') {
+    $('swingWlCollapseBtn').classList.add('collapsed');
+    $('swingWlBody').classList.add('collapsed');
+  }
+ 
+  // Outcome keys to display
+  const SW_OUTCOME_KEYS = [
+    'outcome_5m','outcome_10m','outcome_15m','outcome_20m','outcome_25m','outcome_30m',
+    'outcome_45m','outcome_1h','outcome_1h15m','outcome_1h30m','outcome_1h45m',
+    'outcome_2h','outcome_2h30m','outcome_3h','outcome_4h','outcome_6h','outcome_eod'
+  ];
+  const SW_OUTCOME_LABELS = {
+    outcome_5m:'5m', outcome_10m:'10m', outcome_15m:'15m', outcome_20m:'20m',
+    outcome_25m:'25m', outcome_30m:'30m', outcome_45m:'45m', outcome_1h:'1h',
+    outcome_1h15m:'1:15', outcome_1h30m:'1:30', outcome_1h45m:'1:45',
+    outcome_2h:'2h', outcome_2h30m:'2:30', outcome_3h:'3h', outcome_4h:'4h',
+    outcome_6h:'6h', outcome_eod:'EOD'
+  };
+ 
+  // Week selector
+  const swWeekSel = $('swingWlWeekSelect');
+  swWeekSel.addEventListener('change', () => { swWeek = swWeekSel.value; fetchSwingData(); });
+ 
+  // Filters
+  $('swingWlFilterSymbol').addEventListener('input', () => renderSwing());
+  $('swingWlFilterSector').addEventListener('change', () => renderSwing());
+  $('swingWlFilterPctMin').addEventListener('change', () => renderSwing());
+  $('swingWlFilterDate').addEventListener('change', () => renderSwing());
+ 
+  // Refresh
+  $('swingWlRefreshBtn').addEventListener('click', fetchSwingData);
+ 
+  // Downloads
+  $('swingWlDlJsonBtn').addEventListener('click', () => {
+    const entries = getFilteredSwEntries();
+    if (!entries.length) return;
+    const blob = new Blob([JSON.stringify(entries, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = `sj-swing-watchlist-${swWeek || 'data'}.json`;
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    showToast('Downloaded JSON');
+  });
+ 
+  $('swingWlDlCsvBtn').addEventListener('click', () => {
+    const entries = getFilteredSwEntries();
+    if (!entries.length) return;
+    const csv = buildSwCsv(entries);
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = `sj-swing-watchlist-${swWeek || 'data'}.csv`;
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    showToast('Downloaded CSV');
+  });
+ 
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    if (!t) return;
+    t.textContent = msg; t.classList.add('visible');
+    setTimeout(() => t.classList.remove('visible'), 2000);
+  }
+ 
+  async function fetchSwingData() {
+    try {
+      if (swWeekSel.options.length === 0) {
+        const wRes = await fetch(`${API}/api/weekly-report/weeks`);
+        const wData = await wRes.json();
+        const weeks = (wData.weeks || []).sort().reverse();
+        swWeekSel.innerHTML = '';
+        weeks.forEach((w, i) => {
+          const o = document.createElement('option');
+          o.value = w; o.textContent = w + (i === 0 ? ' (latest)' : '');
+          swWeekSel.appendChild(o);
+        });
+        if (!swWeek && weeks.length) swWeek = weeks[0];
+        swWeekSel.value = swWeek;
+      }
+ 
+      const res = await fetch(`${API}/api/weekly-report?week=${swWeek || ''}`);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const fullReport = await res.json();
+ 
+      swData = fullReport.swing || { allEntries: [], entriesByDate: {}, outcomeStats: {} };
+      populateFilters();
+      renderSwing();
+    } catch (e) {
+      console.warn('[swing-wl] Fetch failed:', e.message);
+      $('swingWlTableWrap').innerHTML = '<div class="swing-wl-empty">Failed to load: ' + e.message + '</div>';
+    }
+  }
+ 
+  function populateFilters() {
+    if (!swData) return;
+    const entries = swData.allEntries || [];
+ 
+    // Sector filter
+    const sectors = new Set();
+    for (const e of entries) if (e.sectorAtEntry) sectors.add(e.sectorAtEntry);
+    const sectorSel = $('swingWlFilterSector');
+    const curSector = sectorSel.value;
+    sectorSel.innerHTML = '<option value="">All Sectors</option>';
+    [...sectors].sort().forEach(s => {
+      const o = document.createElement('option'); o.value = s; o.textContent = s;
+      sectorSel.appendChild(o);
+    });
+    sectorSel.value = curSector;
+ 
+    // Date filter
+    const dates = new Set();
+    for (const e of entries) if (e.date) dates.add(e.date);
+    const dateSel = $('swingWlFilterDate');
+    const curDate = dateSel.value;
+    dateSel.innerHTML = '<option value="">All Dates</option>';
+    [...dates].sort().reverse().forEach(d => {
+      const o = document.createElement('option'); o.value = d; o.textContent = d.slice(5);
+      dateSel.appendChild(o);
+    });
+    dateSel.value = curDate;
+  }
+ 
+  function getFilteredSwEntries() {
+    if (!swData || !swData.allEntries) return [];
+    let entries = swData.allEntries;
+ 
+    const sym = ($('swingWlFilterSymbol').value || '').trim().toUpperCase();
+    if (sym) entries = entries.filter(e => (e.symbol || '').includes(sym));
+ 
+    const sector = $('swingWlFilterSector').value;
+    if (sector) entries = entries.filter(e => (e.sectorAtEntry || '') === sector);
+ 
+    const pctMin = $('swingWlFilterPctMin').value;
+    if (pctMin === '-999') entries = entries.filter(e => (e.pctChangeAtEntry || 0) < 0);
+    else if (pctMin) entries = entries.filter(e => (e.pctChangeAtEntry || 0) >= parseFloat(pctMin));
+ 
+    const date = $('swingWlFilterDate').value;
+    if (date) entries = entries.filter(e => e.date === date);
+ 
+    return entries;
+  }
+ 
+  function renderSwing() {
+    if (!swData) return;
+ 
+    const entries = getFilteredSwEntries();
+    const allEntries = swData.allEntries || [];
+ 
+    // Subtitle
+    $('swingWlSub').textContent = `${entries.length}/${allEntries.length} entries · ${swWeek || ''}`;
+    $('swingWlCount').textContent = entries.length !== allEntries.length ? `${entries.length}/${allEntries.length}` : '';
+ 
+    renderSwStats(entries, allEntries);
+    renderSwTable(entries);
+  }
+ 
+  function renderSwStats(entries, allEntries) {
+    const grid = $('swingWlStatsGrid');
+    if (!allEntries.length) {
+      grid.innerHTML = '<div class="swing-wl-empty" style="grid-column:1/-1;">No swing watchlist data for this week. Data is captured at 9:35 AM ET on trading days.</div>';
+      return;
+    }
+ 
+    const uniqueDays = new Set(entries.map(e => e.date)).size;
+    const uniqueSymbols = new Set(entries.map(e => e.symbol)).size;
+ 
+    // Average % change
+    const pctArr = entries.map(e => e.pctChangeAtEntry).filter(p => p != null);
+    const avgPct = pctArr.length ? (pctArr.reduce((a, b) => a + b, 0) / pctArr.length).toFixed(2) : '—';
+ 
+    // Positive vs negative
+    const positive = pctArr.filter(p => p > 0).length;
+    const negative = pctArr.filter(p => p < 0).length;
+    const breadth = pctArr.length > 0 ? Math.round((positive / pctArr.length) * 100) : 0;
+ 
+    // With outcomes
+    const withEod = entries.filter(e => e.outcomes?.outcome_eod?.pctFromEntry != null).length;
+ 
+    // Sectors breakdown
+    const sectorMap = new Map();
+    for (const e of entries) {
+      const s = e.sectorAtEntry || 'Unknown';
+      sectorMap.set(s, (sectorMap.get(s) || 0) + 1);
+    }
+    const topSector = [...sectorMap.entries()].sort((a, b) => b[1] - a[1])[0];
+ 
+    const pctColor = v => {
+      if (v === '—') return 'var(--muted)';
+      return parseFloat(v) >= 0 ? 'var(--green)' : 'var(--red)';
+    };
+ 
+    grid.innerHTML = `
+      <div class="sw-stat-card">
+        <div class="sw-stat-val">${entries.length}</div>
+        <div class="sw-stat-lbl">Entries</div>
+      </div>
+      <div class="sw-stat-card">
+        <div class="sw-stat-val">${uniqueSymbols}</div>
+        <div class="sw-stat-lbl">Tickers</div>
+      </div>
+      <div class="sw-stat-card">
+        <div class="sw-stat-val">${uniqueDays}</div>
+        <div class="sw-stat-lbl">Days</div>
+      </div>
+      <div class="sw-stat-card">
+        <div class="sw-stat-val" style="color:${pctColor(avgPct)}">${avgPct}%</div>
+        <div class="sw-stat-lbl">Avg Change</div>
+      </div>
+      <div class="sw-stat-card">
+        <div class="sw-stat-val" style="color:${breadth >= 50 ? 'var(--green)' : 'var(--red)'}">${breadth}%</div>
+        <div class="sw-stat-lbl">Breadth (% ↑)</div>
+      </div>
+      <div class="sw-stat-card">
+        <div class="sw-stat-val" style="color:var(--green)">${positive}</div>
+        <div class="sw-stat-lbl">Positive</div>
+      </div>
+      <div class="sw-stat-card">
+        <div class="sw-stat-val" style="color:var(--red)">${negative}</div>
+        <div class="sw-stat-lbl">Negative</div>
+      </div>
+      <div class="sw-stat-card">
+        <div class="sw-stat-val">${withEod}</div>
+        <div class="sw-stat-lbl">Has EOD</div>
+      </div>
+      <div class="sw-stat-card">
+        <div class="sw-stat-val" style="font-size:0.75rem">${topSector ? topSector[0].slice(0, 12) : '—'}</div>
+        <div class="sw-stat-lbl">Top Sector</div>
+      </div>
+    `;
+  }
+ 
+  function renderSwTable(entries) {
+    const wrap = $('swingWlTableWrap');
+    if (!entries.length) {
+      wrap.innerHTML = '<div class="swing-wl-empty">No entries match filters.</div>';
+      return;
+    }
+ 
+    // Sort
+    const sorted = [...entries].sort((a, b) => {
+      let va = resolveSwSort(a, swSortCol);
+      let vb = resolveSwSort(b, swSortCol);
+      if (va == null) va = swSortDir === 'asc' ? Infinity : -Infinity;
+      if (vb == null) vb = swSortDir === 'asc' ? Infinity : -Infinity;
+      if (typeof va === 'string') return swSortDir === 'asc' ? va.localeCompare(vb) : vb.localeCompare(va);
+      return swSortDir === 'asc' ? va - vb : vb - va;
+    });
+ 
+    const baseCols = ['symbol', 'date', 'entryTime', 'priceAtEntry', 'pctChangeAtEntry',
+      'volumeAtEntry', 'marketCapAtEntry', 'rvolAtEntry', 'rangePositionAtEntry',
+      'volMcapRatioAtEntry', 'sectorAtEntry', 'peakPctChange', 'peakMinutesAfterEntry'];
+    const allCols = [...baseCols, ...SW_OUTCOME_KEYS];
+ 
+    const colLabels = {
+      symbol: 'Sym', date: 'Date', entryTime: 'Time', priceAtEntry: 'Price',
+      pctChangeAtEntry: '% Chg', volumeAtEntry: 'Vol', marketCapAtEntry: 'MCap',
+      rvolAtEntry: 'RVOL', rangePositionAtEntry: 'Rng', volMcapRatioAtEntry: 'V/MC',
+      sectorAtEntry: 'Sector', peakPctChange: 'Peak %', peakMinutesAfterEntry: 'Pk Min',
+      ...SW_OUTCOME_LABELS,
+    };
+ 
+    let html = '<table class="swing-wl-table"><thead><tr>';
+    for (const col of allCols) {
+      const arrow = swSortCol === col ? (swSortDir === 'asc' ? '↑' : '↓') : '';
+      const cls = swSortCol === col ? ' class="sorted"' : '';
+      html += `<th${cls} data-swcol="${col}">${colLabels[col] || col} <span style="font-size:0.55rem">${arrow}</span></th>`;
+    }
+    html += '</tr></thead><tbody>';
+ 
+    for (const e of sorted) {
+      // Color-code left border by % change
+      const pct = e.pctChangeAtEntry || 0;
+      const borderColor = pct >= 3 ? 'rgba(34,197,94,0.3)' : pct >= 0 ? 'rgba(45,212,191,0.15)' : 'rgba(239,68,68,0.2)';
+      html += `<tr style="border-left:3px solid ${borderColor}">`;
+      for (const col of allCols) {
+        html += '<td>' + formatSwCell(col, e) + '</td>';
+      }
+      html += '</tr>';
+    }
+    html += '</tbody></table>';
+    wrap.innerHTML = html;
+ 
+    // Sort handlers
+    wrap.querySelectorAll('th[data-swcol]').forEach(th => {
+      th.addEventListener('click', () => {
+        const col = th.dataset.swcol;
+        if (swSortCol === col) swSortDir = swSortDir === 'asc' ? 'desc' : 'asc';
+        else { swSortCol = col; swSortDir = 'desc'; }
+        renderSwTable(entries);
+      });
+    });
+  }
+ 
+  function resolveSwSort(entry, col) {
+    if (col === 'entryTime') return entry.enteredAt || '';
+    if (col.startsWith('outcome_')) return entry.outcomes?.[col]?.pctFromEntry ?? null;
+    return entry[col];
+  }
+ 
+  function formatSwCell(col, entry) {
+    // Outcome columns
+    if (col.startsWith('outcome_')) {
+      const o = entry.outcomes?.[col];
+      if (!o || o.pctFromEntry == null) return '<span style="color:var(--muted)">—</span>';
+      const p = o.pctFromEntry;
+      const cls = p > 0 ? 'color:var(--green);font-weight:600' : p < 0 ? 'color:var(--red);font-weight:600' : 'color:var(--muted)';
+      return `<span style="${cls}">${p > 0 ? '+' : ''}${p.toFixed(2)}%</span>`;
+    }
+ 
+    const val = col === 'entryTime' ? entry.enteredAt : entry[col];
+    if (val == null) return '<span style="color:var(--muted)">—</span>';
+ 
+    switch (col) {
+      case 'symbol': {
+        const pct = entry.pctChangeAtEntry || 0;
+        const clr = pct >= 3 ? 'var(--green)' : pct >= 0 ? '#2dd4bf' : 'var(--red)';
+        return `<span style="font-weight:700;color:${clr}">${val}</span>`;
+      }
+      case 'date': return String(val).slice(5);
+      case 'entryTime':
+        try { return new Date(val).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true }); }
+        catch { return val; }
+      case 'priceAtEntry': return '$' + Number(val).toFixed(val < 1 ? 4 : 2);
+      case 'pctChangeAtEntry':
+      case 'peakPctChange': {
+        const p = Number(val);
+        const cls = p > 0 ? 'color:var(--green);font-weight:600' : p < 0 ? 'color:var(--red);font-weight:600' : 'color:var(--muted)';
+        return `<span style="${cls}">${p > 0 ? '+' : ''}${p.toFixed(2)}%</span>`;
+      }
+      case 'volumeAtEntry': case 'marketCapAtEntry': return fmtCompact(val);
+      case 'rvolAtEntry': {
+        const r = Number(val);
+        const clr = r >= 2 ? 'var(--green)' : r >= 1 ? 'var(--text)' : 'var(--muted)';
+        return `<span style="color:${clr};font-weight:600">${r.toFixed(1)}x</span>`;
+      }
+      case 'rangePositionAtEntry': return Math.round(Number(val) * 100) + '%';
+      case 'volMcapRatioAtEntry': return (Number(val) * 100).toFixed(1) + '%';
+      case 'sectorAtEntry': return String(val).length > 14 ? String(val).slice(0, 12) + '…' : String(val);
+      case 'peakMinutesAfterEntry': return val + 'm';
+      default: return String(val);
+    }
+  }
+ 
+  function fmtCompact(n) {
+    const v = Number(n);
+    if (!isFinite(v)) return '—';
+    if (v >= 1e12) return '$' + (v / 1e12).toFixed(1) + 'T';
+    if (v >= 1e9) return '$' + (v / 1e9).toFixed(1) + 'B';
+    if (v >= 1e6) return '$' + (v / 1e6).toFixed(0) + 'M';
+    if (v >= 1e3) return '$' + (v / 1e3).toFixed(0) + 'K';
+    return '$' + v;
+  }
+ 
+  function buildSwCsv(entries) {
+    const baseCols = ['symbol', 'date', 'enteredAt', 'priceAtEntry', 'pctChangeAtEntry',
+      'volumeAtEntry', 'avgVolumeAtEntry', 'rvolAtEntry', 'marketCapAtEntry',
+      'rangePositionAtEntry', 'volMcapRatioAtEntry', 'sectorAtEntry', 'industryAtEntry',
+      'sharesOutstandingAtEntry', 'peakPctChange', 'peakPrice', 'peakMinutesAfterEntry',
+      'nasdaqPctAtEntry', 'spPctAtEntry', 'openPriceAtEntry'];
+    const allOutcomeKeys = [
+      'outcome_5m','outcome_10m','outcome_15m','outcome_20m','outcome_25m','outcome_30m',
+      'outcome_45m','outcome_1h','outcome_1h15m','outcome_1h30m','outcome_1h45m',
+      'outcome_2h','outcome_2h15m','outcome_2h30m','outcome_2h45m',
+      'outcome_3h','outcome_3h15m','outcome_3h30m','outcome_3h45m',
+      'outcome_4h','outcome_6h','outcome_8h','outcome_10h','outcome_12h',
+      'outcome_14h','outcome_16h','outcome_18h','outcome_eod'
+    ];
+    const swingOutcomeKeys = [];
+    for (let d = 2; d <= 10; d++) {
+      for (const c of ['open','mid1','mid2','close']) {
+        swingOutcomeKeys.push(`outcome_d${d}_${c}`);
+      }
+    }
+    const cols = [...baseCols, ...allOutcomeKeys, ...swingOutcomeKeys,
+      'swingHighPct','swingHighDay','swingLowPct','swingLowDay'];
+    const header = cols.join(',');
+    const rows = entries.map(e => {
+      return cols.map(col => {
+        if (col.startsWith('outcome_')) {
+          const o = e.outcomes?.[col];
+          return o?.pctFromEntry != null ? o.pctFromEntry : '';
+        }
+        const v = e[col];
+        if (v == null) return '';
+        if (typeof v === 'string' && v.includes(',')) return '"' + v.replace(/"/g, '""') + '"';
+        return String(v);
+      }).join(',');
+    });
+    return [header, ...rows].join('\n');
+  }
+ 
+  // Load when dashboard becomes visible
+  const observer = new MutationObserver(() => {
+    if ($('dashboard')?.classList.contains('visible') && !swData) {
+      fetchSwingData();
+    }
+  });
+  observer.observe($('dashboard'), { attributes: true, attributeFilter: ['class'] });
+ 
+  if ($('dashboard')?.classList.contains('visible')) {
+    fetchSwingData();
   }
 })();
 

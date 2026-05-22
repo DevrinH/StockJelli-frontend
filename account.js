@@ -189,19 +189,11 @@
   }
 
   document.getElementById("headerLoginBtn")?.addEventListener("click", () => {
-    const isSubscriber = !!localStorage.getItem("sj_subscriber_email");
-    if (isSubscriber) {
-      // Open account modal directly
-      const accountModal = document.getElementById("accountModal");
-      if (accountModal) {
-        accountModal.classList.add("is-open");
-        accountModal.setAttribute("aria-hidden", "false");
-        document.body.style.overflow = "hidden";
-      }
-    } else {
-      // Open checkout modal
-      const alertsBtn = document.getElementById("enableAlertsBtn") || document.getElementById("inlineAlertBtn");
-      if (alertsBtn) alertsBtn.click();
+    const accountModal = document.getElementById("accountModal");
+    if (accountModal) {
+      accountModal.classList.add("is-open");
+      accountModal.setAttribute("aria-hidden", "false");
+      document.body.style.overflow = "hidden";
     }
   });
 

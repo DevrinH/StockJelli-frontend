@@ -65,12 +65,36 @@ self.addEventListener("push", (event) => {
     event.waitUntil(
       clients.matchAll({ type: "window", includeUncontrolled: true }).then((windowClients) => {
         // If a StockJelli tab is already open, focus it and navigate
-        for (const client of windowClients) {
-          if (client.url.includes("stockjelli.com") || client.url.includes("tradingview.com")) {
-            client.navigate(url);
-            return client.focus();
+        self.addEventListener("notificationclick", (event) => {
+          event.notification.close();
+        
+          const action = event.action;
+          const data = event.notification.data || {};
+        
+          let url = data.url || "https://stockjelli.com";
+        
+          if (action === "dismiss") {
+            return;
           }
-        }
+        
+          const isInternal = url.includes("stockjelli.com");
+        
+          event.waitUntil(
+            clients.matchAll({ type: "window", includeUncontrolled: true }).then((windowClients) => {
+              // Only reuse existing tab for StockJelli URLs
+              if (isInternal) {
+                for (const client of windowClients) {
+                  if (client.url.includes("stockjelli.com")) {
+                    client.navigate(url);
+                    return client.focus();
+                  }
+                }
+              }
+              // External URLs (Robinhood, Webull, TradingView) always open new window
+              return clients.openWindow(url);
+            })
+          );
+        });
         // Otherwise open a new tab
         return clients.openWindow(url);
       })

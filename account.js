@@ -273,6 +273,10 @@
       setSegmented(regionControl, data.region || "americas");
       setSegmented(freqControl, String(data.alertFrequency || 1));
       if (webhookInput) webhookInput.value = data.webhookUrl || "";
+      // Set broker preference
+setSegmented(document.getElementById("accountBrokerControl"), data.preferredBroker || "tradingview");
+
+
 
       // Update hints
       updateAssetHint();
@@ -401,6 +405,13 @@
     updateFreqHint();
   });
 
+    // Broker control
+    document.getElementById("accountBrokerControl")?.addEventListener("click", (e) => {
+      const btn = e.target.closest(".segmented-btn");
+      if (!btn) return;
+      setSegmented(document.getElementById("accountBrokerControl"), btn.dataset.value);
+    });
+
   function updateAssetHint() {
     if (assetHint) assetHint.textContent = ASSET_HINTS[getSegmented(assetControl)] || "";
   }
@@ -435,6 +446,7 @@
       region: region,
       alertFrequency: freq,
       webhookUrl: webhookInput?.value?.trim() || null,
+      preferredBroker: getSegmented(document.getElementById("accountBrokerControl")) || "tradingview",
     };
 
     try {

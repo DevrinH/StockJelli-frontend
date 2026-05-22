@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Redirecting…</title>
+<script>
+  var params = new URLSearchParams(window.location.search);
+  var url = params.get('url');
+  if (url) {
+    // Small delay lets iOS PWA context settle before triggering universal link
+    setTimeout(function() { window.location.href = url; }, 100);
+  } else {
+    window.location.href = 'https://stockjelli.com';
+  }
+</script>
+</head>
+<body style="background:#0d1117;color:#fff;font-family:sans-serif;display:flex;align-items:center;justify-content:center;min-height:100vh;">
+  <p style="opacity:0.5;font-size:14px;">Redirecting…</p>
+</body>
+</html>

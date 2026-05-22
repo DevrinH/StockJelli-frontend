@@ -4118,3 +4118,24 @@ tr.sj-alerted:hover {
   #cryptoTable th:nth-child(4), #cryptoTable td:nth-child(4) { width: 14%; }
   #cryptoTable th:nth-child(7), #cryptoTable td:nth-child(7) { width: 14%; }
 }
+
+.header-login-btn {
+  background: none;
+  border: 1px solid rgba(255,255,255,0.12);
+  color: rgba(255,255,255,0.7);
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 6px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+.header-login-btn:hover {
+  border-color: rgba(77,163,255,0.4);
+  color: #fff;
+}
+.sj-subscriber .header-login-btn {
+  color: rgba(77,163,255,0.8);
+  border-color: rgba(77,163,255,0.2);
+}

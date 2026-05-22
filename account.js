@@ -210,8 +210,9 @@
   // ═══════════════════════════════════════════════════════════════════════════
 
   function updateDrawerButton() {
-    if (!drawerAccountBtn) return;
-    drawerAccountBtn.textContent = "Account";
+    if (drawerAccountBtn) drawerAccountBtn.textContent = "Account";
+    const headerBtn = document.getElementById("headerLoginBtn");
+    if (headerBtn) headerBtn.textContent = localStorage.getItem("sj_subscriber_email") ? "Account" : "Log in";
   }
 
   updateDrawerButton();

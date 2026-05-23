@@ -111,6 +111,7 @@
     <script src="feature-additions.js" defer></script>
     <script src="sponsor.js" defer></script>
     <script src="/push-client.js" defer></script>
+    <script src="free-signup.js" defer></script>
 
     
     <!-- JSON-LD Structured Data -->
@@ -407,17 +408,17 @@
   <div class="notif-banner" id="notifBanner">
     <div class="notif-banner-inner">
       <div class="notif-banner-left">
-        <span class="notif-banner-icon"><span class="notif-bell">🔔</span></span>
+        <span class="notif-banner-icon"><span class="notif-bell">📈</span></span>
         <div class="notif-banner-copy">
           <span class="notif-banner-title">
-            Push Notifications
-            <span class="notif-banner-tag">LIVE</span>
+            Free Stock Alerts
+            <span class="notif-banner-tag" style="background:rgba(74,222,128,0.15);color:#4ade80;">FREE</span>
           </span>
-          <span class="notif-banner-sub">Real-time momentum alerts · $5/mo</span>
+          <span class="notif-banner-sub">1 daily stock alert · No credit card required</span>
         </div>
       </div>
-      <button type="button" class="notif-submit-btn" id="notifSubscribeBtn" onclick="document.getElementById('inlineAlertBtn')?.click()" style="border-radius:8px;border:1px solid rgba(77,163,255,0.25);">
-        <span class="notif-submit-text">Subscribe →</span>
+      <button type="button" class="notif-submit-btn" data-free-signup style="border-radius:8px;border:1px solid rgba(74,222,128,0.25);background:rgba(74,222,128,0.08);">
+        <span class="notif-submit-text" style="color:#4ade80;">Sign Up Free →</span>
       </button>
       <button class="notif-banner-close" id="notifBannerClose" type="button" aria-label="Dismiss">✕</button>
     </div>
@@ -499,9 +500,14 @@
         <h1>Momentum intelligence.</h1>
         <p>Live screener · Alerts · Stocks & Crypto</p>
       </div>
-      <button class="sj-noclutter-btn" id="noClutterBtn" type="button">
-        ✦ Ad-Free · $5/mo
-      </button>
+      <div style="display:flex;gap:8px;align-items:center;">
+        <button class="sj-noclutter-btn" data-free-signup type="button" style="background:rgba(74,222,128,0.08);border-color:rgba(74,222,128,0.2);color:#4ade80;">
+          📈 Free Alerts
+        </button>
+        <button class="sj-noclutter-btn" id="noClutterBtn" type="button">
+          ✦ Ad-Free · $5/mo
+        </button>
+      </div>
     </div>
   </div>
 </section>
@@ -627,13 +633,16 @@
           <!-- NEW: Inline alert callout — immediately after screener table, before filters -->
           <div class="inline-alert-cta" id="inlineAlertCta">
             <div class="inline-alert-left">
-              <span class="inline-alert-icon">⚡</span>
+              <span class="inline-alert-icon">📈</span>
               <div>
-                <span class="inline-alert-title">Get breakout alerts before they trend</span>
-                <span class="inline-alert-sub">Strict criteria. Only plays near the day's high. Delivered to your inbox.</span>
+                <span class="inline-alert-title">Get your first stock alert free</span>
+                <span class="inline-alert-sub">1 daily stock alert delivered to your inbox. No credit card. No commitment.</span>
               </div>
             </div>
-            <button class="btn btn-primary btn-sm" id="inlineAlertBtn">$5/mo →</button>
+            <div style="display:flex;gap:8px;align-items:center;flex-shrink:0;">
+              <button class="btn btn-primary btn-sm" data-free-signup style="background:#22c55e;border-color:#22c55e;">Free →</button>
+              <button class="btn btn-ghost btn-sm" id="inlineAlertBtn" style="font-size:0.75rem;opacity:0.6;">$5/mo for all alerts</button>
+            </div>
           </div>
 
           <div style="height: 16px;"></div>
@@ -1856,6 +1865,80 @@
         </div>
       </div>
     </div>
+
+<!-- Free Signup Modal -->
+<div class="modal-overlay" id="freeSignupModal" aria-hidden="true">
+  <div class="modal modal-compact" role="dialog" aria-modal="true" aria-labelledby="freeSignupTitle" style="max-width:440px;">
+    <button class="modal-close" type="button" id="closeFreeSignupBtn" aria-label="Close">✕</button>
+
+    <div id="freeSignupForm">
+      <div class="modal-header" style="text-align:center;padding-bottom:8px;">
+        <div style="font-size:48px;margin-bottom:8px;">📈</div>
+        <h2 class="modal-title" id="freeSignupTitle" style="font-size:1.3rem;">Free Stock Alerts</h2>
+        <p class="modal-subtitle muted" style="font-size:0.85rem;">Get 1 stock alert per day — straight to your inbox.</p>
+      </div>
+
+      <div style="text-align:center;margin-bottom:16px;">
+        <span style="display:inline-flex;align-items:center;gap:6px;background:rgba(74,222,128,0.08);border:1px solid rgba(74,222,128,0.15);padding:6px 14px;border-radius:20px;font-size:0.78rem;color:#4ade80;font-weight:600;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+          No credit card required
+        </span>
+      </div>
+
+      <div class="card" style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);">
+        <div style="margin-bottom:16px;">
+          <div style="font-size:0.7rem;color:#6b7280;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px;font-weight:600;">What you get</div>
+          <div style="display:flex;flex-direction:column;gap:8px;">
+            <div style="display:flex;align-items:center;gap:8px;font-size:0.85rem;"><span style="color:#4ade80;">✓</span><span style="color:#d1d5db;">1 stock momentum alert per day</span></div>
+            <div style="display:flex;align-items:center;gap:8px;font-size:0.85rem;"><span style="color:#4ade80;">✓</span><span style="color:#d1d5db;">Strict criteria — only strong breakouts</span></div>
+            <div style="display:flex;align-items:center;gap:8px;font-size:0.85rem;"><span style="color:#4ade80;">✓</span><span style="color:#d1d5db;">TradingView chart link in every alert</span></div>
+            <div style="display:flex;align-items:center;gap:8px;font-size:0.85rem;"><span style="color:#4ade80;">✓</span><span style="color:#d1d5db;">Unsubscribe anytime — one click</span></div>
+          </div>
+        </div>
+
+        <div style="margin-bottom:4px;">
+          <label class="form-label" style="font-size:0.78rem;margin-bottom:6px;">Email Address</label>
+          <input type="email" id="freeSignupEmail" class="form-input" placeholder="you@email.com" autocomplete="email" style="font-size:1rem;padding:12px 14px;" />
+          <p id="freeSignupError" class="hint" style="display:none;color:#ef4444;margin-top:6px;font-size:0.8rem;"></p>
+        </div>
+
+        <button class="btn btn-primary btn-wide" id="freeSignupSubmitBtn" type="button" style="margin-top:14px;font-size:1rem;padding:14px;background:#22c55e;border-color:#22c55e;">
+          Get Free Alerts →
+        </button>
+
+        <p class="muted" style="text-align:center;font-size:0.72rem;margin-top:10px;line-height:1.4;">
+          By signing up you agree to our <a href="/terms.html" style="color:#60a5fa;text-decoration:underline;">Terms</a> and <a href="/privacy.html" style="color:#60a5fa;text-decoration:underline;">Privacy Policy</a>.<br>No spam. 1 alert/day max. Unsubscribe anytime.
+        </p>
+      </div>
+
+      <div style="margin-top:14px;padding:12px 16px;background:rgba(255,255,255,0.02);border-radius:8px;border:1px solid rgba(255,255,255,0.04);">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <div>
+            <div style="font-size:0.78rem;color:#9ca3af;">Want unlimited alerts + crypto?</div>
+            <div style="font-size:0.72rem;color:#6b7280;margin-top:2px;">Push notifications · $5/mo</div>
+          </div>
+          <button class="btn btn-ghost" id="freeToPayedBtn" type="button" style="font-size:0.72rem;padding:6px 12px;opacity:0.7;">See plans →</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="freeSignupSuccess" style="display:none;text-align:center;padding:16px 0;">
+      <div style="font-size:52px;margin-bottom:12px;">🎉</div>
+      <h2 style="color:#f9fafb;font-size:1.3rem;margin:0 0 8px;">You're in!</h2>
+      <p style="color:#9ca3af;font-size:0.9rem;line-height:1.5;margin:0 0 20px;">Check your inbox for a welcome email.<br>Your first stock alert will arrive on the next trading day.</p>
+      <div style="background:#1f2937;border-radius:10px;padding:14px;margin-bottom:20px;text-align:left;">
+        <div style="font-size:0.72rem;color:#6b7280;margin-bottom:8px;text-transform:uppercase;">Your plan</div>
+        <div style="display:flex;justify-content:space-between;font-size:0.85rem;">
+          <span style="color:#d1d5db;">📈 1 stock alert/day</span>
+          <span style="color:#4ade80;font-weight:600;">FREE</span>
+        </div>
+      </div>
+      <button class="btn btn-primary btn-wide" id="freeSignupDoneBtn" type="button" style="background:#22c55e;border-color:#22c55e;">Done</button>
+      <p class="muted" style="font-size:0.72rem;margin-top:12px;">Want more? <a href="#" id="successUpgradeLink" style="color:#60a5fa;text-decoration:underline;">Upgrade to unlimited alerts →</a></p>
+    </div>
+  </div>
+</div>
+
 
 </body>
 </html>

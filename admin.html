@@ -770,6 +770,40 @@
     </div>
   </div>
 
+  <div class="btc-regime-section" id="btcRegimeSection" style="padding:14px 20px;border-bottom:1px solid var(--border);background:var(--surface);">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px;">
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+        <button class="section-collapse-btn" id="btcRegimeCollapseBtn" title="Collapse">▼</button>
+        <span style="font-size:1rem;">₿</span>
+        <h3 style="font-size:0.85rem;font-weight:700;color:#f59e0b;font-family:var(--mono);margin:0;letter-spacing:0.02em;">BTC Regime Tracker</h3>
+        <span style="font-size:0.68rem;color:var(--muted);font-family:var(--mono);" id="btcRegimeSub">Loading…</span>
+        <span style="font-size:0.6rem;padding:2px 6px;border-radius:4px;font-weight:700;letter-spacing:0.04em;text-transform:uppercase;font-family:var(--mono);background:rgba(245,158,11,0.12);color:#f59e0b;border:1px solid rgba(245,158,11,0.2);">DATA COLLECTION</span>
+      </div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;">
+        <select class="ctrl-select" id="btcRegimeWeekSelect"></select>
+        <button class="lev-dl-btn" id="btcRegimeDlJsonBtn">⬇ JSON</button>
+        <button class="lev-dl-btn" id="btcRegimeDlCsvBtn">⬇ CSV</button>
+        <button class="lev-ticker-btn" id="btcRegimeRefreshBtn">↻</button>
+      </div>
+    </div>
+
+    <div class="section-body" id="btcRegimeBody">
+      <!-- Stats -->
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:8px;margin-bottom:12px;" id="btcRegimeStatsGrid"></div>
+
+      <!-- Filter row -->
+      <div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap;align-items:center;">
+        <select class="sw-filter-select" id="btcRegimeFilterDate"><option value="">All Dates</option></select>
+        <span style="font-size:0.62rem;color:var(--muted);font-family:var(--mono);" id="btcRegimeCount"></span>
+      </div>
+
+      <!-- Table -->
+      <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;max-height:500px;overflow-y:auto;" id="btcRegimeTableWrap">
+        <div style="text-align:center;padding:20px;color:var(--muted);font-family:var(--mono);font-size:0.75rem;">Loading…</div>
+      </div>
+    </div>
+  </div>
+
   <div class="table-container" id="tableContainer">
     <div class="loading">Loading data...</div>
   </div>
@@ -2322,6 +2356,314 @@ if (localStorage.getItem('sj_lev_collapsed') === '1') {
     fetchSwingData();
   }
 })();
+
+
+// ══════════════════════════════════════════════════════════════════════════
+// BTC REGIME ADMIN PANEL
+// ══════════════════════════════════════════════════════════════════════════
+(function initBtcRegimePanel() {
+  const API = 'https://api.stockjelli.com';
+  let brData = null;
+  let brWeek = null;
+  let brSortCol = 'enteredAt';
+  let brSortDir = 'desc';
+
+  const $ = id => document.getElementById(id);
+
+  // Collapse
+  $('btcRegimeCollapseBtn').addEventListener('click', () => {
+    const btn = $('btcRegimeCollapseBtn');
+    const body = $('btcRegimeBody');
+    btn.classList.toggle('collapsed');
+    body.classList.toggle('collapsed');
+    localStorage.setItem('sj_br_collapsed', btn.classList.contains('collapsed') ? '1' : '0');
+  });
+  if (localStorage.getItem('sj_br_collapsed') === '1') {
+    $('btcRegimeCollapseBtn').classList.add('collapsed');
+    $('btcRegimeBody').classList.add('collapsed');
+  }
+
+  const BR_OUTCOME_KEYS = [
+    'outcome_5m','outcome_10m','outcome_15m','outcome_20m','outcome_25m','outcome_30m',
+    'outcome_45m','outcome_1h','outcome_1h15m','outcome_1h30m','outcome_1h45m',
+    'outcome_2h','outcome_2h30m','outcome_3h','outcome_4h','outcome_6h','outcome_8h',
+    'outcome_10h','outcome_12h','outcome_14h','outcome_16h','outcome_18h','outcome_eod'
+  ];
+  const BR_OUTCOME_LABELS = {
+    outcome_5m:'5m',outcome_10m:'10m',outcome_15m:'15m',outcome_20m:'20m',
+    outcome_25m:'25m',outcome_30m:'30m',outcome_45m:'45m',outcome_1h:'1h',
+    outcome_1h15m:'1:15',outcome_1h30m:'1:30',outcome_1h45m:'1:45',
+    outcome_2h:'2h',outcome_2h30m:'2:30',outcome_3h:'3h',outcome_4h:'4h',
+    outcome_6h:'6h',outcome_8h:'8h',outcome_10h:'10h',outcome_12h:'12h',
+    outcome_14h:'14h',outcome_16h:'16h',outcome_18h:'18h',outcome_eod:'EOD'
+  };
+
+  const brWeekSel = $('btcRegimeWeekSelect');
+  brWeekSel.addEventListener('change', () => { brWeek = brWeekSel.value; fetchBrData(); });
+  $('btcRegimeRefreshBtn').addEventListener('click', fetchBrData);
+  $('btcRegimeFilterDate').addEventListener('change', () => renderBr());
+
+  // Downloads
+  $('btcRegimeDlJsonBtn').addEventListener('click', () => {
+    const entries = getFilteredBrEntries();
+    if (!entries.length) return;
+    const blob = new Blob([JSON.stringify(entries, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a'); a.href = url; a.download = 'sj-btc-regime-' + (brWeek || 'data') + '.json';
+    document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
+    showToast('Downloaded JSON');
+  });
+  $('btcRegimeDlCsvBtn').addEventListener('click', () => {
+    const entries = getFilteredBrEntries();
+    if (!entries.length) return;
+    const csv = buildBrCsv(entries);
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a'); a.href = url; a.download = 'sj-btc-regime-' + (brWeek || 'data') + '.csv';
+    document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
+    showToast('Downloaded CSV');
+  });
+
+  async function fetchBrData() {
+    try {
+      if (brWeekSel.options.length === 0) {
+        const wRes = await fetch(API + '/api/weekly-report/weeks');
+        const wData = await wRes.json();
+        const weeks = (wData.weeks || []).sort().reverse();
+        brWeekSel.innerHTML = '';
+        weeks.forEach(function(w, i) {
+          const o = document.createElement('option');
+          o.value = w; o.textContent = w + (i === 0 ? ' (latest)' : '');
+          brWeekSel.appendChild(o);
+        });
+        if (!brWeek && weeks.length) brWeek = weeks[0];
+        brWeekSel.value = brWeek;
+      }
+      const res = await fetch(API + '/api/weekly-report?week=' + (brWeek || ''));
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      const fullReport = await res.json();
+      brData = fullReport.btcRegime || { allEntries: [], entriesByDate: {}, outcomeStats: {} };
+      populateBrDateFilter();
+      renderBr();
+    } catch (e) {
+      console.warn('[btc-regime] Fetch failed:', e.message);
+      $('btcRegimeTableWrap').innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted);font-family:var(--mono);font-size:0.75rem;">Failed to load: ' + e.message + '</div>';
+    }
+  }
+
+  function populateBrDateFilter() {
+    if (!brData) return;
+    var dates = new Set();
+    (brData.allEntries || []).forEach(function(e) { if (e.date) dates.add(e.date); });
+    var sel = $('btcRegimeFilterDate');
+    var cur = sel.value;
+    sel.innerHTML = '<option value="">All Dates</option>';
+    Array.from(dates).sort().reverse().forEach(function(d) {
+      var o = document.createElement('option'); o.value = d; o.textContent = d.slice(5);
+      sel.appendChild(o);
+    });
+    sel.value = cur;
+  }
+
+  function getFilteredBrEntries() {
+    if (!brData || !brData.allEntries) return [];
+    var entries = brData.allEntries;
+    var dateFilter = $('btcRegimeFilterDate').value;
+    if (dateFilter) entries = entries.filter(function(e) { return e.date === dateFilter; });
+    return entries;
+  }
+
+  function renderBr() {
+    if (!brData) return;
+    var entries = getFilteredBrEntries();
+    var allEntries = brData.allEntries || [];
+    $('btcRegimeSub').textContent = entries.length + '/' + allEntries.length + ' entries · ' + (brWeek || '');
+    $('btcRegimeCount').textContent = entries.length !== allEntries.length ? entries.length + '/' + allEntries.length : '';
+    renderBrStats(entries);
+    renderBrTable(entries);
+  }
+
+  function renderBrStats(entries) {
+    var grid = $('btcRegimeStatsGrid');
+    if (!entries.length) {
+      grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:20px;color:var(--muted);font-family:var(--mono);font-size:0.75rem;">No BTC regime data for this week yet.</div>';
+      return;
+    }
+    var uniqueDays = new Set(entries.map(function(e) { return e.date; })).size;
+    var prices = entries.map(function(e) { return e.priceAtEntry; }).filter(function(p) { return p != null; });
+    var latestPrice = prices.length ? prices[prices.length - 1] : null;
+    var highPrice = prices.length ? Math.max.apply(null, prices) : null;
+    var lowPrice = prices.length ? Math.min.apply(null, prices) : null;
+    var pctArr = entries.map(function(e) { return e.pctChangeAtEntry; }).filter(function(p) { return p != null; });
+    var avgPct = pctArr.length ? (pctArr.reduce(function(a,b){return a+b;},0)/pctArr.length).toFixed(2) : '—';
+    var withEod = entries.filter(function(e) { return e.outcomes && e.outcomes.outcome_eod && e.outcomes.outcome_eod.pctFromEntry != null; }).length;
+
+    var pctColor = function(v) { if (v === '—') return 'var(--muted)'; return parseFloat(v) >= 0 ? 'var(--green)' : 'var(--red)'; };
+
+    grid.innerHTML =
+      '<div class="lev-stat-card"><div class="lev-stat-val">' + entries.length + '</div><div class="lev-stat-lbl">Entries</div></div>' +
+      '<div class="lev-stat-card"><div class="lev-stat-val">' + uniqueDays + '</div><div class="lev-stat-lbl">Days</div></div>' +
+      '<div class="lev-stat-card"><div class="lev-stat-val" style="color:#f59e0b">' + (latestPrice ? '$' + latestPrice.toLocaleString() : '—') + '</div><div class="lev-stat-lbl">Latest</div></div>' +
+      '<div class="lev-stat-card"><div class="lev-stat-val" style="color:var(--green)">' + (highPrice ? '$' + highPrice.toLocaleString() : '—') + '</div><div class="lev-stat-lbl">High</div></div>' +
+      '<div class="lev-stat-card"><div class="lev-stat-val" style="color:var(--red)">' + (lowPrice ? '$' + lowPrice.toLocaleString() : '—') + '</div><div class="lev-stat-lbl">Low</div></div>' +
+      '<div class="lev-stat-card"><div class="lev-stat-val" style="color:' + pctColor(avgPct) + '">' + avgPct + '%</div><div class="lev-stat-lbl">Avg 24h %</div></div>' +
+      '<div class="lev-stat-card"><div class="lev-stat-val">' + withEod + '</div><div class="lev-stat-lbl">Has EOD</div></div>';
+  }
+
+  function renderBrTable(entries) {
+    var wrap = $('btcRegimeTableWrap');
+    if (!entries.length) {
+      wrap.innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted);font-family:var(--mono);font-size:0.75rem;">No entries match filters.</div>';
+      return;
+    }
+
+    var sorted = entries.slice().sort(function(a, b) {
+      var va = resolveBrSort(a, brSortCol);
+      var vb = resolveBrSort(b, brSortCol);
+      if (va == null) va = brSortDir === 'asc' ? Infinity : -Infinity;
+      if (vb == null) vb = brSortDir === 'asc' ? Infinity : -Infinity;
+      if (typeof va === 'string') return brSortDir === 'asc' ? va.localeCompare(vb) : vb.localeCompare(va);
+      return brSortDir === 'asc' ? va - vb : vb - va;
+    });
+
+    var baseCols = ['date', 'hourUTC', 'priceAtEntry', 'pctChangeAtEntry', 'volumeAtEntry',
+      'marketCapAtEntry', 'rangePositionAtEntry', 'volMcapRatioAtEntry',
+      'btcPctAtEntry', 'nasdaqPctAtEntry', 'peakPctChange', 'peakMinutesAfterEntry'];
+    var allCols = baseCols.concat(BR_OUTCOME_KEYS);
+
+    var colLabels = {
+      date: 'Date', hourUTC: 'Hour (UTC)', priceAtEntry: 'Price',
+      pctChangeAtEntry: '24h %', volumeAtEntry: 'Vol', marketCapAtEntry: 'MCap',
+      rangePositionAtEntry: 'Rng', volMcapRatioAtEntry: 'V/MC',
+      btcPctAtEntry: 'BTC %', nasdaqPctAtEntry: 'NDX %',
+      peakPctChange: 'Peak %', peakMinutesAfterEntry: 'Pk Min'
+    };
+    BR_OUTCOME_KEYS.forEach(function(k) { colLabels[k] = BR_OUTCOME_LABELS[k]; });
+
+    var html = '<table class="leveraged-table"><thead><tr>';
+    allCols.forEach(function(col) {
+      var arrow = brSortCol === col ? (brSortDir === 'asc' ? '↑' : '↓') : '';
+      var cls = brSortCol === col ? ' class="sorted"' : '';
+      html += '<th' + cls + ' data-brcol="' + col + '">' + (colLabels[col] || col) + ' <span style="font-size:0.55rem">' + arrow + '</span></th>';
+    });
+    html += '</tr></thead><tbody>';
+
+    sorted.forEach(function(e) {
+      html += '<tr style="border-left:3px solid rgba(245,158,11,0.2)">';
+      allCols.forEach(function(col) {
+        html += '<td>' + formatBrCell(col, e) + '</td>';
+      });
+      html += '</tr>';
+    });
+    html += '</tbody></table>';
+    wrap.innerHTML = html;
+
+    wrap.querySelectorAll('th[data-brcol]').forEach(function(th) {
+      th.addEventListener('click', function() {
+        var col = th.dataset.brcol;
+        if (brSortCol === col) brSortDir = brSortDir === 'asc' ? 'desc' : 'asc';
+        else { brSortCol = col; brSortDir = 'desc'; }
+        renderBrTable(entries);
+      });
+    });
+  }
+
+  function resolveBrSort(entry, col) {
+    if (col === 'hourUTC') return entry.enteredAt || '';
+    if (col.startsWith('outcome_')) {
+      var o = entry.outcomes && entry.outcomes[col];
+      return o && o.pctFromEntry != null ? o.pctFromEntry : null;
+    }
+    return entry[col];
+  }
+
+  function formatBrCell(col, entry) {
+    if (col.startsWith('outcome_')) {
+      var o = entry.outcomes && entry.outcomes[col];
+      if (!o || o.pctFromEntry == null) return '<span style="color:var(--muted)">—</span>';
+      var p = o.pctFromEntry;
+      var cls = p > 0 ? 'color:var(--green);font-weight:600' : p < 0 ? 'color:var(--red);font-weight:600' : 'color:var(--muted)';
+      return '<span style="' + cls + '">' + (p > 0 ? '+' : '') + p.toFixed(2) + '%</span>';
+    }
+
+    if (col === 'hourUTC') {
+      try {
+        var d = new Date(entry.enteredAt);
+        return String(d.getUTCHours()).padStart(2, '0') + ':00';
+      } catch(e) { return '—'; }
+    }
+
+    var val = entry[col];
+    if (val == null) return '<span style="color:var(--muted)">—</span>';
+
+    switch (col) {
+      case 'date': return String(val).slice(5);
+      case 'priceAtEntry': return '$' + Number(val).toLocaleString(undefined, {minimumFractionDigits:0, maximumFractionDigits:0});
+      case 'pctChangeAtEntry':
+      case 'peakPctChange':
+      case 'btcPctAtEntry':
+      case 'nasdaqPctAtEntry': {
+        var pv = Number(val);
+        var c = pv > 0 ? 'color:var(--green);font-weight:600' : pv < 0 ? 'color:var(--red);font-weight:600' : 'color:var(--muted)';
+        return '<span style="' + c + '">' + (pv > 0 ? '+' : '') + pv.toFixed(2) + '%</span>';
+      }
+      case 'volumeAtEntry':
+      case 'marketCapAtEntry': {
+        var v = Number(val);
+        if (v >= 1e12) return '$' + (v/1e12).toFixed(1) + 'T';
+        if (v >= 1e9) return '$' + (v/1e9).toFixed(1) + 'B';
+        if (v >= 1e6) return '$' + (v/1e6).toFixed(0) + 'M';
+        return '$' + v;
+      }
+      case 'rangePositionAtEntry': return Math.round(Number(val) * 100) + '%';
+      case 'volMcapRatioAtEntry': return (Number(val) * 100).toFixed(1) + '%';
+      case 'peakMinutesAfterEntry': return val + 'm';
+      default: return String(val);
+    }
+  }
+
+  function buildBrCsv(entries) {
+    var baseCols = ['date','enteredAt','priceAtEntry','pctChangeAtEntry','volumeAtEntry',
+      'marketCapAtEntry','rangePositionAtEntry','volMcapRatioAtEntry',
+      'btcPctAtEntry','totalCryptoPctAtEntry','nasdaqPctAtEntry','spPctAtEntry',
+      'peakPctChange','peakPrice','peakMinutesAfterEntry'];
+    var swingKeys = [];
+    for (var d = 2; d <= 10; d++) {
+      ['open','mid1','mid2','close'].forEach(function(c) {
+        swingKeys.push('outcome_d' + d + '_' + c);
+      });
+    }
+    var cols = baseCols.concat(BR_OUTCOME_KEYS).concat(swingKeys)
+      .concat(['swingHighPct','swingHighDay','swingLowPct','swingLowDay']);
+    var header = cols.join(',');
+    var rows = entries.map(function(e) {
+      return cols.map(function(col) {
+        if (col.startsWith('outcome_')) {
+          var o = e.outcomes && e.outcomes[col];
+          return o && o.pctFromEntry != null ? o.pctFromEntry : '';
+        }
+        var v = e[col];
+        if (v == null) return '';
+        if (typeof v === 'string' && v.indexOf(',') >= 0) return '"' + v.replace(/"/g, '""') + '"';
+        return String(v);
+      }).join(',');
+    });
+    return [header].concat(rows).join('\n');
+  }
+
+  // Load when dashboard visible
+  var observer = new MutationObserver(function() {
+    if ($('dashboard') && $('dashboard').classList.contains('visible') && !brData) {
+      fetchBrData();
+    }
+  });
+  observer.observe($('dashboard'), { attributes: true, attributeFilter: ['class'] });
+  if ($('dashboard') && $('dashboard').classList.contains('visible')) {
+    fetchBrData();
+  }
+})();
+
+
 
 })();
 </script>

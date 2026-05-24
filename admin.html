@@ -2384,19 +2384,17 @@ if (localStorage.getItem('sj_lev_collapsed') === '1') {
   }
 
   const BR_OUTCOME_KEYS = [
-    'outcome_5m','outcome_10m','outcome_15m','outcome_20m','outcome_25m','outcome_30m',
-    'outcome_45m','outcome_1h','outcome_1h15m','outcome_1h30m','outcome_1h45m',
-    'outcome_2h','outcome_2h30m','outcome_3h','outcome_4h','outcome_6h','outcome_8h',
-    'outcome_10h','outcome_12h','outcome_14h','outcome_16h','outcome_18h','outcome_eod'
-  ];
-  const BR_OUTCOME_LABELS = {
-    outcome_5m:'5m',outcome_10m:'10m',outcome_15m:'15m',outcome_20m:'20m',
-    outcome_25m:'25m',outcome_30m:'30m',outcome_45m:'45m',outcome_1h:'1h',
-    outcome_1h15m:'1:15',outcome_1h30m:'1:30',outcome_1h45m:'1:45',
-    outcome_2h:'2h',outcome_2h30m:'2:30',outcome_3h:'3h',outcome_4h:'4h',
-    outcome_6h:'6h',outcome_8h:'8h',outcome_10h:'10h',outcome_12h:'12h',
-    outcome_14h:'14h',outcome_16h:'16h',outcome_18h:'18h',outcome_eod:'EOD'
-  };
+    'outcome_1h','outcome_2h','outcome_3h','outcome_4h',
+    'outcome_6h','outcome_8h','outcome_10h','outcome_12h',
+    'outcome_14h','outcome_16h','outcome_18h',
+    'outcome_20h','outcome_22h','outcome_24h'
+];
+const BR_OUTCOME_LABELS = {
+    outcome_1h:'1H',outcome_2h:'2H',outcome_3h:'3H',outcome_4h:'4H',
+    outcome_6h:'6H',outcome_8h:'8H',outcome_10h:'10H',outcome_12h:'12H',
+    outcome_14h:'14H',outcome_16h:'16H',outcome_18h:'18H',
+    outcome_20h:'20H',outcome_22h:'22H',outcome_24h:'24H'
+};
 
   const brWeekSel = $('btcRegimeWeekSelect');
   brWeekSel.addEventListener('change', () => { brWeek = brWeekSel.value; fetchBrData(); });

@@ -408,6 +408,26 @@
     }
   }
 
+  // Render compact odds-at-signal from the stamped oddsAtSignal field.
+  // Strength-conditioned number if its band cleared the ladder, else mode-level, else count, else "—".
+  function renderHomeOdds(a) {
+    const o = a.oddsAtSignal;
+    if (!o) return `<span class="alert-log-score" style="color:rgba(255,255,255,0.2)">—</span>`;
+    const cond = o.conditioned, over = o.overall;
+    let pick = null, band = "";
+    if (cond && (cond.display === "pct_with_count" || cond.display === "pct_lead") && cond.hitRate3 != null) {
+      pick = cond; band = (o.strengthBand && o.strengthBand !== "unknown") ? o.strengthBand : "";
+    } else if (over && (over.display === "pct_with_count" || over.display === "pct_lead") && over.hitRate3 != null) {
+      pick = over; band = "";
+    } else if (over && over.n >= 10 && over.hit3 != null) {
+      return `<span class="alert-log-score" style="color:#cbd5e1;font-size:0.62rem">${over.hit3}/${over.n}</span>`;
+    } else {
+      return `<span class="alert-log-score" style="color:rgba(255,255,255,0.2)">—</span>`;
+    }
+    const c = pick.hitRate3 >= 75 ? "#4ade80" : pick.hitRate3 >= 60 ? "#fbbf24" : "#e2e8f0";
+    return `<span class="alert-log-score" style="color:${c};font-size:0.62rem;line-height:1.15">${Math.round(pick.hitRate3)}%<br><span style="opacity:0.45;font-weight:400">${pick.hit3}/${pick.n}</span></span>`;
+  }
+
   function renderTodayAlerts() {
     const container = document.getElementById("alertCardsSection");
     if (!container || !alertLogData) return;
@@ -460,7 +480,7 @@ let todayAlerts = (alertLogData.notifications || []).filter(a => {
       } else {
         if (emptyEl) emptyEl.style.display = "none";
 
-        const headerHtml = `<div class="alert-log-header-row"><span>TIME</span><span>TICKER</span><span>ALERT → PEAK</span><span>MAX GAIN</span><span>SCORE</span><span>RESULT</span></div>`;
+        const headerHtml = `<div class="alert-log-header-row"><span>TIME</span><span>TICKER</span><span>ALERT → PEAK</span><span>MAX GAIN</span><span>ODDS</span><span>RESULT</span></div>`;
 
         const rowsData = todayAlerts.map(a => {
           const peak = a.peakAfterPush != null ? Math.round(a.peakAfterPush * 10) / 10 : null;
@@ -480,20 +500,17 @@ let todayAlerts = (alertLogData.notifications || []).filter(a => {
           : (a.mode === "crypto"
               ? `https://www.tradingview.com/chart/?symbol=BINANCE:${a.symbol}USDT&aff_id=162729`
               : `https://www.tradingview.com/chart/?symbol=${a.symbol}&aff_id=162729`);
-          const sj = a.sjScore || "—";
-          const sjColor = sj >= 75 ? "#4ade80" : sj >= 60 ? "#e2e8f0" : "#64748b";
-
-          return {
-            key: `${a.symbol}-${a.pushTimestamp}`,
-            html: `
-              <span class="alert-log-time">${time}</span>
-              <a href="${tvUrl}" target="_blank" rel="noopener" class="alert-log-ticker">${modeIcon} <strong>${a.symbol}</strong></a>
-              <span class="alert-log-prices">${priceAtPush} → <span style="color:${peakColor}">${peakPriceStr}</span></span>
-              <span class="alert-log-gain" style="color:${peakColor}">${peakStr}</span>
-              <span class="alert-log-score" style="color:${sjColor}">${sj}</span>
-              <span class="alert-log-result">${resultIcon}${a.tweetUrl ? `<a href="${a.tweetUrl}" target="_blank" rel="noopener" style="color:#fff;opacity:0.5;font-size:0.7rem;margin-left:5px;text-decoration:none;font-weight:700;" title="View on X">𝕏</a>` : ''}</span>
-            `,
-          };
+              return {
+                key: `${a.symbol}-${a.pushTimestamp}`,
+                html: `
+                  <span class="alert-log-time">${time}</span>
+                  <a href="${tvUrl}" target="_blank" rel="noopener" class="alert-log-ticker">${modeIcon} <strong>${a.symbol}</strong></a>
+                  <span class="alert-log-prices">${priceAtPush} → <span style="color:${peakColor}">${peakPriceStr}</span></span>
+                  <span class="alert-log-gain" style="color:${peakColor}">${peakStr}</span>
+                  ${renderHomeOdds(a)}
+                  <span class="alert-log-result">${resultIcon}${a.tweetUrl ? `<a href="${a.tweetUrl}" target="_blank" rel="noopener" style="color:#fff;opacity:0.5;font-size:0.7rem;margin-left:5px;text-decoration:none;font-weight:700;" title="View on X">𝕏</a>` : ''}</span>
+                `,
+              };
         });
 
         flipUpdateAlertRows(bodyEl, headerHtml, rowsData);

@@ -168,7 +168,10 @@
         <button class="segmented-btn" type="button" data-value="stocks" role="tab">Stocks</button>
         <button class="segmented-btn" type="button" data-value="crypto" role="tab">Crypto</button>
       </div>
-      <span class="log-toggles-label">Current formula · live outcomes</span>
+      <div class="segmented segmented-small" id="versionToggle" role="tablist">
+        <button class="segmented-btn segmented-on" type="button" data-value="current" role="tab">Current</button>
+        <button class="segmented-btn" type="button" data-value="earlier" role="tab">Earlier</button>
+      </div>
     </div>
 
     <!-- Overall stats -->
@@ -195,7 +198,8 @@
   <script>
     const API_BASE = "https://api.stockjelli.com";
     let logData = null;
-    let logMode = "all";       // all | stocks | crypto
+    let logMode = "all";        // all | stocks | crypto
+    let logVersion = "current"; // current | earlier
 
     async function fetchLog() {
       try {
@@ -277,8 +281,8 @@
     // ── Main render ──
     function renderLog() {
       if (!logData) return;
-      // Current formula only — no more v1/v2 legacy split
-      let alerts = (logData.notifications || []).filter(isCurrent);
+      // Version filter: current formula vs earlier formulas
+      let alerts = (logData.notifications || []).filter(a => logVersion === "current" ? isCurrent(a) : !isCurrent(a));
 
       if (logMode === "stocks") alerts = alerts.filter(a => a.mode === "stocks");
       else if (logMode === "crypto") alerts = alerts.filter(a => a.mode === "crypto");
@@ -299,7 +303,10 @@
 
       const body = document.getElementById("logBody");
       if (alerts.length === 0) {
-        body.innerHTML = `<div class="log-empty">No alerts found for this filter.</div>`;
+        const msg = logVersion === "earlier"
+          ? "No earlier-formula alerts for this filter."
+          : "No alerts found for this filter.";
+        body.innerHTML = `<div class="log-empty">${msg}</div>`;
         return;
       }
 
@@ -376,6 +383,16 @@
       if (!btn) return;
       logMode = btn.dataset.value;
       document.querySelectorAll("#logToggle .segmented-btn").forEach(b => b.classList.toggle("segmented-on", b.dataset.value === logMode));
+      renderLog();
+    });
+
+    // ── Version toggle (Current vs Earlier formula) — affects the row list only,
+    //    NOT the track-record board above (board stays current-formula always). ──
+    document.getElementById("versionToggle")?.addEventListener("click", e => {
+      const btn = e.target.closest(".segmented-btn");
+      if (!btn) return;
+      logVersion = btn.dataset.value;
+      document.querySelectorAll("#versionToggle .segmented-btn").forEach(b => b.classList.toggle("segmented-on", b.dataset.value === logVersion));
       renderLog();
     });
 

@@ -816,7 +816,30 @@
   'use strict';
 
   const API = 'https://api.stockjelli.com';
-  const ADMIN_KEY = 'sjadmin2026';
+
+  // ===== AUTH (server-validated; key never hardcoded) =====
+  window.SJ_API = 'https://api.stockjelli.com';
+  window.sjAdminKey = sessionStorage.getItem('sj_admin_key') || null;
+  window.sjAuthedFetch = async function(path) {
+    const res = await fetch(window.SJ_API + path, {
+      headers: window.sjAdminKey ? { 'x-sj-admin-key': window.sjAdminKey } : {},
+    });
+    if (res.status === 401 || res.status === 503) {
+      window.sjAdminKey = null;
+      sessionStorage.removeItem('sj_admin_key');
+      const dash = document.getElementById('dashboard');
+      const gate = document.getElementById('authGate');
+      if (dash) dash.classList.remove('visible');
+      if (gate) {
+        gate.style.display = 'flex';
+        const err = document.getElementById('authError');
+        if (err) { err.textContent = 'Session expired — re-enter admin key'; err.style.display = 'block'; }
+      }
+      throw new Error('unauthorized');
+    }
+    return res;
+  };
+  
 
   let currentMode = 'stocks';
   let currentView = 'momentum';
@@ -846,24 +869,44 @@
   }
 
   // Auth
-  const urlKey = new URLSearchParams(window.location.search).get('key');
-  const savedKey = localStorage.getItem('sj_admin_key');
-  if (urlKey === ADMIN_KEY || savedKey === ADMIN_KEY) {
-    localStorage.setItem('sj_admin_key', ADMIN_KEY);
-    showDashboard();
-  }
-  document.getElementById('authBtn').addEventListener('click', tryAuth);
+// Auth — validated by the SERVER (200/401), no hardcoded key.
+document.getElementById('authBtn').addEventListener('click', tryAuth);
   document.getElementById('authKey').addEventListener('keydown', e => { if (e.key === 'Enter') tryAuth(); });
-  function tryAuth() {
+  async function tryAuth() {
     const k = document.getElementById('authKey').value.trim();
-    if (k === ADMIN_KEY) { localStorage.setItem('sj_admin_key', ADMIN_KEY); showDashboard(); }
-    else document.getElementById('authError').style.display = 'block';
+    if (!k) return;
+    try {
+      const res = await fetch(window.SJ_API + '/api/weekly-report/weeks', { headers: { 'x-sj-admin-key': k } });
+      if (res.ok) {
+        window.sjAdminKey = k;
+        sessionStorage.setItem('sj_admin_key', k);
+        showDashboard();
+      } else {
+        document.getElementById('authError').style.display = 'block';
+      }
+    } catch (e) {
+      document.getElementById('authError').style.display = 'block';
+    }
   }
   function showDashboard() {
     document.getElementById('authGate').style.display = 'none';
     document.getElementById('dashboard').classList.add('visible');
     loadWeeks();
   }
+  (async function sjInitAuth() {
+    const urlKey = new URLSearchParams(window.location.search).get('key');
+    const candidate = urlKey || window.sjAdminKey;
+    if (!candidate) return;
+    try {
+      const res = await fetch(window.SJ_API + '/api/weekly-report/weeks', { headers: { 'x-sj-admin-key': candidate } });
+      if (res.ok) {
+        window.sjAdminKey = candidate;
+        sessionStorage.setItem('sj_admin_key', candidate);
+        if (urlKey) history.replaceState({}, '', window.location.pathname);
+        showDashboard();
+      }
+    } catch (e) {}
+  })();
 
   // Mode
   document.getElementById('modeStocks').addEventListener('click', () => setMode('stocks'));
@@ -936,7 +979,7 @@
   // Data
   async function loadWeeks() {
     try {
-      const res = await fetch(`${API}/api/weekly-report/weeks`);
+      const res = await window.sjAuthedFetch('/api/weekly-report/weeks');
       const data = await res.json();
       const weeks = (data.weeks||[]).sort().reverse();
       weekSelect.innerHTML = '';
@@ -948,7 +991,7 @@
   async function loadReport() {
     document.getElementById('tableContainer').innerHTML = '<div class="loading">Loading data...</div>';
     try {
-      const res = await fetch(`${API}/api/weekly-report?week=${currentWeek||''}`);
+      const res = await window.sjAuthedFetch(`/api/weekly-report?week=${currentWeek||''}`);
       reportData = await res.json(); extractEntries(); populateSectorFilter(); renderTable();
     } catch (e) { document.getElementById('tableContainer').innerHTML = '<div class="empty-state"><h3>Failed</h3><p>'+e.message+'</p></div>'; }
   }
@@ -1283,7 +1326,7 @@ if (col === 'rvol25m') { const r=entry.outcomes?.outcome_25m?.rvolAtCheck; if(!r
  
   async function fetchNotifData() {
     try {
-      const res = await fetch(`${API}/api/notification-log?limit=500`);
+      const res = await window.sjAuthedFetch('/api/notification-log?limit=500');
       if (!res.ok) return;
       notifData = await res.json();
       renderNotifChart();
@@ -1653,7 +1696,7 @@ if (localStorage.getItem('sj_lev_collapsed') === '1') {
     try {
       // First populate week selector if empty
       if (levWeekSel.options.length === 0) {
-        const wRes = await fetch(`${API}/api/weekly-report/weeks`);
+        const wRes = await window.sjAuthedFetch('/api/weekly-report/weeks');
         const wData = await wRes.json();
         const weeks = (wData.weeks || []).sort().reverse();
         levWeekSel.innerHTML = '';
@@ -1666,7 +1709,7 @@ if (localStorage.getItem('sj_lev_collapsed') === '1') {
         levWeekSel.value = levWeek;
       }
  
-      const res = await fetch(`${API}/api/weekly-report?week=${levWeek || ''}`);
+      const res = await window.sjAuthedFetch(`/api/weekly-report?week=${levWeek || ''}`);
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const fullReport = await res.json();
       
@@ -2020,7 +2063,7 @@ if (localStorage.getItem('sj_lev_collapsed') === '1') {
   async function fetchSwingData() {
     try {
       if (swWeekSel.options.length === 0) {
-        const wRes = await fetch(`${API}/api/weekly-report/weeks`);
+        const wRes = await window.sjAuthedFetch('/api/weekly-report/weeks');
         const wData = await wRes.json();
         const weeks = (wData.weeks || []).sort().reverse();
         swWeekSel.innerHTML = '';
@@ -2033,7 +2076,7 @@ if (localStorage.getItem('sj_lev_collapsed') === '1') {
         swWeekSel.value = swWeek;
       }
  
-      const res = await fetch(`${API}/api/weekly-report?week=${swWeek || ''}`);
+      const res = await window.sjAuthedFetch(`/api/weekly-report?week=${swWeek || ''}`);
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const fullReport = await res.json();
  
@@ -2427,7 +2470,7 @@ const BR_OUTCOME_LABELS = {
   async function fetchBrData() {
     try {
       if (brWeekSel.options.length === 0) {
-        const wRes = await fetch(API + '/api/weekly-report/weeks');
+        const wRes = await window.sjAuthedFetch('/api/weekly-report/weeks');
         const wData = await wRes.json();
         const weeks = (wData.weeks || []).sort().reverse();
         brWeekSel.innerHTML = '';
@@ -2439,7 +2482,7 @@ const BR_OUTCOME_LABELS = {
         if (!brWeek && weeks.length) brWeek = weeks[0];
         brWeekSel.value = brWeek;
       }
-      const res = await fetch(API + '/api/weekly-report?week=' + (brWeek || ''));
+      const res = await window.sjAuthedFetch('/api/weekly-report?week=' + (brWeek || ''));
       if (!res.ok) throw new Error('HTTP ' + res.status);
       const fullReport = await res.json();
       brData = fullReport.btcRegime || { allEntries: [], entriesByDate: {}, outcomeStats: {} };

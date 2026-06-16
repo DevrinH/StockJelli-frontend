@@ -128,21 +128,33 @@
   
       if (mode === "crypto") {
         // Bitcoin — live 24/7 from /api/crypto.
-        // NOTE: /api/crypto only returns rows that PASS the momentum filter
-        // (pctChange >= 3% etc). BTC at +0.6% won't be in rows, so we ask for
-        // a loose filter (pctMin=-100, big limit) so BTC is always present.
-        // The header carries btcPct (the %); the BTC row carries the price.
+        // BTC PRICE SOURCE: your /api/crypto only returns coins that pass the
+        // momentum filter, and its header exposes btcPct (the %) but NOT BTC's
+        // price. So we get price+logo straight from CoinGecko (same source the
+        // backend uses) and fall back to the header for the % if needed.
+        const BTC_LOGO_FALLBACK = "https://assets.coingecko.com/coins/images/1/large/bitcoin.png";
         try {
-          const r = await fetch(`${API_BASE}/api/crypto?limit=250&pctMin=-100&volMin=0&mcapMin=0`, { cache: "no-store" });
-          const d = await r.json();
-          const btcRow = (d.rows || []).find(x => (x.coinSymbol || "").toUpperCase() === "BTC");
-          // prefer the header % (24h), fall back to the row's pctChange
-          const btcPct = d?.header?.btcPct ?? d?.header?.left?.pct ?? btcRow?.pctChange ?? null;
-          const price = btcRow?.price ?? null;
-          const logo = btcRow?.image ?? "https://assets.coingecko.com/coins/images/1/large/bitcoin.png";
-          paintMonitor({ title: "Bitcoin Monitor", tag: "BTC · 24h", price, pct: btcPct, priceDecimals: 0, sessionNote: "live", logo });
+          // 1) CoinGecko — always has BTC price, %, and logo
+          const cg = await fetch("https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=bitcoin", { cache: "no-store" })
+            .then(res => res.json()).catch(() => null);
+          const coin = Array.isArray(cg) ? cg[0] : null;
+          let price = coin?.current_price ?? null;
+          let pct = coin?.price_change_percentage_24h ?? null;
+          let logo = coin?.image ?? BTC_LOGO_FALLBACK;
+  
+          // 2) Fallback: if CoinGecko was blocked/empty, try your API for at least the %
+          if (price == null || pct == null) {
+            const d = await fetch(`${API_BASE}/api/crypto?limit=250&pctMin=-100&volMin=0&mcapMin=0`, { cache: "no-store" })
+              .then(res => res.json()).catch(() => null);
+            const btcRow = (d?.rows || []).find(x => (x.coinSymbol || "").toUpperCase() === "BTC");
+            if (price == null) price = btcRow?.price ?? null;
+            if (pct == null) pct = d?.header?.btcPct ?? d?.header?.left?.pct ?? btcRow?.pctChange ?? null;
+            if (!coin?.image && btcRow?.image) logo = btcRow.image;
+          }
+  
+          paintMonitor({ title: "Bitcoin Monitor", tag: "BTC · 24h", price, pct, priceDecimals: 0, sessionNote: "live", logo });
         } catch (e) {
-          paintMonitor({ title: "Bitcoin Monitor", tag: "BTC · 24h", price: null, pct: null, priceDecimals: 0, logo: "https://assets.coingecko.com/coins/images/1/large/bitcoin.png" });
+          paintMonitor({ title: "Bitcoin Monitor", tag: "BTC · 24h", price: null, pct: null, priceDecimals: 0, logo: BTC_LOGO_FALLBACK });
         }
         return;
       }

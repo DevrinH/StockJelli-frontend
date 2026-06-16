@@ -104,8 +104,13 @@
       const chart = document.querySelector(".monitor-strip-chart");
       if (chart) chart.style.display = "none";
     }
-    function paintMonitor({ title, tag, price, pct, priceDecimals = 2, sessionNote = "" }) {
+    function paintMonitor({ title, tag, price, pct, priceDecimals = 2, sessionNote = "", logo = null }) {
       const t = $("monitorTitle"), tg = $("monitorTag"), p = $("monitorPrice"), c = $("monitorChg");
+      const logoEl = $("monitorLogo");
+      if (logoEl) {
+        if (logo) { logoEl.src = logo; logoEl.alt = title || ""; logoEl.style.display = ""; }
+        else { logoEl.removeAttribute("src"); logoEl.style.display = "none"; }
+      }
       if (t && title) t.textContent = title;
       if (tg) tg.textContent = sessionNote ? `${tag} · ${sessionNote}` : tag;
       if (p) p.textContent = price != null
@@ -134,9 +139,10 @@
           // prefer the header % (24h), fall back to the row's pctChange
           const btcPct = d?.header?.btcPct ?? d?.header?.left?.pct ?? btcRow?.pctChange ?? null;
           const price = btcRow?.price ?? null;
-          paintMonitor({ title: "Bitcoin Monitor", tag: "BTC · 24h", price, pct: btcPct, priceDecimals: 0, sessionNote: "live" });
+          const logo = btcRow?.image ?? "https://assets.coingecko.com/coins/images/1/large/bitcoin.png";
+          paintMonitor({ title: "Bitcoin Monitor", tag: "BTC · 24h", price, pct: btcPct, priceDecimals: 0, sessionNote: "live", logo });
         } catch (e) {
-          paintMonitor({ title: "Bitcoin Monitor", tag: "BTC · 24h", price: null, pct: null, priceDecimals: 0 });
+          paintMonitor({ title: "Bitcoin Monitor", tag: "BTC · 24h", price: null, pct: null, priceDecimals: 0, logo: "https://assets.coingecko.com/coins/images/1/large/bitcoin.png" });
         }
         return;
       }

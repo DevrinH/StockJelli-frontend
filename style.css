@@ -4419,3 +4419,83 @@ tr.sj-alerted:hover {
     justify-self: stretch;
   }
 }
+
+/* ============================================================
+   STOCKJELLI HOMEPAGE — CONSOLIDATED FIXES
+   PASTE THIS AT THE VERY END OF style.css (after EVERYTHING,
+   including the REV-3 block). Source order matters — if this
+   isn't last, the REV-3 @media block re-overrides the centering.
+   ============================================================ */
+
+/* ---- 1. Donut hard size cap (prevents the giant circle) ---- */
+.odds-hero-card .odds-donut-wrap {
+  width: 256px !important;
+  height: 256px !important;
+  max-width: 256px;
+  max-height: 256px;
+  flex: 0 0 auto;
+  margin: 0 auto;
+}
+.odds-hero-card .odds-donut {
+  width: 256px !important;
+  height: 256px !important;
+  max-width: 100%;
+  display: block;
+}
+.odds-hero-card .odds-donut-col {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.odds-hero-card .odds-hero-body {
+  display: grid;
+  grid-template-columns: 280px 1px minmax(0, 1fr);
+  gap: 30px;
+  align-items: center;
+}
+
+/* ---- 2. MOBILE: single column, donut dead-center ---- */
+@media (max-width: 860px) {
+  .odds-hero-card .odds-hero-body {
+    grid-template-columns: 1fr !important;
+    justify-items: center;
+  }
+  .odds-hero-card .odds-donut-col {
+    width: 100%;
+    justify-content: center;
+  }
+  .odds-hero-card .odds-donut-wrap,
+  .odds-hero-card .odds-donut {
+    width: 210px !important;
+    height: 210px !important;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .odds-hero-card .odds-hero-log {
+    width: 100%;
+    justify-self: stretch;
+  }
+}
+
+/* ---- 3. Monitor strip logo (Bitcoin / coin logo) ---- */
+.monitor-strip-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.monitor-strip-titles {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.monitor-strip-logo {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  object-fit: contain;
+  flex-shrink: 0;
+  background: rgba(255,255,255,0.04);
+}
+@media (max-width: 760px) {
+  .monitor-strip-logo { width: 24px; height: 24px; }
+}

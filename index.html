@@ -602,7 +602,7 @@
             <!-- rows -->
             <div class="table-wrap" style="margin-top:10px;">
               <div id="alertCardsBody"></div>
-              <div id="alertCardsEmpty" style="display:none; padding:20px; text-align:center; color:#ffffff40; font-size:0.82rem;"></div>
+              <div id="alertCardsEmpty" style="display:none; padding:20px; text-align:center; color:rgba(255,255,255,0.25); font-size:0.82rem;"></div>
               <div id="alertCardsViewAll" style="display:none; padding:10px 14px; text-align:center; border-top:1px solid rgba(255,255,255,0.04);"></div>
             </div>
           </section>
@@ -625,8 +625,11 @@
   <div class="container">
     <div class="monitor-strip-card">
       <div class="monitor-strip-left">
-        <span class="monitor-strip-title" id="monitorTitle">TQQQ Monitor</span>
-        <span class="monitor-strip-tag" id="monitorTag">ProShares UltraPro QQQ</span>
+        <img id="monitorLogo" class="monitor-strip-logo" src="" alt="" width="28" height="28" style="display:none;" />
+        <div class="monitor-strip-titles">
+          <span class="monitor-strip-title" id="monitorTitle">TQQQ Monitor</span>
+          <span class="monitor-strip-tag" id="monitorTag">ProShares UltraPro QQQ</span>
+        </div>
       </div>
       <div class="monitor-strip-mid">
         <span class="monitor-strip-price" id="monitorPrice">$—</span>
@@ -646,6 +649,13 @@
     </div>
   </div>
 </section>
+
+
+<!-- ============================================================
+     >>> Live Momentum Screener (#screener) goes HERE, unchanged <<<
+     Remove its OWN #assetControl (the one toggle now lives in the hero).
+     Then river / pulse / blog / footer / modals as-is.
+     ============================================================ -->
 
 
 <!-- ============================================================

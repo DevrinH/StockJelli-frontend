@@ -4277,3 +4277,62 @@ tr.sj-alerted:hover {
   .monitor-strip-mid { gap: 10px; }
   .monitor-strip-chart { height: 46px; }
 }
+
+/* ============================================================
+   DONUT SIZE FIX — append to the VERY END of style.css
+   (after the existing REV 3 block). Last definition wins, so
+   this overrides whatever is letting the SVG fill the page.
+
+   ROOT CAUSE: the <svg class="odds-donut"> only had width:100%
+   /height:100% and relied entirely on .odds-donut-wrap being
+   256px. If anything upstream breaks that wrapper's sizing, an
+   SVG with a viewBox expands to fill its container (the whole
+   page) → giant circle. These rules give the donut its OWN hard
+   size cap so it can never balloon again.
+   ============================================================ */
+   .odds-hero-card .odds-donut-wrap {
+    width: 256px !important;
+    height: 256px !important;
+    max-width: 256px;
+    max-height: 256px;
+    flex: 0 0 auto;
+    margin: 0 auto;
+  }
+  
+  .odds-hero-card .odds-donut {
+    width: 256px !important;
+    height: 256px !important;
+    max-width: 100%;
+    display: block;
+  }
+  
+  /* Belt-and-suspenders: make sure the donut COLUMN can't stretch
+     the SVG even if the grid fails to apply. */
+  .odds-hero-card .odds-donut-col {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex: 0 0 auto;
+    max-width: 300px;
+  }
+  
+  /* If the grid itself isn't applying (e.g. a stray brace earlier
+     in the file ate the .odds-hero-body rule), this re-declares it
+     so the three columns lay out and the donut is boxed in. */
+  .odds-hero-card .odds-hero-body {
+    display: grid;
+    grid-template-columns: 280px 1px minmax(0, 1fr);
+    gap: 30px;
+    align-items: center;
+  }
+  
+  @media (max-width: 860px) {
+    .odds-hero-card .odds-hero-body {
+      grid-template-columns: 1fr;
+    }
+    .odds-hero-card .odds-donut-wrap,
+    .odds-hero-card .odds-donut {
+      width: 210px !important;
+      height: 210px !important;
+    }
+  }

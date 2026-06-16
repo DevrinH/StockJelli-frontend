@@ -122,12 +122,17 @@
       const mode = currentMode();
   
       if (mode === "crypto") {
-        // Bitcoin — live 24/7 from /api/crypto (header btcPct + BTC row price)
+        // Bitcoin — live 24/7 from /api/crypto.
+        // NOTE: /api/crypto only returns rows that PASS the momentum filter
+        // (pctChange >= 3% etc). BTC at +0.6% won't be in rows, so we ask for
+        // a loose filter (pctMin=-100, big limit) so BTC is always present.
+        // The header carries btcPct (the %); the BTC row carries the price.
         try {
-          const r = await fetch(`${API_BASE}/api/crypto?limit=50&pctMin=0&mcapMin=0`, { cache: "no-store" });
+          const r = await fetch(`${API_BASE}/api/crypto?limit=250&pctMin=-100&volMin=0&mcapMin=0`, { cache: "no-store" });
           const d = await r.json();
-          const btcPct = d?.header?.btcPct ?? d?.header?.left?.pct ?? null;
           const btcRow = (d.rows || []).find(x => (x.coinSymbol || "").toUpperCase() === "BTC");
+          // prefer the header % (24h), fall back to the row's pctChange
+          const btcPct = d?.header?.btcPct ?? d?.header?.left?.pct ?? btcRow?.pctChange ?? null;
           const price = btcRow?.price ?? null;
           paintMonitor({ title: "Bitcoin Monitor", tag: "BTC · 24h", price, pct: btcPct, priceDecimals: 0, sessionNote: "live" });
         } catch (e) {

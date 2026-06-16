@@ -4139,3 +4139,141 @@ tr.sj-alerted:hover {
   color: rgba(77,163,255,0.8);
   border-color: rgba(77,163,255,0.2);
 }
+
+
+
+
+
+
+/* ============================================================
+   STOCKJELLI HOMEPAGE REVAMP — PHASE 1 CSS — REV 3
+   Append to style.css. REV 3: live alert log nested in odds-card
+   RIGHT column (stacks below donut on mobile); monitor strip
+   flips TQQQ/BTC; header untouched.
+   ============================================================ */
+
+/* ---- (B) HERO ---- */
+.hero-v2 { padding: 36px 0 22px; }
+.hero-v2-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 28px; }
+.hero-v2-title { margin: 0; font-size: 2.9rem; line-height: 1.08; font-weight: 800; letter-spacing: -0.02em; color: #f2f4f8; }
+.hero-v2-accent { color: #818cf8; }
+.hero-v2-sub { margin: 16px 0 0; font-size: 1.05rem; color: rgba(255, 255, 255, 0.42); font-weight: 450; }
+
+.hero-v2-toggle { flex-shrink: 0; padding-top: 8px; }
+.segmented-hero { background: rgba(18,24,38,0.7); border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; padding: 5px; gap: 4px; }
+.segmented-hero .segmented-btn { border: none; background: transparent; border-radius: 10px; padding: 12px 34px; font-size: 0.98rem; font-weight: 600; color: rgba(255,255,255,0.5); }
+.segmented-hero .segmented-btn:hover { background: rgba(255,255,255,0.04); color: rgba(255,255,255,0.8); }
+.segmented-hero .segmented-btn.segmented-on { background: #312e81; color: #fff; box-shadow: inset 0 0 0 1px rgba(129,140,248,0.4); }
+
+.hero-v2-exchange { display: flex; align-items: center; gap: 16px; margin-top: 30px; }
+.hero-v2-exchange-label { font-size: 0.92rem; font-weight: 600; color: rgba(255,255,255,0.55); }
+.exchange-picker { gap: 10px; }
+.exchange-picker .segmented-btn { display: inline-flex; align-items: center; gap: 8px; border-radius: 999px; padding: 9px 18px; font-size: 0.88rem; font-weight: 550; background: rgba(18,24,38,0.6); border: 1px solid rgba(255,255,255,0.08); color: rgba(255,255,255,0.72); }
+.exchange-picker .segmented-btn img { border-radius: 4px; display: block; }
+.exchange-picker .segmented-btn.segmented-on { border-color: rgba(74,222,128,0.4); background: rgba(74,222,128,0.06); color: #fff; }
+
+@media (max-width: 760px) {
+  .hero-v2 { padding: 24px 0 14px; }
+  .hero-v2-top { flex-direction: column; gap: 18px; }
+  .hero-v2-title { font-size: 2rem; }
+  .hero-v2-toggle { width: 100%; padding-top: 0; }
+  .segmented-hero { width: 100%; }
+  .segmented-hero .segmented-btn { flex: 1; padding: 11px 0; }
+  .hero-v2-exchange { flex-wrap: wrap; gap: 10px; margin-top: 20px; }
+  .exchange-picker { width: 100%; flex-wrap: wrap; }
+}
+
+/* ---- (C) ODDS CARD: donut LEFT + live alert log RIGHT ---- */
+.odds-hero { padding: 8px 0 0; }
+.odds-hero-card {
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 18px;
+  background: rgba(16,22,36,0.6);
+  padding: 26px 30px 18px;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.02), 0 18px 55px rgba(0,0,0,0.22);
+}
+.odds-hero-head { display: flex; align-items: baseline; gap: 12px; margin-bottom: 6px; }
+.odds-hero-title { margin: 0; font-size: 1.35rem; font-weight: 700; color: #eef1f6; }
+.odds-hero-count { font-size: 0.92rem; color: rgba(255,255,255,0.35); font-variant-numeric: tabular-nums; }
+
+/* donut column | vrule | log column */
+.odds-hero-body {
+  display: grid;
+  grid-template-columns: 280px 1px minmax(0, 1fr);
+  gap: 30px;
+  align-items: center;
+  padding: 18px 0 20px;
+}
+.odds-donut-col { display: flex; justify-content: center; }
+.odds-donut-wrap { position: relative; width: 256px; height: 256px; }
+.odds-donut { width: 100%; height: 100%; display: block; }
+.odds-donut-track { fill: none; stroke: rgba(255,255,255,0.06); stroke-width: 14; }
+.odds-donut-fill {
+  fill: none; stroke: #6366f1; stroke-width: 14; stroke-linecap: round;
+  stroke-dasharray: 540.35; stroke-dashoffset: 540.35;
+  transition: stroke-dashoffset 1.1s cubic-bezier(0.22,1,0.36,1);
+  filter: drop-shadow(0 0 8px rgba(99,102,241,0.35));
+}
+.odds-donut-center { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+.odds-donut-pct { font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 4.2rem; font-weight: 700; line-height: 1; color: #fff; letter-spacing: -0.02em; }
+.odds-donut-pct-sign { font-size: 1.8rem; font-weight: 600; color: rgba(255,255,255,0.6); margin-left: 2px; }
+.odds-donut-label { margin-top: 8px; font-size: 1.05rem; color: rgba(255,255,255,0.85); }
+.odds-donut-label strong { color: #fff; }
+.odds-donut-sub { font-size: 0.82rem; color: rgba(255,255,255,0.32); margin-top: 2px; }
+
+.odds-hero-vrule { width: 1px; align-self: stretch; background: rgba(255,255,255,0.07); }
+
+/* RIGHT column: the live alert log (#alertCardsSection nested here) */
+.odds-hero-log { min-width: 0; }
+.odds-log-title { margin: 0; font-size: 1.15rem; font-weight: 700; color: #eef1f6; }
+.odds-live-tag { display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px; border-radius: 999px; background: rgba(34,197,94,0.1); border: 1px solid rgba(34,197,94,0.2); font-size: 0.72rem; font-weight: 600; color: #4ade80; }
+.odds-live-dot { width: 6px; height: 6px; border-radius: 50%; background: #22c55e; animation: livePulse 2s ease-in-out infinite; }
+.odds-log-head-right { display: flex; align-items: center; gap: 12px; }
+.odds-log-fulllink { color: rgba(77,163,255,0.75); text-decoration: none; font-size: 0.74rem; font-weight: 500; }
+.odds-log-fulllink:hover { color: rgba(77,163,255,1); }
+#alertCardsDate { font-size: 0.68rem; color: rgba(255,255,255,0.2); }
+/* proof bar shows as flex when alerts-frontend sets display:flex */
+#alertProofBar[style*="flex"] { display: flex !important; }
+
+.odds-hero-foot {
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  padding-top: 14px; border-top: 1px solid rgba(255,255,255,0.05);
+  font-size: 0.9rem; color: rgba(255,255,255,0.4);
+}
+.odds-hero-foot svg { color: #6366f1; flex-shrink: 0; }
+.odds-hero-foot a { color: #818cf8; text-decoration: none; }
+.odds-hero-foot a:hover { text-decoration: underline; }
+
+/* MOBILE: stack — donut on top, live alert log below */
+@media (max-width: 860px) {
+  .odds-hero-card { padding: 20px 16px 14px; }
+  .odds-hero-body { grid-template-columns: 1fr; gap: 18px; padding: 12px 0 14px; }
+  .odds-hero-vrule { display: none; }
+  .odds-donut-wrap { width: 210px; height: 210px; }
+  .odds-donut-pct { font-size: 3.3rem; }
+  .odds-hero-log { width: 100%; }
+}
+
+/* ---- (D) MONITOR STRIP (TQQQ / BTC) ---- */
+.monitor-strip { padding: 18px 0 0; }
+.monitor-strip-card {
+  display: grid; grid-template-columns: auto auto 1fr; gap: 28px; align-items: center;
+  border: 1px solid rgba(255,255,255,0.07); border-radius: 16px;
+  background: rgba(16,22,36,0.5); padding: 18px 26px;
+}
+.monitor-strip-left { display: flex; flex-direction: column; gap: 4px; }
+.monitor-strip-title { font-size: 1.15rem; font-weight: 700; color: #eef1f6; }
+.monitor-strip-tag { font-size: 0.74rem; color: rgba(255,255,255,0.35); letter-spacing: 0.01em; }
+.monitor-strip-mid { display: flex; align-items: baseline; gap: 12px; }
+.monitor-strip-price { font-family: 'JetBrains Mono', monospace; font-size: 1.8rem; font-weight: 700; line-height: 1; color: #fff; }
+.monitor-strip-chg { font-family: 'JetBrains Mono', monospace; font-size: 1.05rem; font-weight: 650; font-variant-numeric: tabular-nums; }
+.monitor-strip-chg.up { color: #22c55e; }
+.monitor-strip-chg.down { color: #ef4444; }
+.monitor-strip-chart { height: 64px; min-width: 0; }
+.monitor-spark { width: 100%; height: 100%; display: block; }
+
+@media (max-width: 760px) {
+  .monitor-strip-card { grid-template-columns: 1fr; gap: 12px; padding: 16px 18px; }
+  .monitor-strip-mid { gap: 10px; }
+  .monitor-strip-chart { height: 46px; }
+}

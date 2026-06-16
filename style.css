@@ -4499,3 +4499,32 @@ tr.sj-alerted:hover {
 @media (max-width: 760px) {
   .monitor-strip-logo { width: 24px; height: 24px; }
 }
+
+.odds-cell { text-align: center; }
+ 
+.odds-pill {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  line-height: 1.05;
+  padding: 3px 9px;
+  border-radius: 7px;
+  font-variant-numeric: tabular-nums;
+}
+.odds-pct { font-size: 0.92rem; font-weight: 800; }
+.odds-frac { font-size: 0.82rem; font-weight: 700; }
+.odds-tier { font-size: 0.5rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; opacity: 0.7; margin-top: 1px; }
+ 
+.odds-accel { color: #4ade80; background: rgba(74,222,128,0.1); }
+.odds-accel .odds-pct { text-shadow: 0 0 8px rgba(74,222,128,0.3); }
+.odds-climb { color: #fbbf24; background: rgba(251,191,36,0.08); }
+.odds-fade  { color: #94a3b8; background: rgba(148,163,184,0.07); }
+ 
+.odds-pending { color: rgba(255,255,255,0.22); font-weight: 600; }
+ 
+@media (max-width: 640px) {
+  .odds-pct { font-size: 0.78rem; }
+  .odds-frac { font-size: 0.72rem; }
+  .odds-tier { font-size: 0.44rem; }
+  .odds-pill { padding: 2px 6px; }
+}

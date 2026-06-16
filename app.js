@@ -220,6 +220,22 @@
     return `<span class="sj-cell sj-blurred-wrap"><span class="sj-blurred ${tier}">${s}${icon}</span><button class="sj-unlock-btn" title="Unlock all SJ Scores">🔒</button></span>`;
   }
 
+  function renderOddsCell(odds) {
+    if (!odds || odds.status === "gathering" || odds.status === "warming") {
+      return '<span class="odds-pending" title="Gathering ~15 min of price action before odds appear">—</span>';
+    }
+    const tier = odds.bucket === "accelerating" ? "odds-accel"
+               : odds.bucket === "climbing"     ? "odds-climb"
+               :                                  "odds-fade";
+    if (odds.status === "thin") {
+      return `<span class="odds-pill ${tier}" title="${odds.label} momentum — not enough resolved history yet to show a rate">${odds.label}</span>`;
+    }
+    if (odds.status === "count") {
+      return `<span class="odds-pill ${tier}" title="${odds.label}: ${odds.hits} of ${odds.n} similar entries cleared +3% cleanly"><span class="odds-frac">${odds.display}</span></span>`;
+    }
+    return `<span class="odds-pill ${tier}" title="${odds.label}: ${odds.hits} of ${odds.n} similar entries reached +3% before dipping -2%. Historical frequency, not a prediction."><span class="odds-pct">${odds.pct}%</span><span class="odds-tier">${odds.label}</span></span>`;
+  }
+
   // ── Market Regime Config ──
   const REGIME_CONFIG = {
     expansion:   { color: "#22c55e", colorRgb: "34, 197, 94",   bpm: 62,  amplitude: 0.35, frequency: 0.07, spikeStrength: 0.25, noise: 0.02, label: "Expansion" },
@@ -655,7 +671,7 @@
         <td>${fmtVolumeCompact(x.volume)}${renderVolumeFire(x.volume, x.avgVolume, x.marketCap, "stock")}${renderWhaleIndicator(x.volume, x.avgVolume, x.marketCap, x.pctChange, x.rangePosition, "stock")}</td>
         <td class="rvol">${renderRvol(x.volume, x.avgVolume, x.marketCap, "stock")}</td>
         <td class="news">${newsHtml}</td>
-        <td class="sj">${renderSJScore(x.sjScore, idx)}</td>
+        <td class="sj">${renderOddsCell(x.continuationOdds)}</td>
       `;
 
       return {
@@ -731,7 +747,7 @@
         <td>${fmtVolumeCompact(x.volume)}${renderVolumeFire(x.volume, null, x.marketCap, "crypto")}${renderWhaleIndicator(x.volume, null, x.marketCap, x.pctChange, x.rangePosition, "crypto") || renderLiquidityDot(x.volume, x.marketCap)}</td>
         <td class="rvol">${renderRvol(x.volume, null, x.marketCap, "crypto")}</td>
         <td>${fmtCompactUsd(x.marketCap, 1)}</td>
-        <td class="sj">${renderSJScore(x.sjScore, idx)}</td>
+        <td class="sj">${renderOddsCell(x.continuationOdds)}</td>
       `;
 
       return {

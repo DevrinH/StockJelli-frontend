@@ -95,27 +95,27 @@
     }
 
 
-    function syncToToggle() {
-        const control = document.getElementById('assetControl');
-        // Read the active asset: the button with .segmented-on, or aria-selected
-        let mode = 'stocks';
-        if (control) {
-          const active = control.querySelector('.segmented-on, [aria-selected="true"]');
-          if (active && active.dataset.value) mode = active.dataset.value;
-        }
+    function getMode() {
+        const m = localStorage.getItem('sj_asset_mode');
+        return (m === 'crypto') ? 'crypto' : 'stocks';
+      }
+    
+      function syncToToggle() {
+        const mode = getMode();
         const tqqqEl = document.getElementById('sjMonitorTqqq');
         const btcEl  = document.getElementById('sjMonitorBtc');
         if (tqqqEl) tqqqEl.style.display = (mode === 'crypto') ? 'none' : '';
         if (btcEl)  btcEl.style.display  = (mode === 'crypto') ? '' : 'none';
       }
     
-      // Sync on load and whenever the toggle is clicked
-      document.addEventListener('click', (e) => {
-        if (e.target.closest('#assetControl')) {
-          // let the toggle's own handler update classes first, then sync
-          setTimeout(syncToToggle, 0);
-        }
-      });
+      // app.js writes sj_asset_mode synchronously inside applyMode() on every
+      // toggle. Same-tab localStorage writes don't fire 'storage' events, so we
+      // poll the value (cheap) and re-sync the instant it changes.
+      let _lastMode = getMode();
+      setInterval(() => {
+        const m = getMode();
+        if (m !== _lastMode) { _lastMode = m; syncToToggle(); }
+      }, 250);
   
       refresh();
       syncToToggle();          // ← add this line

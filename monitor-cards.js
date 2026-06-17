@@ -93,7 +93,35 @@
         if (data.btc)  renderCard(document.getElementById('sjMonitorBtc'),  { ...data.btc,  symbol: 'BTC',  title: 'Bitcoin Monitor' });
       } catch (e) { /* best-effort */ }
     }
+
+
+    function syncToToggle() {
+        const control = document.getElementById('assetControl');
+        // Read the active asset: the button with .segmented-on, or aria-selected
+        let mode = 'stocks';
+        if (control) {
+          const active = control.querySelector('.segmented-on, [aria-selected="true"]');
+          if (active && active.dataset.value) mode = active.dataset.value;
+        }
+        const tqqqEl = document.getElementById('sjMonitorTqqq');
+        const btcEl  = document.getElementById('sjMonitorBtc');
+        if (tqqqEl) tqqqEl.style.display = (mode === 'crypto') ? 'none' : '';
+        if (btcEl)  btcEl.style.display  = (mode === 'crypto') ? '' : 'none';
+      }
+    
+      // Sync on load and whenever the toggle is clicked
+      document.addEventListener('click', (e) => {
+        if (e.target.closest('#assetControl')) {
+          // let the toggle's own handler update classes first, then sync
+          setTimeout(syncToToggle, 0);
+        }
+      });
   
-    refresh();
-    setInterval(refresh, POLL_MS);
+      refresh();
+      syncToToggle();          // ← add this line
+      setInterval(refresh, POLL_MS);
+
+
+
+
   })();

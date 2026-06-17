@@ -117,9 +117,19 @@
         if (m !== _lastMode) { _lastMode = m; syncToToggle(); }
       }, 250);
   
-      refresh();
-      syncToToggle();          // ← add this line
-      setInterval(refresh, POLL_MS);
+      function init() {
+        refresh();
+        syncToToggle();
+        setTimeout(syncToToggle, 100);   // catch app.js's applyMode() after it runs
+        setTimeout(syncToToggle, 500);   // belt-and-suspenders for slow loads
+        setInterval(refresh, POLL_MS);
+      }
+    
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+      } else {
+        init();
+      }
 
 
 

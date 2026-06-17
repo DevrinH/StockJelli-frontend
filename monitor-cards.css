@@ -1,0 +1,19 @@
+/* ── StockJelli Monitor Sparkline Cards (TQQQ + BTC), 10-day, no pill ── */
+.sj-mon-row { display: flex; align-items: center; gap: 28px; flex-wrap: wrap; }
+.sj-mon-head { min-width: 190px; }
+.sj-mon-titlerow { display: flex; align-items: center; gap: 11px; margin-bottom: 8px; }
+.sj-mon-logo { width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; font-weight: 700; }
+.sj-mon-title { font-size: 1.15rem; font-weight: 600; color: #f9fafb; }
+.sj-mon-sub { font-size: 0.78rem; color: rgba(255,255,255,0.4); }
+.sj-mon-right { display: flex; align-items: center; gap: 28px; flex: 1; justify-content: flex-end; min-width: 280px; }
+.sj-mon-pctblock { text-align: right; }
+.sj-mon-pct { font-size: 1.7rem; font-weight: 800; line-height: 1.1; font-variant-numeric: tabular-nums; }
+.sj-mon-since { font-size: 0.74rem; color: rgba(255,255,255,0.35); margin-top: 3px; }
+.sj-mon-svg { max-width: 58%; height: auto; }
+
+@media (max-width: 640px) {
+  .sj-mon-right { width: 100%; justify-content: space-between; min-width: 0; margin-top: 14px; }
+  .sj-mon-pct { font-size: 1.4rem; }
+  .sj-mon-svg { max-width: 52%; }
+  .sj-mon-head { min-width: 0; }
+}

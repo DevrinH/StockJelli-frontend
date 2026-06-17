@@ -9,6 +9,7 @@
     <link rel="dns-prefetch" href="https://api.stockjelli.com" />
     <link rel="dns-prefetch" href="https://financialmodelingprep.com" />
     <link rel="stylesheet" href="broker-picker.css" />
+    <link rel="stylesheet" href="/monitor-cards.css">
     
     <!-- Primary Meta Tags -->
     <title>StockJelli — Free Stock & Crypto Momentum Screener | Clean Momentum, No Noise</title>
@@ -106,6 +107,7 @@
     <script src="app.js?v=4" defer></script>
     <script src="revamp.js?v=4" defer></script>
     <script src="alerts-frontend.js?v=4" defer></script>
+    <script src="/monitor-cards.js"></script>
     <!-- Non-critical: load after data is rendering -->
     <script src="account.js" defer></script>
     <script src="promo-toast.js" defer></script>
@@ -621,34 +623,14 @@
 <!-- ========== (D) MONITOR STRIP — TQQQ (stocks) / BTC (crypto) ========== -->
 <!-- Flips with #assetControl. Stocks → TQQQ price+%+spark. Crypto → BTC 24h.
      Signal state ("uptrend intact") removed until the TQQQ HOLD alert ships. -->
-<section class="monitor-strip" id="monitorStrip">
-  <div class="container">
-    <div class="monitor-strip-card">
-      <div class="monitor-strip-left">
-        <img id="monitorLogo" class="monitor-strip-logo" src="" alt="" width="28" height="28" style="display:none;" />
-        <div class="monitor-strip-titles">
-          <span class="monitor-strip-title" id="monitorTitle">TQQQ Monitor</span>
-          <span class="monitor-strip-tag" id="monitorTag">ProShares UltraPro QQQ</span>
+     <section class="monitor-strip" id="monitorStrip">
+      <div class="container">
+        <div class="sj-monitor-wrap">
+          <div id="sjMonitorTqqq"></div>
+          <div id="sjMonitorBtc"></div>
         </div>
       </div>
-      <div class="monitor-strip-mid">
-        <span class="monitor-strip-price" id="monitorPrice">$—</span>
-        <span class="monitor-strip-chg" id="monitorChg">—</span>
-      </div>
-      <div class="monitor-strip-chart">
-        <svg viewBox="0 0 320 64" preserveAspectRatio="none" class="monitor-spark" aria-hidden="true">
-          <defs>
-            <linearGradient id="monGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="rgba(34,197,94,0.35)"/><stop offset="100%" stop-color="rgba(34,197,94,0)"/></linearGradient>
-            <linearGradient id="monGradRed" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="rgba(239,68,68,0.32)"/><stop offset="100%" stop-color="rgba(239,68,68,0)"/></linearGradient>
-          </defs>
-          <path id="monSparkFill" fill="url(#monGrad)" stroke="none" d=""/>
-          <path id="monSparkLine" fill="none" stroke="#22c55e" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" d=""/>
-          <circle id="monSparkDot" r="3.5" fill="#22c55e"/>
-        </svg>
-      </div>
-    </div>
-  </div>
-</section>
+    </section>
 
 
 <!-- ============================================================

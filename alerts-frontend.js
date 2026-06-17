@@ -518,11 +518,7 @@ let todayAlerts = (alertLogData.notifications || []).filter(a => {
     }
 
     const viewAllEl = document.getElementById("alertCardsViewAll");
-    if (viewAllEl) {
-      const total = (alertLogData.notifications || []).length;
-      if (total > 0) { viewAllEl.style.display = ""; viewAllEl.innerHTML = `<a href="/alert-log.html" class="alert-view-all-link">Show all ${total} alerts →</a>`; }
-      else viewAllEl.style.display = "none";
-    }
+    if (viewAllEl) viewAllEl.style.display = "none";
 
     container.style.display = "";
   }

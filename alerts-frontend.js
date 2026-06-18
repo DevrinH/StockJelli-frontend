@@ -518,7 +518,7 @@ let todayAlerts = (alertLogData.notifications || []).filter(a => {
                 key: `${a.symbol}-${a.pushTimestamp}`,
                 html: `
                   <span class="alert-log-time">${time}</span>
-                  <a href="${tvUrl}" target="_blank" rel="noopener" class="alert-log-ticker">${modeIcon} <strong>${a.symbol}</strong></a>
+                 <a href="${tvUrl}" target="_blank" rel="noopener" class="alert-log-ticker">${modeIcon} <strong>${a.symbol}</strong>${a.primeZone ? ' <span class="prime-badge" title="Prime zone — historically ~80% hit +3%">★</span>' : ''}</a>
                   <span class="alert-log-prices">${priceAtPush} → <span style="color:${peakColor}">${peakPriceStr}</span></span>
                   <span class="alert-log-gain" style="color:${peakColor}">${peakStr}</span>
                   ${renderHomeOdds(a)}

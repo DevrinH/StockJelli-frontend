@@ -286,6 +286,20 @@
     const wrColor = wr >= 80 ? "#4ade80" : wr >= 65 ? "#fbbf24" : "#ef4444";
     const sep = '<span style="color:rgba(255,255,255,0.1)">·</span>';
 
+// Path stats — stocks only (drawdown/time-to-peak were computed from stock data)
+    let pathStatsHtml = "";
+    if (mode === "stocks" && pathStatsData) {
+      const parts = [];
+      if (pathStatsData.timeToPeak) {
+        const hrs = Math.round(pathStatsData.timeToPeak.medianMinutes / 60 * 10) / 10;
+        parts.push(`<span>median ~${hrs}hr to peak</span>`);
+      }
+      if (pathStatsData.drawdown && pathStatsData.drawdown.medianMaxDrawdown != null) {
+        parts.push(`<span>typical dip ${pathStatsData.drawdown.medianMaxDrawdown}%</span>`);
+      }
+      if (parts.length) pathStatsHtml = `${sep}${parts.join(sep)}`;
+    }
+
     bar.innerHTML = `
       <span style="font-weight:700; color:${wrColor}">${wr}% hit +3%</span>
       ${sep}
@@ -294,10 +308,10 @@
       <span>+${avg}% avg peak</span>
       ${sep}
       <span style="color:${nr === wp.length ? '#4ade80' : 'rgba(255,255,255,0.35)'}">${nr}/${wp.length} never red</span>
+      ${pathStatsHtml}
       ${sep}
       <a href="/alert-log.html" style="color:rgba(77,163,255,0.7); text-decoration:none; font-weight:500;">Full log →</a>
     `;
-    bar.style.display = "flex";
   }
 
   // ── initFeaturedAlert REMOVED — #featuredAlertWrap no longer exists in HTML ──
@@ -562,7 +576,12 @@ let todayAlerts = (alertLogData.notifications || []).filter(a => {
     btn.addEventListener("click", () => setTimeout(() => { renderProofBar(); renderTodayAlerts(); }, 100));
     
   });
-
+// Path stats (stocks-only): time-to-peak + typical drawdown, for the proof bar
+let pathStatsData = null;
+fetch(`${API_BASE}/api/path-stats`)
+  .then(r => r.json())
+  .then(d => { pathStatsData = d; renderProofBar(); })
+  .catch(() => {});
   fetchAlertLog();
   setInterval(fetchAlertLog, 60_000);
 

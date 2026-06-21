@@ -5604,3 +5604,34 @@ tr.sj-alerted:hover {
    .feat-rail .feat-rail-odds { color: #ffffff !important; opacity: 1 !important; }
    .feat-rail .feat-rail-res { color: rgba(255, 255, 255, 0.55) !important; }
    .feat-rail .feat-rail-foot { color: rgba(255, 255, 255, 0.55) !important; }
+
+   /* ============================================================
+   MONITOR STRIP — box it like the other cards.
+   Append to the VERY END of style.css.
+   Matches the carousel / sector board / Top Movers card language:
+   white-alpha border, 16px radius, rgba(16,22,36,0.6) surface, shadow.
+   ============================================================ */
+
+/* Box the wrapper that holds the TQQQ + BTC monitors */
+.monitor-strip .sj-monitor-wrap {
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 16px;
+  background: rgba(16, 22, 36, 0.6);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.02), 0 18px 55px rgba(0, 0, 0, 0.22);
+  padding: 18px 24px;
+}
+
+/* If monitor-cards.js renders the TQQQ + BTC as two separate inner
+   blocks, give them a little breathing room between each other */
+.monitor-strip .sj-monitor-wrap > div + div {
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* keep the section's top spacing consistent with neighbors */
+.monitor-strip { padding: 14px 0 0; }
+
+@media (max-width: 760px) {
+  .monitor-strip .sj-monitor-wrap { padding: 14px 16px; border-radius: 12px; }
+}

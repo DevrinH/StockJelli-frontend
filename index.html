@@ -659,35 +659,7 @@
 ============================================================ -->
 
 
-<script>
-  (function () {
-    var dd = document.getElementById("exchangeDropdown");
-    if (!dd) return;
-    var trigger = document.getElementById("exchangeDdTrigger");
-    var menu = document.getElementById("heroBrokerControl");
-    var nameEl = document.getElementById("exchangeDdName");
-    var logoEl = document.getElementById("exchangeDdLogo");
-   
-    function close() { menu.style.display = "none"; trigger.setAttribute("aria-expanded", "false"); dd.classList.remove("open"); }
-    function open() { menu.style.display = "flex"; trigger.setAttribute("aria-expanded", "true"); dd.classList.add("open"); }
-   
-    trigger.addEventListener("click", function (e) {
-      e.stopPropagation();
-      (menu.style.display === "none") ? open() : close();
-    });
-    document.addEventListener("click", function (e) { if (!dd.contains(e.target)) close(); });
-   
-    // mirror the picked broker onto the trigger, then close
-    menu.addEventListener("click", function (e) {
-      var btn = e.target.closest(".exchange-dd-item");
-      if (!btn) return;
-      var img = btn.querySelector("img");
-      nameEl.textContent = btn.textContent.trim();
-      if (img) logoEl.src = img.src;
-      setTimeout(close, 0); // let the broker handler run first
-    });
-  })();
-  </script>
+
 
 
 

@@ -4968,3 +4968,57 @@ tr.sj-alerted:hover {
   margin-left: 5px;
   font-weight: 500;
 }
+
+/* ============================================================
+   TICKER SEARCH — append to style.css (after the sector board block)
+   ============================================================ */
+   .ticker-search { position: relative; margin-top: 22px; max-width: 460px; }
+
+   .ticker-search-box {
+     display: flex; align-items: center; gap: 10px;
+     padding: 11px 14px; border-radius: 12px;
+     background: rgba(18, 24, 38, 0.7);
+     border: 1px solid rgba(255, 255, 255, 0.08);
+     transition: border-color 0.15s ease, box-shadow 0.15s ease;
+   }
+   .ticker-search-box:focus-within {
+     border-color: var(--volt-line, rgba(129, 140, 248, 0.4));
+     box-shadow: 0 0 0 2px rgba(129, 140, 248, 0.08);
+   }
+   .ticker-search-icon { color: rgba(255, 255, 255, 0.35); flex-shrink: 0; }
+   .ticker-search-input {
+     flex: 1; min-width: 0; background: transparent; border: none; outline: none;
+     color: #e6e8eb; font-size: 0.95rem;
+   }
+   .ticker-search-input::placeholder { color: rgba(255, 255, 255, 0.3); }
+   .ticker-search-kbd {
+     font-size: 0.7rem; color: rgba(255, 255, 255, 0.3);
+     padding: 2px 7px; border-radius: 5px;
+     background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.08);
+   }
+   
+   .ticker-search-results {
+     position: absolute; top: calc(100% + 6px); left: 0; right: 0; z-index: 200;
+     background: rgba(16, 22, 36, 0.97);
+     border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px;
+     box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+     overflow: hidden; backdrop-filter: blur(12px);
+   }
+   .tsr-row {
+     display: grid; grid-template-columns: 70px 1fr auto; align-items: center; gap: 12px;
+     padding: 11px 14px; text-decoration: none;
+     border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+   }
+   .tsr-row:last-child { border-bottom: none; }
+   .tsr-row:hover, .tsr-active { background: rgba(129, 140, 248, 0.1); }
+   .tsr-sym { font-weight: 700; color: #eef1f6; letter-spacing: 0.02em; }
+   .tsr-sector { font-size: 0.78rem; color: rgba(255, 255, 255, 0.4); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+   .tsr-mag { font-size: 0.78rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+   .tsr-mag-ok { color: var(--volt, #818cf8); }
+   .tsr-mag-build { color: rgba(255, 255, 255, 0.3); }
+   
+   @media (max-width: 640px) {
+     .ticker-search { max-width: none; }
+     .tsr-sector { display: none; }
+     .tsr-row { grid-template-columns: 60px 1fr auto; }
+   }

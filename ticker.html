@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ticker — StockJelli</title>
+  <meta name="description" content="Magnitude odds and swing receipts for this ticker — how often it makes a big move, with the receipts." />
+  <link rel="preconnect" href="https://api.stockjelli.com" crossorigin />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/StockJelli-S-Logo.png" />
+  <style>
+    /* ticker-page-only layout (board/pill styles come from style.css) */
+    .tk-wrap { width: 82%; max-width: 880px; margin: 0 auto; padding: 28px 0 60px; }
+    @media (max-width:1200px){ .tk-wrap{ width:88%; } }
+    @media (max-width:640px){ .tk-wrap{ width:92%; padding:18px 0 40px; } }
+
+    .tk-back { display:inline-flex; align-items:center; gap:6px; color:rgba(255,255,255,0.4); text-decoration:none; font-size:0.82rem; margin-bottom:18px; }
+    .tk-back:hover{ color:rgba(255,255,255,0.7); }
+
+    .tk-head { display:flex; align-items:flex-end; justify-content:space-between; gap:16px; margin-bottom:6px; flex-wrap:wrap; }
+    .tk-sym { font-size:2.4rem; font-weight:800; letter-spacing:-0.01em; color:#f2f4f8; line-height:1; }
+    .tk-name { font-size:0.95rem; color:rgba(255,255,255,0.4); margin-top:4px; }
+    .tk-live { font-family:'JetBrains Mono',monospace; font-size:1.05rem; font-weight:700; color:#fff; }
+    .tk-live small{ font-weight:600; font-size:0.8rem; margin-left:6px; }
+
+    /* horizon toggle (swing | intraday-soon) */
+    .tk-horizon { display:inline-flex; gap:4px; background:rgba(18,24,38,0.7); border:1px solid rgba(255,255,255,0.08); border-radius:12px; padding:4px; margin:18px 0 22px; }
+    .tk-horizon button { border:none; background:transparent; color:rgba(255,255,255,0.55); border-radius:9px; padding:8px 18px; font-size:0.86rem; font-weight:600; cursor:pointer; }
+    .tk-horizon button.on { background:#312e81; color:#fff; box-shadow:inset 0 0 0 1px rgba(129,140,248,0.4); }
+    .tk-horizon button.soon { opacity:0.4; cursor:not-allowed; }
+    .tk-horizon button.soon::after { content:"soon"; font-size:0.6rem; margin-left:6px; padding:1px 5px; border-radius:4px; background:rgba(255,255,255,0.08); letter-spacing:0.04em; text-transform:uppercase; }
+
+    /* magnitude hero card */
+    .tk-hero { border:1px solid var(--volt-line, rgba(129,140,248,0.3)); border-radius:18px; background:rgba(16,22,36,0.6); padding:28px 30px; box-shadow:inset 0 0 0 1px rgba(255,255,255,0.02), 0 18px 55px rgba(0,0,0,0.22); }
+    .tk-hero-pct { font-size:4rem; font-weight:800; line-height:1; color:var(--volt,#818cf8); letter-spacing:-0.02em; }
+    .tk-hero-pct.cool { color:#a5b4fc; }
+    .tk-hero-cap { font-size:1.05rem; color:rgba(255,255,255,0.85); margin-top:8px; }
+    .tk-hero-cap strong{ color:#fff; }
+    /* the honesty line — structurally separate, boxed */
+    .tk-honesty { margin-top:16px; padding:12px 16px; border-radius:10px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.07); font-size:0.86rem; color:rgba(255,255,255,0.6); line-height:1.5; }
+    .tk-honesty b{ color:rgba(255,255,255,0.85); font-weight:650; }
+
+    /* sector context strip */
+    .tk-sector { display:flex; align-items:center; gap:10px; margin-top:14px; font-size:0.86rem; color:rgba(255,255,255,0.5); flex-wrap:wrap; }
+    .tk-sector-name{ color:rgba(255,255,255,0.8); font-weight:600; }
+    .tk-lean-up{ color:#4ade80; } .tk-lean-down{ color:rgba(255,90,90,0.9); } .tk-lean-flat{ color:rgba(255,255,255,0.45); }
+    .tk-sector-quiet{ color:rgba(255,255,255,0.3); }
+
+    /* receipts */
+    .tk-receipts { margin-top:26px; }
+    .tk-receipts h3 { font-size:1.05rem; font-weight:700; color:#eef1f6; margin:0 0 4px; }
+    .tk-receipts-sub { font-size:0.78rem; color:rgba(255,255,255,0.35); margin-bottom:12px; }
+    .tk-receipt-row { display:grid; grid-template-columns:90px 1fr 110px; align-items:center; gap:12px; padding:10px 12px; border-radius:9px; border:1px solid rgba(255,255,255,0.05); margin-bottom:6px; font-size:0.84rem; }
+    .tk-receipt-date{ color:rgba(255,255,255,0.4); font-variant-numeric:tabular-nums; }
+    .tk-receipt-verdict{ font-weight:650; }
+    .tk-receipt-moved{ color:var(--volt,#818cf8); }
+    .tk-receipt-quiet{ color:rgba(255,255,255,0.35); }
+    .tk-receipt-peak{ text-align:right; font-variant-numeric:tabular-nums; color:rgba(255,255,255,0.45); font-size:0.8rem; }
+
+    .tk-state { padding:40px 0; text-align:center; color:rgba(255,255,255,0.35); font-size:0.9rem; }
+    .tk-foot { margin-top:22px; padding-top:16px; border-top:1px solid rgba(255,255,255,0.05); font-size:0.76rem; color:rgba(255,255,255,0.3); line-height:1.6; }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <div class="header-inner">
+      <div class="header-left">
+        <a href="/" aria-label="StockJelli Home"><img class="logo" src="StockJelli-Logo.png" alt="StockJelli" width="150" height="32" /></a>
+      </div>
+    </div>
+  </header>
+
+  <main class="tk-wrap">
+    <a class="tk-back" href="/">← Back to board</a>
+    <div id="tkContent"><div class="tk-state">Loading…</div></div>
+  </main>
+
+  <script>
+  (function () {
+    var API = "https://api.stockjelli.com";
+    var params = new URLSearchParams(location.search);
+    var sym = (params.get("sym") || "").trim().toUpperCase();
+    var el = document.getElementById("tkContent");
+
+    if (!sym) { el.innerHTML = '<div class="tk-state">No ticker specified. <a href="/" style="color:#818cf8">Go to the board →</a></div>'; return; }
+    document.title = sym + " — StockJelli";
+
+    function leanClass(d){ return d==="up"?"tk-lean-up":d==="down"?"tk-lean-down":"tk-lean-flat"; }
+
+    function magHero(mag) {
+      if (!mag || mag.status === "warming" || mag.status === "gathering") {
+        return '<div class="tk-hero">' +
+          '<div class="tk-hero-pct" style="color:rgba(255,255,255,0.4)">—</div>' +
+          '<div class="tk-hero-cap">Still building this name\u2019s history.</div>' +
+          '<div class="tk-honesty">We show a magnitude rate once there\u2019s enough resolved data. Not enough yet for ' + sym + '.</div>' +
+          '</div>';
+      }
+      if (mag.status === "thin" || mag.status === "count") {
+        var disp = mag.display || (mag.hits + "/" + mag.n);
+        return '<div class="tk-hero">' +
+          '<div class="tk-hero-pct" style="font-size:2.6rem;color:rgba(255,255,255,0.7)">' + disp + '</div>' +
+          '<div class="tk-hero-cap">made a <strong>big move</strong> (\u00b15% in ~3 days) in ' + mag.hits + ' of the last ' + mag.n + ' setups</div>' +
+          '<div class="tk-honesty">Still gathering \u2014 we don\u2019t show a % until there are at least 30 resolved setups. This is the raw count so far.</div>' +
+          '</div>';
+      }
+      // ok
+      var cool = mag.pct < 50 ? " cool" : "";
+      return '<div class="tk-hero">' +
+        '<div class="tk-hero-pct' + cool + '">\u2248' + mag.pct + '%</div>' +
+        '<div class="tk-hero-cap">chance of a <strong>big move</strong> \u2014 \u00b15% within ~3 days</div>' +
+        '<div class="tk-honesty"><b>Direction is a coin flip on the name itself.</b> This number is how OFTEN ' + sym + ' moves big, not WHICH WAY. Over the last 8 weeks it cleared \u00b15% in ' + mag.hits + ' of ' + mag.n + ' setups.</div>' +
+        '</div>';
+    }
+
+    function sectorStrip(sector, lean, sectorMag) {
+      if (!sector) return "";
+      // honesty: only show the lean if the sector is actually moving (mag ok).
+      // if sector magnitude is low, frame the lean as "moves uncommon here".
+      var leanOk = lean && lean.status === "ok" && lean.pct != null;
+      var magLow = !(sectorMag && sectorMag.status === "ok" && sectorMag.pct >= 35);
+      var leanHtml;
+      if (!leanOk) {
+        leanHtml = '<span class="tk-sector-quiet">no clear lean</span>';
+      } else if (magLow) {
+        leanHtml = '<span class="' + leanClass(lean.dir) + '">leans ' + lean.dir + ' ' + lean.pct + '%</span>' +
+          '<span class="tk-sector-quiet">\u2014 but moves are uncommon in this sector right now</span>';
+      } else {
+        leanHtml = '<span class="' + leanClass(lean.dir) + '">leans ' + lean.dir + ' ' + lean.pct + '% this month</span>';
+      }
+      return '<div class="tk-sector">Sector: <span class="tk-sector-name">' + sector + '</span> · ' + leanHtml + '</div>';
+    }
+
+    function receipts(rows) {
+      if (!rows || !rows.length) {
+        return '<div class="tk-receipts"><h3>Receipts</h3><div class="tk-receipts-sub">No resolved setups in the window yet.</div></div>';
+      }
+      var body = rows.map(function (r) {
+        var verdict = r.moved
+          ? '<span class="tk-receipt-verdict tk-receipt-moved">Big move</span>'
+          : '<span class="tk-receipt-verdict tk-receipt-quiet">Stayed quiet</span>';
+        var peak = (r.peakMove != null)
+          ? '<span class="tk-receipt-peak">peak ' + (r.peakMove >= 0 ? "+" : "") + r.peakMove + '%</span>'
+          : '<span class="tk-receipt-peak"></span>';
+        return '<div class="tk-receipt-row"><span class="tk-receipt-date">' + r.date + '</span>' + verdict + peak + '</div>';
+      }).join("");
+      return '<div class="tk-receipts"><h3>Receipts</h3>' +
+        '<div class="tk-receipts-sub">Recent resolved setups \u2014 did it make a big move (\u00b15% in ~3 days)? Real outcomes, not forecasts.</div>' +
+        body + '</div>';
+    }
+
+    function horizonToggle() {
+      return '<div class="tk-horizon">' +
+        '<button class="on" type="button">Swing</button>' +
+        '<button class="soon" type="button" disabled aria-disabled="true">Intraday</button>' +
+        '</div>';
+    }
+
+    fetch(API + "/api/ticker/" + encodeURIComponent(sym), { cache: "no-store" })
+      .then(function (r) { return r.json(); })
+      .then(function (d) {
+        if (!d || d.error) { el.innerHTML = '<div class="tk-state">Couldn\u2019t load ' + sym + '.</div>'; return; }
+        var liveHtml = d.live && d.live.price != null
+          ? '<div class="tk-live">$' + Number(d.live.price).toFixed(2) +
+            '<small class="' + (d.live.pctChange >= 0 ? "up" : "down") + '">' +
+            (d.live.pctChange >= 0 ? "+" : "") + Number(d.live.pctChange).toFixed(2) + '%</small></div>'
+          : "";
+        el.innerHTML =
+          '<div class="tk-head"><div><div class="tk-sym">' + d.symbol + '</div>' +
+          (d.name ? '<div class="tk-name">' + d.name + '</div>' : '') + '</div>' + liveHtml + '</div>' +
+          horizonToggle() +
+          magHero(d.magnitude) +
+          sectorStrip(d.sector, d.sectorLean, d.sectorMagnitude) +
+          receipts(d.receipts) +
+          '<div class="tk-foot">Magnitude is a backward-looking frequency over a rolling 8-week window \u2014 not a prediction about the next move. Direction shown is the sector\u2019s weak lean, never a call on ' + d.symbol + ' itself. Educational tool only, not financial advice.</div>';
+      })
+      .catch(function () { el.innerHTML = '<div class="tk-state">Couldn\u2019t load ' + sym + '.</div>'; });
+  })();
+  </script>
+</body>
+</html>

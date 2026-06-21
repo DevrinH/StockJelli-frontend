@@ -559,46 +559,76 @@
      IDs preserved: #assetControl, #horizonControl, #horizonNote,
      #heroBrokerControl — so all existing JS keeps working.
 ============================================================ -->
-<section class="control-bar">
+<section class="control-bar control-bar-v3">
   <div class="container">
     <div class="control-bar-row">
-      <!-- LEFT cluster: horizon + asset -->
+      <!-- LEFT: the two primary toggles, label-free -->
       <div class="control-cluster">
-        <div class="control-group">
-          <span class="control-label">Horizon</span>
-          <div class="segmented segmented-ctrl" id="horizonControl" role="tablist" aria-label="Time horizon selector">
-            <button class="segmented-btn segmented-on" type="button" data-horizon="swing" role="tab" aria-selected="true">
-              Swing <span class="horizon-tinytag">multi-day</span>
-            </button>
-            <button class="segmented-btn" type="button" data-horizon="intraday" role="tab" aria-selected="false">
-              Intraday <span class="horizon-tinytag">today</span>
-            </button>
-          </div>
+        <div class="segmented segmented-ctrl" id="horizonControl" role="tablist" aria-label="Time horizon selector">
+          <button class="segmented-btn segmented-on" type="button" data-horizon="swing" role="tab" aria-selected="true">
+            Swing <span class="horizon-tinytag">multi-day</span>
+          </button>
+          <button class="segmented-btn" type="button" data-horizon="intraday" role="tab" aria-selected="false">
+            Intraday <span class="horizon-tinytag">today</span>
+          </button>
         </div>
-
-        <div class="control-group">
-          <span class="control-label">Market</span>
-          <div class="segmented segmented-ctrl" id="assetControl" role="tablist" aria-label="Asset type selector">
-            <button class="segmented-btn segmented-on" type="button" data-value="stocks" role="tab" aria-selected="true">Stocks</button>
-            <button class="segmented-btn" type="button" data-value="crypto" role="tab" aria-selected="false">Crypto</button>
-          </div>
+ 
+        <div class="segmented segmented-ctrl" id="assetControl" role="tablist" aria-label="Asset type selector">
+          <button class="segmented-btn segmented-on" type="button" data-value="stocks" role="tab" aria-selected="true">Stocks</button>
+          <button class="segmented-btn" type="button" data-value="crypto" role="tab" aria-selected="false">Crypto</button>
         </div>
       </div>
-
-      <!-- RIGHT cluster: exchange -->
-      <div class="control-group control-group-exchange">
-        <span class="control-label">Exchange</span>
-        <div class="segmented exchange-picker" id="heroBrokerControl" role="group" aria-label="Preferred exchange">
-          <button type="button" class="segmented-btn segmented-on" data-value="robinhood"><img src="/icons/robinhood-logo.png" alt="" width="14" height="14" />Robinhood</button>
-          <button type="button" class="segmented-btn" data-value="tradingview"><img src="/icons/tradingview-logo.png" alt="" width="14" height="14" />TradingView</button>
-          <button type="button" class="segmented-btn" data-value="webull"><img src="/icons/webull-logo.png" alt="" width="14" height="14" />Webull</button>
+ 
+      <!-- RIGHT: exchange dropdown -->
+      <div class="exchange-dd" id="exchangeDropdown">
+        <button class="exchange-dd-trigger" id="exchangeDdTrigger" type="button" aria-haspopup="true" aria-expanded="false">
+          <img class="exchange-dd-logo" id="exchangeDdLogo" src="/icons/robinhood-logo.png" alt="" width="15" height="15" />
+          <span class="exchange-dd-name" id="exchangeDdName">Robinhood</span>
+          <svg class="exchange-dd-caret" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+ 
+        <!-- keeps #heroBrokerControl so existing broker JS binds normally -->
+        <div class="exchange-dd-menu" id="heroBrokerControl" role="group" aria-label="Preferred exchange" style="display:none;">
+          <button type="button" class="exchange-dd-item segmented-btn segmented-on" data-value="robinhood"><img src="/icons/robinhood-logo.png" alt="" width="15" height="15" />Robinhood</button>
+          <button type="button" class="exchange-dd-item segmented-btn" data-value="tradingview"><img src="/icons/tradingview-logo.png" alt="" width="15" height="15" />TradingView</button>
+          <button type="button" class="exchange-dd-item segmented-btn" data-value="webull"><img src="/icons/webull-logo.png" alt="" width="15" height="15" />Webull</button>
         </div>
       </div>
     </div>
-
+ 
     <div class="control-note" id="horizonNote">Swing · chance of a big move (±5%) over the next ~3 days · direction is the sector's lean, not a call on the name</div>
   </div>
 </section>
+
+<script>
+  (function () {
+    var dd = document.getElementById("exchangeDropdown");
+    if (!dd) return;
+    var trigger = document.getElementById("exchangeDdTrigger");
+    var menu = document.getElementById("heroBrokerControl");
+    var nameEl = document.getElementById("exchangeDdName");
+    var logoEl = document.getElementById("exchangeDdLogo");
+   
+    function close() { menu.style.display = "none"; trigger.setAttribute("aria-expanded", "false"); dd.classList.remove("open"); }
+    function open() { menu.style.display = "flex"; trigger.setAttribute("aria-expanded", "true"); dd.classList.add("open"); }
+   
+    trigger.addEventListener("click", function (e) {
+      e.stopPropagation();
+      (menu.style.display === "none") ? open() : close();
+    });
+    document.addEventListener("click", function (e) { if (!dd.contains(e.target)) close(); });
+   
+    // mirror the picked broker onto the trigger, then close
+    menu.addEventListener("click", function (e) {
+      var btn = e.target.closest(".exchange-dd-item");
+      if (!btn) return;
+      var img = btn.querySelector("img");
+      nameEl.textContent = btn.textContent.trim();
+      if (img) logoEl.src = img.src;
+      setTimeout(close, 0); // let the broker handler run first
+    });
+  })();
+  </script>
 
 
 

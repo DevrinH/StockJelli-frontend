@@ -5211,3 +5211,116 @@ tr.sj-alerted:hover {
   .control-group-exchange .exchange-picker { width: 100%; }
   .control-group-exchange .exchange-picker .segmented-btn { flex: 1; justify-content: center; }
 }
+
+/* ============================================================
+   CONTROL BAR v3 — single clean row + exchange dropdown.
+   Append to the END of style.css (after header-controlbar.css).
+   These rules WIN over the earlier .control-group / .control-label
+   block because they come later. The old .control-label is unused
+   now (labels removed from markup).
+   ============================================================ */
+
+   .control-bar-v3 {
+    padding: 14px 0 4px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    margin-bottom: 0;
+  }
+  .control-bar-v3 .control-bar-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .control-bar-v3 .control-cluster {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  
+  /* tighter, label-free segmented toggles */
+  .control-bar-v3 .segmented-ctrl {
+    display: inline-flex;
+    width: auto;
+    background: rgba(18, 24, 38, 0.7);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 11px;
+    padding: 4px;
+    gap: 3px;
+  }
+  .control-bar-v3 .segmented-ctrl .segmented-btn {
+    border: none; background: transparent; border-radius: 8px;
+    padding: 8px 18px; font-size: 0.9rem; font-weight: 600;
+    color: rgba(255, 255, 255, 0.5); white-space: nowrap;
+  }
+  .control-bar-v3 .segmented-ctrl .segmented-btn:hover { background: rgba(255, 255, 255, 0.04); color: rgba(255, 255, 255, 0.8); }
+  .control-bar-v3 .segmented-ctrl .segmented-btn.segmented-on { background: #312e81; color: #fff; box-shadow: inset 0 0 0 1px rgba(129, 140, 248, 0.4); }
+  .control-bar-v3 .segmented-ctrl .horizon-tinytag { font-size: 0.68rem; opacity: 0.55; margin-left: 5px; font-weight: 500; }
+  
+  .control-bar-v3 .control-note {
+    margin-top: 10px;
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.4);
+    line-height: 1.4;
+  }
+  
+  /* ---- Exchange dropdown ---- */
+  .exchange-dd { position: relative; flex-shrink: 0; }
+  .exchange-dd-trigger {
+    display: inline-flex; align-items: center; gap: 8px;
+    height: 40px; padding: 0 14px;
+    border-radius: 11px;
+    background: rgba(18, 24, 38, 0.7);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 0.86rem; font-weight: 600; cursor: pointer;
+    transition: border-color 0.15s ease, background 0.15s ease;
+  }
+  .exchange-dd-trigger:hover { border-color: rgba(255, 255, 255, 0.16); background: rgba(18, 24, 38, 0.95); }
+  .exchange-dd.open .exchange-dd-trigger { border-color: rgba(129, 140, 248, 0.4); }
+  .exchange-dd-logo { border-radius: 4px; display: block; }
+  .exchange-dd-caret { color: rgba(255, 255, 255, 0.4); transition: transform 0.15s ease; }
+  .exchange-dd.open .exchange-dd-caret { transform: rotate(180deg); }
+  
+  .exchange-dd-menu {
+    position: absolute;
+    top: calc(100% + 6px);
+    right: 0;
+    z-index: 1200;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 180px;
+    padding: 6px;
+    background: rgba(16, 22, 36, 0.98);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+  }
+  .exchange-dd-item {
+    display: flex !important; align-items: center; gap: 9px;
+    width: 100%; text-align: left;
+    padding: 9px 12px; border-radius: 8px;
+    border: none; background: transparent;
+    color: rgba(255, 255, 255, 0.72); font-size: 0.86rem; font-weight: 550; cursor: pointer;
+  }
+  .exchange-dd-item img { border-radius: 4px; display: block; }
+  .exchange-dd-item:hover { background: rgba(255, 255, 255, 0.05); color: #fff; }
+  .exchange-dd-item.segmented-on { background: rgba(74, 222, 128, 0.08); color: #fff; }
+  
+  /* ---- tighten the gap before the carousel + the carousel's own padding ---- */
+  .swing-feat { padding: 14px 0 6px; }
+  /* kill the dead space under the carousel list (the big gap above the dots) */
+  .feat-hero .feat-list { flex: 0 1 auto; }
+  .feat-hero { min-height: 0; }
+  
+  /* ---- Responsive ---- */
+  @media (max-width: 760px) {
+    .control-bar-v3 .control-bar-row { flex-direction: column; align-items: stretch; gap: 12px; }
+    .control-bar-v3 .control-cluster { gap: 10px; }
+    .control-bar-v3 .segmented-ctrl { flex: 1; }
+    .control-bar-v3 .segmented-ctrl .segmented-btn { flex: 1; padding: 9px 0; text-align: center; }
+    .exchange-dd { width: 100%; }
+    .exchange-dd-trigger { width: 100%; justify-content: space-between; }
+    .exchange-dd-menu { left: 0; right: 0; }
+  }

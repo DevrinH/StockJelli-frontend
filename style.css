@@ -4811,3 +4811,68 @@ tr.sj-alerted:hover {
   .sector-board-body { grid-template-columns: 1fr; }
   .sector-board-foot-note { display: none; }
 }
+
+/* ============================================================
+   SWING VIEW — carousel + magnitude rail. Append to style.css.
+   Ported from v4's .feat-* with the violet/magnitude theme.
+   Two-column on desktop (carousel left 1.55fr, rail right 1fr),
+   stacks to one column on mobile.
+   ============================================================ */
+   .swing-feat { padding: 18px 0 6px; }
+   .volt-c { color: var(--volt, #a78bfa); }
+   
+   .feat-row { display: grid; grid-template-columns: 1.55fr 1fr; gap: 14px; align-items: stretch; }
+   
+   .feat-hero {
+     background: rgba(18, 24, 38, 0.82); border: 1px solid rgba(255, 255, 255, 0.07);
+     border-radius: 16px; padding: 18px 20px; position: relative; overflow: hidden;
+     display: flex; flex-direction: column;
+   }
+   .feat-hero::before { content: ""; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, var(--volt, #a78bfa), transparent 60%); }
+   .feat-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; }
+   .feat-kicker { display: flex; align-items: center; gap: 9px; }
+   .feat-ico { width: 30px; height: 30px; border-radius: 8px; background: rgba(167, 139, 250, 0.14); display: flex; align-items: center; justify-content: center; color: var(--volt, #a78bfa); font-size: 0.95rem; }
+   .feat-sec { font-size: 1.25rem; font-weight: 800; letter-spacing: -0.01em; color: #f2f4f8; }
+   .feat-state { font-size: 0.74rem; font-weight: 700; margin-top: 1px; }
+   .feat-nav { display: flex; align-items: center; gap: 10px; }
+   .feat-count { font-size: 0.78rem; color: rgba(255, 255, 255, 0.4); font-variant-numeric: tabular-nums; min-width: 42px; text-align: center; }
+   .feat-arrow { width: 34px; height: 34px; border-radius: 50%; border: 1px solid rgba(255, 255, 255, 0.14); background: rgba(255, 255, 255, 0.02); color: rgba(255, 255, 255, 0.7); font-size: 1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.12s; }
+   .feat-arrow:hover { border-color: rgba(167, 139, 250, 0.5); color: #fff; background: rgba(167, 139, 250, 0.1); }
+   
+   .feat-list { flex: 1; margin-top: 12px; }
+   .feat-frow { display: grid; grid-template-columns: 64px 1fr 56px; align-items: center; gap: 11px; padding: 7px 0; cursor: pointer; border-radius: 6px; }
+   .feat-frow:hover { background: rgba(255, 255, 255, 0.025); }
+   .feat-sym { font-size: 0.92rem; font-weight: 700; color: rgba(255,255,255,0.85); }
+   .feat-bar { position: relative; height: 20px; background: rgba(255, 255, 255, 0.06); border-radius: 3px; overflow: hidden; }
+   .feat-fill { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 3px; transition: width 0.7s cubic-bezier(0.22,1,0.36,1); }
+   .feat-pct { position: absolute; top: 50%; transform: translateY(-50%); font-size: 0.74rem; font-weight: 700; font-variant-numeric: tabular-nums; white-space: nowrap; }
+   .feat-quiet { display: flex; align-items: center; height: 20px; font-size: 0.74rem; color: rgba(255, 255, 255, 0.4); }
+   .feat-n { font-size: 0.74rem; text-align: right; font-variant-numeric: tabular-nums; color: rgba(255, 255, 255, 0.45); }
+   
+   .feat-foot { display: flex; align-items: center; justify-content: space-between; margin-top: 12px; padding-top: 10px; border-top: 1px solid rgba(255, 255, 255, 0.05); font-size: 0.68rem; color: rgba(255, 255, 255, 0.32); }
+   .feat-dots { display: flex; gap: 5px; }
+   .feat-dot { width: 6px; height: 6px; border-radius: 50%; background: rgba(255, 255, 255, 0.18); cursor: pointer; transition: 0.15s; }
+   .feat-dot.on { background: var(--volt, #a78bfa); width: 18px; border-radius: 3px; }
+   .feat-prog { height: 2px; background: rgba(255, 255, 255, 0.06); border-radius: 2px; margin-top: 10px; overflow: hidden; }
+   .feat-prog-fill { height: 100%; background: rgba(167, 139, 250, 0.55); width: 0%; }
+   
+   /* RIGHT rail */
+   .feat-rail { background: rgba(18, 24, 38, 0.82); border: 1px solid rgba(167, 139, 250, 0.16); border-radius: 16px; padding: 16px 18px; position: relative; overflow: hidden; display: flex; flex-direction: column; }
+   .feat-rail::before { content: ""; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, rgba(167, 139, 250, 0.5), transparent 60%); }
+   .feat-rail-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+   .feat-rail-title { font-size: 0.84rem; font-weight: 700; color: var(--volt-soft, #c4b5fd); text-transform: uppercase; letter-spacing: 0.04em; }
+   .live-tag { display: inline-flex; align-items: center; gap: 5px; font-size: 0.6rem; font-weight: 700; letter-spacing: 0.05em; color: #4ade80; }
+   .live-dot { width: 6px; height: 6px; border-radius: 50%; background: #22c55e; animation: livePulse 2s ease-in-out infinite; }
+   @keyframes livePulse { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
+   .feat-rail-row { display: grid; grid-template-columns: 1fr auto auto; align-items: center; gap: 9px; padding: 9px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.04); cursor: pointer; }
+   .feat-rail-row:last-of-type { border-bottom: none; }
+   .feat-rail-row:hover { background: rgba(255, 255, 255, 0.02); }
+   .feat-rail-tk { font-size: 0.82rem; font-weight: 700; color: rgba(255,255,255,0.85); }
+   .feat-rail-tk small { display: block; color: rgba(255, 255, 255, 0.35); font-weight: 400; font-size: 0.66rem; margin-top: 1px; }
+   .feat-rail-odds { font-variant-numeric: tabular-nums; font-weight: 700; font-size: 0.8rem; }
+   .feat-rail-res { color: rgba(255, 255, 255, 0.3); font-size: 0.9rem; }
+   .feat-rail-foot { margin-top: auto; padding-top: 12px; font-size: 0.64rem; color: rgba(255, 255, 255, 0.3); }
+   
+   @media (max-width: 760px) {
+     .feat-row { grid-template-columns: 1fr; }
+   }

@@ -110,6 +110,7 @@
     <script src="/monitor-cards.js?v=2" defer></script>
     <script src="sector-board.js?v=1" defer></script>
     <script src="horizon-toggle.js?v=1" defer></script>
+    <script src="swing-view.js?v=1" defer></script>
     <!-- Non-critical: load after data is rendering -->
     <script src="account.js" defer></script>
     <script src="promo-toast.js" defer></script>
@@ -544,18 +545,24 @@
       </div>
     </div>
 
-    <div class="hero-v2-toggle hero-horizon-toggle">
-      <span class="hero-horizon-label">Horizon</span>
-      <div class="segmented segmented-hero" id="horizonControl" role="tablist" aria-label="Time horizon selector">
-        <button class="segmented-btn segmented-on" type="button" data-horizon="swing" role="tab" aria-selected="true">
-          Swing <span class="horizon-tinytag">multi-day</span>
-        </button>
-        <button class="segmented-btn" type="button" data-horizon="intraday" role="tab" aria-selected="false" disabled aria-disabled="true">
-          Intraday <span class="horizon-tinytag horizon-soon">soon</span>
-        </button>
-      </div>
-    </div>
-    <div class="hero-horizon-note" id="horizonNote">Swing · chance of a big move (±5%) over the next ~3 days · direction is the sector's lean, not a call on the name</div>
+<!-- ============================================================
+     (HORIZON) SWING / INTRADAY TOGGLE — both real, swing default.
+     Paste inside the hero, after the asset-toggle block.
+     Both buttons ENABLED — intraday is your existing live page,
+     swing is the new flagship view. No "soon" tag.
+============================================================ -->
+<div class="hero-v2-toggle hero-horizon-toggle">
+  <span class="hero-horizon-label">Horizon</span>
+  <div class="segmented segmented-hero" id="horizonControl" role="tablist" aria-label="Time horizon selector">
+    <button class="segmented-btn segmented-on" type="button" data-horizon="swing" role="tab" aria-selected="true">
+      Swing <span class="horizon-tinytag">multi-day</span>
+    </button>
+    <button class="segmented-btn" type="button" data-horizon="intraday" role="tab" aria-selected="false">
+      Intraday <span class="horizon-tinytag">today</span>
+    </button>
+  </div>
+</div>
+<div class="hero-horizon-note" id="horizonNote">Swing · chance of a big move (±5%) over the next ~3 days · direction is the sector's lean, not a call on the name</div>
 
     <div class="hero-v2-exchange">
       <span class="hero-v2-exchange-label">Exchange</span>
@@ -570,6 +577,7 @@
 
 
 <!-- ========== (C) ODDS CARD — donut LEFT + live alert log RIGHT ========== -->
+<div id="intradayView">
 <section class="odds-hero">
   <div class="container">
     <div class="odds-hero-card">
@@ -636,42 +644,6 @@
 </section>
 
 
-<!-- ============================================================
-     (S) SECTOR BOARD — paste BETWEEN the odds-hero </section>
-     and the monitor strip <section class="monitor-strip">.
-     Fetches /api/sectors. Rows are server-tiered (lead/context/
-     quiet). Magnitude is the headline ("names moving a lot");
-     direction is the SECTOR's weak lean, shown as context, and
-     SUPPRESSED entirely on quiet rows so a clean-looking
-     direction can't masquerade as a signal.
-     Wired by the sector-board.js block (paste into app.js or
-     load as its own file — see notes).
-============================================================ -->
-<section class="sector-board" id="sectorBoard" style="display:none;">
-  <div class="container">
-    <div class="sector-board-card">
-      <div class="sector-board-head">
-        <div class="sector-board-head-left">
-          <h2 class="sector-board-title">Sector Board</h2>
-          <span class="sector-board-sub" id="sectorBoardSub">how much each sector is moving · this month</span>
-        </div>
-        <span class="sector-board-tag" id="sectorBoardTag">
-          <span class="sector-board-tag-dot"></span>rolling ~3.5 weeks
-        </span>
-      </div>
-
-      <div class="sector-board-body" id="sectorBoardBody">
-        <!-- rows injected by JS -->
-      </div>
-
-      <div class="sector-board-foot">
-        <span class="sector-board-foot-key"><span class="sb-key-bar"></span> bar = chance of a big move (±5% in ~3 days)</span>
-        <span class="sector-board-foot-note">Direction is the sector's weak lean, not a call on any one name.</span>
-      </div>
-    </div>
-  </div>
-</section>
-
 
 
 
@@ -679,7 +651,8 @@
 <!-- ========== (D) MONITOR STRIP — TQQQ (stocks) / BTC (crypto) ========== -->
 <!-- Flips with #assetControl. Stocks → TQQQ price+%+spark. Crypto → BTC 24h.
      Signal state ("uptrend intact") removed until the TQQQ HOLD alert ships. -->
-     <section class="monitor-strip" id="monitorStrip">
+     <div id="tqqqAlways">
+      <section class="monitor-strip" id="monitorStrip">
       <div class="container">
         <div class="sj-monitor-wrap">
           <div id="sjMonitorTqqq"></div>
@@ -687,6 +660,26 @@
         </div>
       </div>
     </section>
+  </div><!-- /#tqqqAlways -->
+
+  <div id="swingView">
+ 
+    <!-- (1) carousel + magnitude rail — full contents of swing-view.html -->
+    <section class="swing-feat">
+      <div class="container">
+        ... PASTE the full inside of swing-view.html here ...
+      </div>
+    </section>
+   
+    <!-- (2) new live swing screener — PLACEHOLDER until built next -->
+    <!-- <div id="swingScreenerMount"></div> -->
+   
+    <!-- (3) full grouped sector board — the block you CUT in Step 1 -->
+    <section class="sector-board" id="sectorBoard" style="display:none;">
+      ... the sector board section ...
+    </section>
+   
+  </div><!-- /#swingView -->
 
 
 <!-- ============================================================
@@ -1044,6 +1037,7 @@
         </div>
       </div>
     </section>
+  </div><!-- /#intradayView -->
 
 <!-- Blog / Insights -->
 <section class="blog-section" id="blogSection">

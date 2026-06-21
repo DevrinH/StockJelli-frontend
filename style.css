@@ -4941,3 +4941,30 @@ tr.sj-alerted:hover {
 @media (max-width: 760px) {
   .feat-row { grid-template-columns: 1fr; }
 }
+
+/* Horizon toggle — cap width so the outer box doesn't span full row */
+.hero-horizon-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 22px;
+  padding-top: 0;
+  width: auto;
+}
+.hero-horizon-toggle .segmented-hero {
+  display: inline-flex;
+  width: auto;
+  flex: 0 0 auto;
+}
+.hero-horizon-label {
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.55);
+  flex-shrink: 0;
+}
+.horizon-tinytag {
+  font-size: 0.7rem;
+  opacity: 0.55;
+  margin-left: 5px;
+  font-weight: 500;
+}

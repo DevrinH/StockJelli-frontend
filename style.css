@@ -5572,3 +5572,23 @@ tr.sj-alerted:hover {
   @media (max-width: 760px) {
     #pulseTicker.pulse-ticker { position: static !important; }
   }
+
+  /* ============================================================
+   STICKY TICKER — visual separation. Append to END of style.css.
+   The ticker IS sticky (confirmed pinning at 120px); it just reads
+   as merged with the header bars above it. These give it its own
+   subtle identity so the pin is visible.
+   ============================================================ */
+
+#pulseTicker.pulse-ticker {
+  position: sticky !important;
+  top: 120px !important;
+  z-index: 997;
+  background: rgba(9, 12, 20, 0.95) !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+}
+
+@media (max-width: 900px) { #pulseTicker.pulse-ticker { top: 58px !important; } }
+@media (max-width: 760px) { #pulseTicker.pulse-ticker { position: static !important; box-shadow: none; } }

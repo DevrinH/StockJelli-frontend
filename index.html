@@ -381,35 +381,53 @@
 
 
   <header class="header">
-    <div class="header-inner">
-      <div class="header-left">
-        <a href="/" aria-label="StockJelli Home">
-          <img class="logo" src="StockJelli-Logo.png" alt="StockJelli - Stock and Crypto Momentum Screener" width="150" height="32" />
-        </a>
-      </div>
-  
-      <div class="header-center market-indices">
-        <span id="idxLeft" class="idx">
-          <span id="idxLeftLabel">NASDAQ</span>
-          <span id="idxLeftValue" class="idx-value up">+1.24%</span>
-        </span>
-      
-        <span class="divider">|</span>
-      
-        <span id="idxRight" class="idx">
-          <span id="idxRightLabel">S&P 500</span>
-          <span id="idxRightValue" class="idx-value down">-0.31%</span>
-        </span>
-      </div>
+<!-- ============================================================
+     REPLACE the entire <div class="header-inner"> … </div>
+     (inside <header class="header">) with this block.
+     Polymarket layout: logo LEFT · compact search beside it ·
+     indices pushed RIGHT before the Log in button.
+     Search is narrow (tickers are ~4 chars). The old hero
+     #tickerSearch is removed — this is the only search now,
+     and ticker-search.js targets these same IDs.
+============================================================ -->
+<div class="header-inner header-inner-v2">
+  <div class="header-left">
+    <a href="/" aria-label="StockJelli Home">
+      <img class="logo" src="StockJelli-Logo.png" alt="StockJelli - Stock and Crypto Momentum Screener" width="150" height="32" />
+    </a>
 
-  
-      <div class="header-right">
-        <button class="header-login-btn" id="headerLoginBtn" type="button">Log in</button>
-        <button class="menu-btn" id="menuBtn" aria-label="Open navigation menu">
-          <span></span><span></span><span></span>
-        </button>
+    <!-- compact header search (moved out of the hero) -->
+    <div class="header-search" id="tickerSearch">
+      <div class="ticker-search-box">
+        <svg class="ticker-search-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+        <input type="text" id="tickerSearchInput" class="ticker-search-input"
+               placeholder="Search ticker…"
+               autocomplete="off" spellcheck="false" aria-label="Search a ticker" />
+        <kbd class="ticker-search-kbd">↵</kbd>
       </div>
+      <div class="ticker-search-results" id="tickerSearchResults" style="display:none;"></div>
     </div>
+  </div>
+
+  <div class="header-right">
+    <div class="header-indices market-indices">
+      <span id="idxLeft" class="idx">
+        <span id="idxLeftLabel">NASDAQ</span>
+        <span id="idxLeftValue" class="idx-value up">+1.24%</span>
+      </span>
+      <span class="divider">|</span>
+      <span id="idxRight" class="idx">
+        <span id="idxRightLabel">S&P 500</span>
+        <span id="idxRightValue" class="idx-value down">-0.31%</span>
+      </span>
+    </div>
+
+    <button class="header-login-btn" id="headerLoginBtn" type="button">Log in</button>
+    <button class="menu-btn" id="menuBtn" aria-label="Open navigation menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</div>
   </header>
 
   <div class="notif-banner" id="notifBanner">
@@ -531,48 +549,54 @@
 
 
 <!-- ========== (B) HERO ========== -->
-<section class="hero-v2">
+<!-- ============================================================
+     REPLACE the ENTIRE <section class="hero-v2"> … </section>
+     (the whole hero block, including its #tickerSearch which is
+     now in the header) with this control bar.
+     Kalshi/Polymarket style: one tidy horizontal strip of controls,
+     no big headline. Horizon + Asset on the left, Exchange on the
+     right. The horizon note sits as a thin sub-line.
+     IDs preserved: #assetControl, #horizonControl, #horizonNote,
+     #heroBrokerControl — so all existing JS keeps working.
+============================================================ -->
+<section class="control-bar">
   <div class="container">
-    <div class="hero-v2-top">
-      <div class="hero-v2-copy">
-        <h1 class="hero-v2-title">See the <span class="hero-v2-accent">odds</span> before<br>you take the trade.</h1>
-        <p class="hero-v2-sub">Momentum signals, with the receipts.</p>
+    <div class="control-bar-row">
+      <!-- LEFT cluster: horizon + asset -->
+      <div class="control-cluster">
+        <div class="control-group">
+          <span class="control-label">Horizon</span>
+          <div class="segmented segmented-ctrl" id="horizonControl" role="tablist" aria-label="Time horizon selector">
+            <button class="segmented-btn segmented-on" type="button" data-horizon="swing" role="tab" aria-selected="true">
+              Swing <span class="horizon-tinytag">multi-day</span>
+            </button>
+            <button class="segmented-btn" type="button" data-horizon="intraday" role="tab" aria-selected="false">
+              Intraday <span class="horizon-tinytag">today</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="control-group">
+          <span class="control-label">Market</span>
+          <div class="segmented segmented-ctrl" id="assetControl" role="tablist" aria-label="Asset type selector">
+            <button class="segmented-btn segmented-on" type="button" data-value="stocks" role="tab" aria-selected="true">Stocks</button>
+            <button class="segmented-btn" type="button" data-value="crypto" role="tab" aria-selected="false">Crypto</button>
+          </div>
+        </div>
       </div>
-      <div class="hero-v2-toggle">
-        <div class="segmented segmented-hero" id="assetControl" role="tablist" aria-label="Asset type selector">
-          <button class="segmented-btn segmented-on" type="button" data-value="stocks" role="tab" aria-selected="true">Stocks</button>
-          <button class="segmented-btn" type="button" data-value="crypto" role="tab" aria-selected="false">Crypto</button>
+
+      <!-- RIGHT cluster: exchange -->
+      <div class="control-group control-group-exchange">
+        <span class="control-label">Exchange</span>
+        <div class="segmented exchange-picker" id="heroBrokerControl" role="group" aria-label="Preferred exchange">
+          <button type="button" class="segmented-btn segmented-on" data-value="robinhood"><img src="/icons/robinhood-logo.png" alt="" width="14" height="14" />Robinhood</button>
+          <button type="button" class="segmented-btn" data-value="tradingview"><img src="/icons/tradingview-logo.png" alt="" width="14" height="14" />TradingView</button>
+          <button type="button" class="segmented-btn" data-value="webull"><img src="/icons/webull-logo.png" alt="" width="14" height="14" />Webull</button>
         </div>
       </div>
     </div>
 
-<!-- ============================================================
-     (HORIZON) SWING / INTRADAY TOGGLE — both real, swing default.
-     Paste inside the hero, after the asset-toggle block.
-     Both buttons ENABLED — intraday is your existing live page,
-     swing is the new flagship view. No "soon" tag.
-============================================================ -->
-<div class="hero-v2-toggle hero-horizon-toggle">
-  <span class="hero-horizon-label">Horizon</span>
-  <div class="segmented segmented-hero" id="horizonControl" role="tablist" aria-label="Time horizon selector">
-    <button class="segmented-btn segmented-on" type="button" data-horizon="swing" role="tab" aria-selected="true">
-      Swing <span class="horizon-tinytag">multi-day</span>
-    </button>
-    <button class="segmented-btn" type="button" data-horizon="intraday" role="tab" aria-selected="false">
-      Intraday <span class="horizon-tinytag">today</span>
-    </button>
-  </div>
-</div>
-<div class="hero-horizon-note" id="horizonNote">Swing · chance of a big move (±5%) over the next ~3 days · direction is the sector's lean, not a call on the name</div>
-
-    <div class="hero-v2-exchange">
-      <span class="hero-v2-exchange-label">Exchange</span>
-      <div class="segmented exchange-picker" id="heroBrokerControl" role="group" aria-label="Preferred exchange">
-        <button type="button" class="segmented-btn segmented-on" data-value="robinhood"><img src="/icons/robinhood-logo.png" alt="" width="14" height="14" />Robinhood</button>
-        <button type="button" class="segmented-btn" data-value="tradingview"><img src="/icons/tradingview-logo.png" alt="" width="14" height="14" />TradingView</button>
-        <button type="button" class="segmented-btn" data-value="webull"><img src="/icons/webull-logo.png" alt="" width="14" height="14" />Webull</button>
-      </div>
-    </div>
+    <div class="control-note" id="horizonNote">Swing · chance of a big move (±5%) over the next ~3 days · direction is the sector's lean, not a call on the name</div>
   </div>
 </section>
 

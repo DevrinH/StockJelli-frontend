@@ -411,11 +411,7 @@
         </span>
       </div>
  
-      <!-- NEW: no-credit-card CTA → opens #freeSignupModal -->
-      <button class="header-signup-btn" id="headerSignupBtn" type="button">
-        Sign up free
-        <span class="header-signup-sub">no credit card</span>
-      </button>
+
  
       <button class="header-login-btn" id="headerLoginBtn" type="button">Log in</button>
       <button class="menu-btn" id="menuBtn" aria-label="Open navigation menu">
@@ -428,7 +424,7 @@
 <!-- ===== TIER 2: sticky subheader (the toggles) ===== -->
 <div class="subheader" id="subheader">
   <div class="subheader-inner">
-    <div class="subheader-left">
+    <div class="subheader-controls">
       <div class="segmented segmented-ctrl" id="horizonControl" role="tablist" aria-label="Time horizon selector">
         <button class="segmented-btn segmented-on" type="button" data-horizon="swing" role="tab" aria-selected="true">
           Swing <span class="horizon-tinytag">multi-day</span>
@@ -443,21 +439,27 @@
         <button class="segmented-btn" type="button" data-value="crypto" role="tab" aria-selected="false">Crypto</button>
       </div>
  
-      <span class="subheader-note" id="horizonNote">chance of a big move (±5%) over the next ~3 days · direction is the sector's lean</span>
+      <div class="exchange-dd" id="exchangeDropdown">
+        <button class="exchange-dd-trigger" id="exchangeDdTrigger" type="button" aria-haspopup="true" aria-expanded="false">
+          <img class="exchange-dd-logo" id="exchangeDdLogo" src="/icons/robinhood-logo.png" alt="" width="15" height="15" />
+          <span class="exchange-dd-name" id="exchangeDdName">Robinhood</span>
+          <svg class="exchange-dd-caret" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="exchange-dd-menu" id="heroBrokerControl" role="group" aria-label="Preferred exchange" style="display:none;">
+          <button type="button" class="exchange-dd-item segmented-btn segmented-on" data-value="robinhood"><img src="/icons/robinhood-logo.png" alt="" width="15" height="15" />Robinhood</button>
+          <button type="button" class="exchange-dd-item segmented-btn" data-value="tradingview"><img src="/icons/tradingview-logo.png" alt="" width="15" height="15" />TradingView</button>
+          <button type="button" class="exchange-dd-item segmented-btn" data-value="webull"><img src="/icons/webull-logo.png" alt="" width="15" height="15" />Webull</button>
+        </div>
+      </div>
+ 
+      <!-- Sign up free — moved here from the top header -->
+      <button class="header-signup-btn subheader-signup" id="headerSignupBtn" type="button">
+        Sign up free
+        <span class="header-signup-sub">no credit card</span>
+      </button>
     </div>
  
-    <div class="exchange-dd" id="exchangeDropdown">
-      <button class="exchange-dd-trigger" id="exchangeDdTrigger" type="button" aria-haspopup="true" aria-expanded="false">
-        <img class="exchange-dd-logo" id="exchangeDdLogo" src="/icons/robinhood-logo.png" alt="" width="15" height="15" />
-        <span class="exchange-dd-name" id="exchangeDdName">Robinhood</span>
-        <svg class="exchange-dd-caret" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
-      </button>
-      <div class="exchange-dd-menu" id="heroBrokerControl" role="group" aria-label="Preferred exchange" style="display:none;">
-        <button type="button" class="exchange-dd-item segmented-btn segmented-on" data-value="robinhood"><img src="/icons/robinhood-logo.png" alt="" width="15" height="15" />Robinhood</button>
-        <button type="button" class="exchange-dd-item segmented-btn" data-value="tradingview"><img src="/icons/tradingview-logo.png" alt="" width="15" height="15" />TradingView</button>
-        <button type="button" class="exchange-dd-item segmented-btn" data-value="webull"><img src="/icons/webull-logo.png" alt="" width="15" height="15" />Webull</button>
-      </div>
-    </div>
+    <span class="subheader-note" id="horizonNote">Swing · chance of a big move (±5%) over the next ~3 days · direction is the sector's lean</span>
   </div>
 </div>
 
@@ -674,46 +676,7 @@
      IDs preserved: #assetControl, #horizonControl, #horizonNote,
      #heroBrokerControl — so all existing JS keeps working.
 ============================================================ -->
-<section class="control-bar control-bar-v3">
-  <div class="container">
-    <div class="control-bar-row">
-      <!-- LEFT: the two primary toggles, label-free -->
-      <div class="control-cluster">
-        <div class="segmented segmented-ctrl" id="horizonControl" role="tablist" aria-label="Time horizon selector">
-          <button class="segmented-btn segmented-on" type="button" data-horizon="swing" role="tab" aria-selected="true">
-            Swing <span class="horizon-tinytag">multi-day</span>
-          </button>
-          <button class="segmented-btn" type="button" data-horizon="intraday" role="tab" aria-selected="false">
-            Intraday <span class="horizon-tinytag">today</span>
-          </button>
-        </div>
- 
-        <div class="segmented segmented-ctrl" id="assetControl" role="tablist" aria-label="Asset type selector">
-          <button class="segmented-btn segmented-on" type="button" data-value="stocks" role="tab" aria-selected="true">Stocks</button>
-          <button class="segmented-btn" type="button" data-value="crypto" role="tab" aria-selected="false">Crypto</button>
-        </div>
-      </div>
- 
-      <!-- RIGHT: exchange dropdown -->
-      <div class="exchange-dd" id="exchangeDropdown">
-        <button class="exchange-dd-trigger" id="exchangeDdTrigger" type="button" aria-haspopup="true" aria-expanded="false">
-          <img class="exchange-dd-logo" id="exchangeDdLogo" src="/icons/robinhood-logo.png" alt="" width="15" height="15" />
-          <span class="exchange-dd-name" id="exchangeDdName">Robinhood</span>
-          <svg class="exchange-dd-caret" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
-        </button>
- 
-        <!-- keeps #heroBrokerControl so existing broker JS binds normally -->
-        <div class="exchange-dd-menu" id="heroBrokerControl" role="group" aria-label="Preferred exchange" style="display:none;">
-          <button type="button" class="exchange-dd-item segmented-btn segmented-on" data-value="robinhood"><img src="/icons/robinhood-logo.png" alt="" width="15" height="15" />Robinhood</button>
-          <button type="button" class="exchange-dd-item segmented-btn" data-value="tradingview"><img src="/icons/tradingview-logo.png" alt="" width="15" height="15" />TradingView</button>
-          <button type="button" class="exchange-dd-item segmented-btn" data-value="webull"><img src="/icons/webull-logo.png" alt="" width="15" height="15" />Webull</button>
-        </div>
-      </div>
-    </div>
- 
-    <div class="control-note" id="horizonNote">Swing · chance of a big move (±5%) over the next ~3 days · direction is the sector's lean, not a call on the name</div>
-  </div>
-</section>
+
 
 <script>
   (function () {

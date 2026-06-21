@@ -5475,3 +5475,69 @@ tr.sj-alerted:hover {
   /* subheader can't sticky-stack cleanly when both wrap on mobile — let it scroll */
   .subheader { position: static; }
 }
+
+/* ============================================================
+   SUBHEADER ALIGNMENT + STICKY TICKER — append to the END of
+   style.css (must be LAST so it wins over the two-tier block).
+   ============================================================ */
+
+/* All four controls in one aligned row; note drops below */
+.subheader-inner {
+  display: flex;
+  flex-direction: column;     /* controls row on top, note underneath */
+  align-items: stretch;
+  gap: 6px;
+  width: 82%;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 10px 0;
+}
+@media (max-width: 1200px) { .subheader-inner { width: 72%; } }
+@media (max-width: 900px)  { .subheader-inner { width: 92%; } }
+@media (min-width: 1401px) { .subheader-inner { width: calc((100vw - 440px) * 0.82); max-width: 1400px; } }
+
+.subheader-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+/* signup button sits inline with the toggles, vertically aligned */
+.subheader-signup {
+  height: 38px;
+  justify-content: center;
+}
+
+/* the exchange dropdown trigger height matches the toggles' height */
+.subheader .exchange-dd-trigger { height: 38px; }
+.subheader .segmented-ctrl { align-self: stretch; }
+
+.subheader-note {
+  font-size: 0.76rem;
+  color: rgba(255, 255, 255, 0.35);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ---- Sticky scrolling ticker, directly below the subheader ----
+   Header is sticky at top:0 (~62px tall). Subheader sticky at
+   top:62px (~58px tall). Ticker sticks just below that stack. */
+.pulse-ticker {
+  position: sticky;
+  top: 120px;                 /* header (62) + subheader (~58) */
+  z-index: 998;               /* under both sticky bars */
+}
+
+/* ---- Responsive ---- */
+@media (max-width: 900px) {
+  /* subheader goes non-sticky on small screens (two bars can't stack
+     cleanly); let the ticker fall back to its own offset */
+  .pulse-ticker { top: 58px; }
+}
+@media (max-width: 760px) {
+  .subheader-controls { gap: 8px; }
+  .subheader-signup { width: 100%; }
+  .pulse-ticker { position: static; }   /* don't fight the wrapping subheader */
+}

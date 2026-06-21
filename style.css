@@ -4531,3 +4531,171 @@ tr.sj-alerted:hover {
 }
 
 .prime-badge { color: #fbbf24; font-size: 0.7rem; margin-left: 2px; }
+
+/* ============================================================
+   SECTOR BOARD + MAGNITUDE PILLS
+   Append to the VERY END of style.css.
+   Matches the existing card language (rgba(16,22,36,…) surface,
+   white-alpha borders) and introduces the violet --volt accent
+   for the volatility/magnitude theme.
+   ============================================================ */
+
+   :root {
+    --volt: #818cf8;          /* violet — magnitude/volatility accent */
+    --volt-soft: rgba(129, 140, 248, 0.14);
+    --volt-line: rgba(129, 140, 248, 0.30);
+  }
+  
+  /* ── Section + card shell ─────────────────────────────────── */
+  .sector-board { padding: 18px 0 0; }
+  
+  .sector-board-card {
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    border-radius: 18px;
+    background: rgba(16, 22, 36, 0.6);
+    padding: 22px 26px 14px;
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.02), 0 18px 55px rgba(0, 0, 0, 0.22);
+  }
+  
+  .sector-board-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 14px;
+  }
+  .sector-board-head-left { display: flex; align-items: baseline; gap: 12px; min-width: 0; }
+  .sector-board-title { margin: 0; font-size: 1.25rem; font-weight: 700; color: #eef1f6; }
+  .sector-board-sub { font-size: 0.82rem; color: rgba(255, 255, 255, 0.35); }
+  
+  .sector-board-tag {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 3px 10px; border-radius: 999px;
+    background: var(--volt-soft); border: 1px solid var(--volt-line);
+    font-size: 0.7rem; font-weight: 600; color: var(--volt); white-space: nowrap;
+  }
+  .sector-board-tag-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--volt); animation: livePulse 2s ease-in-out infinite;
+  }
+  
+  /* ── Rows ─────────────────────────────────────────────────── */
+  .sector-board-body { display: flex; flex-direction: column; gap: 2px; }
+  
+  .sb-row {
+    display: grid;
+    grid-template-columns: 150px 1fr 168px;
+    align-items: center;
+    gap: 16px;
+    padding: 11px 8px;
+    border-radius: 10px;
+    transition: background 0.12s ease;
+  }
+  .sb-row:hover { background: rgba(255, 255, 255, 0.02); }
+  
+  .sb-name { font-weight: 650; letter-spacing: 0.01em; font-size: 0.92rem; color: rgba(255,255,255,0.88); }
+  .sb-name-quiet { color: rgba(255, 255, 255, 0.4); font-weight: 600; }
+  
+  /* magnitude bar (the gate / headline) */
+  .sb-bar-wrap { min-width: 0; display: flex; align-items: center; gap: 10px; }
+  .sb-bar-track {
+    position: relative; flex: 1; height: 8px; border-radius: 5px;
+    background: rgba(255, 255, 255, 0.06); overflow: hidden;
+  }
+  .sb-bar-fill {
+    position: absolute; left: 0; top: 0; bottom: 0;
+    border-radius: 5px; background: var(--volt);
+    transition: width 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .sb-bar-pct {
+    font-variant-numeric: tabular-nums; font-size: 0.84rem; font-weight: 700;
+    color: rgba(255, 255, 255, 0.82); min-width: 38px; text-align: right;
+  }
+  
+  /* lead rows: brighter bar + glow */
+  .sb-row-lead .sb-bar-fill { box-shadow: 0 0 10px rgba(129, 140, 248, 0.45); }
+  .sb-row-lead .sb-bar-pct { color: #fff; }
+  
+  /* context rows: muted bar */
+  .sb-row-context .sb-bar-fill { background: rgba(129, 140, 248, 0.55); }
+  
+  /* quiet rows: grey bar, low presence */
+  .sb-row-quiet .sb-bar-fill { background: rgba(255, 255, 255, 0.14); }
+  .sb-row-quiet .sb-bar-pct { color: rgba(255, 255, 255, 0.3); }
+  
+  /* direction lean column (context/flavor) */
+  .sb-lean { text-align: right; font-size: 0.8rem; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .sb-lean-up { color: #4ade80; }
+  .sb-lean-down { color: rgba(255, 90, 90, 0.9); }
+  .sb-lean-flat { color: rgba(255, 255, 255, 0.42); }
+  .sb-lean-dim { color: rgba(255, 255, 255, 0.2); }      /* quiet rows: "—" / no edge */
+  .sb-lean-word { font-size: 0.66rem; text-transform: uppercase; letter-spacing: 0.04em; opacity: 0.75; margin-left: 4px; }
+  
+  /* lead-tier "moving most" chip */
+  .sb-lead-chip {
+    display: inline-block; margin-left: 8px; padding: 1px 7px; border-radius: 4px;
+    font-size: 0.56rem; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase;
+    color: var(--volt); background: var(--volt-soft); border: 1px solid var(--volt-line);
+    vertical-align: middle;
+  }
+  
+  /* ── Foot ─────────────────────────────────────────────────── */
+  .sector-board-foot {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 12px; flex-wrap: wrap;
+    margin-top: 12px; padding-top: 12px;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    font-size: 0.72rem; color: rgba(255, 255, 255, 0.32);
+  }
+  .sector-board-foot-key { display: inline-flex; align-items: center; gap: 7px; }
+  .sb-key-bar { width: 18px; height: 6px; border-radius: 3px; background: var(--volt); display: inline-block; }
+  
+  /* ── Mobile ───────────────────────────────────────────────── */
+  @media (max-width: 640px) {
+    .sector-board-card { padding: 16px 14px 10px; border-radius: 12px; }
+    .sector-board-title { font-size: 1.05rem; }
+    .sector-board-sub { display: none; }
+    .sb-row { grid-template-columns: 92px 1fr 70px; gap: 10px; padding: 9px 4px; }
+    .sb-name { font-size: 0.82rem; }
+    .sb-bar-pct { font-size: 0.76rem; min-width: 32px; }
+    .sb-lean { font-size: 0.7rem; }
+    .sb-lean-word, .sb-lead-chip { display: none; }
+    .sector-board-foot-note { display: none; }
+  }
+  
+  /* ============================================================
+     MAGNITUDE PILL — screener "Magnitude" column
+     Replaces the continuation-odds pill in the Odds↑ column slot.
+     Five states map to magnitudeForRow(): ok / count / thin /
+     gathering / warming. Keeps the same column geometry so the
+     table-layout:fixed colgroup widths don't need changing.
+     ============================================================ */
+  
+  .mag-cell { text-align: center; }
+  
+  .mag-pill {
+    display: inline-flex; flex-direction: column; align-items: center;
+    line-height: 1.05; padding: 3px 9px; border-radius: 7px;
+    font-variant-numeric: tabular-nums;
+  }
+  .mag-pct { font-size: 0.92rem; font-weight: 800; }
+  .mag-frac { font-size: 0.82rem; font-weight: 700; }
+  .mag-tier { font-size: 0.5rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; opacity: 0.7; margin-top: 1px; }
+  
+  /* resolved % — violet (magnitude theme), brightness by band */
+  .mag-ok { color: var(--volt); background: var(--volt-soft); }
+  .mag-ok.mag-hot { color: #a5b4fc; }
+  .mag-ok .mag-pct { text-shadow: 0 0 8px rgba(129, 140, 248, 0.35); }
+  
+  /* count tier — fraction, no % yet (n 10–29) */
+  .mag-count { color: rgba(255, 255, 255, 0.6); background: rgba(255, 255, 255, 0.04); }
+  
+  /* thin / gathering / warming — building history */
+  .mag-build { color: rgba(255, 255, 255, 0.28); font-weight: 600; font-size: 0.72rem; }
+  
+  @media (max-width: 640px) {
+    .mag-pct { font-size: 0.78rem; }
+    .mag-frac { font-size: 0.72rem; }
+    .mag-tier { font-size: 0.44rem; }
+    .mag-pill { padding: 2px 6px; }
+  }

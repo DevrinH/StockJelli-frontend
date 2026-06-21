@@ -236,6 +236,24 @@
     return `<span class="odds-pill ${tier}" title="${odds.label}: ${odds.hits} of ${odds.n} similar entries reached +3% before dipping -2%. Historical frequency, not a prediction."><span class="odds-pct">${odds.pct}%</span><span class="odds-tier">${odds.label}</span></span>`;
   }
 
+  function renderMagnitudeCell(mag) {
+    if (!mag || mag.status === "warming" || mag.status === "gathering") {
+      return '<span class="mag-build" title="Building this name\u2019s 8-week move history">building</span>';
+    }
+    if (mag.status === "thin") {
+      const disp = mag.display || `${mag.hits}/${mag.n}`;
+      return `<span class="mag-pill mag-build" title="${mag.hits} of ${mag.n} recent entries made a big move (\u00b15% in ~3 days). Too few to show a rate yet.">${disp}</span>`;
+    }
+    if (mag.status === "count") {
+      const disp = mag.display || `${mag.hits}/${mag.n}`;
+      return `<span class="mag-pill mag-count" title="${mag.hits} of ${mag.n} recent entries made a big move (\u00b15% in ~3 days). Gathering more before showing a %."><span class="mag-frac">${disp}</span><span class="mag-tier">gathering</span></span>`;
+    }
+    // status === "ok" — resolved %, server-rounded to fives
+    const hot = mag.pct >= 60 ? " mag-hot" : "";
+    const disp = mag.display || `\u2248${mag.pct}%`;
+    return `<span class="mag-pill mag-ok${hot}" title="Over the last 8 weeks, ${mag.symbol || "this name"} made a big move (\u00b15% in ~3 days) ${mag.hits} of ${mag.n} times. Direction-agnostic \u2014 not a prediction of up or down."><span class="mag-pct">${disp}</span><span class="mag-tier">big move</span></span>`;
+  }
+
   // ── Market Regime Config ──
   const REGIME_CONFIG = {
     expansion:   { color: "#22c55e", colorRgb: "34, 197, 94",   bpm: 62,  amplitude: 0.35, frequency: 0.07, spikeStrength: 0.25, noise: 0.02, label: "Expansion" },
@@ -671,7 +689,7 @@
         <td>${fmtVolumeCompact(x.volume)}${renderVolumeFire(x.volume, x.avgVolume, x.marketCap, "stock")}${renderWhaleIndicator(x.volume, x.avgVolume, x.marketCap, x.pctChange, x.rangePosition, "stock")}</td>
         <td class="rvol">${renderRvol(x.volume, x.avgVolume, x.marketCap, "stock")}</td>
         <td class="news">${newsHtml}</td>
-        <td class="sj">${renderOddsCell(x.continuationOdds)}</td>
+        <td class="mag-cell">${renderMagnitudeCell(x.magnitudeOdds)}</td>
       `;
 
       return {

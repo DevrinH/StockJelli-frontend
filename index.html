@@ -621,6 +621,46 @@
 </section>
 
 
+<!-- ============================================================
+     (S) SECTOR BOARD — paste BETWEEN the odds-hero </section>
+     and the monitor strip <section class="monitor-strip">.
+     Fetches /api/sectors. Rows are server-tiered (lead/context/
+     quiet). Magnitude is the headline ("names moving a lot");
+     direction is the SECTOR's weak lean, shown as context, and
+     SUPPRESSED entirely on quiet rows so a clean-looking
+     direction can't masquerade as a signal.
+     Wired by the sector-board.js block (paste into app.js or
+     load as its own file — see notes).
+============================================================ -->
+<section class="sector-board" id="sectorBoard" style="display:none;">
+  <div class="container">
+    <div class="sector-board-card">
+      <div class="sector-board-head">
+        <div class="sector-board-head-left">
+          <h2 class="sector-board-title">Sector Board</h2>
+          <span class="sector-board-sub" id="sectorBoardSub">how much each sector is moving · this month</span>
+        </div>
+        <span class="sector-board-tag" id="sectorBoardTag">
+          <span class="sector-board-tag-dot"></span>rolling ~3.5 weeks
+        </span>
+      </div>
+
+      <div class="sector-board-body" id="sectorBoardBody">
+        <!-- rows injected by JS -->
+      </div>
+
+      <div class="sector-board-foot">
+        <span class="sector-board-foot-key"><span class="sb-key-bar"></span> bar = chance of a big move (±5% in ~3 days)</span>
+        <span class="sector-board-foot-note">Direction is the sector's weak lean, not a call on any one name.</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+
+
+
 <!-- ========== (D) MONITOR STRIP — TQQQ (stocks) / BTC (crypto) ========== -->
 <!-- Flips with #assetControl. Stocks → TQQQ price+%+spark. Crypto → BTC 24h.
      Signal state ("uptrend intact") removed until the TQQQ HOLD alert ships. -->
@@ -676,7 +716,7 @@
                   <th>Volume</th>
                   <th class="rvol-header" title="Relative Volume — current volume vs average">RVOL</th>
                   <th>News</th>
-                  <th class="odds-header" title="Odds of continuation — how often momentum entries with this early acceleration profile have cleanly cleared +3% (reached +3% before dipping -2%). Backward-looking frequency, not a prediction.">Odds&nbsp;↑</th>
+                  <th class="mag-header" title="Magnitude — how often this name has made a BIG MOVE (price moved 5% or more in either direction within ~3 days), as a rolling rate over the last 8 weeks. Direction-agnostic: it does NOT predict up or down. Backward-looking frequency, not a prediction.">Magnitude</th>
                 </tr>
               </thead>
 

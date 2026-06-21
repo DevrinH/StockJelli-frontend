@@ -5635,3 +5635,11 @@ tr.sj-alerted:hover {
 @media (max-width: 760px) {
   .monitor-strip .sj-monitor-wrap { padding: 14px 16px; border-radius: 12px; }
 }
+
+.feat-frow-quiet { opacity: 0.5; }
+.feat-frow-quiet .feat-sym { color: rgba(255,255,255,0.45); }
+.feat-fill-quiet {
+  background: rgba(255,255,255,0.14) !important;
+  box-shadow: none !important;
+}
+.feat-frow-quiet .feat-pct { color: rgba(255,255,255,0.4); }

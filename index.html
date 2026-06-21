@@ -380,55 +380,170 @@
 
 
 
-  <header class="header">
-<!-- ============================================================
-     REPLACE the entire <div class="header-inner"> … </div>
-     (inside <header class="header">) with this block.
-     Polymarket layout: logo LEFT · compact search beside it ·
-     indices pushed RIGHT before the Log in button.
-     Search is narrow (tickers are ~4 chars). The old hero
-     #tickerSearch is removed — this is the only search now,
-     and ticker-search.js targets these same IDs.
-============================================================ -->
-<div class="header-inner header-inner-v2">
-  <div class="header-left">
-    <a href="/" aria-label="StockJelli Home">
-      <img class="logo" src="StockJelli-Logo.png" alt="StockJelli - Stock and Crypto Momentum Screener" width="150" height="32" />
-    </a>
-
-    <!-- compact header search (moved out of the hero) -->
-    <div class="header-search" id="tickerSearch">
-      <div class="ticker-search-box">
-        <svg class="ticker-search-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-        <input type="text" id="tickerSearchInput" class="ticker-search-input"
-               placeholder="Search ticker…"
-               autocomplete="off" spellcheck="false" aria-label="Search a ticker" />
-        <kbd class="ticker-search-kbd">↵</kbd>
+<!-- ===== TIER 1: main header ===== -->
+<header class="header header-v3">
+  <div class="header-inner header-inner-v3">
+    <div class="header-left">
+      <a href="/" aria-label="StockJelli Home">
+        <img class="logo" src="StockJelli-Logo.png" alt="StockJelli - Stock and Crypto Momentum Screener" width="150" height="32" />
+      </a>
+ 
+      <div class="header-search" id="tickerSearch">
+        <div class="ticker-search-box">
+          <svg class="ticker-search-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+          <input type="text" id="tickerSearchInput" class="ticker-search-input" placeholder="Search ticker…" autocomplete="off" spellcheck="false" aria-label="Search a ticker" />
+          <kbd class="ticker-search-kbd">↵</kbd>
+        </div>
+        <div class="ticker-search-results" id="tickerSearchResults" style="display:none;"></div>
       </div>
-      <div class="ticker-search-results" id="tickerSearchResults" style="display:none;"></div>
+    </div>
+ 
+    <div class="header-right">
+      <div class="header-indices market-indices">
+        <span id="idxLeft" class="idx">
+          <span id="idxLeftLabel">NASDAQ</span>
+          <span id="idxLeftValue" class="idx-value up">+1.24%</span>
+        </span>
+        <span class="divider">|</span>
+        <span id="idxRight" class="idx">
+          <span id="idxRightLabel">S&P 500</span>
+          <span id="idxRightValue" class="idx-value down">-0.31%</span>
+        </span>
+      </div>
+ 
+      <!-- NEW: no-credit-card CTA → opens #freeSignupModal -->
+      <button class="header-signup-btn" id="headerSignupBtn" type="button">
+        Sign up free
+        <span class="header-signup-sub">no credit card</span>
+      </button>
+ 
+      <button class="header-login-btn" id="headerLoginBtn" type="button">Log in</button>
+      <button class="menu-btn" id="menuBtn" aria-label="Open navigation menu">
+        <span></span><span></span><span></span>
+      </button>
     </div>
   </div>
-
-  <div class="header-right">
-    <div class="header-indices market-indices">
-      <span id="idxLeft" class="idx">
-        <span id="idxLeftLabel">NASDAQ</span>
-        <span id="idxLeftValue" class="idx-value up">+1.24%</span>
-      </span>
-      <span class="divider">|</span>
-      <span id="idxRight" class="idx">
-        <span id="idxRightLabel">S&P 500</span>
-        <span id="idxRightValue" class="idx-value down">-0.31%</span>
-      </span>
+</header>
+ 
+<!-- ===== TIER 2: sticky subheader (the toggles) ===== -->
+<div class="subheader" id="subheader">
+  <div class="subheader-inner">
+    <div class="subheader-left">
+      <div class="segmented segmented-ctrl" id="horizonControl" role="tablist" aria-label="Time horizon selector">
+        <button class="segmented-btn segmented-on" type="button" data-horizon="swing" role="tab" aria-selected="true">
+          Swing <span class="horizon-tinytag">multi-day</span>
+        </button>
+        <button class="segmented-btn" type="button" data-horizon="intraday" role="tab" aria-selected="false">
+          Intraday <span class="horizon-tinytag">today</span>
+        </button>
+      </div>
+ 
+      <div class="segmented segmented-ctrl" id="assetControl" role="tablist" aria-label="Asset type selector">
+        <button class="segmented-btn segmented-on" type="button" data-value="stocks" role="tab" aria-selected="true">Stocks</button>
+        <button class="segmented-btn" type="button" data-value="crypto" role="tab" aria-selected="false">Crypto</button>
+      </div>
+ 
+      <span class="subheader-note" id="horizonNote">chance of a big move (±5%) over the next ~3 days · direction is the sector's lean</span>
     </div>
-
-    <button class="header-login-btn" id="headerLoginBtn" type="button">Log in</button>
-    <button class="menu-btn" id="menuBtn" aria-label="Open navigation menu">
-      <span></span><span></span><span></span>
-    </button>
+ 
+    <div class="exchange-dd" id="exchangeDropdown">
+      <button class="exchange-dd-trigger" id="exchangeDdTrigger" type="button" aria-haspopup="true" aria-expanded="false">
+        <img class="exchange-dd-logo" id="exchangeDdLogo" src="/icons/robinhood-logo.png" alt="" width="15" height="15" />
+        <span class="exchange-dd-name" id="exchangeDdName">Robinhood</span>
+        <svg class="exchange-dd-caret" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      <div class="exchange-dd-menu" id="heroBrokerControl" role="group" aria-label="Preferred exchange" style="display:none;">
+        <button type="button" class="exchange-dd-item segmented-btn segmented-on" data-value="robinhood"><img src="/icons/robinhood-logo.png" alt="" width="15" height="15" />Robinhood</button>
+        <button type="button" class="exchange-dd-item segmented-btn" data-value="tradingview"><img src="/icons/tradingview-logo.png" alt="" width="15" height="15" />TradingView</button>
+        <button type="button" class="exchange-dd-item segmented-btn" data-value="webull"><img src="/icons/webull-logo.png" alt="" width="15" height="15" />Webull</button>
+      </div>
+    </div>
   </div>
 </div>
-  </header>
+
+
+
+<script>
+  (function () {
+    "use strict";
+   
+    // ---- helper: reveal a modal-overlay using the site's own class ----
+    function openModal(id) {
+      var m = document.getElementById(id);
+      if (!m) return false;
+      m.classList.add("is-open");
+      m.setAttribute("aria-hidden", "false");
+      return true;
+    }
+    function closeModal(m) {
+      m.classList.remove("is-open");
+      m.setAttribute("aria-hidden", "true");
+    }
+   
+    // ---- Log in → account modal (fallback only; runs after account.js) ----
+    var loginBtn = document.getElementById("headerLoginBtn");
+    if (loginBtn) {
+      loginBtn.addEventListener("click", function () {
+        // open the account modal; if account.js already handled it, this
+        // is harmless (the class is idempotent)
+        openModal("accountModal");
+      });
+    }
+   
+    // ---- Sign up free → free signup modal (no credit card) ----
+    var signupBtn = document.getElementById("headerSignupBtn");
+    if (signupBtn) {
+      signupBtn.addEventListener("click", function () {
+        // prefer the dedicated free modal; fall back to plans if absent
+        if (!openModal("freeSignupModal")) openModal("alertsModal");
+      });
+    }
+   
+    // ---- close any modal on its ✕ or backdrop click (safety net) ----
+    document.querySelectorAll(".modal-overlay").forEach(function (overlay) {
+      overlay.addEventListener("click", function (e) {
+        if (e.target === overlay) closeModal(overlay);
+      });
+      var x = overlay.querySelector(".modal-close");
+      if (x) x.addEventListener("click", function () { closeModal(overlay); });
+    });
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Escape") {
+        document.querySelectorAll(".modal-overlay.is-open").forEach(closeModal);
+      }
+    });
+   
+    // ---- Exchange dropdown ----
+    var dd = document.getElementById("exchangeDropdown");
+    if (dd) {
+      var trigger = document.getElementById("exchangeDdTrigger");
+      var menu = document.getElementById("heroBrokerControl");
+      var nameEl = document.getElementById("exchangeDdName");
+      var logoEl = document.getElementById("exchangeDdLogo");
+   
+      function closeDd() { menu.style.display = "none"; trigger.setAttribute("aria-expanded", "false"); dd.classList.remove("open"); }
+      function openDd() { menu.style.display = "flex"; trigger.setAttribute("aria-expanded", "true"); dd.classList.add("open"); }
+   
+      trigger.addEventListener("click", function (e) {
+        e.stopPropagation();
+        (menu.style.display === "none" || !menu.style.display) ? openDd() : closeDd();
+      });
+      document.addEventListener("click", function (e) { if (!dd.contains(e.target)) closeDd(); });
+   
+      menu.addEventListener("click", function (e) {
+        var btn = e.target.closest(".exchange-dd-item");
+        if (!btn) return;
+        var img = btn.querySelector("img");
+        if (nameEl) nameEl.textContent = btn.textContent.trim();
+        if (img && logoEl) logoEl.src = img.src;
+        setTimeout(closeDd, 0); // let the broker handler run first
+      });
+    }
+  })();
+  </script>
+
+
+
 
   <div class="notif-banner" id="notifBanner">
     <div class="notif-banner-inner">

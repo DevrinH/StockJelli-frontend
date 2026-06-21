@@ -1,75 +1,72 @@
 /* ============================================================
-   sector-board.js — self-contained. Add to index.html <head>:
-     <script src="sector-board.js?v=1" defer></script>
-   Renders the Sector Board from /api/sectors. No app.js needed.
-
-   Server already tiers each row (lead / context / quiet) and
-   sorts them. This file is pure rendering + the honesty rules:
-     • magnitude bar is the headline on every row
-     • direction lean shows on lead/context, SUPPRESSED on quiet
-     • lead row gets a "moving most" chip
-   The board is a STOCKS surface (sectors are equity sectors), so
-   it hides on the crypto tab to stay coherent with #assetControl.
+   sector-board.js (v2 — grouped cards, mockup shape)
+   Replaces the flat-row version. Renders each sector as a CARD:
+     header = sector name + magnitude % (the gate, real today)
+              + direction lean as a SIDE LABEL (suppressed on quiet)
+     rows   = top example names, each with a MAGNITUDE bar + fraction
+     foot   = sample-depth line
+   Bars are magnitude (how much names move), never direction — so a
+   bar can't be misread as "chance it goes up". Names route to
+   /ticker.html on click. Hides on the crypto tab.
 ============================================================ */
 (function () {
     "use strict";
-  
     var API = "https://api.stockjelli.com";
     var section = document.getElementById("sectorBoard");
     var body = document.getElementById("sectorBoardBody");
     if (!section || !body) return;
   
-    function leanClass(dir) {
-      if (dir === "up") return "sb-lean-up";
-      if (dir === "down") return "sb-lean-down";
-      return "sb-lean-flat";
+    function leanClass(d) { return d === "up" ? "sb-lean-up" : d === "down" ? "sb-lean-down" : "sb-lean-flat"; }
+  
+    function headerLean(tier, lean) {
+      if (tier === "quiet") return '<span class="sb-lean sb-lean-dim">quiet \u00b7 no edge</span>';
+      if (lean && lean.status === "ok" && lean.pct != null) {
+        return '<span class="sb-lean ' + leanClass(lean.dir) + '">leans ' + lean.dir + ' ' + lean.pct + '%</span>';
+      }
+      return '<span class="sb-lean sb-lean-dim">no clear lean</span>';
     }
   
-    function renderRow(r) {
+    function nameRow(nm) {
+      var barW = Math.max(0, Math.min(100, nm.rawPct == null ? 0 : nm.rawPct));
+      var fillClass = nm.rawPct >= 60 ? "sb-fill-hot" : nm.rawPct >= 35 ? "sb-fill-mid" : "sb-fill-low";
+      var label = nm.display;
+      return '<a class="sb-name-row" href="/ticker.html?sym=' + encodeURIComponent(nm.symbol) + '">' +
+        '<span class="sb-name-sym">' + nm.symbol + '</span>' +
+        '<span class="sb-name-bar"><span class="sb-name-fill ' + fillClass + '" style="width:' + barW + '%"></span>' +
+          '<span class="sb-name-pct">' + label + '</span></span>' +
+        '<span class="sb-name-n">n=' + nm.n + '</span>' +
+      '</a>';
+    }
+  
+    function card(r) {
       var tier = r.tier || "quiet";
       var mag = r.magnitude || {};
-      var lean = r.lean || {};
-      var magPct = (mag.status === "ok" && mag.pct != null) ? mag.pct : null;
+      var magPct = (mag.status === "ok" && mag.pct != null) ? mag.pct + "%" : "\u2014";
+      var names = (r.names || []).map(nameRow).join("");
+      var foot;
+      if (tier === "lead") foot = "most movement this month";
+      else if (tier === "context") foot = "moderate movement";
+      else foot = "quiet / weak this month";
+      var nTotal = mag.n != null ? mag.n : 0;
   
-      // bar width: use the resolved pct, else the raw rate if present, else 0
-      var rawPct = magPct;
-      if (rawPct == null && mag.n && mag.hits != null) {
-        rawPct = Math.round((mag.hits / mag.n) * 100);
-      }
-      var barW = Math.max(0, Math.min(100, rawPct == null ? 0 : rawPct));
-  
-      var magLabel = magPct != null ? magPct + "%"
-        : (rawPct != null ? "~" + rawPct + "%" : "—");
-  
-      // direction: only on lead/context; quiet rows suppress it entirely
-      var leanHtml;
-      if (tier === "quiet") {
-        leanHtml = '<span class="sb-lean-dim">no edge</span>';
-      } else if (lean.status === "ok" && lean.pct != null) {
-        var word = lean.dir === "up" ? "up" : lean.dir === "down" ? "down" : "flat";
-        leanHtml = '<span class="' + leanClass(lean.dir) + '">leans ' + word +
-          ' ' + lean.pct + '%</span>';
-      } else {
-        leanHtml = '<span class="sb-lean-dim">—</span>';
-      }
-  
-      var chip = tier === "lead" ? '<span class="sb-lead-chip">moving most</span>' : "";
-      var nameClass = tier === "quiet" ? "sb-name sb-name-quiet" : "sb-name";
-  
-      return '' +
-        '<div class="sb-row sb-row-' + tier + '">' +
-          '<div class="' + nameClass + '">' + r.sector + chip + '</div>' +
-          '<div class="sb-bar-wrap">' +
-            '<div class="sb-bar-track"><div class="sb-bar-fill" style="width:' + barW + '%"></div></div>' +
-            '<span class="sb-bar-pct">' + magLabel + '</span>' +
+      return '<div class="sb-card sb-card-' + tier + '">' +
+        '<div class="sb-card-head">' +
+          '<div class="sb-card-head-left">' +
+            '<span class="sb-card-sec">' + r.sector + '</span>' +
+            (tier === "lead" ? '<span class="sb-lead-chip">moving most</span>' : '') +
           '</div>' +
-          '<div class="sb-lean">' + leanHtml + '</div>' +
-        '</div>';
+          headerLean(tier, r.lean) +
+        '</div>' +
+        '<div class="sb-card-mag"><span class="sb-card-magpct">' + magPct + '</span>' +
+          '<span class="sb-card-magcap">of names made a big move (\u00b15% / ~3d)</span></div>' +
+        (names ? '<div class="sb-card-names">' + names + '</div>' : '') +
+        '<div class="sb-card-foot">' + foot + ' \u00b7 ' + nTotal + ' resolved signals</div>' +
+      '</div>';
     }
   
     function render(rows) {
       if (!rows || !rows.length) { section.style.display = "none"; return; }
-      body.innerHTML = rows.map(renderRow).join("");
+      body.innerHTML = rows.map(card).join("");
       section.style.display = "";
     }
   
@@ -80,7 +77,6 @@
         .catch(function () { section.style.display = "none"; });
     }
   
-    // Show on stocks, hide on crypto — mirror #assetControl.
     function currentMode() {
       try { return localStorage.getItem("sj_asset_mode") || "stocks"; } catch (e) { return "stocks"; }
     }
@@ -89,15 +85,9 @@
       else if (body.children.length) section.style.display = "";
     }
     var ctrl = document.getElementById("assetControl");
-    if (ctrl) {
-      ctrl.addEventListener("click", function (e) {
-        var btn = e.target.closest("[data-value]");
-        if (!btn) return;
-        setTimeout(applyModeVisibility, 0);
-      });
-    }
+    if (ctrl) ctrl.addEventListener("click", function () { setTimeout(applyModeVisibility, 0); });
   
     load();
-    setInterval(load, 5 * 60 * 1000);   // refresh every 5 min (board is slow-moving)
+    setInterval(load, 5 * 60 * 1000);
     if (currentMode() === "crypto") section.style.display = "none";
   })();

@@ -4699,3 +4699,115 @@ tr.sj-alerted:hover {
     .mag-tier { font-size: 0.44rem; }
     .mag-pill { padding: 2px 6px; }
   }
+
+  /* ============================================================
+   SECTOR BOARD v2 — GROUPED CARDS (mockup shape)
+   REPLACES the flat-row .sb-* rules from
+   sector-board-and-magnitude.css. Keep the --volt :root vars and
+   the .mag-* pill rules from that file; swap ONLY the board rules
+   below. (Magnitude pill CSS for the screener is unchanged.)
+   ============================================================ */
+
+.sector-board { padding: 18px 0 0; }
+
+.sector-board-card {
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 18px;
+  background: rgba(16, 22, 36, 0.6);
+  padding: 22px 26px 16px;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.02), 0 18px 55px rgba(0, 0, 0, 0.22);
+}
+.sector-board-head {
+  display: flex; align-items: baseline; justify-content: space-between;
+  gap: 12px; margin-bottom: 16px; flex-wrap: wrap;
+}
+.sector-board-head-left { display: flex; align-items: baseline; gap: 12px; min-width: 0; }
+.sector-board-title { margin: 0; font-size: 1.25rem; font-weight: 700; color: #eef1f6; }
+.sector-board-sub { font-size: 0.82rem; color: rgba(255, 255, 255, 0.35); }
+.sector-board-tag {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 3px 10px; border-radius: 999px;
+  background: var(--volt-soft, rgba(129,140,248,0.14)); border: 1px solid var(--volt-line, rgba(129,140,248,0.3));
+  font-size: 0.7rem; font-weight: 600; color: var(--volt, #818cf8); white-space: nowrap;
+}
+.sector-board-tag-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--volt, #818cf8); animation: livePulse 2s ease-in-out infinite; }
+
+/* ── the card GRID (mockup: auto-fit cards) ── */
+.sector-board-body {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 12px;
+}
+
+/* ── individual sector CARD ── */
+.sb-card {
+  background: rgba(18, 24, 38, 0.72);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 14px;
+  padding: 15px 17px;
+  position: relative;
+}
+/* lead card: violet top accent + glow */
+.sb-card-lead { border-color: var(--volt-line, rgba(129,140,248,0.3)); }
+.sb-card-lead::before {
+  content: ""; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  border-radius: 14px 14px 0 0;
+  background: linear-gradient(90deg, var(--volt, #818cf8), transparent 65%);
+}
+.sb-card-quiet { opacity: 0.78; }
+
+.sb-card-head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; margin-bottom: 4px; }
+.sb-card-head-left { display: flex; align-items: baseline; gap: 8px; min-width: 0; }
+.sb-card-sec { font-size: 0.96rem; font-weight: 700; color: #f2f4f8; }
+.sb-lead-chip {
+  padding: 1px 7px; border-radius: 4px; font-size: 0.54rem; font-weight: 700;
+  letter-spacing: 0.05em; text-transform: uppercase;
+  color: var(--volt, #818cf8); background: var(--volt-soft, rgba(129,140,248,0.14)); border: 1px solid var(--volt-line, rgba(129,140,248,0.3));
+}
+
+/* direction lean = SIDE LABEL (not the bar) */
+.sb-lean { font-size: 0.72rem; font-weight: 700; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.sb-lean-up { color: #4ade80; }
+.sb-lean-down { color: rgba(255, 90, 90, 0.9); }
+.sb-lean-flat { color: rgba(255, 255, 255, 0.45); }
+.sb-lean-dim { color: rgba(255, 255, 255, 0.28); font-weight: 600; }
+
+/* sector magnitude % = the header headline number */
+.sb-card-mag { display: flex; align-items: baseline; gap: 8px; margin-bottom: 12px; }
+.sb-card-magpct { font-size: 1.5rem; font-weight: 800; color: var(--volt, #818cf8); line-height: 1; font-variant-numeric: tabular-nums; }
+.sb-card-quiet .sb-card-magpct { color: rgba(255, 255, 255, 0.4); }
+.sb-card-magcap { font-size: 0.68rem; color: rgba(255, 255, 255, 0.4); line-height: 1.3; }
+
+/* ── per-name rows inside the card (magnitude bars) ── */
+.sb-card-names { display: flex; flex-direction: column; gap: 4px; }
+.sb-name-row {
+  display: grid; grid-template-columns: 58px 1fr 46px; align-items: center; gap: 10px;
+  padding: 4px 0; text-decoration: none; border-radius: 6px;
+}
+.sb-name-row:hover { background: rgba(255, 255, 255, 0.03); }
+.sb-name-sym { font-size: 0.82rem; font-weight: 700; letter-spacing: 0.02em; color: rgba(255,255,255,0.82); }
+.sb-name-bar { position: relative; height: 20px; background: rgba(255, 255, 255, 0.06); border-radius: 4px; overflow: hidden; }
+.sb-name-fill { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 4px; transition: width 0.8s cubic-bezier(0.22,1,0.36,1); }
+.sb-fill-hot { background: linear-gradient(90deg, rgba(129,140,248,0.45), var(--volt, #818cf8)); }
+.sb-fill-mid { background: linear-gradient(90deg, rgba(129,140,248,0.3), rgba(129,140,248,0.7)); }
+.sb-fill-low { background: linear-gradient(90deg, rgba(255,255,255,0.1), rgba(255,255,255,0.25)); }
+.sb-name-pct { position: absolute; top: 50%; right: 7px; transform: translateY(-50%); font-size: 0.7rem; font-weight: 700; font-variant-numeric: tabular-nums; color: #fff; }
+.sb-name-n { font-size: 0.7rem; text-align: right; font-variant-numeric: tabular-nums; color: rgba(255, 255, 255, 0.4); }
+
+.sb-card-foot { margin-top: 10px; padding-top: 9px; border-top: 1px solid rgba(255, 255, 255, 0.05); font-size: 0.64rem; color: rgba(255, 255, 255, 0.32); }
+
+.sector-board-foot {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+  margin-top: 14px; padding-top: 12px; border-top: 1px solid rgba(255, 255, 255, 0.05);
+  font-size: 0.72rem; color: rgba(255, 255, 255, 0.32);
+}
+.sector-board-foot-key { display: inline-flex; align-items: center; gap: 7px; }
+.sb-key-bar { width: 18px; height: 6px; border-radius: 3px; background: var(--volt, #818cf8); display: inline-block; }
+
+@media (max-width: 640px) {
+  .sector-board-card { padding: 16px 14px 12px; border-radius: 12px; }
+  .sector-board-title { font-size: 1.05rem; }
+  .sector-board-sub { display: none; }
+  .sector-board-body { grid-template-columns: 1fr; }
+  .sector-board-foot-note { display: none; }
+}

@@ -5592,3 +5592,15 @@ tr.sj-alerted:hover {
 
 @media (max-width: 900px) { #pulseTicker.pulse-ticker { top: 58px !important; } }
 @media (max-width: 760px) { #pulseTicker.pulse-ticker { position: static !important; box-shadow: none; } }
+
+/* ============================================================
+   TOP MOVERS — white text. Append to the VERY END of style.css.
+   High-specificity + !important so it wins over the faded defaults.
+   ============================================================ */
+
+   .feat-rail .feat-rail-title { color: #ffffff !important; opacity: 1 !important; }
+   .feat-rail .feat-rail-tk { color: #ffffff !important; opacity: 1 !important; }
+   .feat-rail .feat-rail-tk small { color: rgba(255, 255, 255, 0.62) !important; }
+   .feat-rail .feat-rail-odds { color: #ffffff !important; opacity: 1 !important; }
+   .feat-rail .feat-rail-res { color: rgba(255, 255, 255, 0.55) !important; }
+   .feat-rail .feat-rail-foot { color: rgba(255, 255, 255, 0.55) !important; }

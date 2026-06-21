@@ -646,103 +646,6 @@
 
 
 
-
-
-<!-- ========== (D) MONITOR STRIP — TQQQ (stocks) / BTC (crypto) ========== -->
-<!-- Flips with #assetControl. Stocks → TQQQ price+%+spark. Crypto → BTC 24h.
-     Signal state ("uptrend intact") removed until the TQQQ HOLD alert ships. -->
-     <div id="tqqqAlways">
-      <section class="monitor-strip" id="monitorStrip">
-      <div class="container">
-        <div class="sj-monitor-wrap">
-          <div id="sjMonitorTqqq"></div>
-          <div id="sjMonitorBtc"></div>
-        </div>
-      </div>
-    </section>
-  </div><!-- /#tqqqAlways -->
-
-  <div id="swingView">
-
-    <!-- ============================================================
-         SWING VIEW — paste as the FIRST child of <div id="swingView">.
-         Carousel (left) + magnitude alert rail (right); stacks on mobile.
-         Wired to /api/sectors (real data). TQQQ is NOT here — it lives
-         in #tqqqAlways above, shown on both horizons.
-    ============================================================ -->
-    <section class="swing-feat">
-      <div class="container">
-        <div class="sec-head">
-          <div style="display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;">
-            <h2 class="sec-title volt">Where it's moving</h2>
-            <span class="sec-sub">sector by sector · chance of a big move, this month</span>
-          </div>
-          <span class="regime-tag">swing · ~3-day window</span>
-        </div>
-    
-        <div class="feat-row" id="featRow">
-          <!-- LEFT: rotating sector carousel -->
-          <div class="feat-hero" id="featHero">
-            <div class="feat-top">
-              <div class="feat-kicker">
-                <div class="feat-ico" id="featIco">◆</div>
-                <div><div class="feat-sec" id="featSec">—</div><div class="feat-state" id="featState"></div></div>
-              </div>
-              <div class="feat-nav">
-                <button class="feat-arrow" id="featPrev" type="button" aria-label="Previous sector">‹</button>
-                <span class="feat-count" id="featCount">1 / 1</span>
-                <button class="feat-arrow" id="featNext" type="button" aria-label="Next sector">›</button>
-              </div>
-            </div>
-            <div class="feat-list" id="featList"></div>
-            <div class="feat-prog"><div class="feat-prog-fill" id="featProg"></div></div>
-            <div class="feat-foot">
-              <div class="feat-dots" id="featDots"></div>
-              <span id="featTally"></span>
-            </div>
-          </div>
-    
-          <!-- RIGHT: magnitude alert rail (top names by movement) -->
-          <div class="feat-rail">
-            <div class="feat-rail-head">
-              <span class="feat-rail-title">Top movers</span>
-              <span class="live-tag"><span class="live-dot"></span>LIVE</span>
-            </div>
-            <div id="featRailBody"></div>
-            <div class="feat-rail-foot" id="featRailFoot">by how often they make a big move</div>
-          </div>
-        </div>
-      </div>
-    </section>
-    
-      <!-- (2) new live swing screener — PLACEHOLDER until built next -->
-      <!-- <div id="swingScreenerMount"></div> -->
-    
-      <!-- (3) full grouped sector board -->
-      <section class="sector-board" id="sectorBoard" style="display:none;">
-        <div class="container">
-          <div class="sector-board-card">
-            <div class="sector-board-head">
-              <div class="sector-board-head-left">
-                <h2 class="sector-board-title">Sector Board</h2>
-                <span class="sector-board-sub" id="sectorBoardSub">how much each sector is moving · this month</span>
-              </div>
-              <span class="sector-board-tag" id="sectorBoardTag">
-                <span class="sector-board-tag-dot"></span>rolling ~3.5 weeks
-              </span>
-            </div>
-            <div class="sector-board-body" id="sectorBoardBody"></div>
-            <div class="sector-board-foot">
-              <span class="sector-board-foot-key"><span class="sb-key-bar"></span> bar = chance of a big move (±5% in ~3 days)</span>
-              <span class="sector-board-foot-note">Direction is the sector's weak lean, not a call on any one name.</span>
-            </div>
-          </div>
-        </div>
-      </section>
-    
-    </div><!-- /#swingView -->
-
-
 <!-- ============================================================
      >>> Live Momentum Screener (#screener) goes HERE, unchanged <<<
      Remove its OWN #assetControl (the one toggle now lives in the hero).
@@ -1099,6 +1002,102 @@
       </div>
     </section>
   </div><!-- /#intradayView -->
+
+
+<!-- ========== (D) MONITOR STRIP — TQQQ (stocks) / BTC (crypto) ========== -->
+<!-- Flips with #assetControl. Stocks → TQQQ price+%+spark. Crypto → BTC 24h.
+     Signal state ("uptrend intact") removed until the TQQQ HOLD alert ships. -->
+     <div id="tqqqAlways">
+      <section class="monitor-strip" id="monitorStrip">
+      <div class="container">
+        <div class="sj-monitor-wrap">
+          <div id="sjMonitorTqqq"></div>
+          <div id="sjMonitorBtc"></div>
+        </div>
+      </div>
+    </section>
+  </div><!-- /#tqqqAlways -->
+
+  <div id="swingView">
+
+    <!-- ============================================================
+         SWING VIEW — paste as the FIRST child of <div id="swingView">.
+         Carousel (left) + magnitude alert rail (right); stacks on mobile.
+         Wired to /api/sectors (real data). TQQQ is NOT here — it lives
+         in #tqqqAlways above, shown on both horizons.
+    ============================================================ -->
+    <section class="swing-feat">
+      <div class="container">
+        <div class="sec-head">
+          <div style="display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;">
+            <h2 class="sec-title volt">Where it's moving</h2>
+            <span class="sec-sub">sector by sector · chance of a big move, this month</span>
+          </div>
+          <span class="regime-tag">swing · ~3-day window</span>
+        </div>
+    
+        <div class="feat-row" id="featRow">
+          <!-- LEFT: rotating sector carousel -->
+          <div class="feat-hero" id="featHero">
+            <div class="feat-top">
+              <div class="feat-kicker">
+                <div class="feat-ico" id="featIco">◆</div>
+                <div><div class="feat-sec" id="featSec">—</div><div class="feat-state" id="featState"></div></div>
+              </div>
+              <div class="feat-nav">
+                <button class="feat-arrow" id="featPrev" type="button" aria-label="Previous sector">‹</button>
+                <span class="feat-count" id="featCount">1 / 1</span>
+                <button class="feat-arrow" id="featNext" type="button" aria-label="Next sector">›</button>
+              </div>
+            </div>
+            <div class="feat-list" id="featList"></div>
+            <div class="feat-prog"><div class="feat-prog-fill" id="featProg"></div></div>
+            <div class="feat-foot">
+              <div class="feat-dots" id="featDots"></div>
+              <span id="featTally"></span>
+            </div>
+          </div>
+    
+          <!-- RIGHT: magnitude alert rail (top names by movement) -->
+          <div class="feat-rail">
+            <div class="feat-rail-head">
+              <span class="feat-rail-title">Top movers</span>
+              <span class="live-tag"><span class="live-dot"></span>LIVE</span>
+            </div>
+            <div id="featRailBody"></div>
+            <div class="feat-rail-foot" id="featRailFoot">by how often they make a big move</div>
+          </div>
+        </div>
+      </div>
+    </section>
+    
+      <!-- (2) new live swing screener — PLACEHOLDER until built next -->
+      <!-- <div id="swingScreenerMount"></div> -->
+    
+      <!-- (3) full grouped sector board -->
+      <section class="sector-board" id="sectorBoard" style="display:none;">
+        <div class="container">
+          <div class="sector-board-card">
+            <div class="sector-board-head">
+              <div class="sector-board-head-left">
+                <h2 class="sector-board-title">Sector Board</h2>
+                <span class="sector-board-sub" id="sectorBoardSub">how much each sector is moving · this month</span>
+              </div>
+              <span class="sector-board-tag" id="sectorBoardTag">
+                <span class="sector-board-tag-dot"></span>rolling ~3.5 weeks
+              </span>
+            </div>
+            <div class="sector-board-body" id="sectorBoardBody"></div>
+            <div class="sector-board-foot">
+              <span class="sector-board-foot-key"><span class="sb-key-bar"></span> bar = chance of a big move (±5% in ~3 days)</span>
+              <span class="sector-board-foot-note">Direction is the sector's weak lean, not a call on any one name.</span>
+            </div>
+          </div>
+        </div>
+      </section>
+    
+    </div><!-- /#swingView -->
+
 
 <!-- Blog / Insights -->
 <section class="blog-section" id="blogSection">

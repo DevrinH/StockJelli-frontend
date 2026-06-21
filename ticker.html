@@ -46,6 +46,15 @@
     .tk-lean-up{ color:#4ade80; } .tk-lean-down{ color:rgba(255,90,90,0.9); } .tk-lean-flat{ color:rgba(255,255,255,0.45); }
     .tk-sector-quiet{ color:rgba(255,255,255,0.3); }
 
+    /* sparkline card */
+    .tk-spark-wrap { margin:18px 0 4px; }
+    .tk-spark-card { border:1px solid rgba(255,255,255,0.07); border-radius:16px; background:rgba(16,22,36,0.6); padding:16px 18px 8px; box-shadow:inset 0 0 0 1px rgba(255,255,255,0.02); }
+    .tk-spark-head { display:flex; align-items:baseline; justify-content:space-between; gap:10px; margin-bottom:10px; }
+    .tk-spark-label { font-size:0.74rem; font-weight:600; letter-spacing:0.04em; text-transform:uppercase; color:rgba(255,255,255,0.4); }
+    .tk-spark-range { font-size:0.74rem; color:rgba(255,255,255,0.35); font-variant-numeric:tabular-nums; }
+    .tk-spark-svg { display:block; width:100%; height:90px; }
+    .tk-spark-empty { font-size:0.82rem; color:rgba(255,255,255,0.3); padding:24px 0; text-align:center; }
+
     /* receipts */
     .tk-receipts { margin-top:26px; }
     .tk-receipts h3 { font-size:1.05rem; font-weight:700; color:#eef1f6; margin:0 0 4px; }
@@ -82,7 +91,7 @@
     var sym = (params.get("sym") || "").trim().toUpperCase();
     var el = document.getElementById("tkContent");
 
-    if (!sym) { el.innerHTML = '<div class="tk-state">No ticker specified. <a href="/" style="color:#818cf8">Go to the board →</a></div>'; return; }
+    if (!sym) { el.innerHTML = '<div class="tk-state">No ticker specified. <a href="/" style="color:#818cf8">Go to the board &rarr;</a></div>'; return; }
     document.title = sym + " — StockJelli";
 
     function leanClass(d){ return d==="up"?"tk-lean-up":d==="down"?"tk-lean-down":"tk-lean-flat"; }
@@ -90,7 +99,7 @@
     function magHero(mag) {
       if (!mag || mag.status === "warming" || mag.status === "gathering") {
         return '<div class="tk-hero">' +
-          '<div class="tk-hero-pct" style="color:rgba(255,255,255,0.4)">—</div>' +
+          '<div class="tk-hero-pct" style="color:rgba(255,255,255,0.4)">&mdash;</div>' +
           '<div class="tk-hero-cap">Still building this name\u2019s history.</div>' +
           '<div class="tk-honesty">We show a magnitude rate once there\u2019s enough resolved data. Not enough yet for ' + sym + '.</div>' +
           '</div>';
@@ -107,15 +116,61 @@
       var cool = mag.pct < 50 ? " cool" : "";
       return '<div class="tk-hero">' +
         '<div class="tk-hero-pct' + cool + '">\u2248' + mag.pct + '%</div>' +
-        '<div class="tk-hero-cap">chance of a <strong>big move</strong> \u2014 \u00b15% within ~3 days</div>' +
-        '<div class="tk-honesty"><b>Direction is a coin flip on the name itself.</b> This number is how OFTEN ' + sym + ' moves big, not WHICH WAY. Over the last 8 weeks it cleared \u00b15% in ' + mag.hits + ' of ' + mag.n + ' setups.</div>' +
+        '<div class="tk-hero-cap">of the time, ' + sym + ' has made a <strong>big move</strong> \u2014 \u00b15% within a ~3-day window</div>' +
+        '<div class="tk-honesty"><b>This is how OFTEN it moves, not which way.</b> Direction on the name itself is a coin flip. Measured over the last 8 weeks: ' + sym + ' cleared \u00b15% in ' + mag.hits + ' of ' + mag.n + ' setups. Historical frequency, not a prediction.</div>' +
         '</div>';
+    }
+
+    // ── Sparkline (gradient line, daily series) ──
+    function buildSparkline(prices, uid) {
+      if (!Array.isArray(prices) || prices.length < 2) {
+        return '<div class="tk-spark-empty">Not enough price history to chart yet.</div>';
+      }
+      var W = 600, H = 90, PAD = 6;
+      var min = Math.min.apply(null, prices), max = Math.max.apply(null, prices);
+      var span = (max - min) || 1, n = prices.length;
+      var pts = prices.map(function (p, i) {
+        var x = PAD + (i / (n - 1)) * (W - 2 * PAD);
+        var y = PAD + (1 - (p - min) / span) * (H - 2 * PAD);
+        return [x, y];
+      });
+      var up = prices[n - 1] >= prices[0];
+      var stroke = up ? "#4ade80" : "#f87171";
+      var gradTop = up ? "rgba(74,222,128,0.28)" : "rgba(248,113,113,0.26)";
+      var gradBot = up ? "rgba(74,222,128,0)" : "rgba(248,113,113,0)";
+      var line = pts.map(function (pt, i) { return (i ? "L" : "M") + pt[0].toFixed(1) + " " + pt[1].toFixed(1); }).join(" ");
+      var area = line + " L" + pts[n - 1][0].toFixed(1) + " " + (H - PAD) + " L" + pts[0][0].toFixed(1) + " " + (H - PAD) + " Z";
+      var gid = "spark-grad-" + uid;
+      return '<svg class="tk-spark-svg" viewBox="0 0 ' + W + ' ' + H + '" preserveAspectRatio="none" aria-hidden="true">' +
+        '<defs><linearGradient id="' + gid + '" x1="0" y1="0" x2="0" y2="1">' +
+          '<stop offset="0%" stop-color="' + gradTop + '"/>' +
+          '<stop offset="100%" stop-color="' + gradBot + '"/></linearGradient></defs>' +
+        '<path d="' + area + '" fill="url(#' + gid + ')"/>' +
+        '<path d="' + line + '" fill="none" stroke="' + stroke + '" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>' +
+        '<circle cx="' + pts[n - 1][0].toFixed(1) + '" cy="' + pts[n - 1][1].toFixed(1) + '" r="3" fill="' + stroke + '"/></svg>';
+    }
+
+    function sparkHTML(d) {
+      var hist = d.history || d.sparkline || d.prices || d.series || null;
+      var inner, range = "";
+      if (Array.isArray(hist) && hist.length >= 2) {
+        var nums = hist.map(function (h) { return typeof h === "number" ? h : (h.price != null ? h.price : h.close); })
+                       .filter(function (v) { return typeof v === "number" && !isNaN(v); });
+        inner = buildSparkline(nums, d.symbol || "x");
+        if (nums.length) {
+          var lo = Math.min.apply(null, nums), hi = Math.max.apply(null, nums);
+          range = '<span class="tk-spark-range">$' + lo.toFixed(2) + ' \u2013 $' + hi.toFixed(2) + '</span>';
+        }
+      } else {
+        inner = '<div class="tk-spark-empty">Price history not available for this ticker yet.</div>';
+      }
+      return '<div class="tk-spark-wrap"><div class="tk-spark-card">' +
+        '<div class="tk-spark-head"><span class="tk-spark-label">Price \u00b7 daily</span>' + range + '</div>' +
+        inner + '</div></div>';
     }
 
     function sectorStrip(sector, lean, sectorMag) {
       if (!sector) return "";
-      // honesty: only show the lean if the sector is actually moving (mag ok).
-      // if sector magnitude is low, frame the lean as "moves uncommon here".
       var leanOk = lean && lean.status === "ok" && lean.pct != null;
       var magLow = !(sectorMag && sectorMag.status === "ok" && sectorMag.pct >= 35);
       var leanHtml;
@@ -127,7 +182,7 @@
       } else {
         leanHtml = '<span class="' + leanClass(lean.dir) + '">leans ' + lean.dir + ' ' + lean.pct + '% this month</span>';
       }
-      return '<div class="tk-sector">Sector: <span class="tk-sector-name">' + sector + '</span> · ' + leanHtml + '</div>';
+      return '<div class="tk-sector">Sector: <span class="tk-sector-name">' + sector + '</span> \u00b7 ' + leanHtml + '</div>';
     }
 
     function receipts(rows) {
@@ -167,6 +222,7 @@
         el.innerHTML =
           '<div class="tk-head"><div><div class="tk-sym">' + d.symbol + '</div>' +
           (d.name ? '<div class="tk-name">' + d.name + '</div>' : '') + '</div>' + liveHtml + '</div>' +
+          sparkHTML(d) +
           horizonToggle() +
           magHero(d.magnitude) +
           sectorStrip(d.sector, d.sectorLean, d.sectorMagnitude) +

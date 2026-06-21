@@ -5541,3 +5541,34 @@ tr.sj-alerted:hover {
   .subheader-signup { width: 100%; }
   .pulse-ticker { position: static; }   /* don't fight the wrapping subheader */
 }
+
+/* ============================================================
+   STICKY STACK FIX — append to the VERY END of style.css (last).
+   Order on page: header (top:0) → subheader (top:62) → ticker.
+   ============================================================ */
+
+/* Ticker sticks directly below the header+subheader stack.
+   It starts display:none and JS flips it to block when filled —
+   so we force the sticky positioning to win once it's visible. */
+   #pulseTicker.pulse-ticker {
+    position: sticky !important;
+    top: 120px !important;        /* header (~62) + subheader (~58) */
+    z-index: 997;                  /* below header(1001) + subheader(1000) */
+  }
+  
+  /* The "Market Closed" pill was also sticky top:0, fighting the
+     header for the same slot. Make it NON-sticky so it just scrolls
+     in normal flow under the ticker. */
+  #marketClosedNotice.market-session-notice {
+    position: static !important;
+    top: auto !important;
+  }
+  
+  /* On small screens the subheader becomes non-sticky (it wraps),
+     so the ticker should fall back to sit under just the header. */
+  @media (max-width: 900px) {
+    #pulseTicker.pulse-ticker { top: 58px !important; }
+  }
+  @media (max-width: 760px) {
+    #pulseTicker.pulse-ticker { position: static !important; }
+  }

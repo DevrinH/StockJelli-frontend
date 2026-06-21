@@ -4279,7 +4279,8 @@ tr.sj-alerted:hover {
   .monitor-strip-chart { height: 46px; }
 }
 
-/*/* ============================================================
+/* ============================================================
+   DONUT SIZE FIX — append to the VERY END of style.css
    DONUT SIZE FIX — append to the VERY END of style.css
    (after the existing REV 3 block). Last definition wins, so
    this overrides whatever is letting the SVG fill the page.

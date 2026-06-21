@@ -467,80 +467,61 @@
 
 <script>
   (function () {
-    "use strict";
-   
-    // ---- helper: reveal a modal-overlay using the site's own class ----
-    function openModal(id) {
-      var m = document.getElementById(id);
-      if (!m) return false;
-      m.classList.add("is-open");
-      m.setAttribute("aria-hidden", "false");
-      return true;
-    }
-    function closeModal(m) {
-      m.classList.remove("is-open");
-      m.setAttribute("aria-hidden", "true");
-    }
-   
-    // ---- Log in → account modal (fallback only; runs after account.js) ----
-    var loginBtn = document.getElementById("headerLoginBtn");
-    if (loginBtn) {
-      loginBtn.addEventListener("click", function () {
-        // open the account modal; if account.js already handled it, this
-        // is harmless (the class is idempotent)
-        openModal("accountModal");
-      });
-    }
-   
-    // ---- Sign up free → free signup modal (no credit card) ----
-    var signupBtn = document.getElementById("headerSignupBtn");
-    if (signupBtn) {
-      signupBtn.addEventListener("click", function () {
-        // prefer the dedicated free modal; fall back to plans if absent
-        if (!openModal("freeSignupModal")) openModal("alertsModal");
-      });
-    }
-   
-    // ---- close any modal on its ✕ or backdrop click (safety net) ----
-    document.querySelectorAll(".modal-overlay").forEach(function (overlay) {
-      overlay.addEventListener("click", function (e) {
-        if (e.target === overlay) closeModal(overlay);
-      });
-      var x = overlay.querySelector(".modal-close");
-      if (x) x.addEventListener("click", function () { closeModal(overlay); });
-    });
-    document.addEventListener("keydown", function (e) {
-      if (e.key === "Escape") {
-        document.querySelectorAll(".modal-overlay.is-open").forEach(closeModal);
-      }
-    });
-   
-    // ---- Exchange dropdown ----
     var dd = document.getElementById("exchangeDropdown");
-    if (dd) {
-      var trigger = document.getElementById("exchangeDdTrigger");
-      var menu = document.getElementById("heroBrokerControl");
-      var nameEl = document.getElementById("exchangeDdName");
-      var logoEl = document.getElementById("exchangeDdLogo");
+    if (!dd) return;
+    var trigger = document.getElementById("exchangeDdTrigger");
+    var menu = document.getElementById("heroBrokerControl");
+    var nameEl = document.getElementById("exchangeDdName");
+    var logoEl = document.getElementById("exchangeDdLogo");
    
-      function closeDd() { menu.style.display = "none"; trigger.setAttribute("aria-expanded", "false"); dd.classList.remove("open"); }
-      function openDd() { menu.style.display = "flex"; trigger.setAttribute("aria-expanded", "true"); dd.classList.add("open"); }
+    function closeDd() { menu.style.display = "none"; trigger.setAttribute("aria-expanded", "false"); dd.classList.remove("open"); }
+    function openDd() { menu.style.display = "flex"; trigger.setAttribute("aria-expanded", "true"); dd.classList.add("open"); }
    
-      trigger.addEventListener("click", function (e) {
-        e.stopPropagation();
-        (menu.style.display === "none" || !menu.style.display) ? openDd() : closeDd();
-      });
-      document.addEventListener("click", function (e) { if (!dd.contains(e.target)) closeDd(); });
+    trigger.addEventListener("click", function (e) {
+      e.stopPropagation();
+      (menu.style.display === "none" || !menu.style.display) ? openDd() : closeDd();
+    });
+    document.addEventListener("click", function (e) { if (!dd.contains(e.target)) closeDd(); });
    
-      menu.addEventListener("click", function (e) {
-        var btn = e.target.closest(".exchange-dd-item");
-        if (!btn) return;
-        var img = btn.querySelector("img");
-        if (nameEl) nameEl.textContent = btn.textContent.trim();
-        if (img && logoEl) logoEl.src = img.src;
-        setTimeout(closeDd, 0); // let the broker handler run first
+    // mirror the picked broker onto the trigger (label + logo + active state)
+    function syncTrigger(value) {
+      var btn = menu.querySelector('.exchange-dd-item[data-value="' + value + '"]');
+      if (!btn) return;
+      var img = btn.querySelector("img");
+      if (nameEl) nameEl.textContent = btn.textContent.trim();
+      if (img && logoEl) logoEl.src = img.src;
+      menu.querySelectorAll(".exchange-dd-item").forEach(function (b) {
+        b.classList.toggle("segmented-on", b === btn);
       });
     }
+   
+    // pick: delegate to broker-link.js (it saves to sj_broker + re-renders)
+    menu.addEventListener("click", function (e) {
+      var btn = e.target.closest(".exchange-dd-item");
+      if (!btn) return;
+      var value = btn.dataset.value;
+      if (typeof window.setSelectedBroker === "function") {
+        window.setSelectedBroker(value);     // ← the correct, single source of truth
+      }
+      syncTrigger(value);
+      closeDd();
+    });
+   
+    // keep the trigger in sync if broker changes anywhere (e.g. the inline picker)
+    window.addEventListener("sj:broker-changed", function (e) {
+      if (e && e.detail && e.detail.broker) syncTrigger(e.detail.broker);
+    });
+   
+    // on load: show whatever broker-link.js currently has selected
+    function initFromSaved() {
+      var current = (typeof window.getSelectedBroker === "function")
+        ? window.getSelectedBroker()
+        : "tradingview";
+      syncTrigger(current);
+    }
+    // broker-link.js may load after this; retry once on next tick
+    if (typeof window.getSelectedBroker === "function") initFromSaved();
+    else setTimeout(initFromSaved, 300);
   })();
   </script>
 

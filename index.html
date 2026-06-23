@@ -1458,7 +1458,7 @@ setInterval(() => {
       if (!res.ok) throw new Error("HTTP "+res.status);
       const data = await res.json();
       // tolerate { sectors:[...] } or a bare array
-      const sectors = Array.isArray(data) ? data : (data.sectors || data.board || []);
+      const sectors = Array.isArray(data) ? data : (data.rows || data.sectors || data.board || []);
       render(sectors);
     }catch(e){
       tilesEl.innerHTML = `<div class="hm-empty">Couldn't load the heatmap right now. Refresh to try again.</div>`;

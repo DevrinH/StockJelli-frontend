@@ -1111,6 +1111,14 @@ function syncFromAssetControl(mode){
   }
 
   load();
+
+// Auto-refresh every 60s, but only during market hours (when the scorecard
+// is live and ticking). Overnight/weekends the prediction face is static,
+// so we skip polling — re-checking the clock each tick handles the 9:30
+// turn-on and 4pm turn-off without a page reload.
+setInterval(() => {
+  if (isMarketHoursET()) load();
+}, 60000);
 })();
 </script>
 

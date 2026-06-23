@@ -1058,6 +1058,13 @@
     const heroBig = `<div class="tw-stat ${moveCls==="down"?"":""}" style="color:${moveCls==="up"?"var(--tw-up)":moveCls==="down"?"var(--tw-down)":"#fff"}">${moveStr}</div>`;
     const heroSub = `<div class="tw-stat-sub">move today (either direction)</div>`;
 
+    const priceStr = n.price != null ? `$${Number(n.price).toFixed(2)}` : "";
+    const pcls = n.priceChangePct == null ? "flat" : n.priceChangePct>0 ? "up" : n.priceChangePct<0 ? "down" : "flat";
+    const pctStr = n.priceChangePct != null ? `${n.priceChangePct>=0?"+":""}${n.priceChangePct.toFixed(2)}%` : "";
+    const priceLine = priceStr
+      ? `<div class="tw-second" style="margin-top:8px"><span class="tw-ret ${pcls}" style="font-size:15px">${priceStr}</span>${pctStr?`<span class="tw-ret ${pcls}" style="font-size:11px">${pctStr}</span>`:""}</div>`
+      : "";
+
     // secondary = did it hit +3%
     const hit3 = n.hit3 === true;
     const second = n.hit3 != null
@@ -1070,6 +1077,7 @@
         <div style="min-width:0"><div class="tw-sym">${sym}</div>${nm}</div>
       </div>
       ${heroBig}${heroSub}
+      ${priceLine}
       ${activeTag}
       ${second}
     </article>`;
@@ -1078,33 +1086,30 @@
 
   let hasLoaded = false;  // add this near the top, by `let asset = "stocks";`
 
-async function load(){
-  // only show the loading wipe on the very first load — refreshes update in place
-  if (!hasLoaded){
-    cardsEl.innerHTML = `<div class="tw-empty" data-tw-loading>Loading…</div>`;
-    pooledEl.hidden = true;
-  }
-  const scorecard = isMarketHoursET();
-  const url = scorecard
-    ? `${TW_API_BASE}/api/watchlist-scorecard?asset=${encodeURIComponent(asset)}`
-    : `${TW_API_BASE}/api/tomorrow-watchlist?asset=${encodeURIComponent(asset)}`;
-  try{
-    const res = await fetch(url, { credentials:"omit" });
-    if (!res.ok) throw new Error("HTTP "+res.status);
-    const data = await res.json();
-    if (scorecard) renderScorecard(data);
-    else render(data);
-    hasLoaded = true;
-  }catch(e){
-    // only show the error state if we have nothing on screen yet;
-    // on a failed refresh, keep the last good cards rather than blanking
+  async function load(){
     if (!hasLoaded){
-      cardsEl.innerHTML = scorecard
-        ? `<div class="tw-empty">Yesterday's watchlist results aren't in yet. Check back shortly.</div>`
-        : `<div class="tw-empty">Couldn't load the watchlist right now. Refresh to try again.</div>`;
+      cardsEl.innerHTML = `<div class="tw-empty" data-tw-loading>Loading…</div>`;
+      pooledEl.hidden = true;
+    }
+    const scorecard = isMarketHoursET();
+    const url = scorecard
+      ? `${TW_API_BASE}/api/watchlist-scorecard?asset=${encodeURIComponent(asset)}`
+      : `${TW_API_BASE}/api/tomorrow-watchlist?asset=${encodeURIComponent(asset)}`;
+    try{
+      const res = await fetch(url, { credentials:"omit" });
+      if (!res.ok) throw new Error("HTTP "+res.status);
+      const data = await res.json();
+      if (scorecard) renderScorecard(data);
+      else render(data);
+      hasLoaded = true;
+    }catch(e){
+      if (!hasLoaded){
+        cardsEl.innerHTML = scorecard
+          ? `<div class="tw-empty">Yesterday's watchlist results aren't in yet. Check back shortly.</div>`
+          : `<div class="tw-empty">Couldn't load the watchlist right now. Refresh to try again.</div>`;
+      }
     }
   }
-}
 
 // Sync to the page-level Stocks/Crypto toggle (#assetControl in the subheader)
 function syncFromAssetControl(mode){

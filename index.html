@@ -909,13 +909,13 @@
     if (data.leadMetric === "direction"){
       // crypto: lead with direction (green%), return as meta
       pPctEl.textContent = (p.greenPct ?? "—") + "%";
-      pLblEl.textContent = "of ran-and-held setups closed higher the next day";
+      pLblEl.textContent = "of ran-and-held setups closed higher the next session";
       const ret = fmtRet(p.avgNextReturn);
       pMetaEl.textContent = `n=${p.n} setups · avg next day ${ret||"—"} · also active ${p.stayedActivePct}% of the time`;
     } else {
       // stocks: lead with magnitude (stayed active)
       pPctEl.textContent = (p.stayedActivePct ?? "—") + "%";
-      pLblEl.textContent = "of ran-and-held setups stayed active the next day";
+      pLblEl.textContent = "of ran-and-held setups stayed active the next session";
       const ret = fmtRet(p.avgNextReturn);
       pMetaEl.textContent = `n=${p.n} setups · avg next day ${ret||"—"} (median ${fmtRet(p.medianNextReturn)||"—"})`;
     }
@@ -987,8 +987,8 @@
   function render(data){
     // sub copy per asset
     subEl.textContent = data.leadMetric === "direction"
-      ? "Coins that ran and held today. Historically these leaned higher the next day."
-      : "Names that ran and held today. Historically these stay active the next day.";
+  ? "Coins that ran and held last session. Historically these leaned higher the next session."
+  : "Names that ran and held last session. Historically these stay active the next session.";
 
     footLeft.textContent = data.today
       ? `From ${data.today}'s close · updated after each session`

@@ -669,7 +669,7 @@
       </h2>
       <p class="tw-sub" data-tw-sub>Names that ran and held today. Historically these stay active the next day.</p>
     </div>
-    <div class="tw-toggle" role="tablist" aria-label="Asset class">
+    <div class="tw-toggle" role="tablist" aria-label="Asset class" style="display:none;">
       <button class="tw-tg is-active" role="tab" aria-selected="true"  data-asset="stocks">Stocks</button>
       <button class="tw-tg"           role="tab" aria-selected="false" data-asset="crypto">Crypto</button>
     </div>
@@ -986,6 +986,30 @@
     }catch(e){
       cardsEl.innerHTML = `<div class="tw-empty">Couldn't load the watchlist right now. Refresh to try again.</div>`;
     }
+  }
+
+// Sync to the page-level Stocks/Crypto toggle (#assetControl in the subheader)
+function syncFromAssetControl(mode){
+    const want = mode === "crypto" ? "crypto" : "stocks";
+    if (want === asset) return;
+    asset = want;
+    toggles.forEach(b => {
+      const on = b.dataset.asset === want;
+      b.classList.toggle("is-active", on);
+      b.setAttribute("aria-selected", on ? "true" : "false");
+    });
+    load();
+  }
+
+  const assetControl = document.getElementById("assetControl");
+  if (assetControl){
+    assetControl.addEventListener("click", (e) => {
+      const btn = e.target.closest(".segmented-btn");
+      if (!btn) return;
+      syncFromAssetControl(btn.dataset.value);
+    });
+    const initMode = localStorage.getItem("sj_asset_mode") || "stocks";
+    syncFromAssetControl(initMode);
   }
 
   load();

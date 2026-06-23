@@ -788,6 +788,10 @@
   width:30px;height:30px;border-radius:8px;flex:none;display:flex;align-items:center;justify-content:center;
   background:#0c1119;border:1px solid var(--tw-line-2);font-size:11px;font-weight:700;color:var(--tw-violet-2);
 }
+#tw-watchlist .tw-logo{
+  width:30px;height:30px;border-radius:8px;flex:none;object-fit:contain;
+  background:#0c1119;border:1px solid var(--tw-line-2);padding:3px;
+}
 #tw-watchlist .tw-sym{font-size:15px;font-weight:680;color:#f3f6fb;letter-spacing:-.01em;}
 #tw-watchlist .tw-name{font-size:11px;color:var(--tw-dim-2);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:130px;}
 
@@ -909,7 +913,18 @@
   }
 
   function cardHTML(n, leadMetric){
-    const badge = esc((n.symbol||"?").slice(0,4));
+    const sym = esc(n.symbol || "?");
+    // logo: stocks built from symbol (FMP), crypto from API image field — matches the screener
+    let logoSrc = "";
+    if (asset === "crypto") {
+      logoSrc = n.image || n.logo || "";
+    } else {
+      logoSrc = "https://financialmodelingprep.com/image-stock/" + encodeURIComponent(n.symbol || "") + ".png";
+    }
+    const fallbackBadge = esc((n.symbol||"?").slice(0,4));
+    const logoHtml = logoSrc
+      ? `<img class="tw-logo" src="${logoSrc}" alt="" loading="lazy" onerror="this.onerror=null;this.outerHTML='<div class=\\'tw-badge\\'>${fallbackBadge}</div>'">`
+      : `<div class="tw-badge">${fallbackBadge}</div>`;
     const nm = n.name && n.name !== n.symbol ? `<div class="tw-name">${esc(n.name)}</div>` : "";
     const heldTag = `<span class="tw-held">Held gains into close</span>`;
 
@@ -950,8 +965,8 @@
 
     return `<article class="tw-card">
       <div class="tw-card-top">
-        <div class="tw-badge">${badge}</div>
-        <div style="min-width:0"><div class="tw-sym">${esc(n.symbol)}</div>${nm}</div>
+        ${logoHtml}
+        <div style="min-width:0"><div class="tw-sym">${sym}</div>${nm}</div>
       </div>
       ${heroBig}${heroSub}${maturing}
       ${ranLine}

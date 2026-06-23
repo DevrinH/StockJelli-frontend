@@ -664,7 +664,7 @@
     <div class="tw-head-left">
       <h2 id="tw-title">
         <span class="tw-cal" aria-hidden="true">▦</span>
-        Tomorrow's Watchlist
+        <span data-tw-title-text>Tomorrow's Watchlist</span>
         <button class="tw-info" type="button" aria-label="How it works" data-tw-info>ⓘ</button>
       </h2>
       <p class="tw-sub" data-tw-sub>Names that ran and held today. Historically these stay active the next day.</p>
@@ -864,6 +864,7 @@
   if (!root) return;
   const cardsEl  = root.querySelector("[data-tw-cards]");
   const subEl    = root.querySelector("[data-tw-sub]");
+  const titleTextEl = root.querySelector("[data-tw-title-text]");
   const pooledEl = root.querySelector("[data-tw-pooled]");
   const pPctEl   = root.querySelector("[data-tw-pooled-pct]");
   const pLblEl   = root.querySelector("[data-tw-pooled-label]");
@@ -986,6 +987,7 @@
 
   function render(data){
     // sub copy per asset
+    if (titleTextEl) titleTextEl.textContent = "Tomorrow's Watchlist";
     subEl.textContent = data.leadMetric === "direction"
   ? "Coins that ran and held last session. Historically these leaned higher the next session."
   : "Names that ran and held last session. Historically these stay active the next session.";
@@ -1006,6 +1008,7 @@
 
   function renderScorecard(data){
     // header copy flips to scorecard framing
+    if (titleTextEl) titleTextEl.textContent = "Yesterday's Watchlist";
     const dateStr = data.scoredDate || data.today || "yesterday";
     subEl.textContent = "Yesterday's watchlist — how the flagged names are doing today.";
     footLeft.textContent = `Flagged at ${dateStr}'s close · scoring live this session`;
@@ -1065,10 +1068,12 @@
       ? `<div class="tw-second" style="margin-top:8px"><span class="tw-ret ${pcls}" style="font-size:15px">${priceStr}</span>${pctStr?`<span class="tw-ret ${pcls}" style="font-size:11px">${pctStr}</span>`:""}</div>`
       : "";
 
-    // secondary = did it hit +3%
-    const hit3 = n.hit3 === true;
-    const second = n.hit3 != null
-      ? `<div class="tw-second"><span class="tw-ret ${hit3?"up":"flat"}">${hit3?"✓ hit +3%":"not +3% yet"}</span></div>`
+// secondary = did it move 3%+ in EITHER direction (the ±3% milestone)
+const mv = n.movePct != null ? Number(n.movePct) : null;
+    const hit3 = mv != null && Math.abs(mv) >= 3;
+    const mvCls = mv == null ? "flat" : mv > 0 ? "up" : "down";
+    const second = mv != null
+      ? `<div class="tw-second"><span class="tw-ret ${hit3 ? mvCls : "flat"}">${hit3 ? `✓ moved ${mv>=0?"+":""}${mv.toFixed(1)}%` : "under 3% so far"}</span></div>`
       : "";
 
       return `<article class="tw-card">

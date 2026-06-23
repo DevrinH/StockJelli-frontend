@@ -1033,7 +1033,17 @@
   function scorecardCardHTML(n){
     const sym = esc(n.symbol || "?");
     const nm = n.name && n.name !== n.symbol ? `<div class="tw-name">${esc(n.name)}</div>` : "";
-    const badge = esc((n.symbol||"?").slice(0,4));
+    // logo: stocks from FMP, crypto from API image — same as the prediction cards
+    let logoSrc = "";
+    if (asset === "crypto") {
+      logoSrc = n.image || n.logo || "";
+    } else {
+      logoSrc = "https://financialmodelingprep.com/image-stock/" + encodeURIComponent(n.symbol || "") + ".png";
+    }
+    const fallbackBadge = esc((n.symbol||"?").slice(0,4));
+    const logoHtml = logoSrc
+      ? `<img class="tw-logo" src="${logoSrc}" alt="" loading="lazy" onerror="this.onerror=null;this.outerHTML='<div class=\\'tw-badge\\'>${fallbackBadge}</div>'">`
+      : `<div class="tw-badge">${fallbackBadge}</div>`;
 
     // headline = stayed active (big move either direction)
     const active = !!n.stayedActive;
@@ -1054,9 +1064,9 @@
       ? `<div class="tw-second"><span class="tw-ret ${hit3?"up":"flat"}">${hit3?"✓ hit +3%":"not +3% yet"}</span></div>`
       : "";
 
-    return `<article class="tw-card">
+      return `<article class="tw-card">
       <div class="tw-card-top">
-        <div class="tw-badge">${badge}</div>
+        ${logoHtml}
         <div style="min-width:0"><div class="tw-sym">${sym}</div>${nm}</div>
       </div>
       ${heroBig}${heroSub}

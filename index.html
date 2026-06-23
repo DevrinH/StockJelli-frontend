@@ -634,10 +634,719 @@
      #heroBrokerControl — so all existing JS keeps working.
 ============================================================ -->
 
+<!--
+  ════════════════════════════════════════════════════════════════════
+  TOMORROW'S WATCHLIST — drop-in homepage section
+  ════════════════════════════════════════════════════════════════════
+  Renders the validated "ran-and-held → active tomorrow" feature.
+
+  HOW IT WORKS
+    • Fetches GET /api/tomorrow-watchlist?asset=stocks|crypto
+    • Pooled headline (the validated big-n number) sits at the SECTION
+      level, attributed to the SETUP TYPE — never to a single name.
+    • Per-name cards show that name's OWN record as a fraction (3/3)
+      until it matures past the n-ladder, then its own %.
+    • Stock/Crypto toggle flips BOTH the asset param AND the headline
+      framing — leadMetric drives it:
+        stocks  → "magnitude": headline = "stayed active" %
+        crypto  → "direction": headline = green% + avg next-day return
+      (crypto magnitude baseline is ~70%, so leading with it oversells;
+       lead with direction, which is the real crypto edge.)
+
+  HONESTY RULES BAKED IN
+    • No card ever implies "SYM will go up X%."
+    • Stock cards lead with magnitude ("stayed active"); crypto cards
+      lead with direction (green% + return), per leadMetric.
+    • Fractions until a name matures — no fake "100% (1 of 1)".
+    • "Active" = made a big intraday move (either direction), labelled
+      as such so it's never read as a directional promise.
+
+  DROP-IN
+    Paste this whole block where the section should appear. It is
+    self-scoped under #tw-watchlist (no global CSS leakage). Set
+    TW_API_BASE below if your API isn't same-origin.
+  ════════════════════════════════════════════════════════════════════
+-->
+
+<section id="tw-watchlist" aria-labelledby="tw-title">
+  <div class="tw-head">
+    <div class="tw-head-left">
+      <h2 id="tw-title">
+        <span class="tw-cal" aria-hidden="true">▦</span>
+        Tomorrow's Watchlist
+        <button class="tw-info" type="button" aria-label="How it works" data-tw-info>ⓘ</button>
+      </h2>
+      <p class="tw-sub" data-tw-sub>Names that ran and held today. Historically these stay active the next day.</p>
+    </div>
+    <div class="tw-toggle" role="tablist" aria-label="Asset class">
+      <button class="tw-tg is-active" role="tab" aria-selected="true"  data-asset="stocks">Stocks</button>
+      <button class="tw-tg"           role="tab" aria-selected="false" data-asset="crypto">Crypto</button>
+    </div>
+  </div>
+
+  <!-- Pooled headline: the validated big-n number, attributed to the SETUP -->
+  <div class="tw-pooled" data-tw-pooled hidden>
+    <div class="tw-pooled-main">
+      <span class="tw-pooled-pct" data-tw-pooled-pct>—</span>
+      <span class="tw-pooled-label" data-tw-pooled-label></span>
+    </div>
+    <div class="tw-pooled-meta" data-tw-pooled-meta></div>
+  </div>
+
+  <!-- Cards -->
+  <div class="tw-cards" data-tw-cards aria-live="polite">
+    <div class="tw-empty" data-tw-loading>Loading…</div>
+  </div>
+
+  <div class="tw-foot">
+    <span data-tw-foot-left>Backtested on logged momentum data · Updated after each close</span>
+    <span class="tw-foot-right">Magnitude, not a prediction · Not financial advice</span>
+  </div>
+
+  <!-- info popover -->
+  <div class="tw-pop" data-tw-pop hidden>
+    <button class="tw-pop-x" type="button" data-tw-pop-close aria-label="Close">×</button>
+    <h3>How this works</h3>
+    <p>Each day we flag names that <strong>ran and held</strong> — moved up and kept the gain into the close. In our logged history, names that did this tended to stay <strong>active</strong> (make another big move) the next day.</p>
+    <p>The big number is the rate across <em>all</em> ran-and-held setups, not any single name. Each card shows that name's own record so far — as a fraction until it has enough setups to show a percentage.</p>
+    <p>"Active" means a large move in <em>either</em> direction. It is a measure of expected movement, not a prediction that the price will go up.</p>
+  </div>
+</section>
+
+<style>
+/* ── scoped to #tw-watchlist ─────────────────────────────────────── */
+#tw-watchlist{
+  --tw-bg:#0e131c;
+  --tw-card:#141b27;
+  --tw-card-2:#161e2c;
+  --tw-line:#1f2937;
+  --tw-line-2:#283445;
+  --tw-text:#e7ecf3;
+  --tw-dim:#8a97a8;
+  --tw-dim-2:#5f6b7c;
+  --tw-green:#34d399;
+  --tw-green-dim:#1f7a5a;
+  --tw-violet:#7c5cff;
+  --tw-violet-2:#a78bfa;
+  --tw-up:#34d399;
+  --tw-down:#f87171;
+
+  max-width:1180px;
+  margin:0 auto;
+  padding:22px 20px 14px;
+  color:var(--tw-text);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Inter,sans-serif;
+  background:var(--tw-bg);
+  border:1px solid var(--tw-line);
+  border-radius:16px;
+  position:relative;
+}
+
+/* header */
+#tw-watchlist .tw-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:16px;}
+#tw-watchlist .tw-head-left{min-width:0;}
+#tw-watchlist h2{
+  display:flex;align-items:center;gap:9px;
+  margin:0 0 4px;font-size:19px;font-weight:650;letter-spacing:-.01em;color:#f3f6fb;
+}
+#tw-watchlist .tw-cal{color:var(--tw-violet-2);font-size:16px;}
+#tw-watchlist .tw-info{
+  background:none;border:none;color:var(--tw-dim-2);font-size:13px;cursor:pointer;padding:0;line-height:1;
+}
+#tw-watchlist .tw-info:hover{color:var(--tw-dim);}
+#tw-watchlist .tw-sub{margin:0;font-size:13px;color:var(--tw-dim);line-height:1.45;max-width:60ch;}
+
+/* toggle */
+#tw-watchlist .tw-toggle{display:inline-flex;background:#0a0f17;border:1px solid var(--tw-line);border-radius:10px;padding:3px;flex:none;}
+#tw-watchlist .tw-tg{
+  appearance:none;border:none;background:none;color:var(--tw-dim);
+  font-size:13px;font-weight:600;padding:6px 16px;border-radius:8px;cursor:pointer;transition:.15s;
+}
+#tw-watchlist .tw-tg:hover{color:var(--tw-text);}
+#tw-watchlist .tw-tg.is-active{background:var(--tw-violet);color:#fff;box-shadow:0 1px 0 rgba(0,0,0,.3);}
+
+/* pooled headline */
+#tw-watchlist .tw-pooled{
+  display:flex;align-items:baseline;justify-content:space-between;gap:14px;flex-wrap:wrap;
+  padding:12px 16px;margin-bottom:16px;
+  background:linear-gradient(180deg,rgba(124,92,255,.07),rgba(124,92,255,.02));
+  border:1px solid var(--tw-line-2);border-radius:12px;
+}
+#tw-watchlist .tw-pooled-main{display:flex;align-items:baseline;gap:10px;}
+#tw-watchlist .tw-pooled-pct{font-size:30px;font-weight:720;letter-spacing:-.02em;color:#fff;line-height:1;font-variant-numeric:tabular-nums;}
+#tw-watchlist .tw-pooled-label{font-size:13.5px;color:var(--tw-dim);max-width:42ch;line-height:1.35;}
+#tw-watchlist .tw-pooled-meta{font-size:12px;color:var(--tw-dim-2);font-variant-numeric:tabular-nums;}
+
+/* cards grid */
+#tw-watchlist .tw-cards{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(208px,1fr));gap:12px;
+}
+#tw-watchlist .tw-card{
+  background:var(--tw-card);border:1px solid var(--tw-line);border-radius:13px;
+  padding:14px 14px 13px;position:relative;overflow:hidden;transition:border-color .15s,transform .15s;
+}
+#tw-watchlist .tw-card:hover{border-color:var(--tw-line-2);transform:translateY(-1px);}
+#tw-watchlist .tw-card-top{display:flex;align-items:center;gap:9px;margin-bottom:11px;}
+#tw-watchlist .tw-badge{
+  width:30px;height:30px;border-radius:8px;flex:none;display:flex;align-items:center;justify-content:center;
+  background:#0c1119;border:1px solid var(--tw-line-2);font-size:11px;font-weight:700;color:var(--tw-violet-2);
+}
+#tw-watchlist .tw-sym{font-size:15px;font-weight:680;color:#f3f6fb;letter-spacing:-.01em;}
+#tw-watchlist .tw-name{font-size:11px;color:var(--tw-dim-2);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:130px;}
+
+/* the hero stat (magnitude for stocks, direction for crypto) */
+#tw-watchlist .tw-stat{font-size:26px;font-weight:700;line-height:1;letter-spacing:-.02em;color:#fff;font-variant-numeric:tabular-nums;}
+#tw-watchlist .tw-stat-sub{font-size:11.5px;color:var(--tw-dim);margin-top:5px;line-height:1.3;}
+
+/* held tag */
+#tw-watchlist .tw-held{
+  display:inline-flex;align-items:center;gap:5px;margin-top:11px;
+  font-size:11px;font-weight:600;color:var(--tw-green);
+  background:rgba(52,211,153,.08);border:1px solid rgba(52,211,153,.18);
+  border-radius:999px;padding:3px 9px;
+}
+#tw-watchlist .tw-held::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--tw-green);}
+
+/* secondary line (avg return / activity) */
+#tw-watchlist .tw-second{margin-top:10px;display:flex;align-items:baseline;gap:6px;}
+#tw-watchlist .tw-ret{font-size:13px;font-weight:650;font-variant-numeric:tabular-nums;}
+#tw-watchlist .tw-ret.up{color:var(--tw-up);}
+#tw-watchlist .tw-ret.down{color:var(--tw-down);}
+#tw-watchlist .tw-ret.flat{color:var(--tw-dim);}
+#tw-watchlist .tw-ret-lbl{font-size:11px;color:var(--tw-dim-2);}
+
+/* maturing fraction look */
+#tw-watchlist .tw-stat.is-fraction{font-size:20px;color:var(--tw-text);}
+#tw-watchlist .tw-maturing{font-size:10.5px;color:var(--tw-dim-2);margin-top:4px;}
+
+/* empty / loading */
+#tw-watchlist .tw-empty{
+  grid-column:1/-1;text-align:center;color:var(--tw-dim);font-size:13.5px;
+  padding:30px 16px;background:var(--tw-card);border:1px dashed var(--tw-line-2);border-radius:13px;
+}
+
+/* footer */
+#tw-watchlist .tw-foot{
+  display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;
+  margin-top:14px;padding-top:11px;border-top:1px solid var(--tw-line);
+  font-size:11px;color:var(--tw-dim-2);
+}
+
+/* info popover */
+#tw-watchlist .tw-pop{
+  position:absolute;top:54px;left:20px;right:20px;max-width:460px;z-index:5;
+  background:#0c121c;border:1px solid var(--tw-line-2);border-radius:13px;padding:16px 18px 6px;
+  box-shadow:0 18px 50px rgba(0,0,0,.55);
+}
+#tw-watchlist .tw-pop h3{margin:0 0 8px;font-size:14px;color:#f3f6fb;}
+#tw-watchlist .tw-pop p{margin:0 0 10px;font-size:12.5px;color:var(--tw-dim);line-height:1.5;}
+#tw-watchlist .tw-pop strong{color:var(--tw-text);}
+#tw-watchlist .tw-pop-x{position:absolute;top:9px;right:11px;background:none;border:none;color:var(--tw-dim);font-size:19px;cursor:pointer;line-height:1;}
+
+@media (max-width:560px){
+  #tw-watchlist{padding:18px 14px 12px;}
+  #tw-watchlist .tw-head{flex-direction:column;}
+  #tw-watchlist .tw-pooled-pct{font-size:26px;}
+}
+@media (prefers-reduced-motion:reduce){
+  #tw-watchlist .tw-card{transition:none;}
+}
+</style>
+
+<script>
+(function(){
+  "use strict";
+  // Set to "" for same-origin, or your API base e.g. "https://api.stockjelli.com"
+  const TW_API_BASE = "https://api.stockjelli.com";
+
+  const root   = document.getElementById("tw-watchlist");
+  if (!root) return;
+  const cardsEl  = root.querySelector("[data-tw-cards]");
+  const subEl    = root.querySelector("[data-tw-sub]");
+  const pooledEl = root.querySelector("[data-tw-pooled]");
+  const pPctEl   = root.querySelector("[data-tw-pooled-pct]");
+  const pLblEl   = root.querySelector("[data-tw-pooled-label]");
+  const pMetaEl  = root.querySelector("[data-tw-pooled-meta]");
+  const footLeft = root.querySelector("[data-tw-foot-left]");
+  const toggles  = [...root.querySelectorAll(".tw-tg")];
+  const popEl    = root.querySelector("[data-tw-pop]");
+
+  let asset = "stocks";
+
+  // info popover
+  root.querySelector("[data-tw-info]").addEventListener("click", () => { popEl.hidden = !popEl.hidden; });
+  root.querySelector("[data-tw-pop-close]").addEventListener("click", () => { popEl.hidden = true; });
+
+  toggles.forEach(btn => btn.addEventListener("click", () => {
+    if (btn.dataset.asset === asset) return;
+    asset = btn.dataset.asset;
+    toggles.forEach(b => {
+      const on = b === btn;
+      b.classList.toggle("is-active", on);
+      b.setAttribute("aria-selected", on ? "true" : "false");
+    });
+    load();
+  }));
+
+  function esc(s){ return String(s==null?"":s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
+  function fmtRet(v){ if (v==null) return null; const s=(v>=0?"+":"")+v.toFixed(1)+"%"; return s; }
+  function retClass(v){ if (v==null) return "flat"; if (v>0.05) return "up"; if (v<-0.05) return "down"; return "flat"; }
+
+  function renderPooled(data){
+    const p = data.pooled || {};
+    if (!p.n){ pooledEl.hidden = true; return; }
+    pooledEl.hidden = false;
+    if (data.leadMetric === "direction"){
+      // crypto: lead with direction (green%), return as meta
+      pPctEl.textContent = (p.greenPct ?? "—") + "%";
+      pLblEl.textContent = "of ran-and-held setups closed higher the next day";
+      const ret = fmtRet(p.avgNextReturn);
+      pMetaEl.textContent = `n=${p.n} setups · avg next day ${ret||"—"} · also active ${p.stayedActivePct}% of the time`;
+    } else {
+      // stocks: lead with magnitude (stayed active)
+      pPctEl.textContent = (p.stayedActivePct ?? "—") + "%";
+      pLblEl.textContent = "of ran-and-held setups stayed active the next day";
+      const ret = fmtRet(p.avgNextReturn);
+      pMetaEl.textContent = `n=${p.n} setups · avg next day ${ret||"—"} (median ${fmtRet(p.medianNextReturn)||"—"})`;
+    }
+  }
+
+  function cardHTML(n, leadMetric){
+    const badge = esc((n.symbol||"?").slice(0,4));
+    const nm = n.name && n.name !== n.symbol ? `<div class="tw-name">${esc(n.name)}</div>` : "";
+    const heldTag = `<span class="tw-held">Held gains into close</span>`;
+
+    // Hero stat differs by asset:
+    //  stocks  → "stayed active" magnitude (own % or fraction)
+    //  crypto  → green% if matured, else fraction; return as the second line
+    let heroBig, heroSub, maturing = "";
+
+    if (leadMetric === "direction"){
+      if (n.enoughHistory && n.greenPct != null){
+        heroBig = `<div class="tw-stat">${n.greenPct}%</div>`;
+        heroSub = `<div class="tw-stat-sub">closed higher next day · ${n.n} setups</div>`;
+      } else {
+        heroBig = `<div class="tw-stat is-fraction">${esc(n.stayedActiveDisplay)}</div>`;
+        heroSub = `<div class="tw-stat-sub">setups so far</div>`;
+        maturing = `<div class="tw-maturing">% shows once it has 10+ setups</div>`;
+      }
+    } else {
+      if (n.enoughHistory && n.stayedActivePct != null){
+        heroBig = `<div class="tw-stat">${n.stayedActivePct}%</div>`;
+        heroSub = `<div class="tw-stat-sub">stayed active next day · ${n.n} setups</div>`;
+      } else {
+        heroBig = `<div class="tw-stat is-fraction">${esc(n.stayedActiveDisplay)}</div>`;
+        heroSub = `<div class="tw-stat-sub">stayed active so far</div>`;
+        maturing = `<div class="tw-maturing">% shows once it has 10+ setups</div>`;
+      }
+    }
+
+    // second line: avg next-day return (labelled clearly as average)
+    let second = "";
+    if (n.avgNextReturn != null){
+      const rc = retClass(n.avgNextReturn);
+      second = `<div class="tw-second"><span class="tw-ret ${rc}">${fmtRet(n.avgNextReturn)}</span><span class="tw-ret-lbl">avg next-day</span></div>`;
+    }
+
+    const ranLine = n.ranTodayPct != null
+      ? `<div class="tw-stat-sub" style="margin-top:9px">Ran +${Number(n.ranTodayPct).toFixed(1)}% today</div>` : "";
+
+    return `<article class="tw-card">
+      <div class="tw-card-top">
+        <div class="tw-badge">${badge}</div>
+        <div style="min-width:0"><div class="tw-sym">${esc(n.symbol)}</div>${nm}</div>
+      </div>
+      ${heroBig}${heroSub}${maturing}
+      ${ranLine}
+      ${heldTag}
+      ${second}
+    </article>`;
+  }
+
+  function render(data){
+    // sub copy per asset
+    subEl.textContent = data.leadMetric === "direction"
+      ? "Coins that ran and held today. Historically these leaned higher the next day."
+      : "Names that ran and held today. Historically these stay active the next day.";
+
+    footLeft.textContent = data.today
+      ? `From ${data.today}'s close · updated after each session`
+      : "Updated after each session";
+
+    renderPooled(data);
+
+    const names = data.names || [];
+    if (!names.length){
+      cardsEl.innerHTML = `<div class="tw-empty">No ran-and-held names from the last session. Check back after the next close.</div>`;
+      return;
+    }
+    cardsEl.innerHTML = names.map(n => cardHTML(n, data.leadMetric)).join("");
+  }
+
+  async function load(){
+    cardsEl.innerHTML = `<div class="tw-empty" data-tw-loading>Loading…</div>`;
+    pooledEl.hidden = true;
+    try{
+      const res = await fetch(`${TW_API_BASE}/api/tomorrow-watchlist?asset=${encodeURIComponent(asset)}`, { credentials:"omit" });
+      if (!res.ok) throw new Error("HTTP "+res.status);
+      const data = await res.json();
+      render(data);
+    }catch(e){
+      cardsEl.innerHTML = `<div class="tw-empty">Couldn't load the watchlist right now. Refresh to try again.</div>`;
+    }
+  }
+
+  load();
+})();
+</script>
 
 
 
+<!--
+  ════════════════════════════════════════════════════════════════════
+  MOMENTUM HEATMAP  +  LIVE ALERT LOG  — two-column row
+  ════════════════════════════════════════════════════════════════════
+  LEFT  : Momentum Heatmap — sector tiles "running hot now".
+          Wired to GET /api/sectors (already in index.js).
+          Renders each sector's magnitude.pct as ACTIVITY (how hot),
+          tier (lead/context/quiet) drives color intensity, and the
+          directional `lean` is a small side-label — NEVER the headline.
+  RIGHT : The EXISTING live-alert log. The #alertCardsSection markup
+          (and ALL its child IDs) is moved in here UNCHANGED so
+          alerts-frontend.js keeps working with zero edits. The donut
+          is gone.
 
+  HONESTY RULES BAKED IN
+    • Tiles show magnitude % labelled "running hot" / "active now" —
+      NOT "probability of continuation" (the 50.57% sector backtest
+      makes a directional claim dishonest).
+    • Lean is a faint side-label ("slight up lean"), never the number.
+    • Quiet sectors show "—" for lean (no edge to claim).
+
+  DROP-IN
+    Self-scoped under #hm-row. Paste where the row should appear
+    (the spot the old odds-card occupied, after the subheader).
+    Set HM_API_BASE below if not same-origin.
+
+    NOTE: the #alertCardsSection block below is MOVED from the old
+    odds-card, not duplicated. Delete it from the old location.
+  ════════════════════════════════════════════════════════════════════
+-->
+
+<section id="hm-row" aria-labelledby="hm-title">
+  <div class="hm-grid">
+
+    <!-- ░░░ LEFT: Momentum Heatmap ░░░ -->
+    <div class="hm-heat">
+      <div class="hm-head">
+        <div class="hm-head-left">
+          <h2 id="hm-title">
+            <span class="hm-ico" aria-hidden="true">▦</span>
+            Momentum Heatmap
+            <button class="hm-info" type="button" aria-label="How it works" data-hm-info>ⓘ</button>
+          </h2>
+          <p class="hm-sub">Which sectors are running hot right now — by how much they're moving, not which way.</p>
+        </div>
+        <span class="hm-live"><span class="hm-live-dot"></span>Live</span>
+      </div>
+
+      <div class="hm-tiles" data-hm-tiles aria-live="polite">
+        <div class="hm-empty" data-hm-loading>Loading…</div>
+      </div>
+
+      <div class="hm-foot">
+        <span class="hm-foot-key"><span class="hm-key-swatch"></span> Brighter = more active now</span>
+        <span class="hm-foot-note">Activity, not a direction call · Not financial advice</span>
+      </div>
+
+      <!-- info popover -->
+      <div class="hm-pop" data-hm-pop hidden>
+        <button class="hm-pop-x" type="button" data-hm-pop-close aria-label="Close">×</button>
+        <h3>How this works</h3>
+        <p>Each tile shows how <strong>active</strong> a sector is right now — how often its names have been making big moves recently. Brighter tiles are running hotter.</p>
+        <p>This measures <em>movement</em>, not direction. The small lean label is a weak tendency, not a prediction that the sector will go up or down.</p>
+      </div>
+    </div>
+
+    <!-- ░░░ RIGHT: existing live-alert log (MOVED here unchanged) ░░░ -->
+    <div class="hm-log">
+      <section id="alertCardsSection" style="display:none;">
+        <div class="section-head" style="margin-bottom:10px;">
+          <div class="section-head-left">
+            <h3 class="odds-log-title">Live Alert Log</h3>
+            <span class="odds-live-tag"><span class="odds-live-dot"></span>Live</span>
+          </div>
+          <div class="odds-log-head-right">
+            <a href="/alert-log.html" class="odds-log-fulllink">Full log →</a>
+            <span id="alertCardsDate"></span>
+          </div>
+        </div>
+
+        <!-- all-time proof bar -->
+        <div id="alertProofBar" style="display:none; margin-bottom:8px; padding:6px 12px; border-radius:8px; background:rgba(34,197,94,0.04); border:1px solid rgba(34,197,94,0.08); font-size:0.68rem; color:rgba(255,255,255,0.45); align-items:center; gap:6px; flex-wrap:wrap;"></div>
+
+        <!-- today's stats -->
+        <div id="alertCardsStats" class="alert-stats-row"></div>
+
+        <!-- rows -->
+        <div class="table-wrap" style="margin-top:10px;">
+          <div id="alertCardsBody"></div>
+          <div id="alertCardsEmpty" style="display:none; padding:20px; text-align:center; color:rgba(255,255,255,0.25); font-size:0.82rem;"></div>
+          <div id="alertCardsViewAll" style="display:none; padding:10px 14px; text-align:center; border-top:1px solid rgba(255,255,255,0.04);"></div>
+        </div>
+      </section>
+    </div>
+
+  </div>
+</section>
+
+<style>
+/* ── scoped to #hm-row ───────────────────────────────────────────── */
+#hm-row{
+  --hm-bg:#0e131c;
+  --hm-card:#141b27;
+  --hm-line:#1f2937;
+  --hm-line-2:#283445;
+  --hm-text:#e7ecf3;
+  --hm-dim:#8a97a8;
+  --hm-dim-2:#5f6b7c;
+  --hm-volt:#818cf8;
+  --hm-volt-2:#a5b4fc;
+  --hm-up:#34d399;
+  --hm-down:#f87171;
+
+  max-width:1180px;
+  margin:18px auto 0;
+  padding:0 20px;
+  color:var(--hm-text);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Inter,sans-serif;
+}
+
+/* two-column: heatmap LEFT, log RIGHT */
+#hm-row .hm-grid{
+  display:grid;
+  grid-template-columns:minmax(0,1.05fr) minmax(0,0.95fr);
+  gap:16px;
+  align-items:stretch;
+}
+
+/* shared card shell */
+#hm-row .hm-heat,
+#hm-row .hm-log{
+  background:var(--hm-bg);
+  border:1px solid var(--hm-line);
+  border-radius:16px;
+  padding:20px 20px 14px;
+  position:relative;
+  min-width:0;
+}
+
+/* header */
+#hm-row .hm-head{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;margin-bottom:16px;}
+#hm-row .hm-head-left{min-width:0;}
+#hm-row h2{
+  display:flex;align-items:center;gap:9px;
+  margin:0 0 4px;font-size:18px;font-weight:650;letter-spacing:-.01em;color:#f3f6fb;
+}
+#hm-row .hm-ico{color:var(--hm-volt-2);font-size:15px;}
+#hm-row .hm-info{background:none;border:none;color:var(--hm-dim-2);font-size:13px;cursor:pointer;padding:0;line-height:1;}
+#hm-row .hm-info:hover{color:var(--hm-dim);}
+#hm-row .hm-sub{margin:0;font-size:12.5px;color:var(--hm-dim);line-height:1.45;max-width:52ch;}
+#hm-row .hm-live{display:inline-flex;align-items:center;gap:6px;flex:none;font-size:11px;font-weight:600;color:var(--hm-up);}
+#hm-row .hm-live-dot{width:6px;height:6px;border-radius:50%;background:var(--hm-up);animation:hmPulse 2s ease-in-out infinite;}
+@keyframes hmPulse{0%,100%{opacity:1}50%{opacity:.4}}
+
+/* tiles grid */
+#hm-row .hm-tiles{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;
+}
+#hm-row .hm-tile{
+  border-radius:12px;padding:12px 13px 11px;position:relative;overflow:hidden;
+  border:1px solid var(--hm-line);background:var(--hm-card);
+  transition:transform .15s,border-color .15s;
+}
+#hm-row .hm-tile:hover{transform:translateY(-1px);border-color:var(--hm-line-2);}
+/* heat intensity driven by tier via inline --heat (0..1) */
+#hm-row .hm-tile::before{
+  content:"";position:absolute;inset:0;border-radius:12px;pointer-events:none;
+  background:linear-gradient(180deg,
+    rgba(129,140,248,calc(var(--heat,0)*0.18)),
+    rgba(129,140,248,calc(var(--heat,0)*0.04)));
+}
+#hm-row .hm-tile.is-lead{border-color:var(--hm-volt);}
+#hm-row .hm-tile.is-lead::after{
+  content:"";position:absolute;top:0;left:0;right:0;height:2px;border-radius:12px 12px 0 0;
+  background:linear-gradient(90deg,var(--hm-volt),transparent 65%);
+}
+#hm-row .hm-tile-sec{position:relative;font-size:12.5px;font-weight:650;color:#f2f4f8;letter-spacing:-.01em;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:7px;}
+#hm-row .hm-tile-mag{position:relative;display:flex;align-items:baseline;gap:5px;}
+#hm-row .hm-tile-pct{font-size:24px;font-weight:740;line-height:1;color:#fff;
+  font-variant-numeric:tabular-nums;letter-spacing:-.02em;}
+#hm-row .hm-tile.is-quiet .hm-tile-pct{color:var(--hm-dim);}
+#hm-row .hm-tile-cap{font-size:10px;color:var(--hm-dim-2);}
+/* lean side-label — small, never the headline */
+#hm-row .hm-tile-lean{position:relative;margin-top:8px;font-size:10.5px;font-weight:600;
+  display:inline-flex;align-items:center;gap:4px;}
+#hm-row .hm-tile-lean.up{color:var(--hm-up);}
+#hm-row .hm-tile-lean.down{color:var(--hm-down);}
+#hm-row .hm-tile-lean.flat{color:var(--hm-dim-2);}
+#hm-row .hm-tile-lead-chip{position:relative;display:inline-block;margin-top:8px;padding:1px 7px;border-radius:4px;
+  font-size:9px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;
+  color:var(--hm-volt);background:rgba(129,140,248,.12);border:1px solid rgba(129,140,248,.3);}
+
+/* empty / loading */
+#hm-row .hm-empty{
+  grid-column:1/-1;text-align:center;color:var(--hm-dim);font-size:13px;
+  padding:26px 16px;background:var(--hm-card);border:1px dashed var(--hm-line-2);border-radius:12px;
+}
+
+/* footer */
+#hm-row .hm-foot{
+  display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;
+  margin-top:14px;padding-top:11px;border-top:1px solid var(--hm-line);
+  font-size:10.5px;color:var(--hm-dim-2);
+}
+#hm-row .hm-foot-key{display:inline-flex;align-items:center;gap:7px;}
+#hm-row .hm-key-swatch{width:18px;height:6px;border-radius:3px;
+  background:linear-gradient(90deg,rgba(129,140,248,.25),var(--hm-volt));display:inline-block;}
+
+/* info popover */
+#hm-row .hm-pop{
+  position:absolute;top:50px;left:20px;right:20px;max-width:420px;z-index:5;
+  background:#0c121c;border:1px solid var(--hm-line-2);border-radius:12px;padding:15px 17px 6px;
+  box-shadow:0 18px 50px rgba(0,0,0,.55);
+}
+#hm-row .hm-pop h3{margin:0 0 8px;font-size:13.5px;color:#f3f6fb;}
+#hm-row .hm-pop p{margin:0 0 10px;font-size:12px;color:var(--hm-dim);line-height:1.5;}
+#hm-row .hm-pop strong{color:var(--hm-text);}
+#hm-row .hm-pop-x{position:absolute;top:9px;right:11px;background:none;border:none;color:var(--hm-dim);font-size:18px;cursor:pointer;line-height:1;}
+
+/* RIGHT log column — reuse existing .odds-log-* / #alertCards* styles from style.css;
+   just give the wrapper the same card frame */
+#hm-row .hm-log{display:flex;flex-direction:column;}
+#hm-row .hm-log #alertCardsSection{display:block;}
+
+/* stack on smaller screens — heatmap on top, log below */
+@media (max-width:880px){
+  #hm-row .hm-grid{grid-template-columns:1fr;}
+}
+@media (max-width:560px){
+  #hm-row{padding:0 14px;}
+  #hm-row .hm-heat,#hm-row .hm-log{padding:16px 14px 12px;}
+  #hm-row .hm-tiles{grid-template-columns:repeat(auto-fill,minmax(128px,1fr));}
+  #hm-row .hm-tile-pct{font-size:21px;}
+}
+@media (prefers-reduced-motion:reduce){
+  #hm-row .hm-tile{transition:none;}
+}
+</style>
+
+<script>
+(function(){
+  "use strict";
+  const HM_API_BASE = "https://api.stockjelli.com";
+
+  const root = document.getElementById("hm-row");
+  if (!root) return;
+  const tilesEl = root.querySelector("[data-hm-tiles]");
+  const popEl   = root.querySelector("[data-hm-pop]");
+
+  root.querySelector("[data-hm-info]").addEventListener("click", () => { popEl.hidden = !popEl.hidden; });
+  root.querySelector("[data-hm-pop-close]").addEventListener("click", () => { popEl.hidden = true; });
+
+  function esc(s){ return String(s==null?"":s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
+
+  // tier → heat intensity (0..1) for the tile glow
+  function heatForTier(tier){
+    if (tier === "lead") return 1;
+    if (tier === "context") return 0.55;
+    return 0.18; // quiet
+  }
+
+  // Render the directional lean as a SMALL side-label only.
+  // /api/sectors returns `lean` — be tolerant of shape (string or {dir,pct}).
+  function leanLabel(lean, tier){
+    if (tier === "quiet") return `<span class="hm-tile-lean flat">— no clear lean</span>`;
+    if (lean == null) return "";
+    let dir = null, pct = null;
+    if (typeof lean === "string") dir = lean;
+    else if (typeof lean === "object") { dir = lean.dir || lean.direction || null; pct = lean.pct ?? lean.value ?? null; }
+    if (!dir) return "";
+    const d = String(dir).toLowerCase();
+    const cls = d.includes("up") ? "up" : d.includes("down") ? "down" : "flat";
+    const arrow = cls === "up" ? "↑" : cls === "down" ? "↓" : "·";
+    const word = cls === "flat" ? "even" : (cls + " lean");
+    const pctStr = (pct != null && Number.isFinite(Number(pct))) ? ` ${Number(pct) >= 0 ? "+" : ""}${Number(pct).toFixed(1)}%` : "";
+    return `<span class="hm-tile-lean ${cls}">${arrow} slight ${esc(word)}${pctStr}</span>`;
+  }
+
+  function tileHTML(s){
+    // tolerant field access against the /api/sectors shape:
+    // { sector|name, magnitude:{status,pct}, lean, tier, names[] }
+    const name = s.sector || s.name || s.label || "—";
+    const tier = s.tier || "context";
+    const mag = s.magnitude || {};
+    const pct = (mag.pct != null) ? mag.pct : (s.pct != null ? s.pct : null);
+    const status = mag.status || s.status || null;
+
+    const heat = heatForTier(tier);
+    const cls = tier === "lead" ? "is-lead" : tier === "quiet" ? "is-quiet" : "";
+
+    // magnitude is ACTIVITY, labelled as such — never "probability of continuation"
+    let magBlock;
+    if (pct != null && status !== "gathering" && status !== "warming"){
+      magBlock = `<div class="hm-tile-mag"><span class="hm-tile-pct">${Math.round(pct)}%</span><span class="hm-tile-cap">active now</span></div>`;
+    } else {
+      magBlock = `<div class="hm-tile-mag"><span class="hm-tile-pct" style="font-size:15px;color:var(--hm-dim)">building</span></div>`;
+    }
+
+    const leadChip = tier === "lead" ? `<span class="hm-tile-lead-chip">moving most</span>` : "";
+    const lean = leadChip ? leadChip : leanLabel(s.lean, tier);
+
+    return `<div class="hm-tile ${cls}" style="--heat:${heat}">
+      <div class="hm-tile-sec">${esc(name)}</div>
+      ${magBlock}
+      ${lean}
+    </div>`;
+  }
+
+  function render(sectors){
+    if (!Array.isArray(sectors) || !sectors.length){
+      tilesEl.innerHTML = `<div class="hm-empty">No sector activity to show right now. Check back shortly.</div>`;
+      return;
+    }
+    // sort: lead first, then by magnitude desc
+    const rank = { lead:0, context:1, quiet:2 };
+    const sorted = sectors.slice().sort((a,b) => {
+      const ta = rank[a.tier] ?? 1, tb = rank[b.tier] ?? 1;
+      if (ta !== tb) return ta - tb;
+      const pa = (a.magnitude && a.magnitude.pct) || a.pct || 0;
+      const pb = (b.magnitude && b.magnitude.pct) || b.pct || 0;
+      return pb - pa;
+    });
+    tilesEl.innerHTML = sorted.map(tileHTML).join("");
+  }
+
+  async function load(){
+    tilesEl.innerHTML = `<div class="hm-empty" data-hm-loading>Loading…</div>`;
+    try{
+      const res = await fetch(`${HM_API_BASE}/api/sectors`, { credentials:"omit", cache:"no-store" });
+      if (!res.ok) throw new Error("HTTP "+res.status);
+      const data = await res.json();
+      // tolerate { sectors:[...] } or a bare array
+      const sectors = Array.isArray(data) ? data : (data.sectors || data.board || []);
+      render(sectors);
+    }catch(e){
+      tilesEl.innerHTML = `<div class="hm-empty">Couldn't load the heatmap right now. Refresh to try again.</div>`;
+    }
+  }
+
+  load();
+  // refresh on the same cadence as the rest of the page (data changes intraday)
+  setInterval(load, 60000);
+})();
+</script>
 
 
 <!-- ========== (C) ODDS CARD — donut LEFT + live alert log RIGHT ========== -->

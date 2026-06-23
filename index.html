@@ -423,14 +423,7 @@
 <div class="subheader" id="subheader">
   <div class="subheader-inner">
     <div class="subheader-controls">
-      <div class="segmented segmented-ctrl" id="horizonControl" role="tablist" aria-label="Time horizon selector">
-        <button class="segmented-btn segmented-on" type="button" data-horizon="swing" role="tab" aria-selected="true">
-          Swing <span class="horizon-tinytag">multi-day</span>
-        </button>
-        <button class="segmented-btn" type="button" data-horizon="intraday" role="tab" aria-selected="false">
-          Intraday <span class="horizon-tinytag">today</span>
-        </button>
-      </div>
+
  
       <div class="segmented segmented-ctrl" id="assetControl" role="tablist" aria-label="Asset type selector">
         <button class="segmented-btn segmented-on" type="button" data-value="stocks" role="tab" aria-selected="true">Stocks</button>
@@ -457,7 +450,7 @@
       </button>
     </div>
  
-    <span class="subheader-note" id="horizonNote">Swing · chance of a big move (±5%) over the next ~3 days · direction is the sector's lean</span>
+
   </div>
 </div>
 
@@ -1349,70 +1342,7 @@
 
 <!-- ========== (C) ODDS CARD — donut LEFT + live alert log RIGHT ========== -->
 <div id="intradayView">
-<section class="odds-hero">
-  <div class="container">
-    <div class="odds-hero-card">
-      <div class="odds-hero-head">
-        <h2 class="odds-hero-title" id="oddsHeroTitle">Stock Momentum Odds</h2>
-        <span class="odds-hero-count" id="oddsHeroCount">— of — signals</span>
-      </div>
 
-      <div class="odds-hero-body">
-        <!-- LEFT: donut -->
-        <div class="odds-donut-col">
-          <div class="odds-donut-wrap">
-            <svg class="odds-donut" viewBox="0 0 200 200" aria-hidden="true">
-              <circle class="odds-donut-track" cx="100" cy="100" r="86" />
-              <circle class="odds-donut-fill" id="oddsDonutFill" cx="100" cy="100" r="86" transform="rotate(-90 100 100)" />
-            </svg>
-            <div class="odds-donut-center">
-              <div class="odds-donut-pct"><span id="oddsDonutPct">—</span><span class="odds-donut-pct-sign">%</span></div>
-              <div class="odds-donut-label">hit <strong>+3%</strong></div>
-              <div class="odds-donut-sub">at peak</div>
-              <div class="odds-donut-pathstats" id="oddsPathStats"></div>
-            </div>
-          </div>
-        </div>
-
-        <div class="odds-hero-vrule"></div>
-
-        <!-- RIGHT: the LIVE ALERT LOG (== #alertCardsSection, moved in here) -->
-        <div class="odds-hero-log">
-          <section id="alertCardsSection" style="display:none;">
-            <div class="section-head" style="margin-bottom:10px;">
-              <div class="section-head-left">
-                <h3 class="odds-log-title">Live Alert Log</h3>
-                <span class="odds-live-tag"><span class="odds-live-dot"></span>Live</span>
-              </div>
-              <div class="odds-log-head-right">
-                <a href="/alert-log.html" class="odds-log-fulllink">Full log →</a>
-                <span id="alertCardsDate"></span>
-              </div>
-            </div>
-
-            <!-- all-time proof bar -->
-            <div id="alertProofBar" style="display:none; margin-bottom:8px; padding:6px 12px; border-radius:8px; background:rgba(34,197,94,0.04); border:1px solid rgba(34,197,94,0.08); font-size:0.68rem; color:rgba(255,255,255,0.45); align-items:center; gap:6px; flex-wrap:wrap;"></div>
-
-            <!-- today's stats -->
-            <div id="alertCardsStats" class="alert-stats-row"></div>
-
-            <!-- rows -->
-            <div class="table-wrap" style="margin-top:10px;">
-              <div id="alertCardsBody"></div>
-              <div id="alertCardsEmpty" style="display:none; padding:20px; text-align:center; color:rgba(255,255,255,0.25); font-size:0.82rem;"></div>
-              <div id="alertCardsViewAll" style="display:none; padding:10px 14px; text-align:center; border-top:1px solid rgba(255,255,255,0.04);"></div>
-            </div>
-          </section>
-        </div>
-      </div>
-
-      <div class="odds-hero-foot">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-        <span>Every alert is logged publicly. <a href="/alert-log.html">Check out the log.</a></span>
-      </div>
-    </div>
-  </div>
-</section>
 
 
 
@@ -1680,6 +1610,18 @@
       </section>
 
 
+      <div id="tqqqAlways">
+        <section class="monitor-strip" id="monitorStrip">
+        <div class="container">
+          <div class="sj-monitor-wrap">
+            <div id="sjMonitorTqqq"></div>
+            <div id="sjMonitorBtc"></div>
+          </div>
+        </div>
+      </section>
+    </div><!-- /#tqqqAlways -->
+  
+
       <div id="sponsorAfterScreener"></div>
 
      <section class="momentum-river" id="momentumRiver">
@@ -1775,99 +1717,7 @@
   </div><!-- /#intradayView -->
 
 
-  <div id="swingView">
 
-    <!-- ============================================================
-         SWING VIEW — paste as the FIRST child of <div id="swingView">.
-         Carousel (left) + magnitude alert rail (right); stacks on mobile.
-         Wired to /api/sectors (real data). TQQQ is NOT here — it lives
-         in #tqqqAlways above, shown on both horizons.
-    ============================================================ -->
-    <section class="swing-feat">
-      <div class="container">
-        <div class="sec-head">
-          <div style="display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;">
-            <h2 class="sec-title volt">Where it's moving</h2>
-            <span class="sec-sub">sector by sector · chance of a big move, this month</span>
-          </div>
-          <span class="regime-tag">swing · ~3-day window</span>
-        </div>
-    
-        <div class="feat-row" id="featRow">
-          <!-- LEFT: rotating sector carousel -->
-          <div class="feat-hero" id="featHero">
-            <div class="feat-top">
-              <div class="feat-kicker">
-                <div class="feat-ico" id="featIco">◆</div>
-                <div><div class="feat-sec" id="featSec">—</div><div class="feat-state" id="featState"></div></div>
-              </div>
-              <div class="feat-nav">
-                <button class="feat-arrow" id="featPrev" type="button" aria-label="Previous sector">‹</button>
-                <span class="feat-count" id="featCount">1 / 1</span>
-                <button class="feat-arrow" id="featNext" type="button" aria-label="Next sector">›</button>
-              </div>
-            </div>
-            <div class="feat-list" id="featList"></div>
-            <div class="feat-prog"><div class="feat-prog-fill" id="featProg"></div></div>
-            <div class="feat-foot">
-              <div class="feat-dots" id="featDots"></div>
-              <span id="featTally"></span>
-            </div>
-          </div>
-    
-          <!-- RIGHT: magnitude alert rail (top names by movement) -->
-          <div class="feat-rail">
-            <div class="feat-rail-head">
-              <span class="feat-rail-title">Top movers</span>
-              <span class="live-tag"><span class="live-dot"></span>LIVE</span>
-            </div>
-            <div id="featRailBody"></div>
-            <div class="feat-rail-foot" id="featRailFoot">by how often they make a big move</div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-        <!-- ========== (D) MONITOR STRIP — TQQQ (stocks) / BTC (crypto) ========== -->
-<!-- Flips with #assetControl. Stocks → TQQQ price+%+spark. Crypto → BTC 24h.
-     Signal state ("uptrend intact") removed until the TQQQ HOLD alert ships. -->
-     <div id="tqqqAlways">
-      <section class="monitor-strip" id="monitorStrip">
-      <div class="container">
-        <div class="sj-monitor-wrap">
-          <div id="sjMonitorTqqq"></div>
-          <div id="sjMonitorBtc"></div>
-        </div>
-      </div>
-    </section>
-  </div><!-- /#tqqqAlways -->
-    
-      <!-- (2) new live swing screener — PLACEHOLDER until built next -->
-      <!-- <div id="swingScreenerMount"></div> -->
-    
-      <!-- (3) full grouped sector board -->
-      <section class="sector-board" id="sectorBoard" style="display:none;">
-        <div class="container">
-          <div class="sector-board-card">
-            <div class="sector-board-head">
-              <div class="sector-board-head-left">
-                <h2 class="sector-board-title">Sector Board</h2>
-                <span class="sector-board-sub" id="sectorBoardSub">how much each sector is moving · this month</span>
-              </div>
-              <span class="sector-board-tag" id="sectorBoardTag">
-                <span class="sector-board-tag-dot"></span>rolling ~3.5 weeks
-              </span>
-            </div>
-            <div class="sector-board-body" id="sectorBoardBody"></div>
-            <div class="sector-board-foot">
-              <span class="sector-board-foot-key"><span class="sb-key-bar"></span> bar = chance of a big move (±5% in ~3 days)</span>
-              <span class="sector-board-foot-note">Direction is the sector's weak lean, not a call on any one name.</span>
-            </div>
-          </div>
-        </div>
-      </section>
-    
-    </div><!-- /#swingView -->
 
 
 

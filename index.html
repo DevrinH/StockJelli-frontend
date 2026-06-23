@@ -874,6 +874,15 @@
 
   let asset = "stocks";
 
+  // Market-hours clock: scorecard 9:30am–4pm ET weekdays, prediction otherwise
+  function isMarketHoursET(){
+    const et = new Date(new Date().toLocaleString("en-US",{timeZone:"America/New_York"}));
+    const day = et.getDay();                 // 0=Sun 6=Sat
+    if (day === 0 || day === 6) return false;
+    const mins = et.getHours()*60 + et.getMinutes();
+    return mins >= 570 && mins < 960;        // 9:30 (570) → 16:00 (960)
+  }
+
   // info popover
   root.querySelector("[data-tw-info]").addEventListener("click", () => { popEl.hidden = !popEl.hidden; });
   root.querySelector("[data-tw-pop-close]").addEventListener("click", () => { popEl.hidden = true; });
@@ -995,16 +1004,85 @@
     cardsEl.innerHTML = names.map(n => cardHTML(n, data.leadMetric)).join("");
   }
 
+  function renderScorecard(data){
+    // header copy flips to scorecard framing
+    const dateStr = data.scoredDate || data.today || "yesterday";
+    subEl.textContent = "Yesterday's watchlist — how the flagged names are doing today.";
+    footLeft.textContent = `Flagged at ${dateStr}'s close · scoring live this session`;
+
+    // pooled: "X of Y stayed active today · Z hit +3%"
+    const p = data.pooled || {};
+    if (p.total){
+      pooledEl.hidden = false;
+      pPctEl.textContent = `${p.stayedActiveCount ?? 0}/${p.total}`;
+      pLblEl.textContent = "flagged names have stayed active today";
+      const h3 = p.hit3Count != null ? `${p.hit3Count}/${p.total} hit +3%` : "";
+      pMetaEl.textContent = h3;
+    } else {
+      pooledEl.hidden = true;
+    }
+
+    const names = data.names || [];
+    if (!names.length){
+      cardsEl.innerHTML = `<div class="tw-empty">No names were flagged at yesterday's close.</div>`;
+      return;
+    }
+    cardsEl.innerHTML = names.map(scorecardCardHTML).join("");
+  }
+
+  function scorecardCardHTML(n){
+    const sym = esc(n.symbol || "?");
+    const nm = n.name && n.name !== n.symbol ? `<div class="tw-name">${esc(n.name)}</div>` : "";
+    const badge = esc((n.symbol||"?").slice(0,4));
+
+    // headline = stayed active (big move either direction)
+    const active = !!n.stayedActive;
+    const activeTag = active
+      ? `<span class="tw-held" style="color:var(--tw-green)">Stayed active</span>`
+      : `<span class="tw-held" style="color:var(--tw-dim-2);background:rgba(255,255,255,.03);border-color:var(--tw-line)">Quiet so far</span>`;
+
+    // hero = today's move so far
+    const movePct = n.movePct != null ? Number(n.movePct) : null;
+    const moveStr = movePct != null ? `${movePct>=0?"+":""}${movePct.toFixed(1)}%` : "—";
+    const moveCls = movePct == null ? "flat" : movePct>0.05 ? "up" : movePct<-0.05 ? "down" : "flat";
+    const heroBig = `<div class="tw-stat ${moveCls==="down"?"":""}" style="color:${moveCls==="up"?"var(--tw-up)":moveCls==="down"?"var(--tw-down)":"#fff"}">${moveStr}</div>`;
+    const heroSub = `<div class="tw-stat-sub">move today (either direction)</div>`;
+
+    // secondary = did it hit +3%
+    const hit3 = n.hit3 === true;
+    const second = n.hit3 != null
+      ? `<div class="tw-second"><span class="tw-ret ${hit3?"up":"flat"}">${hit3?"✓ hit +3%":"not +3% yet"}</span></div>`
+      : "";
+
+    return `<article class="tw-card">
+      <div class="tw-card-top">
+        <div class="tw-badge">${badge}</div>
+        <div style="min-width:0"><div class="tw-sym">${sym}</div>${nm}</div>
+      </div>
+      ${heroBig}${heroSub}
+      ${activeTag}
+      ${second}
+    </article>`;
+  }
+
+
   async function load(){
     cardsEl.innerHTML = `<div class="tw-empty" data-tw-loading>Loading…</div>`;
     pooledEl.hidden = true;
+    const scorecard = isMarketHoursET();
+    const url = scorecard
+      ? `${TW_API_BASE}/api/watchlist-scorecard?asset=${encodeURIComponent(asset)}`
+      : `${TW_API_BASE}/api/tomorrow-watchlist?asset=${encodeURIComponent(asset)}`;
     try{
-      const res = await fetch(`${TW_API_BASE}/api/tomorrow-watchlist?asset=${encodeURIComponent(asset)}`, { credentials:"omit" });
+      const res = await fetch(url, { credentials:"omit" });
       if (!res.ok) throw new Error("HTTP "+res.status);
       const data = await res.json();
-      render(data);
+      if (scorecard) renderScorecard(data);
+      else render(data);
     }catch(e){
-      cardsEl.innerHTML = `<div class="tw-empty">Couldn't load the watchlist right now. Refresh to try again.</div>`;
+      cardsEl.innerHTML = scorecard
+        ? `<div class="tw-empty">Yesterday's watchlist results aren't in yet. Check back shortly.</div>`
+        : `<div class="tw-empty">Couldn't load the watchlist right now. Refresh to try again.</div>`;
     }
   }
 

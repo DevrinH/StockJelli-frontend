@@ -162,7 +162,7 @@
     </div>
 
 <!-- ── Watchlist Scorecard: today's live + full history ── -->
-<div class="wl-board" id="wlBoard">
+<div class="wl-board" id="wlBoard" style="display:none;">
   <div class="tr-board-head">
     <span class="tr-board-title">🎯 Watchlist Scorecard</span>
     <span class="tr-live"><span class="tr-live-dot"></span>live</span>
@@ -200,6 +200,10 @@
 
     <!-- Toggles row -->
     <div class="log-toggles">
+      <div class="segmented segmented-small" id="viewToggle" role="tablist">
+        <button class="segmented-btn segmented-on" type="button" data-view="alerts" role="tab">Alerts</button>
+        <button class="segmented-btn" type="button" data-view="watchlist" role="tab">Watchlist</button>
+      </div>
       <div class="segmented segmented-small" id="logToggle" role="tablist">
         <button class="segmented-btn segmented-on" type="button" data-value="all" role="tab">All</button>
         <button class="segmented-btn" type="button" data-value="stocks" role="tab">Stocks</button>
@@ -238,6 +242,37 @@
     let logMode = "all";        // all | stocks | crypto
     let logVersion = "current"; // current | earlier
 
+   // ── View toggle: Alerts ⟷ Watchlist ──
+let currentView = "alerts";
+const alertEls = () => [
+  document.getElementById("trBoard"),
+  document.getElementById("logStats"),
+  document.querySelector(".log-table-wrap"),
+  document.getElementById("versionToggle"),
+].filter(Boolean);
+const wlEl = () => document.getElementById("wlBoard");
+
+function setView(view){
+  currentView = view;
+  const showWatchlist = view === "watchlist";
+  alertEls().forEach(el => el.style.display = showWatchlist ? "none" : "");
+  if (wlEl()) wlEl().style.display = showWatchlist ? "" : "none";
+  // "All" doesn't apply to watchlist — nudge to stocks if it's selected
+  if (showWatchlist && logMode === "all"){
+    logMode = "stocks";
+    document.querySelectorAll("#logToggle .segmented-btn").forEach(b => b.classList.toggle("segmented-on", b.dataset.value === "stocks"));
+  }
+  if (showWatchlist) loadWatchlist(logMode);
+}
+
+document.getElementById("viewToggle")?.addEventListener("click", e => {
+  const btn = e.target.closest(".segmented-btn");
+  if (!btn) return;
+  document.querySelectorAll("#viewToggle .segmented-btn").forEach(b => b.classList.toggle("segmented-on", b === btn));
+  setView(btn.dataset.view);
+});
+   
+   
     async function fetchLog() {
       try {
         const res = await fetch(`${API_BASE}/api/notification-log?limit=500`);
@@ -421,6 +456,7 @@
       logMode = btn.dataset.value;
       document.querySelectorAll("#logToggle .segmented-btn").forEach(b => b.classList.toggle("segmented-on", b.dataset.value === logMode));
       renderLog();
+      if (currentView === "watchlist") loadWatchlist(logMode);
     });
 
     // ── Version toggle (Current vs Earlier formula) — affects the row list only,
@@ -493,8 +529,12 @@
     } catch(e){ document.getElementById("wlHistory").innerHTML = `<div class="tr-col-thin">Couldn't load history.</div>`; }
   }
 
-  loadToday();
-  loadHistory();
+  window.loadWatchlist = function(asset){
+    const a = asset === "crypto" ? "crypto" : "stocks";
+    loadToday(a);
+    loadHistory(a);
+  };
+  // don't auto-load on page load — only when Watchlist view is opened
 })();
 
     fetchLog();

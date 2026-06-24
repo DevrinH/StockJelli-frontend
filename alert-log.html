@@ -110,6 +110,25 @@
     .log-loading { padding: 40px; text-align: center; color: rgba(255,255,255,0.3); font-size: 0.82rem; }
     .log-disclaimer { margin-top: 16px; font-size: 0.62rem; color: rgba(255,255,255,0.1); text-align: center; }
 
+    /* ── Watchlist scorecard board ── */
+    .wl-board { background: rgba(18,24,38,0.88); border: 1px solid rgba(255,255,255,0.06); border-radius: 14px; padding: 16px 18px; margin-bottom: 18px; }
+    .wl-day { border: 1px solid rgba(255,255,255,0.05); border-radius: 10px; margin-bottom: 10px; overflow: hidden; }
+    .wl-day-head { display: flex; align-items: center; gap: 8px; padding: 9px 12px; background: rgba(0,0,0,0.18); flex-wrap: wrap; }
+    .wl-day-date { font-size: 0.78rem; font-weight: 700; color: #e6edf3; }
+    .wl-day-arrow { color: rgba(255,255,255,0.3); font-size: 0.7rem; }
+    .wl-day-pooled { margin-left: auto; font-size: 0.68rem; color: rgba(255,255,255,0.4); font-variant-numeric: tabular-nums; }
+    .wl-day-pooled b { color: #4ade80; }
+    .wl-names { padding: 4px 0; }
+    .wl-name { display: grid; grid-template-columns: 1fr 70px 90px 24px; align-items: center; gap: 6px; padding: 6px 12px; font-size: 0.76rem; }
+    .wl-name + .wl-name { border-top: 1px solid rgba(255,255,255,0.03); }
+    .wl-name-sym { font-weight: 700; color: #e6edf3; }
+    .wl-name-sec { font-size: 0.62rem; color: rgba(255,255,255,0.25); margin-left: 5px; font-weight: 400; }
+    .wl-name-move { font-variant-numeric: tabular-nums; font-weight: 700; text-align: right; }
+    .wl-name-tag { font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.03em; text-align: right; }
+    .wl-name-res { text-align: center; font-size: 0.82rem; }
+    .wl-today-card { border: 1px solid rgba(96,165,250,0.18); background: rgba(96,165,250,0.03); border-radius: 10px; margin-bottom: 14px; overflow: hidden; }
+    .wl-history-head { font-size: 0.66rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: rgba(255,255,255,0.3); margin: 16px 0 10px; }
+
     @media (max-width: 640px) {
       .log-page { padding: 14px; }
       .log-page-title { font-size: 1rem; }
@@ -122,6 +141,8 @@
       .log-row-prices { display: none; }
       .log-row-odds { display: none; }
       .log-row-header span:nth-child(5) { display: none; }
+      .wl-name { grid-template-columns: 1fr 58px 24px; }
+      .wl-name-tag { display: none; }
     }
   </style>
 </head>
@@ -148,7 +169,7 @@
       </div>
     </div>
 
-    <!-- Track-record odds board -->
+    <!-- Track-record odds board (Alerts view only) -->
     <div class="tr-board" id="trBoard">
       <div class="tr-board-head">
         <span class="tr-board-title">📊 Track record</span>
@@ -160,43 +181,6 @@
         <div class="tr-col"><div class="tr-col-thin">Loading…</div></div>
       </div>
     </div>
-
-<!-- ── Watchlist Scorecard: today's live + full history ── -->
-<div class="wl-board" id="wlBoard" style="display:none;">
-  <div class="tr-board-head">
-    <span class="tr-board-title">🎯 Watchlist Scorecard</span>
-    <span class="tr-live"><span class="tr-live-dot"></span>live</span>
-  </div>
-  <p class="tr-board-sub">Each session we flag names that ran and held into the close. Here's how those picks did the next session — "stayed active" means a big move either direction; "+3%" is an upside hit.</p>
-  <div id="wlToday"><div class="tr-col-thin">Loading today's scorecard…</div></div>
-  <div class="wl-history-head">Past sessions</div>
-  <div id="wlHistory"><div class="tr-col-thin">Loading history…</div></div>
-</div>
-
-<style>
-  .wl-board { background: rgba(18,24,38,0.88); border: 1px solid rgba(255,255,255,0.06); border-radius: 14px; padding: 16px 18px; margin-bottom: 18px; }
-  .wl-day { border: 1px solid rgba(255,255,255,0.05); border-radius: 10px; margin-bottom: 10px; overflow: hidden; }
-  .wl-day-head { display: flex; align-items: center; gap: 8px; padding: 9px 12px; background: rgba(0,0,0,0.18); flex-wrap: wrap; }
-  .wl-day-date { font-size: 0.78rem; font-weight: 700; color: #e6edf3; }
-  .wl-day-arrow { color: rgba(255,255,255,0.3); font-size: 0.7rem; }
-  .wl-day-pooled { margin-left: auto; font-size: 0.68rem; color: rgba(255,255,255,0.4); font-variant-numeric: tabular-nums; }
-  .wl-day-pooled b { color: #4ade80; }
-  .wl-names { padding: 4px 0; }
-  .wl-name { display: grid; grid-template-columns: 1fr 70px 90px 24px; align-items: center; gap: 6px; padding: 6px 12px; font-size: 0.76rem; }
-  .wl-name + .wl-name { border-top: 1px solid rgba(255,255,255,0.03); }
-  .wl-name-sym { font-weight: 700; color: #e6edf3; }
-  .wl-name-sec { font-size: 0.62rem; color: rgba(255,255,255,0.25); margin-left: 5px; font-weight: 400; }
-  .wl-name-move { font-variant-numeric: tabular-nums; font-weight: 700; text-align: right; }
-  .wl-name-tag { font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.03em; text-align: right; }
-  .wl-name-res { text-align: center; font-size: 0.82rem; }
-  .wl-today-card { border: 1px solid rgba(96,165,250,0.18); background: rgba(96,165,250,0.03); border-radius: 10px; margin-bottom: 14px; overflow: hidden; }
-  .wl-history-head { font-size: 0.66rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: rgba(255,255,255,0.3); margin: 16px 0 10px; }
-  @media (max-width: 640px) {
-    .wl-name { grid-template-columns: 1fr 58px 24px; }
-    .wl-name-tag { display: none; }
-  }
-</style>
-
 
     <!-- Toggles row -->
     <div class="log-toggles">
@@ -215,15 +199,28 @@
       </div>
     </div>
 
+    <!-- ===== ALERTS VIEW ===== -->
     <!-- Overall stats -->
     <div class="log-overall-stats" id="logStats"></div>
 
     <!-- Log table -->
-    <div class="log-table-wrap">
+    <div class="log-table-wrap" id="logTableWrap">
       <div class="log-row-header">
         <span>DATE</span><span>TICKER</span><span>ALERT → PEAK</span><span>MAX GAIN</span><span>ODDS AT SIGNAL</span><span>RESULT</span>
       </div>
       <div id="logBody"><div class="log-loading">Loading alert history...</div></div>
+    </div>
+
+    <!-- ===== WATCHLIST VIEW (below toggles, same slot as alerts) ===== -->
+    <div class="wl-board" id="wlBoard" style="display:none;">
+      <div class="tr-board-head">
+        <span class="tr-board-title">🎯 Watchlist Scorecard</span>
+        <span class="tr-live"><span class="tr-live-dot"></span>live</span>
+      </div>
+      <p class="tr-board-sub">Each session we flag names that ran and held into the close. Here's how those picks did the next session — "stayed active" means a big move either direction; "+3%" is an upside hit.</p>
+      <div id="wlToday"><div class="tr-col-thin">Loading today's scorecard…</div></div>
+      <div class="wl-history-head">Past sessions</div>
+      <div id="wlHistory"><div class="tr-col-thin">Loading history…</div></div>
     </div>
 
     <p class="log-disclaimer">Educational tool only. Not financial advice. Past performance does not guarantee future results. "Odds at signal" is the historical frequency of similar past alerts, recorded when each alert fired — not a prediction.</p>
@@ -241,38 +238,48 @@
     let logData = null;
     let logMode = "all";        // all | stocks | crypto
     let logVersion = "current"; // current | earlier
+    let currentView = "alerts"; // alerts | watchlist
 
-   // ── View toggle: Alerts ⟷ Watchlist ──
-let currentView = "alerts";
-const alertEls = () => [
-  document.getElementById("trBoard"),
-  document.getElementById("logStats"),
-  document.querySelector(".log-table-wrap"),
-  document.getElementById("versionToggle"),
-].filter(Boolean);
-const wlEl = () => document.getElementById("wlBoard");
+    // ── View toggle: Alerts ⟷ Watchlist ──
+    // Alerts view owns: trBoard, logStats, logTableWrap, the All button, versionToggle.
+    // Watchlist view owns: wlBoard. The Stocks/Crypto buttons stay live in both.
+    function alertEls() {
+      return [
+        document.getElementById("trBoard"),
+        document.getElementById("logStats"),
+        document.getElementById("logTableWrap"),
+        document.getElementById("versionToggle"),
+      ].filter(Boolean);
+    }
 
-function setView(view){
-  currentView = view;
-  const showWatchlist = view === "watchlist";
-  alertEls().forEach(el => el.style.display = showWatchlist ? "none" : "");
-  if (wlEl()) wlEl().style.display = showWatchlist ? "" : "none";
-  // "All" doesn't apply to watchlist — nudge to stocks if it's selected
-  if (showWatchlist && logMode === "all"){
-    logMode = "stocks";
-    document.querySelectorAll("#logToggle .segmented-btn").forEach(b => b.classList.toggle("segmented-on", b.dataset.value === "stocks"));
-  }
-  if (showWatchlist) loadWatchlist(logMode);
-}
+    function setView(view) {
+      currentView = view;
+      const showWatchlist = view === "watchlist";
 
-document.getElementById("viewToggle")?.addEventListener("click", e => {
-  const btn = e.target.closest(".segmented-btn");
-  if (!btn) return;
-  document.querySelectorAll("#viewToggle .segmented-btn").forEach(b => b.classList.toggle("segmented-on", b === btn));
-  setView(btn.dataset.view);
-});
-   
-   
+      alertEls().forEach(el => { el.style.display = showWatchlist ? "none" : ""; });
+      const wl = document.getElementById("wlBoard");
+      if (wl) wl.style.display = showWatchlist ? "" : "none";
+
+      // "All" isn't meaningful for the watchlist — hide it and force stocks if it was selected.
+      const allBtn = document.querySelector('#logToggle .segmented-btn[data-value="all"]');
+      if (allBtn) allBtn.style.display = showWatchlist ? "none" : "";
+      if (showWatchlist && logMode === "all") {
+        logMode = "stocks";
+        document.querySelectorAll("#logToggle .segmented-btn")
+          .forEach(b => b.classList.toggle("segmented-on", b.dataset.value === "stocks"));
+      }
+
+      if (showWatchlist) loadWatchlist(logMode);
+    }
+
+    document.getElementById("viewToggle")?.addEventListener("click", e => {
+      const btn = e.target.closest(".segmented-btn");
+      if (!btn) return;
+      document.querySelectorAll("#viewToggle .segmented-btn")
+        .forEach(b => b.classList.toggle("segmented-on", b === btn));
+      setView(btn.dataset.view);
+    });
+
     async function fetchLog() {
       try {
         const res = await fetch(`${API_BASE}/api/notification-log?limit=500`);
@@ -319,7 +326,6 @@ document.getElementById("viewToggle")?.addEventListener("click", e => {
             <div class="tr-col-thin">Collecting data — ${L.n} resolved so far.</div>
           </div>`;
         }
-        // n-ladder: 10–29 counts only (no % leading); 30+ show percentages
         const showPct = L.n >= 30;
         const rung = (lbl, p, c) => `<div class="tr-rung">
             <span class="tr-rung-lbl">hit ${lbl}</span>
@@ -350,10 +356,9 @@ document.getElementById("viewToggle")?.addEventListener("click", e => {
       return { total: alerts.length, wp: wp.length, w3, duds, nr, avg, wr };
     }
 
-    // ── Main render ──
+    // ── Main render (alerts table) ──
     function renderLog() {
       if (!logData) return;
-      // Version filter: current formula vs earlier formulas
       let alerts = (logData.notifications || []).filter(a => logVersion === "current" ? isCurrent(a) : !isCurrent(a));
 
       if (logMode === "stocks") alerts = alerts.filter(a => a.mode === "stocks");
@@ -382,7 +387,6 @@ document.getElementById("viewToggle")?.addEventListener("click", e => {
         return;
       }
 
-      // newest first
       const sorted = alerts.slice().sort((a, b) => {
         const ta = a.pushTimestamp ? new Date(a.pushTimestamp).getTime() : 0;
         const tb = b.pushTimestamp ? new Date(b.pushTimestamp).getTime() : 0;
@@ -402,8 +406,6 @@ document.getElementById("viewToggle")?.addEventListener("click", e => {
         const priceAtPush = a.priceAtPush != null ? `$${a.priceAtPush.toFixed(2)}` : "$—";
         const peakPriceStr = a.peakAfterPushPrice ? `$${a.peakAfterPushPrice.toFixed(2)}` : peakStr;
         const tvUrl = a.mode === "crypto" ? `https://www.tradingview.com/chart/?symbol=BINANCE:${a.symbol}USDT&aff_id=162729` : `https://www.tradingview.com/chart/?symbol=${a.symbol}&aff_id=162729`;
-
-        // Odds at signal — the stamped oddsAtSignal (Option A). Falls back for pre-stamp alerts.
         const oddsCell = renderOddsCell(a);
 
         return `<div class="log-row">
@@ -417,9 +419,6 @@ document.getElementById("viewToggle")?.addEventListener("click", e => {
       }).join("");
     }
 
-    // Render the "odds at signal" cell from the stamped oddsAtSignal field.
-    // Prefers the strength-conditioned number if its band cleared the n-ladder,
-    // else the mode-level overall, else "—" (pre-stamp alerts).
     function renderOddsCell(a) {
       const o = a.oddsAtSignal;
       if (!o) return `<span class="log-row-odds log-row-odds-empty">—</span>`;
@@ -435,7 +434,6 @@ document.getElementById("viewToggle")?.addEventListener("click", e => {
         pick = over;
         bandLabel = "all";
       } else if (over && over.n >= 10 && over.hit3 != null) {
-        // 10–29: counts only
         return `<span class="log-row-odds"><span style="color:#cbd5e1">${over.hit3}/${over.n}</span> hit +3%<br><span class="log-row-odds-band">all</span></span>`;
       } else {
         return `<span class="log-row-odds log-row-odds-empty">—</span>`;
@@ -449,93 +447,98 @@ document.getElementById("viewToggle")?.addEventListener("click", e => {
       </span>`;
     }
 
-    // ── Asset toggle ──
+    // ── Asset toggle (Stocks/Crypto/All) — drives whichever view is active ──
     document.getElementById("logToggle")?.addEventListener("click", e => {
       const btn = e.target.closest(".segmented-btn");
       if (!btn) return;
+      // ignore clicks on a hidden button (All while in watchlist view)
+      if (btn.style.display === "none") return;
       logMode = btn.dataset.value;
-      document.querySelectorAll("#logToggle .segmented-btn").forEach(b => b.classList.toggle("segmented-on", b.dataset.value === logMode));
-      renderLog();
+      document.querySelectorAll("#logToggle .segmented-btn")
+        .forEach(b => b.classList.toggle("segmented-on", b.dataset.value === logMode));
       if (currentView === "watchlist") loadWatchlist(logMode);
+      else renderLog();
     });
 
-    // ── Version toggle (Current vs Earlier formula) — affects the row list only,
-    //    NOT the track-record board above (board stays current-formula always). ──
+    // ── Version toggle (Current vs Earlier formula) — alerts list only ──
     document.getElementById("versionToggle")?.addEventListener("click", e => {
       const btn = e.target.closest(".segmented-btn");
       if (!btn) return;
       logVersion = btn.dataset.value;
-      document.querySelectorAll("#versionToggle .segmented-btn").forEach(b => b.classList.toggle("segmented-on", b.dataset.value === logVersion));
+      document.querySelectorAll("#versionToggle .segmented-btn")
+        .forEach(b => b.classList.toggle("segmented-on", b.dataset.value === logVersion));
       renderLog();
     });
 
-    (function(){
-  const WL_API = "https://api.stockjelli.com";
+    // ── Watchlist scorecard (today's live + full history) ──
+    (function () {
+      const WL_API = "https://api.stockjelli.com";
 
-  function fmtDate(d){ try { return new Date(d+"T12:00:00Z").toLocaleDateString("en-US",{month:"short",day:"numeric"}); } catch { return d; } }
+      function fmtDate(d) { try { return new Date(d + "T12:00:00Z").toLocaleDateString("en-US", { month: "short", day: "numeric" }); } catch { return d; } }
 
-  function nameRow(n){
-    const mv = n.movePct != null ? Number(n.movePct) : null;
-    const moveStr = mv != null ? `${mv>=0?"+":""}${mv.toFixed(1)}%` : "—";
-    const moveColor = mv == null ? "rgba(255,255,255,0.3)" : mv > 0 ? "#4ade80" : mv < 0 ? "#f87171" : "rgba(255,255,255,0.4)";
-    const active = !!n.stayedActive;
-    const tag = active
-      ? `<span class="wl-name-tag" style="color:#4ade80">stayed active</span>`
-      : `<span class="wl-name-tag" style="color:rgba(255,255,255,0.3)">quiet</span>`;
-    const res = !n.resolved ? "⏳" : active ? "✅" : "·";
-    const sec = n.sector ? `<span class="wl-name-sec">${n.sector}</span>` : "";
-    return `<div class="wl-name">
-      <span class="wl-name-sym">${n.symbol}${sec}</span>
-      <span class="wl-name-move" style="color:${moveColor}">${moveStr}</span>
-      ${tag}
-      <span class="wl-name-res">${res}</span>
-    </div>`;
-  }
+      function nameRow(n) {
+        const mv = n.movePct != null ? Number(n.movePct) : null;
+        const moveStr = mv != null ? `${mv >= 0 ? "+" : ""}${mv.toFixed(1)}%` : "—";
+        const moveColor = mv == null ? "rgba(255,255,255,0.3)" : mv > 0 ? "#4ade80" : mv < 0 ? "#f87171" : "rgba(255,255,255,0.4)";
+        const active = !!n.stayedActive;
+        const tag = active
+          ? `<span class="wl-name-tag" style="color:#4ade80">stayed active</span>`
+          : `<span class="wl-name-tag" style="color:rgba(255,255,255,0.3)">quiet</span>`;
+        const res = !n.resolved ? "⏳" : active ? "✅" : "·";
+        const sec = n.sector ? `<span class="wl-name-sec">${n.sector}</span>` : "";
+        return `<div class="wl-name">
+          <span class="wl-name-sym">${n.symbol}${sec}</span>
+          <span class="wl-name-move" style="color:${moveColor}">${moveStr}</span>
+          ${tag}
+          <span class="wl-name-res">${res}</span>
+        </div>`;
+      }
 
-  function dayBlock(day, isToday){
-    const p = day.pooled || {};
-    const pooled = p.total
-      ? `<b>${p.stayedActiveCount}/${p.total}</b> stayed active · ${p.hit3Count}/${p.total} hit +3%`
-      : "no picks";
-    const label = isToday
-      ? `<span class="wl-day-date">${fmtDate(day.scoredDate)}'s picks</span><span class="wl-day-arrow">→ today, live</span>`
-      : `<span class="wl-day-date">${fmtDate(day.scoredDate)}</span><span class="wl-day-arrow">→ ${fmtDate(day.resolvedDate)}</span>`;
-    return `<div class="${isToday ? 'wl-today-card' : 'wl-day'}">
-      <div class="wl-day-head">${label}<span class="wl-day-pooled">${pooled}</span></div>
-      <div class="wl-names">${(day.names||[]).map(nameRow).join("") || '<div class="tr-col-thin">No names flagged.</div>'}</div>
-    </div>`;
-  }
+      function dayBlock(day, isToday) {
+        const p = day.pooled || {};
+        const pooled = p.total
+          ? `<b>${p.stayedActiveCount}/${p.total}</b> stayed active · ${p.hit3Count}/${p.total} hit +3%`
+          : "no picks";
+        const label = isToday
+          ? `<span class="wl-day-date">${fmtDate(day.scoredDate)}'s picks</span><span class="wl-day-arrow">→ today, live</span>`
+          : `<span class="wl-day-date">${fmtDate(day.scoredDate)}</span><span class="wl-day-arrow">→ ${fmtDate(day.resolvedDate)}</span>`;
+        return `<div class="${isToday ? 'wl-today-card' : 'wl-day'}">
+          <div class="wl-day-head">${label}<span class="wl-day-pooled">${pooled}</span></div>
+          <div class="wl-names">${(day.names || []).map(nameRow).join("") || '<div class="tr-col-thin">No names flagged.</div>'}</div>
+        </div>`;
+      }
 
-  async function loadToday(){
-    try {
-      const r = await fetch(`${WL_API}/api/watchlist-scorecard?asset=stocks`);
-      const d = await r.json();
-      const el = document.getElementById("wlToday");
-      if (!d.names || !d.names.length){ el.innerHTML = `<div class="tr-col-thin">No names flagged at the last close.</div>`; return; }
-      // shape today's scorecard into the same dayBlock format
-      el.innerHTML = dayBlock({ scoredDate: d.scoredDate, resolvedDate: d.today, pooled: d.pooled, names: d.names }, true);
-    } catch(e){ document.getElementById("wlToday").innerHTML = `<div class="tr-col-thin">Couldn't load today's scorecard.</div>`; }
-  }
+      async function loadToday(asset) {
+        const a = asset === "crypto" ? "crypto" : "stocks";
+        const el = document.getElementById("wlToday");
+        try {
+          const r = await fetch(`${WL_API}/api/watchlist-scorecard?asset=${a}`);
+          const d = await r.json();
+          if (!d.names || !d.names.length) { el.innerHTML = `<div class="tr-col-thin">No names flagged at the last close.</div>`; return; }
+          el.innerHTML = dayBlock({ scoredDate: d.scoredDate, resolvedDate: d.today, pooled: d.pooled, names: d.names }, true);
+        } catch (e) { el.innerHTML = `<div class="tr-col-thin">Couldn't load today's scorecard.</div>`; }
+      }
 
-  async function loadHistory(){
-    try {
-      const r = await fetch(`${WL_API}/api/watchlist-history?asset=stocks`);
-      const d = await r.json();
-      const el = document.getElementById("wlHistory");
-      // skip the most recent day if it's the same as today's live scoredDate (avoid dup)
-      const days = (d.days||[]);
-      if (!days.length){ el.innerHTML = `<div class="tr-col-thin">No resolved history yet.</div>`; return; }
-      el.innerHTML = days.map(day => dayBlock(day, false)).join("");
-    } catch(e){ document.getElementById("wlHistory").innerHTML = `<div class="tr-col-thin">Couldn't load history.</div>`; }
-  }
+      async function loadHistory(asset) {
+        const a = asset === "crypto" ? "crypto" : "stocks";
+        const el = document.getElementById("wlHistory");
+        try {
+          const r = await fetch(`${WL_API}/api/watchlist-history?asset=${a}`);
+          const d = await r.json();
+          const days = (d.days || []);
+          if (!days.length) { el.innerHTML = `<div class="tr-col-thin">No resolved history yet.</div>`; return; }
+          el.innerHTML = days.map(day => dayBlock(day, false)).join("");
+        } catch (e) { el.innerHTML = `<div class="tr-col-thin">Couldn't load history.</div>`; }
+      }
 
-  window.loadWatchlist = function(asset){
-    const a = asset === "crypto" ? "crypto" : "stocks";
-    loadToday(a);
-    loadHistory(a);
-  };
-  // don't auto-load on page load — only when Watchlist view is opened
-})();
+      window.loadWatchlist = function (asset) {
+        document.getElementById("wlToday").innerHTML = `<div class="tr-col-thin">Loading today's scorecard…</div>`;
+        document.getElementById("wlHistory").innerHTML = `<div class="tr-col-thin">Loading history…</div>`;
+        loadToday(asset);
+        loadHistory(asset);
+      };
+      // don't auto-load — only when Watchlist view is opened
+    })();
 
     fetchLog();
   </script>

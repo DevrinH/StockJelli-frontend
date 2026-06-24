@@ -5349,8 +5349,9 @@ tr.sj-alerted:hover {
 @media (max-width: 900px)  { .header-inner-v3 { width: 92%; } }
 @media (min-width: 1401px) { .header-inner-v3 { width: calc((100vw - 440px) * 0.82); max-width: 1400px; } }
 
-.header-inner-v3 .header-left { display: flex; align-items: center; gap: 18px; flex: 1 1 auto; min-width: 0; }
-.header-inner-v3 .header-right { display: flex; align-items: center; gap: 12px; flex: 0 0 auto; }
+.header-inner-v3 .header-left { display: flex; align-items: center; gap: 18px; flex: 1 1 0; min-width: 0; }
+.header-inner-v3 .header-right { display: flex; align-items: center; justify-content: flex-end; gap: 12px; flex: 1 1 0; min-width: 0; }
+.header-inner-v3 .header-indices { flex: 0 0 auto; justify-content: center; white-space: nowrap; }
 
 /* compact header search */
 .header-search { position: relative; width: 220px; max-width: 100%; }

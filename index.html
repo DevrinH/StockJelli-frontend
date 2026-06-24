@@ -396,18 +396,23 @@
       </div>
     </div>
  
+    <!-- indices now a middle zone, direct child of header-inner-v3 -->
+    <div class="header-indices market-indices">
+      <span id="idxLeft" class="idx">
+        <span id="idxLeftLabel">NASDAQ</span>
+        <span id="idxLeftValue" class="idx-value up">+1.24%</span>
+      </span>
+      <span class="divider">|</span>
+      <span id="idxRight" class="idx">
+        <span id="idxRightLabel">S&P 500</span>
+        <span id="idxRightValue" class="idx-value down">-0.31%</span>
+      </span>
+    </div>
+
     <div class="header-right">
-      <div class="header-indices market-indices">
-        <span id="idxLeft" class="idx">
-          <span id="idxLeftLabel">NASDAQ</span>
-          <span id="idxLeftValue" class="idx-value up">+1.24%</span>
-        </span>
-        <span class="divider">|</span>
-        <span id="idxRight" class="idx">
-          <span id="idxRightLabel">S&P 500</span>
-          <span id="idxRightValue" class="idx-value down">-0.31%</span>
-        </span>
-      </div>
+      <button class="header-login-btn" id="headerLoginBtn" type="button">Log in</button>
+      <button class="menu-btn" id="menuBtn" ...>...</button>
+    </div>
  
 
  
@@ -1083,7 +1088,7 @@ const mv = n.movePct != null ? Number(n.movePct) : null;
     const mvCls = mv == null ? "flat" : mv > 0 ? "up" : "down";
     const second = mv != null
       ? `<div class="tw-second"><span class="tw-ret ${hit3 ? mvCls : "flat"}">${hit3 ? `✓ moved ${mv>=0?"+":""}${mv.toFixed(1)}%` : "under 3% so far"}</span></div>`
-      : "";
+      : `<div class="tw-second"><span class="tw-ret flat">awaiting today's move</span></div>`;
 
       return `<article class="tw-card">
       <div class="tw-card-top">

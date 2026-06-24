@@ -1034,6 +1034,7 @@
       return;
     }
     cardsEl.innerHTML = names.map(scorecardCardHTML).join("");
+    if (window.LivePrices) window.LivePrices.refresh();
   }
 
   function scorecardCardHTML(n){
@@ -1064,12 +1065,17 @@
     const heroBig = `<div class="tw-stat ${moveCls==="down"?"":""}" style="color:${moveCls==="up"?"var(--tw-up)":moveCls==="down"?"var(--tw-down)":"#fff"}">${moveStr}</div>`;
     const heroSub = `<div class="tw-stat-sub">move today (either direction)</div>`;
 
-    const priceStr = n.price != null ? `$${Number(n.price).toFixed(2)}` : "";
-    const pcls = n.priceChangePct == null ? "flat" : n.priceChangePct>0 ? "up" : n.priceChangePct<0 ? "down" : "flat";
-    const pctStr = n.priceChangePct != null ? `${n.priceChangePct>=0?"+":""}${n.priceChangePct.toFixed(2)}%` : "";
-    const priceLine = priceStr
-      ? `<div class="tw-second" style="margin-top:8px"><span class="tw-ret ${pcls}" style="font-size:15px">${priceStr}</span>${pctStr?`<span class="tw-ret ${pcls}" style="font-size:11px">${pctStr}</span>`:""}</div>`
-      : "";
+// Live price: seed with the scorecard's baked value, then the flash layer
+    // (live-price-flash) takes over via data-sym — ticks + flashes on change.
+    const seedPrice = n.price != null
+      ? "$" + Number(n.price).toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2})
+      : "—";
+    const seedPctStr = n.priceChangePct != null ? `${n.priceChangePct>=0?"+":""}${n.priceChangePct.toFixed(2)}%` : "";
+    const seedCls = n.priceChangePct == null ? "live-flat" : n.priceChangePct>0 ? "live-up" : n.priceChangePct<0 ? "live-down" : "live-flat";
+    const priceLine = `<div class="tw-second" style="margin-top:8px">
+        <span class="live-price ${seedCls}" data-sym="${sym}" style="font-size:15px">${seedPrice}</span>
+        <span class="live-pct ${seedCls}" data-sym="${sym}" style="font-size:11px">${seedPctStr}</span>
+      </div>`;
 
 // secondary = did it move 3%+ in EITHER direction (the ±3% milestone)
 const mv = n.movePct != null ? Number(n.movePct) : null;
@@ -2929,6 +2935,170 @@ setInterval(() => {
   </div>
 </div>
 
+
+<!--
+  LIVE PRICE FLASH LAYER  —  drop-in for the homepage
+  ────────────────────────────────────────────────────────────────
+  Robinhood-style: every price element flashes green/red the instant
+  its value changes, and the number animates to the new value.
+
+  HOW IT BINDS (markup-agnostic)
+    Tag each price element you want live with:
+        <span class="live-price" data-sym="MU">$1,123.40</span>
+    Optionally a percent element:
+        <span class="live-pct" data-sym="MU">+3.3%</span>
+    The layer finds every [data-sym], polls /api/live-prices for those
+    symbols, and on change: updates text + flashes the element.
+
+  WHY THIS DESIGN
+    It doesn't care how your cards are built. Render the card however you
+    like with a price placeholder carrying data-sym; this layer drives it.
+    One layer handles every live price on the page (watchlist, etc).
+
+  POLLING
+    Polls /api/live-prices?symbols=... every POLL_MS (15s). Reads OUR cache
+    (server already throttles Tiingo), so this is cheap regardless of users.
+
+  PASTE
+    Put the <style> in your homepage <head> (or an existing <style>),
+    and the <script> near the bottom of <body>. Then make your scorecard
+    cards render the price as: <span class="live-price" data-sym="${sym}">…</span>
+-->
+
+<style>
+  /* base look — tune to match your card type scale */
+  .live-price { font-variant-numeric: tabular-nums; transition: color 0.2s ease; border-radius: 4px; padding: 0 2px; }
+  .live-pct   { font-variant-numeric: tabular-nums; transition: color 0.2s ease; }
+
+  /* directional color (steady state, based on % vs prev close) */
+  .live-up    { color: #4ade80; }
+  .live-down  { color: #f87171; }
+  .live-flat  { color: rgba(255,255,255,0.6); }
+
+  /* the FLASH — a brief background pulse the moment the value changes */
+  @keyframes flashUp   { 0% { background: rgba(74,222,128,0.35); } 100% { background: rgba(74,222,128,0); } }
+  @keyframes flashDown { 0% { background: rgba(248,113,113,0.35); } 100% { background: rgba(248,113,113,0); } }
+  .flash-up   { animation: flashUp   0.6s ease-out; }
+  .flash-down { animation: flashDown 0.6s ease-out; }
+
+  /* a tiny "last updated" heartbeat you can place anywhere */
+  .live-heartbeat { font-size: 0.66rem; color: rgba(255,255,255,0.3); display: inline-flex; align-items: center; gap: 5px; }
+  .live-heartbeat .dot { width: 6px; height: 6px; border-radius: 50%; background: #22c55e; }
+  .live-heartbeat.pulsing .dot { animation: hbPulse 1s ease-out; }
+  @keyframes hbPulse { 0% { transform: scale(1.8); opacity: 0.4; } 100% { transform: scale(1); opacity: 1; } }
+</style>
+
+<script>
+(function () {
+  const LP_API = "https://api.stockjelli.com";
+  const POLL_MS = 15000;
+
+  // remember the last price we displayed per symbol, so we can diff & flash
+  const lastShown = new Map();   // SYM -> number
+
+  function fmtPrice(p) {
+    if (p == null) return "—";
+    // commas + 2dp; handles MU-at-$1,123 nicely
+    return "$" + Number(p).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
+  function fmtPct(p) {
+    if (p == null) return "";
+    return (p >= 0 ? "+" : "") + Number(p).toFixed(2) + "%";
+  }
+
+  // which symbols are on the page right now?
+  function pageSymbols() {
+    const set = new Set();
+    document.querySelectorAll("[data-sym]").forEach(el => {
+      const s = (el.getAttribute("data-sym") || "").toUpperCase();
+      if (s) set.add(s);
+    });
+    return [...set];
+  }
+
+  // apply a quote to every element bound to that symbol
+  function applyQuote(sym, q) {
+    const prev = lastShown.get(sym);
+    const changed = prev != null && q.price != null && q.price !== prev;
+    const dir = q.price > prev ? "up" : q.price < prev ? "down" : "flat";
+
+    // price elements
+    document.querySelectorAll(`.live-price[data-sym="${sym}"]`).forEach(el => {
+      el.textContent = fmtPrice(q.price);
+      // steady-state directional color from pct vs prev close
+      el.classList.remove("live-up", "live-down", "live-flat");
+      el.classList.add(q.pct > 0 ? "live-up" : q.pct < 0 ? "live-down" : "live-flat");
+      // flash on actual tick-to-tick change
+      if (changed) {
+        el.classList.remove("flash-up", "flash-down");
+        void el.offsetWidth;                       // restart the animation
+        el.classList.add(dir === "up" ? "flash-up" : "flash-down");
+      }
+    });
+
+    // percent elements
+    document.querySelectorAll(`.live-pct[data-sym="${sym}"]`).forEach(el => {
+      el.textContent = fmtPct(q.pct);
+      el.classList.remove("live-up", "live-down", "live-flat");
+      el.classList.add(q.pct > 0 ? "live-up" : q.pct < 0 ? "live-down" : "live-flat");
+    });
+
+    if (q.price != null) lastShown.set(sym, q.price);
+    return changed;
+  }
+
+  function pulseHeartbeats() {
+    document.querySelectorAll(".live-heartbeat").forEach(hb => {
+      hb.classList.remove("pulsing");
+      void hb.offsetWidth;
+      hb.classList.add("pulsing");
+      const t = hb.querySelector("[data-hb-time]");
+      if (t) t.textContent = "just now";
+    });
+  }
+
+  let pollTimer = null;
+
+  async function poll() {
+    const syms = pageSymbols();
+    if (!syms.length) return;
+    try {
+      const r = await fetch(`${LP_API}/api/live-prices?symbols=${encodeURIComponent(syms.join(","))}`);
+      if (!r.ok) return;
+      const data = await r.json();
+      const quotes = data.symbols || {};
+      let anyChange = false;
+      for (const sym of syms) {
+        const q = quotes[sym];
+        if (q) anyChange = applyQuote(sym, q) || anyChange;
+      }
+      if (anyChange) pulseHeartbeats();
+    } catch (e) {
+      // network blip — keep last-shown values, try again next tick
+    }
+  }
+
+  // expose so the watchlist loader can prime/refresh after it renders new cards
+  window.LivePrices = {
+    poll,
+    // call after you re-render cards so new [data-sym] elements get populated immediately
+    refresh() { poll(); },
+    start() {
+      if (pollTimer) return;
+      poll();                                       // prime immediately
+      pollTimer = setInterval(poll, POLL_MS);
+    },
+    stop() { if (pollTimer) { clearInterval(pollTimer); pollTimer = null; } },
+  };
+
+  // auto-start once DOM is ready
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", () => window.LivePrices.start());
+  } else {
+    window.LivePrices.start();
+  }
+})();
+</script>
 
 </body>
 </html>

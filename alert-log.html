@@ -161,6 +161,43 @@
       </div>
     </div>
 
+<!-- ── Watchlist Scorecard: today's live + full history ── -->
+<div class="wl-board" id="wlBoard">
+  <div class="tr-board-head">
+    <span class="tr-board-title">🎯 Watchlist Scorecard</span>
+    <span class="tr-live"><span class="tr-live-dot"></span>live</span>
+  </div>
+  <p class="tr-board-sub">Each session we flag names that ran and held into the close. Here's how those picks did the next session — "stayed active" means a big move either direction; "+3%" is an upside hit.</p>
+  <div id="wlToday"><div class="tr-col-thin">Loading today's scorecard…</div></div>
+  <div class="wl-history-head">Past sessions</div>
+  <div id="wlHistory"><div class="tr-col-thin">Loading history…</div></div>
+</div>
+
+<style>
+  .wl-board { background: rgba(18,24,38,0.88); border: 1px solid rgba(255,255,255,0.06); border-radius: 14px; padding: 16px 18px; margin-bottom: 18px; }
+  .wl-day { border: 1px solid rgba(255,255,255,0.05); border-radius: 10px; margin-bottom: 10px; overflow: hidden; }
+  .wl-day-head { display: flex; align-items: center; gap: 8px; padding: 9px 12px; background: rgba(0,0,0,0.18); flex-wrap: wrap; }
+  .wl-day-date { font-size: 0.78rem; font-weight: 700; color: #e6edf3; }
+  .wl-day-arrow { color: rgba(255,255,255,0.3); font-size: 0.7rem; }
+  .wl-day-pooled { margin-left: auto; font-size: 0.68rem; color: rgba(255,255,255,0.4); font-variant-numeric: tabular-nums; }
+  .wl-day-pooled b { color: #4ade80; }
+  .wl-names { padding: 4px 0; }
+  .wl-name { display: grid; grid-template-columns: 1fr 70px 90px 24px; align-items: center; gap: 6px; padding: 6px 12px; font-size: 0.76rem; }
+  .wl-name + .wl-name { border-top: 1px solid rgba(255,255,255,0.03); }
+  .wl-name-sym { font-weight: 700; color: #e6edf3; }
+  .wl-name-sec { font-size: 0.62rem; color: rgba(255,255,255,0.25); margin-left: 5px; font-weight: 400; }
+  .wl-name-move { font-variant-numeric: tabular-nums; font-weight: 700; text-align: right; }
+  .wl-name-tag { font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.03em; text-align: right; }
+  .wl-name-res { text-align: center; font-size: 0.82rem; }
+  .wl-today-card { border: 1px solid rgba(96,165,250,0.18); background: rgba(96,165,250,0.03); border-radius: 10px; margin-bottom: 14px; overflow: hidden; }
+  .wl-history-head { font-size: 0.66rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: rgba(255,255,255,0.3); margin: 16px 0 10px; }
+  @media (max-width: 640px) {
+    .wl-name { grid-template-columns: 1fr 58px 24px; }
+    .wl-name-tag { display: none; }
+  }
+</style>
+
+
     <!-- Toggles row -->
     <div class="log-toggles">
       <div class="segmented segmented-small" id="logToggle" role="tablist">
@@ -395,6 +432,70 @@
       document.querySelectorAll("#versionToggle .segmented-btn").forEach(b => b.classList.toggle("segmented-on", b.dataset.value === logVersion));
       renderLog();
     });
+
+    (function(){
+  const WL_API = "https://api.stockjelli.com";
+
+  function fmtDate(d){ try { return new Date(d+"T12:00:00Z").toLocaleDateString("en-US",{month:"short",day:"numeric"}); } catch { return d; } }
+
+  function nameRow(n){
+    const mv = n.movePct != null ? Number(n.movePct) : null;
+    const moveStr = mv != null ? `${mv>=0?"+":""}${mv.toFixed(1)}%` : "—";
+    const moveColor = mv == null ? "rgba(255,255,255,0.3)" : mv > 0 ? "#4ade80" : mv < 0 ? "#f87171" : "rgba(255,255,255,0.4)";
+    const active = !!n.stayedActive;
+    const tag = active
+      ? `<span class="wl-name-tag" style="color:#4ade80">stayed active</span>`
+      : `<span class="wl-name-tag" style="color:rgba(255,255,255,0.3)">quiet</span>`;
+    const res = !n.resolved ? "⏳" : active ? "✅" : "·";
+    const sec = n.sector ? `<span class="wl-name-sec">${n.sector}</span>` : "";
+    return `<div class="wl-name">
+      <span class="wl-name-sym">${n.symbol}${sec}</span>
+      <span class="wl-name-move" style="color:${moveColor}">${moveStr}</span>
+      ${tag}
+      <span class="wl-name-res">${res}</span>
+    </div>`;
+  }
+
+  function dayBlock(day, isToday){
+    const p = day.pooled || {};
+    const pooled = p.total
+      ? `<b>${p.stayedActiveCount}/${p.total}</b> stayed active · ${p.hit3Count}/${p.total} hit +3%`
+      : "no picks";
+    const label = isToday
+      ? `<span class="wl-day-date">${fmtDate(day.scoredDate)}'s picks</span><span class="wl-day-arrow">→ today, live</span>`
+      : `<span class="wl-day-date">${fmtDate(day.scoredDate)}</span><span class="wl-day-arrow">→ ${fmtDate(day.resolvedDate)}</span>`;
+    return `<div class="${isToday ? 'wl-today-card' : 'wl-day'}">
+      <div class="wl-day-head">${label}<span class="wl-day-pooled">${pooled}</span></div>
+      <div class="wl-names">${(day.names||[]).map(nameRow).join("") || '<div class="tr-col-thin">No names flagged.</div>'}</div>
+    </div>`;
+  }
+
+  async function loadToday(){
+    try {
+      const r = await fetch(`${WL_API}/api/watchlist-scorecard?asset=stocks`);
+      const d = await r.json();
+      const el = document.getElementById("wlToday");
+      if (!d.names || !d.names.length){ el.innerHTML = `<div class="tr-col-thin">No names flagged at the last close.</div>`; return; }
+      // shape today's scorecard into the same dayBlock format
+      el.innerHTML = dayBlock({ scoredDate: d.scoredDate, resolvedDate: d.today, pooled: d.pooled, names: d.names }, true);
+    } catch(e){ document.getElementById("wlToday").innerHTML = `<div class="tr-col-thin">Couldn't load today's scorecard.</div>`; }
+  }
+
+  async function loadHistory(){
+    try {
+      const r = await fetch(`${WL_API}/api/watchlist-history?asset=stocks`);
+      const d = await r.json();
+      const el = document.getElementById("wlHistory");
+      // skip the most recent day if it's the same as today's live scoredDate (avoid dup)
+      const days = (d.days||[]);
+      if (!days.length){ el.innerHTML = `<div class="tr-col-thin">No resolved history yet.</div>`; return; }
+      el.innerHTML = days.map(day => dayBlock(day, false)).join("");
+    } catch(e){ document.getElementById("wlHistory").innerHTML = `<div class="tr-col-thin">Couldn't load history.</div>`; }
+  }
+
+  loadToday();
+  loadHistory();
+})();
 
     fetchLog();
   </script>

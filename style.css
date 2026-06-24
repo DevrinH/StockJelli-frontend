@@ -5644,3 +5644,47 @@ tr.sj-alerted:hover {
   box-shadow: none !important;
 }
 .feat-frow-quiet .feat-pct { color: rgba(255,255,255,0.4); }
+
+/* ============================================================
+   WATCHLIST + HEATMAP WIDTH PARITY — append to the VERY END.
+   Forces #hm-row to be ONE bordered box at the same width as
+   #tw-watchlist, on every screen. Kills the inner-card inset.
+   ============================================================ */
+   #tw-watchlist,
+   #hm-row {
+     width: 82%;
+     max-width: 1400px;
+     margin-left: auto;
+     margin-right: auto;
+     box-sizing: border-box;
+   }
+   @media (max-width: 1200px) {
+     #tw-watchlist, #hm-row { width: 72%; }
+   }
+   @media (max-width: 900px) {
+     #tw-watchlist, #hm-row { width: 92%; }
+   }
+   
+   /* Make #hm-row a single bordered box exactly like #tw-watchlist */
+   #hm-row {
+     background: #0e131c;
+     border: 1px solid #1f2937;
+     border-radius: 16px;
+   }
+   /* Strip the inner cards' own frame so they fill edge-to-edge */
+   #hm-row .hm-heat,
+   #hm-row .hm-log {
+     background: transparent !important;
+     border: none !important;
+     border-radius: 0 !important;
+   }
+   /* When stacked (mobile/tablet), divide the two with a line instead
+      of two separate boxes */
+   @media (max-width: 880px) {
+     #hm-row .hm-grid { grid-template-columns: 1fr; }
+     #hm-row .hm-log { border-top: 1px solid #1f2937 !important; }
+   }
+   /* On desktop two-column, divide with a vertical line */
+   @media (min-width: 881px) {
+     #hm-row .hm-log { border-left: 1px solid #1f2937 !important; }
+   }

@@ -409,19 +409,26 @@
       </span>
     </div>
 
-    <div class="header-right">
-      <button class="header-login-btn" id="headerLoginBtn" type="button">Log in</button>
-      <button class="menu-btn" id="menuBtn" ...>...</button>
-    </div>
- 
+<!-- indices: middle zone, direct child of header-inner-v3 -->
+<div class="header-indices market-indices">
+  <span id="idxLeft" class="idx">
+    <span id="idxLeftLabel">NASDAQ</span>
+    <span id="idxLeftValue" class="idx-value up">+1.24%</span>
+  </span>
+  <span class="divider">|</span>
+  <span id="idxRight" class="idx">
+    <span id="idxRightLabel">S&P 500</span>
+    <span id="idxRightValue" class="idx-value down">-0.31%</span>
+  </span>
+</div>
 
- 
-      <button class="header-login-btn" id="headerLoginBtn" type="button">Log in</button>
-      <button class="menu-btn" id="menuBtn" aria-label="Open navigation menu">
-        <span></span><span></span><span></span>
-      </button>
-    </div>
-  </div>
+<div class="header-right">
+  <button class="header-login-btn" id="headerLoginBtn" type="button">Log in</button>
+  <button class="menu-btn" id="menuBtn" aria-label="Open navigation menu">
+    <span></span><span></span><span></span>
+  </button>
+</div>
+</div>
 </header>
  
 <!-- ===== TIER 2: sticky subheader (the toggles) ===== -->
@@ -852,9 +859,10 @@
 #tw-watchlist .tw-pop-x{position:absolute;top:9px;right:11px;background:none;border:none;color:var(--tw-dim);font-size:19px;cursor:pointer;line-height:1;}
 
 @media (max-width:560px){
-  #tw-watchlist{padding:18px 14px 12px;}
-  #tw-watchlist .tw-head{flex-direction:column;}
-  #tw-watchlist .tw-pooled-pct{font-size:26px;}
+  #hm-row{padding:0 14px;}
+  #hm-row .hm-heat,#hm-row .hm-log{padding:16px 14px 12px;}
+  #hm-row .hm-tiles{grid-template-columns:repeat(auto-fill,minmax(128px,1fr));}
+  #hm-row .hm-tile-pct{font-size:21px;}
 }
 @media (prefers-reduced-motion:reduce){
   #tw-watchlist .tw-card{transition:none;}

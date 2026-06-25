@@ -5688,3 +5688,49 @@ tr.sj-alerted:hover {
    @media (min-width: 881px) {
      #hm-row .hm-log { border-left: 1px solid #1f2937 !important; }
    }
+
+
+
+
+   /* ============================================================
+   FORCE WATCHLIST + HEATMAP TO IDENTICAL WIDTH — LAST RULE.
+   Nothing below this in the file. Uses body-scoped specificity
+   so it beats every earlier #tw-watchlist / #hm-row rule.
+   ============================================================ */
+body #tw-watchlist,
+body #hm-row {
+  width: 82% !important;
+  max-width: 1400px !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+  box-sizing: border-box !important;
+}
+@media (max-width: 1200px) {
+  body #tw-watchlist,
+  body #hm-row { width: 72% !important; }
+}
+@media (max-width: 900px) {
+  body #tw-watchlist,
+  body #hm-row { width: 92% !important; }
+}
+
+/* Make #hm-row its OWN bordered box (like the watchlist) so its
+   visible edge is at the 92% line, not inset by inner cards */
+body #hm-row {
+  background: #0e131c !important;
+  border: 1px solid #1f2937 !important;
+  border-radius: 16px !important;
+}
+body #hm-row .hm-grid { gap: 0 !important; }
+body #hm-row .hm-heat,
+body #hm-row .hm-log {
+  background: transparent !important;
+  border: none !important;
+  border-radius: 0 !important;
+}
+@media (max-width: 880px) {
+  body #hm-row .hm-grid { grid-template-columns: 1fr !important; }
+  body #hm-row .hm-log { border-top: 1px solid #1f2937 !important; }
+}
